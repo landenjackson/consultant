@@ -176,7 +176,7 @@
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: 'minimax-m2.5',
+                        model: 'MiniMax-M3',
                         messages: [
                             { role: 'system', content: 'You are Consultant, a helpful AI assistant. Be concise and helpful.' },
                             { role: 'user', content: message }
@@ -185,12 +185,13 @@
                 });
                 
                 const data = await response.json();
+                console.log('API Response:', data);
                 
                 // Remove thinking message
                 thinkingMsg.remove();
                 
                 // Add assistant response
-                const assistantMessage = data.choices?.[0]?.message?.content || 'Sorry, I could not get a response.';
+                const assistantMessage = data?.choices?.[0]?.message?.content || 'Sorry, I could not get a response.';
                 addMessage(assistantMessage, 'assistant');
                 
             } catch (error) {
