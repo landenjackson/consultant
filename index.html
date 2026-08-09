@@ -182,22 +182,26 @@
                             { role: 'user', content: message }
                         ]
                     })
+                }).catch(err => {
+                    console.error('Fetch error:', err);
+                    throw new Error('Network error: ' + err.message);
                 });
                 
+                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('API Response:', data);
+                console.log('API Response:', JSON.stringify(data));
                 
                 // Remove thinking message
                 thinkingMsg.remove();
                 
                 // Add assistant response
-                const assistantMessage = data?.choices?.[0]?.message?.content || 'Sorry, I could not get a response.';
+                const assistantMessage = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || 'Sorry, I could not get a response.';
                 addMessage(assistantMessage, 'assistant');
                 
             } catch (error) {
                 console.error('Error:', error);
                 thinkingMsg.remove();
-                addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+                addMessage('Error: ' + error.message, 'assistant');
             }
             
             // Re-enable input
