@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultant - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 20px;
+            background: linear-gradient(90deg, #39FF14, #00FF87);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #0a0a0a;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            color: #0a0a0a;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: #39FF14;
+            color: #0a0a0a;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.assistant {
+            align-self: flex-start;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.thinking {
+            align-self: flex-start;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .input-container {
+            padding: 15px;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #333;
+            border-radius: 24px;
+            background: #0a0a0a;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .input-container input:focus {
+            border-color: #39FF14;
+        }
+        
+        .input-container button {
+            padding: 12px 24px;
+            background: #39FF14;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .input-container button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .api-note {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Consultant</h1>
+        <p>Your AI Assistant</p>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="message assistant">
+            Hello! I'm Consultant, your AI assistant. How can I help you today?
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+        <button id="sendButton">Send</button>
+    </div>
+    
+    <div class="api-note">Powered by MiniMax</div>
+    
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        // API Configuration - UPDATE THESE
+        const API_KEY = 'YOUR_API_KEY_HERE';
+        const API_URL = 'https://api.myclaw.ai/v1/chat/completions';
+        
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Show thinking
+            const thinkingMsg = addMessage('Thinking...', 'thinking');
+            
+            // Disable input while processing
+            sendButton.disabled = true;
+            userInput.disabled = true;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'minimax-m2.5',
+                        messages: [
+                            { role: 'system', content: 'You are Consultant, a helpful AI assistant. Be concise and helpful.' },
+                            { role: 'user', content: message }
+                        ]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remove thinking message
+                thinkingMsg.remove();
+                
+                // Add assistant response
+                const assistantMessage = data.choices?.[0]?.message?.content || 'Sorry, I could not get a response.';
+                addMessage(assistantMessage, 'assistant');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                thinkingMsg.remove();
+                addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+            }
+            
+            // Re-enable input
+            sendButton.disabled = false;
+            userInput.disabled = false;
+            userInput.focus();
+        }
+        
+        function addMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return messageDiv;
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Auto-focus input
+        userInput.focus();
+    </script>
+</body>
+</html>
