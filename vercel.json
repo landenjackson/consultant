@@ -1,8 +1,8 @@
 {
-  "framework": null,
+  "version": 2,
   "builds": [
     {
-      "src": "api/chat.js",
+      "src": "/api/chat.js",
       "use": "@vercel/node@3.0.25"
     }
   ],
