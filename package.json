@@ -1,0 +1,11 @@
+{
+  "name": "consultant",
+  "version": "1.0.0",
+  "description": "Consultant Telegram Mini App",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
