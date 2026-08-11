@@ -12,20 +12,48 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const API_KEY = process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1';
-  const API_URL = 'https://api.myclaw.ai/v1/chat/completions';
+  // Google Gemini API configuration
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCG4wF5eA3i6Ed3N_HsdDCavWvlKzuVYj8';
+  const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   try {
-    const response = await fetch(API_URL, {
+    const { messages } = req.body;
+    
+    // Convert messages to Gemini format
+    const contents = messages.map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048
+        }
+      })
     });
 
     const data = await response.json();
+    
+    // Extract the response text from Gemini format
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      const reply = data.candidates[0].content.parts[0].text;
+      return res.status(200).json({
+        choices: [{
+          message: {
+            role: 'assistant',
+            content: reply
+          }
+        }]
+      });
+    }
+    
     return res.status(200).json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
