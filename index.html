@@ -142,23 +142,28 @@
         <button id="sendButton">Send</button>
     </div>
     
-    <div class="api-note">Powered by MiniMax</div>
-    
+    <div class="api-note">Powered by Gemini 2.0 Flash</div>
+
     <script>
         const chatContainer = document.getElementById('chatContainer');
         const userInput = document.getElementById('userInput');
         const sendButton = document.getElementById('sendButton');
         
-        // API Configuration - UPDATE THESE
-        const API_KEY = ''; // No longer needed in client
+        // API Configuration
         const API_URL = '/api/chat';
         
+        // Chat History (for Multi-turn Interaction)
+        let chatHistory = [
+            { role: 'system', content: 'You are Consultant, a helpful AI assistant. Be concise and professional.' }
+        ];
+
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
             
-            // Add user message
+            // Add user message to UI and history
             addMessage(message, 'user');
+            chatHistory.push({ role: 'user', content: message });
             userInput.value = '';
             
             // Show thinking
@@ -175,27 +180,27 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'minimax-m3',
-                        messages: [
-                            { role: 'system', content: 'You are Consultant, a helpful AI assistant. Be concise and helpful.' },
-                            { role: 'user', content: message }
-                        ]
+                        model: 'gemini-2.0-flash', // Using latest Gemini model
+                        messages: chatHistory
                     })
-                }).catch(err => {
-                    console.error('Fetch error:', err);
-                    throw new Error('Network error: ' + err.message);
                 });
                 
-                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('API Response:', JSON.stringify(data));
                 
                 // Remove thinking message
                 thinkingMsg.remove();
                 
-                // Add assistant response
-                const assistantMessage = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || 'Sorry, I could not get a response.';
+                // Extract response using standard format
+                const assistantMessage = data?.choices?.[0]?.message?.content || 'No response from AI.';
+                
+                // Add assistant response to UI and history
                 addMessage(assistantMessage, 'assistant');
+                chatHistory.push({ role: 'assistant', content: assistantMessage });
+                
+                // Manage Context Caching (keep last 10 messages to save tokens)
+                if (chatHistory.length > 11) {
+                    chatHistory = [chatHistory[0], ...chatHistory.slice(-10)];
+                }
                 
             } catch (error) {
                 console.error('Error:', error);
