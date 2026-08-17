@@ -1,14 +1,17 @@
 {
   "name": "consultant",
-  "version": "1.0.0",
-  "description": "Consultant Telegram Mini App",
-  "main": "index.js",
+  "version": "1.1.0",
+  "description": "Consultant Telegram Mini App - Gemini Powered",
+  "main": "api/chat.js",
+  "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve public"
   },
-  "dependencies": {},
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
   "devDependencies": {}
 }
