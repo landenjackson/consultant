@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   // Google Gemini API configuration
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCG4wF5eA3i6Ed3N_HsdDCavWvlKzuVYj8';
-  const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
   try {
     const { messages } = req.body;

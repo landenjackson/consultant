@@ -142,7 +142,7 @@
         <button id="sendButton">Send</button>
     </div>
     
-    <div class="api-note">Powered by Gemini 2.0 Flash</div>
+    <div class="api-note">Powered by Gemini 3.6 Flash</div>
 
     <script>
         const chatContainer = document.getElementById('chatContainer');
@@ -180,7 +180,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gemini-2.0-flash', // Using latest Gemini model
+                        model: 'gemini-3.6-flash', // Using latest Gemini model
                         messages: chatHistory
                     })
                 });
@@ -190,8 +190,13 @@
                 // Remove thinking message
                 thinkingMsg.remove();
                 
-                // Extract response using standard format
-                const assistantMessage = data?.choices?.[0]?.message?.content || 'No response from AI.';
+                // Handle new Gemini 3.6 format if necessary
+                let assistantMessage = 'No response from AI.';
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    assistantMessage = data.choices[0].message.content;
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    assistantMessage = data.candidates[0].content.parts[0].text;
+                }
                 
                 // Add assistant response to UI and history
                 addMessage(assistantMessage, 'assistant');
