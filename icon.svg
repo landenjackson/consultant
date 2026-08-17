@@ -18,7 +18,7 @@
   
   <text x="256" y="310" font-family="Arial" font-size="18" fill="#888888" text-anchor="middle">Consults. Edits. Drafts.</text>
   
-  <text x="256" y="340" font-family="Arial" font-size="18" fill="#888888" text-anchor="middle">Powered by MiniMax</text>
+  <text x="256" y="340" font-family="Arial" font-size="18" fill="#888888" text-anchor="middle">Powered by Gemini 2.0</text>
   
   <rect x="120" y="400" width="272" height="4" fill="url(#accentGrad)"/>
   

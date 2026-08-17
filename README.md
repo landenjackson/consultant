@@ -1,6 +1,6 @@
 # Consultant - Telegram Mini App
 
-Your AI assistant powered by MiniMax-M3.
+Your AI assistant powered by Gemini 2.0 Flash.
 
 ## Setup
 
@@ -49,7 +49,7 @@ const API_URL = 'https://api.myclaw.ai/v1/chat/completions';
 ## Features
 
 - Chat interface
-- Powered by MiniMax-M3
+- Powered by Gemini 2.0 Flash
 - Optimized for Telegram mobile
 
 ---
