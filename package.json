@@ -11,6 +11,7 @@
     "start": "npx serve public"
   },
   "dependencies": {
+    "@base44/sdk": "^0.8.43",
     "cors": "^2.8.6",
     "express": "^4.22.2",
     "node-fetch": "^3.3.2"
