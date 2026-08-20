@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   }
 
   // Configuration for 2026 Gemini 3.6 Flash
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '«redacted:AIza…»';
+  // Read MYCLAW_API_KEY if GEMINI_API_KEY is not set or is invalid
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.MYCLAW_API_KEY;
   const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
   try {
