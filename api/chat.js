@@ -47,19 +47,20 @@ CRITICAL TONE & RESPONSE DIRECTIVES:
     ];
 
     // Use the Base44 SDK to generate chat completions directly via your Base44 App configuration
-    const completion = await base44.chat.completions.create({
-      model: "gemini-3.6-flash", // Statically routing to Gemini 3.6 Flash via the SDK
-      messages: formattedMessages,
+    // Correct method according to SDK types is integrations.Core.InvokeLLM
+    const responseText = await base44.integrations.Core.InvokeLLM({
+      model: "gemini_3_flash", // Matches valid option from SDK validation error
+      prompt: formattedMessages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n'), // Matches 'prompt' field requirement
       temperature: 0.7,
       max_tokens: 2048
     });
 
-    if (completion && completion.choices && completion.choices[0]) {
+    if (responseText) {
       return res.status(200).json({
         choices: [{
           message: {
             role: 'assistant',
-            content: completion.choices[0].message.content
+            content: typeof responseText === 'string' ? responseText : JSON.stringify(responseText)
           }
         }]
       });
