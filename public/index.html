@@ -23,7 +23,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: #000000;
+            background: #111111; /* Changed to dark gray for easier reading */
             color: #ffffff;
             height: 100vh;
             display: flex;
@@ -33,8 +33,8 @@
         /* Sidebar */
         .sidebar {
             width: 260px;
-            background: #000000;
-            border-right: 1px solid #1a1a1a;
+            background: #181818; /* Dark gray sidebar */
+            border-right: 1px solid #222;
             display: flex;
             flex-direction: column;
             z-index: 50;
@@ -114,7 +114,7 @@
             font-size: 13px;
             color: #39FF14;
             z-index: 10;
-            background: rgba(0,0,0,0.5);
+            background: rgba(17,17,17,0.5); /* Match dark gray */
             backdrop-filter: blur(5px);
         }
 
@@ -130,7 +130,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #000000;
+            background: #111111; /* Dark gray content background */
             overflow: hidden;
         }
 
@@ -203,8 +203,8 @@
         }
 
         .asset-card {
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: #181818; /* Dark gray asset cards */
+            border: 1px solid #333;
             border-radius: 12px;
             padding: 20px;
             transition: all 0.2s;
@@ -238,13 +238,14 @@
             width: 100%;
             display: flex;
             justify-content: center;
+            background: linear-gradient(transparent, #111111 20%); /* Smooth dark gray gradient */
         }
 
         .input-box {
             width: 100%;
             max-width: 800px;
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: #181818; /* Dark gray input box */
+            border: 1px solid #333;
             border-radius: 24px;
             padding: 8px 16px;
             display: flex;
@@ -280,7 +281,7 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(17,17,17,0.95); /* Match dark gray */
             z-index: 1000;
             display: none;
             justify-content: center;
@@ -289,8 +290,8 @@
         }
 
         .modal-content {
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: #181818; /* Dark gray modal card */
+            border: 1px solid #333;
             border-radius: 24px;
             padding: 48px;
             max-width: 960px;
@@ -317,7 +318,8 @@
         }
 
         .plan-card {
-            border: 1px solid #222;
+            border: 1px solid #333;
+            background: #111111; /* Match background */
             border-radius: 16px;
             padding: 32px;
             text-align: left;
