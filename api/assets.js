@@ -18,21 +18,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    // GET: List all FileAssets (optionally filtered by workspace)
+    // GET: List all FileAssets
     if (req.method === 'GET') {
       const { workspace } = req.query || {};
       let assets = [];
       
       if (base44.entities && base44.entities.FileAsset) {
-        assets = await base44.entities.FileAsset.list({
-          limit: 50,
-          sort: { created_at: -1 }
-        });
+        assets = await base44.entities.FileAsset.list();
       }
 
       // Filter in-memory if workspace is specified and not default
       if (workspace && workspace !== 'default' && Array.isArray(assets)) {
-        assets = assets.filter(a => a.workspace === workspace);
+        assets = assets.filter(a => a.notes === workspace || (a.name && a.name.includes(workspace)));
       }
 
       return res.status(200).json({ assets: assets || [] });
@@ -48,29 +45,19 @@ export default async function handler(req, res) {
 
       const assetName = name || title || `Briefing_${Date.now()}`;
 
+      // Schema requires name, file_url, and optional notes/kind
+      const payload = {
+        name: assetName,
+        file_url: `data:text/plain;charset=utf-8,${encodeURIComponent(content)}`,
+        notes: workspace,
+        kind: 'other'
+      };
+
       let createdAsset = null;
       if (base44.entities && base44.entities.FileAsset) {
-        createdAsset = await base44.entities.FileAsset.create({
-          name: assetName,
-          title: assetName,
-          content: content,
-          workspace: workspace,
-          metrics_csv: metrics_csv || '',
-          type: type,
-          created_at: new Date().toISOString()
-        });
+        createdAsset = await base44.entities.FileAsset.create(payload);
       } else {
-        // Fallback response if entity schema is slightly different
-        createdAsset = {
-          id: `local_${Date.now()}`,
-          name: assetName,
-          title: assetName,
-          content: content,
-          workspace: workspace,
-          metrics_csv: metrics_csv,
-          type: type,
-          created_at: new Date().toISOString()
-        };
+        createdAsset = { id: `local_${Date.now()}`, ...payload };
       }
 
       return res.status(201).json({ asset: createdAsset });
