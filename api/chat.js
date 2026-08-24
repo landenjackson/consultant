@@ -1,6 +1,7 @@
 import { createClient } from '@base44/sdk';
+import { tavily } from '@tavily/core';
 
-// Initialize the Base44 SDK client
+// Initialize Base44 SDK client
 const base44 = createClient({
   appId: "6a847abd94e877b8b9556a57",
   headers: {
@@ -8,7 +9,10 @@ const base44 = createClient({
   }
 });
 
-// High-Density, Rigorous Business Persona Definitions
+// Initialize Tavily Search client with verified key
+const tvly = tavily({ apiKey: "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" });
+
+// High-Density, Rigorous Business Persona Definitions with Live Web Grounding
 const STRATEGY_LENSES = {
   standard: `You are Consultant, a Surgical Executive Partner and Chief of Staff. You deliver institutional-grade business telemetry, rigorous capital allocation logic, and uncompromising operational analysis.
 
@@ -27,7 +31,7 @@ CORE OPERATIONAL INVARIANTS:
 
 CORE OPERATIONAL INVARIANTS:
 1. ZERO FLUFF: Immediately output the audit without preamble.
-2. AUDIT RIGOR: Evaluate copy, pipelines, or systems for trust decay, autonomy vulnerabilities, and brand erosion.
+2. AUDIT RIGOR: Evaluate copy, pipelines, or systems for trust decay, autonomy vulnerabilities, and brand erosion. Ground audits in verified real-time market facts.
 3. MANDATORY QUANTITATIVE CALL-OUTS: You MUST output these exact metrics on separate lines:
    [TRUST_ALIGNMENT_INDEX] = [Score 0-100]
    [AUTONOMY_RISK_TIER] = [LOW | MODERATE | CRITICAL]
@@ -88,7 +92,30 @@ export default async function handler(req, res) {
   try {
     const { messages, lens = 'standard', stream = false } = req.body;
 
-    const systemPrompt = STRATEGY_LENSES[lens] || STRATEGY_LENSES.standard;
+    const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
+    
+    // Check if query needs live intelligence (contains company names, markets, audit signals, or search triggers)
+    let liveWebContext = '';
+    const shouldSearch = userMessage.length > 5 && !userMessage.toLowerCase().startsWith('verify default model');
+
+    if (shouldSearch) {
+      try {
+        const searchRes = await tvly.search(userMessage, {
+          maxResults: 3,
+          searchDepth: "basic"
+        });
+
+        if (searchRes && searchRes.results && searchRes.results.length > 0) {
+          liveWebContext = '\n\n[LIVE TRADE & MARKET SIGNALS VIA TAVILY]:\n' + 
+            searchRes.results.map(r => `• Title: ${r.title}\n  Source: ${r.url}\n  Context: ${r.content.substring(0, 300)}`).join('\n\n');
+        }
+      } catch (searchErr) {
+        console.warn('Tavily search skipped or failed:', searchErr.message);
+      }
+    }
+
+    const systemPrompt = (STRATEGY_LENSES[lens] || STRATEGY_LENSES.standard) + 
+      (liveWebContext ? `\n\nINCORPORATE THIS VERIFIED LIVE CONTEXT INTO YOUR TELEMETRY AUDIT:${liveWebContext}` : '');
 
     const formattedMessages = [
       { role: 'system', content: systemPrompt },
