@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import handler from './api/chat.js';
+import chatHandler from './api/chat.js';
+import assetsHandler from './api/assets.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -18,7 +19,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Express handler with full streaming support
 app.post('/api/chat', async (req, res) => {
-    await handler(req, res);
+    await chatHandler(req, res);
+});
+
+// FileAsset Entity Handler for Base44 Cloud Data
+app.all('/api/assets', async (req, res) => {
+    await assetsHandler(req, res);
 });
 
 // Fallback to index.html for PWA routing

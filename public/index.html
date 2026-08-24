@@ -1061,48 +1061,87 @@
             document.body.removeChild(link);
         }
 
-        // Vault LocalStorage Logic
-        function getVaultItems() {
-            try {
-                const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
-                const ws = document.getElementById('clientWorkspace').value;
-                return all.filter(i => !i.workspace || i.workspace === ws || ws === 'default');
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function updateVaultCount() {
-            const count = getVaultItems().length;
-            document.getElementById('vaultCount').textContent = count;
-        }
-
-        function saveToVault(idx) {
+        // Base44 Cloud FileAsset & LocalStorage Sync
+        async function saveToVault(idx) {
             const item = conversationHistory[idx] || conversationHistory[conversationHistory.length - 1];
             if (!item || item.role !== 'assistant') return;
 
-            const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             const ws = document.getElementById('clientWorkspace').value;
             const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 40) || "Strategic Briefing";
-            
-            all.unshift({
+            const csvMetrics = extractMetricsCSV(item.content);
+
+            // 1. Save to local fallback first
+            const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            const newAsset = {
                 id: Date.now(),
                 workspace: ws,
                 title: title,
                 content: item.content,
+                metrics_csv: csvMetrics,
                 date: new Date().toLocaleString()
-            });
+            };
+            all.unshift(newAsset);
             localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 100)));
             updateVaultCount();
-            alert("Briefing saved to workspace Vault.");
+
+            // 2. Sync to Base44 FileAsset Entity
+            try {
+                const res = await fetch('/api/assets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: title,
+                        title: title,
+                        content: item.content,
+                        workspace: ws,
+                        metrics_csv: csvMetrics,
+                        type: 'telemetry_brief'
+                    })
+                });
+                if (res.ok) {
+                    alert("Briefing synchronized to Base44 FileAsset Data & Workspace Vault.");
+                } else {
+                    alert("Saved locally to Workspace Vault.");
+                }
+            } catch (err) {
+                alert("Saved locally to Workspace Vault.");
+            }
         }
 
-        function renderVault() {
+        async function renderVault() {
             const grid = document.getElementById('vaultGrid');
-            grid.innerHTML = '';
-            const items = getVaultItems();
+            grid.innerHTML = '<p style="color:#777; grid-column: 1/-1;">Loading FileAssets from Base44...</p>';
+            
+            const ws = document.getElementById('clientWorkspace').value;
+            let items = [];
+
+            // Try pulling from Base44 FileAsset backend
+            try {
+                const res = await fetch(`/api/assets?workspace=${encodeURIComponent(ws)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.assets && data.assets.length > 0) {
+                        items = data.assets.map(a => ({
+                            id: a.id || a._id,
+                            title: a.title || a.name || 'Strategic Briefing',
+                            content: a.content || '',
+                            workspace: a.workspace || ws,
+                            date: a.created_at ? new Date(a.created_at).toLocaleString() : new Date().toLocaleString()
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.warn("Base44 FileAsset pull fallback to local cache", e);
+            }
+
+            // Fallback to local cache if Base44 list is empty
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#666; grid-column: 1/-1;">No saved memos in this workspace. Run a briefing and click "Save to Vault".</p>';
+                items = getVaultItems();
+            }
+
+            grid.innerHTML = '';
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="color:#666; grid-column: 1/-1;">No saved FileAssets in this workspace. Run a briefing and click "Save to Vault".</p>';
                 return;
             }
 
