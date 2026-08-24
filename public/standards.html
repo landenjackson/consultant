@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Operator's Standard | Consultant</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#111111">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #111111;
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 780px;
+            width: 100%;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #39FF14;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .header {
+            border-bottom: 1px solid #222;
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            color: #39FF14;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .pillar {
+            background: #161616;
+            border: 1px solid #282828;
+            border-left: 3px solid #39FF14;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .pillar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pillar p {
+            color: #b0b0b0;
+            font-size: 14.5px;
+            margin-bottom: 12px;
+        }
+
+        .roi-badge {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            color: #39FF14;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .telemetry-card {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+
+        .telemetry-header {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #777;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #202020;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .metric-row:last-child { border-bottom: none; }
+        .metric-name { color: #888; }
+        .metric-val { color: #39FF14; font-weight: 700; }
+
+        .footer-cta {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="nav-back">← Return to Studio</a>
+        
+        <div class="header">
+            <div class="badge">Operational Protocol</div>
+            <h1>The Operator’s Standard</h1>
+            <div class="subtitle">Precision Intelligence, Human Execution, and Zero Hallucination Risk.</div>
+        </div>
+
+        <div class="pillar">
+            <div class="pillar-title">1. Research-First Intelligence (The Discovery Engine)</div>
+            <p>We eliminate generic outbound and stale industry templates. AI aggregates live trade signals, market shifts, and competitive friction points in seconds, delivering actionable dossiers before discovery even starts.</p>
+            <div class="roi-badge">ROI: Zero wasted meetings. Strategies built on verified intelligence from minute one.</div>
+        </div>
+
+        <div class="pillar">
+            <div class="pillar-title">2. The Human-Verified Gate (The Quality Moat)</div>
+            <p>Raw AI builds skeletons; human operators provide judgment. Every model, outbound brief, and strategic roadmap passes through a dedicated human verification gate before client deployment.</p>
+            <div class="roi-badge">ROI: Complete protection against hallucination, tone drift, and brand erosion.</div>
+        </div>
+
+        <div class="pillar">
+            <div class="pillar-title">3. Isolated Data Sovereignty (Enterprise Security)</div>
+            <p>Client strategy and proprietary numbers remain locked. We enforce private, isolated model boundaries that never train public LLMs or expose confidential trade data.</p>
+            <div class="roi-badge">ROI: Institutional-grade privacy with modern computational leverage.</div>
+        </div>
+
+        <div class="telemetry-card">
+            <div class="telemetry-header">Quantitative Moat Telemetry</div>
+            <div class="metric-row">
+                <span class="metric-name">[SPEED_MULTIPLIER]</span>
+                <span class="metric-val">4.8x</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-name">[HALLUCINATION_RISK]</span>
+                <span class="metric-val">0.00</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-name">[STRATEGIC_ALIGNMENT]</span>
+                <span class="metric-val">100%</span>
+            </div>
+        </div>
+
+        <div class="footer-cta">
+            Consultant Studio • Built for Operators
+        </div>
+    </div>
+</body>
+</html>

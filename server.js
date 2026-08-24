@@ -16,18 +16,9 @@ app.use(express.json());
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Mock Vercel response object for our handler
+// Express handler with full streaming support
 app.post('/api/chat', async (req, res) => {
-    const vercelRes = {
-        status: (code) => ({
-            json: (data) => res.status(code).json(data),
-            end: () => res.status(code).end()
-        }),
-        setHeader: (name, value) => res.setHeader(name, value),
-        json: (data) => res.json(data)
-    };
-    
-    await handler(req, vercelRes);
+    await handler(req, res);
 });
 
 // Fallback to index.html for PWA routing

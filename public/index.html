@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultant</title>
+    <title>Consultant | Surgical Executive Intelligence</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#39FF14">
+    <meta name="theme-color" content="#111111">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon.svg">
@@ -23,7 +23,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: #111111; /* Changed to dark gray for easier reading */
+            background: #111111;
             color: #ffffff;
             height: 100vh;
             display: flex;
@@ -32,17 +32,16 @@
 
         /* Sidebar */
         .sidebar {
-            width: 260px;
-            background: #181818; /* Dark gray sidebar */
-            border-right: 1px solid #222;
+            width: 280px;
+            background: #181818;
+            border-right: 1px solid #242424;
             display: flex;
             flex-direction: column;
             z-index: 50;
         }
 
         .sidebar-brand {
-            padding: 24px;
-            margin-bottom: 10px;
+            padding: 20px 20px 14px;
         }
 
         .brand-name {
@@ -52,35 +51,108 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            letter-spacing: 0.5px;
         }
 
         .brand-tagline {
-            font-size: 12px;
+            font-size: 11px;
             color: #39FF14;
             margin-top: 4px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-pill {
+            background: rgba(57, 255, 20, 0.12);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Workspace Switcher */
+        .workspace-block {
+            padding: 0 16px 12px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #777;
+            margin-bottom: 6px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workspace-select {
+            width: 100%;
+            background: #121212;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .workspace-select option {
+            background: #181818;
+            color: #fff;
+        }
+
+        /* Strategy Lens Selector */
+        .lens-container {
+            padding: 0 16px 14px;
+        }
+
+        .lens-select {
+            width: 100%;
+            background: #121212;
+            border: 1px solid #333;
+            color: #39FF14;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .lens-select option {
+            background: #181818;
+            color: #fff;
         }
 
         .nav-list {
             flex: 1;
             padding: 0 12px;
+            overflow-y: auto;
         }
 
         .nav-item {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 8px;
-            font-size: 14px;
-            color: #ffffff;
+            font-size: 13.5px;
+            color: #b0b0b0;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             transition: all 0.2s;
         }
 
         .nav-item:hover {
             background: rgba(57, 255, 20, 0.05);
+            color: #fff;
         }
 
         .nav-item.active {
@@ -90,9 +162,9 @@
         }
 
         .nav-item svg {
-            width: 18px;
-            height: 18px;
-            opacity: 0.7;
+            width: 17px;
+            height: 17px;
+            opacity: 0.8;
         }
 
         .nav-item.active svg {
@@ -100,28 +172,54 @@
             stroke: #39FF14;
         }
 
+        /* Competitive Moat Card in Sidebar */
+        .moat-box {
+            margin: 12px 14px;
+            padding: 12px;
+            background: #121212;
+            border: 1px solid #282828;
+            border-radius: 10px;
+            font-size: 11.5px;
+            line-height: 1.5;
+            color: #999;
+        }
+
+        .moat-title {
+            color: #39FF14;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         /* Top Status Bar */
         .status-bar {
             position: absolute;
             top: 0;
             right: 0;
-            left: 260px;
-            padding: 12px 24px;
+            left: 280px;
+            padding: 10px 24px;
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            gap: 20px;
-            font-size: 13px;
+            gap: 18px;
+            font-size: 12.5px;
             color: #39FF14;
             z-index: 10;
-            background: rgba(17,17,17,0.5); /* Match dark gray */
-            backdrop-filter: blur(5px);
+            background: rgba(17,17,17,0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #1f1f1f;
         }
 
         .status-item {
             display: flex;
             align-items: center;
             gap: 6px;
+            font-weight: 500;
         }
 
         /* Main Area */
@@ -130,7 +228,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #111111; /* Dark gray content background */
+            background: #111111;
             overflow: hidden;
         }
 
@@ -150,65 +248,209 @@
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 100px 20px 40px;
+            padding: 85px 24px 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 16px;
+            max-width: 880px;
+            width: 100%;
+            margin: 0 auto;
         }
 
         .hero-section {
             text-align: center;
-            max-width: 600px;
-            margin-top: 40px;
+            max-width: 640px;
+            margin: 20px auto 10px;
         }
 
         .hero-avatar {
-            width: 64px;
-            height: 64px;
+            width: 52px;
+            height: 52px;
             background: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.3);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
+            margin: 0 auto 16px;
             color: #39FF14;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
         }
 
-        /* Studio Content (Files/Plans) */
-        .studio-view {
-            padding: 100px 40px 40px;
-            max-width: 1000px;
-            margin: 0 auto;
+        /* Interactive Strategy Builder / Quick Intake */
+        .intake-card {
+            background: #161616;
+            border: 1px solid #282828;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-top: 14px;
+            text-align: left;
+        }
+
+        .intake-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intake-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .intake-field select, .intake-field input {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            color: #ccc;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .btn-launch-intake {
+            background: #39FF14;
+            color: #000;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.15s;
+        }
+
+        .btn-launch-intake:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Message Bubbles */
+        .message-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .message-row.assistant {
+            justify-content: flex-start;
+        }
+
+        .message-card {
+            max-width: 88%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .message-row.user .message-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: #fff;
+        }
+
+        .message-row.assistant .message-card {
+            background: #161616;
+            border: 1px solid #292929;
+            border-left: 3px solid #39FF14;
+            color: #e5e5e5;
             width: 100%;
         }
 
+        .metric-badge {
+            display: inline-block;
+            background: rgba(57, 255, 20, 0.08);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            color: #39FF14;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin: 4px 0;
+            font-size: 13px;
+        }
+
+        .memo-actions {
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid #252525;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            background: #202020;
+            border: 1px solid #383838;
+            color: #39FF14;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #2a2a2a;
+            border-color: #39FF14;
+        }
+
+        /* Studio Views */
+        .studio-view {
+            padding: 85px 36px 36px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            overflow-y: auto;
+        }
+
         .studio-header {
-            margin-bottom: 30px;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
         .studio-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
         }
 
         .asset-card {
-            background: #181818; /* Dark gray asset cards */
-            border: 1px solid #333;
+            background: #161616;
+            border: 1px solid #2b2b2b;
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px;
             transition: all 0.2s;
             cursor: pointer;
+            position: relative;
         }
 
         .asset-card:hover {
@@ -216,41 +458,44 @@
             transform: translateY(-2px);
         }
 
-        .asset-icon {
-            color: #39FF14;
-            margin-bottom: 15px;
-        }
-
         .asset-name {
             font-weight: 600;
             margin-bottom: 6px;
-            font-size: 15px;
+            font-size: 14px;
+            color: #fff;
         }
 
         .asset-meta {
-            font-size: 12px;
-            color: #666;
+            font-size: 11.5px;
+            color: #777;
+            display: flex;
+            justify-content: space-between;
         }
 
         /* Input Container */
         .input-wrapper {
-            padding: 20px;
+            padding: 14px 20px 20px;
             width: 100%;
             display: flex;
             justify-content: center;
-            background: linear-gradient(transparent, #111111 20%); /* Smooth dark gray gradient */
+            background: linear-gradient(transparent, #111111 30%);
         }
 
         .input-box {
             width: 100%;
-            max-width: 800px;
-            background: #181818; /* Dark gray input box */
-            border: 1px solid #333;
-            border-radius: 24px;
-            padding: 8px 16px;
+            max-width: 880px;
+            background: #181818;
+            border: 1px solid #2d2d2d;
+            border-radius: 20px;
+            padding: 6px 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .input-box:focus-within {
+            border-color: #39FF14;
         }
 
         .input-box input {
@@ -258,9 +503,9 @@
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 16px;
+            font-size: 14.5px;
             outline: none;
-            padding: 10px 0;
+            padding: 8px 0;
         }
 
         .icon-btn {
@@ -273,6 +518,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
 
         .icon-btn:hover { background: rgba(57, 255, 20, 0.1); }
@@ -281,7 +527,7 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(17,17,17,0.95); /* Match dark gray */
+            background: rgba(17,17,17,0.95);
             z-index: 1000;
             display: none;
             justify-content: center;
@@ -290,11 +536,11 @@
         }
 
         .modal-content {
-            background: #181818; /* Dark gray modal card */
+            background: #181818;
             border: 1px solid #333;
-            border-radius: 24px;
-            padding: 48px;
-            max-width: 960px;
+            border-radius: 20px;
+            padding: 36px;
+            max-width: 900px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
@@ -303,25 +549,25 @@
 
         .close-modal {
             position: absolute;
-            top: 24px;
-            right: 24px;
-            color: #666;
+            top: 20px;
+            right: 20px;
+            color: #777;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 24px;
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 40px;
+            gap: 18px;
+            margin-top: 26px;
         }
 
         .plan-card {
             border: 1px solid #333;
-            background: #111111; /* Match background */
-            border-radius: 16px;
-            padding: 32px;
+            background: #111111;
+            border-radius: 14px;
+            padding: 22px;
             text-align: left;
             position: relative;
             display: flex;
@@ -333,75 +579,86 @@
             background: rgba(57, 255, 20, 0.02);
         }
 
-        .plan-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .plan-price { font-size: 36px; font-weight: 700; color: #39FF14; }
-        .plan-trial { font-size: 12px; color: #39FF14; background: rgba(57, 255, 20, 0.1); padding: 4px 10px; border-radius: 20px; display: inline-block; margin: 12px 0; }
-        .plan-features { margin: 20px 0; flex: 1; }
-        .plan-features li { list-style: none; font-size: 14px; color: #ccc; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .plan-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+        .plan-price { font-size: 30px; font-weight: 700; color: #39FF14; }
+        .plan-trial { font-size: 11px; color: #39FF14; background: rgba(57, 255, 20, 0.1); padding: 4px 8px; border-radius: 20px; display: inline-block; margin: 8px 0; }
+        .plan-features { margin: 14px 0; flex: 1; }
+        .plan-features li { list-style: none; font-size: 12.5px; color: #ccc; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .plan-features li::before { content: "✓"; color: #39FF14; font-weight: bold; }
 
         .btn-trial {
             background: #39FF14;
             color: #000;
             border: none;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 11px;
+            border-radius: 8px;
             font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
             width: 100%;
             transition: transform 0.2s;
         }
 
         .btn-trial:hover { transform: scale(1.02); }
+
+        /* Print / Memo Styling */
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .sidebar, .status-bar, .input-wrapper, .memo-actions, .intake-card, .hero-section { display: none !important; }
+            .main-content { overflow: visible !important; }
+            .chat-area { padding: 0 !important; max-width: 100% !important; }
+            .message-row.assistant .message-card { background: #fff !important; border: 1px solid #000 !important; color: #000 !important; }
+            .metric-badge { border: 1px solid #000 !important; color: #000 !important; }
+        }
     </style>
 </head>
 <body>
-    <!-- Pricing Modal -->
+    <!-- Pricing & Checkout Modal -->
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 32px; margin-bottom: 12px;">Start Your 30-Day Free Trial</h2>
-                <p style="color: #888;">Select the plan that fits your execution velocity.</p>
+                <h2 style="font-size: 26px; margin-bottom: 6px;">Consultant Enterprise Subscription</h2>
+                <p style="color: #888; font-size: 13.5px;">Surgical operational intelligence for consultants and operators.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
                     <div class="plan-name">Basic Plan</div>
-                    <div class="plan-price">$15.99<span style="font-size: 14px; color: #666; font-weight: 400;">/mo</span></div>
+                    <div class="plan-price">$15.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
                     <div class="plan-trial">30 Days Free</div>
                     <ul class="plan-features">
-                        <li>Unlimited Strategy Chats</li>
-                        <li>5 PDF Reports per Month</li>
-                        <li>Standard Execution Plans</li>
+                        <li>Unlimited Strategy Briefings</li>
+                        <li>Telemetry Summary Output</li>
+                        <li>Standard Strategy Lens</li>
                     </ul>
-                    <button class="btn-trial">Get Started</button>
+                    <button class="btn-trial" onclick="checkoutPlan('basic', 15.99)">Start Basic Trial</button>
                 </div>
 
                 <div class="plan-card featured">
                     <div class="plan-name">Pro Plan</div>
-                    <div class="plan-price">$39.99<span style="font-size: 14px; color: #666; font-weight: 400;">/mo</span></div>
+                    <div class="plan-price">$39.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
                     <div class="plan-trial">30 Days Free</div>
                     <ul class="plan-features">
-                        <li>Everything in Basic</li>
-                        <li>Unlimited File Reports</li>
-                        <li>Custom Execution Pipelines</li>
-                        <li>Priority Response Speed</li>
+                        <li>All Strategy Lenses (Trust, Local, SaaS)</li>
+                        <li>Multi-Client Workspace Switcher</li>
+                        <li>Offline Vault & Telemetry CSV Export</li>
+                        <li>Live Telemetry Streaming</li>
                     </ul>
-                    <button class="btn-trial">Start Pro Trial</button>
+                    <button class="btn-trial" onclick="checkoutPlan('pro', 39.99)">Start Pro Trial</button>
                 </div>
 
                 <div class="plan-card">
                     <div class="plan-name">Expert Plan</div>
-                    <div class="plan-price">$79.99<span style="font-size: 14px; color: #666; font-weight: 400;">/mo</span></div>
+                    <div class="plan-price">$79.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
                     <div class="plan-trial">30 Days Free</div>
                     <ul class="plan-features">
                         <li>Everything in Pro</li>
-                        <li>Industrial-Grade Analysis</li>
-                        <li>API Access for Superagents</li>
-                        <li>Expert Consultation Mode</li>
+                        <li>SPSS Research Framework Integration</li>
+                        <li>Custom Strategy Engine Tuning</li>
+                        <li>Direct Operator Access</li>
                     </ul>
-                    <button class="btn-trial">Get Expert Access</button>
+                    <button class="btn-trial" onclick="checkoutPlan('expert', 79.99)">Get Expert Access</button>
                 </div>
             </div>
         </div>
@@ -411,24 +668,52 @@
     <div class="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
-            <div class="brand-tagline">Operator Mode Active</div>
+            <div class="brand-tagline">
+                <span>Operator Mode</span>
+                <span class="tag-pill">v1.5</span>
+            </div>
+        </div>
+
+        <!-- Multi-Workspace Client Switcher -->
+        <div class="workspace-block">
+            <div class="section-label">
+                <span>Client Workspace</span>
+                <span style="cursor:pointer; color:#39FF14;" onclick="createWorkspace()" title="Add Client">+ New</span>
+            </div>
+            <select id="clientWorkspace" class="workspace-select" onchange="onWorkspaceChange()">
+                <option value="default">📁 General Strategy Workspace</option>
+                <option value="mas_diner">🥞 Ma's Diner (Analog Connection)</option>
+                <option value="cleaver_brooks">🏭 Cleaver-Brooks (Industrial Pivot)</option>
+                <option value="bannerman">📍 Bannerman Crossings (Huddle)</option>
+            </select>
+        </div>
+
+        <!-- Strategy Lens Selector -->
+        <div class="lens-container">
+            <div class="section-label">Strategy Engine Lens</div>
+            <select id="strategyLens" class="lens-select" onchange="onLensChange()">
+                <option value="standard">⚡ Chief of Staff Telemetry</option>
+                <option value="trust_auditor">🛡️ Trust & Autonomy Auditor</option>
+                <option value="hyperlocal">📍 Hyperlocal Community</option>
+                <option value="saas_operator">💼 SaaS / Unit Economics</option>
+            </select>
         </div>
 
         <div class="nav-list">
             <div class="nav-item active" onclick="switchView('chat')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Chat
+                Strategy Chat
             </div>
-            <div class="nav-item" onclick="switchView('files')">
+            <div class="nav-item" onclick="switchView('vault')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Files & Reports
+                Saved Vault (<span id="vaultCount">0</span>)
             </div>
-            <div class="nav-item" onclick="switchView('plans')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                Execution Plans
+            <div class="nav-item" onclick="window.location.href='/standards.html'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Operator Standard
             </div>
             <div class="nav-item" onclick="openPricing()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -436,11 +721,17 @@
             </div>
         </div>
 
-        <div style="padding: 20px 12px; border-top: 1px solid #1a1a1a;">
-            <div class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Settings
+        <!-- Competitive Moat Differentiation -->
+        <div class="moat-box">
+            <div class="moat-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Why Consultant
             </div>
+            <div>Claude & ChatGPT output conversational filler. Consultant enforces surgical quantitative telemetry and human-in-the-loop orchestration.</div>
+        </div>
+
+        <div style="padding: 12px; border-top: 1px solid #202020; font-size: 11px; color: #666; text-align: center;">
+            Consultant: Built for Operators.
         </div>
     </div>
 
@@ -448,107 +739,400 @@
     <div class="main-content">
         <div class="status-bar">
             <div class="status-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 99.98%</div>
-            <div class="status-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 38ms</div>
+            <div class="status-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> <span id="latencyDisplay">22ms</span></div>
             <div class="status-item" id="clock">14:15:00</div>
         </div>
 
         <!-- Chat Section -->
         <section id="chat-section" class="view-section active">
-            <div class="chat-area">
-                <div class="hero-section">
+            <div class="chat-area" id="chatArea">
+                <div class="hero-section" id="heroSection">
                     <div class="hero-avatar">C</div>
-                    <h1 style="font-size: 32px; margin-bottom: 12px;">Hi, I'm Consultant</h1>
-                    <p style="color: #888; font-size: 18px; margin-bottom: 24px;">I'm here to help you turn high-level strategy into actual results.</p>
+                    <h1 style="font-size: 26px; margin-bottom: 6px;">Consultant Studio</h1>
+                    <p style="color: #888; font-size: 14.5px;">Surgical operational strategy and telemetry-backed briefings.</p>
+
+                    <!-- Interactive Strategy Builder Intake Card -->
+                    <div class="intake-card">
+                        <div class="intake-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Interactive Strategy Builder
+                        </div>
+                        <div class="intake-grid">
+                            <div class="intake-field">
+                                <select id="intakeFocus">
+                                    <option value="Local Neighborhood Retail & Diner">Local Retail / Diner</option>
+                                    <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS / Pricing</option>
+                                    <option value="Industrial Narrative & Modern Tech Pivot">Industrial Tech Pivot</option>
+                                    <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth Sprint</option>
+                                </select>
+                            </div>
+                            <div class="intake-field">
+                                <select id="intakeConstraint">
+                                    <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Integrity</option>
+                                    <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Required</option>
+                                    <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Budget</option>
+                                    <option value="128 BPM Content Cadence with No Fluff">High Cadence Content</option>
+                                </select>
+                            </div>
+                            <div class="intake-field">
+                                <input type="text" id="intakeGoal" placeholder="Core goal (e.g. 5% neighbor lift)">
+                            </div>
+                        </div>
+                        <button class="btn-launch-intake" onclick="launchStrategyBuilder()">Build Surgical Telemetry Brief</button>
+                    </div>
                 </div>
             </div>
+
             <div class="input-wrapper">
                 <div class="input-box">
-                    <button class="icon-btn" title="Upload Asset">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <button class="icon-btn" title="Run Trust Audit" onclick="insertAuditTemplate()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
-                    <input type="text" placeholder="Tell me what you need to ship...">
-                    <button class="icon-btn" style="background: #111; padding: 10px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    <input type="text" id="userInput" placeholder="Ask a strategic question or enter copy to audit..." onkeydown="handleKey(event)">
+                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #222; padding: 8px 12px; border-radius: 12px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- Files Section -->
-        <section id="files-section" class="view-section">
+        <!-- Saved Vault Section -->
+        <section id="vault-section" class="view-section">
             <div class="studio-view">
                 <div class="studio-header">
-                    <h1 class="studio-title">Files & Reports</h1>
-                    <p style="color: #666;">All your strategic assets in one place.</p>
-                </div>
-                <div class="grid-container">
-                    <div class="asset-card">
-                        <div class="asset-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                        <div class="asset-name">Ma's Diner Q3 Strategy.pdf</div>
-                        <div class="asset-meta">Added 2 hours ago • 2.4MB</div>
+                    <div>
+                        <h1 class="studio-title">Saved Briefings Vault</h1>
+                        <p style="color: #777; font-size: 13px;" id="vaultWorkspaceLabel">Offline-cached operational memos for the active workspace.</p>
                     </div>
-                    <div class="asset-card">
-                        <div class="asset-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                        <div class="asset-name">Cleaver-Brooks Brand Audit.docx</div>
-                        <div class="asset-meta">Added yesterday • 1.1MB</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="action-btn" onclick="exportVaultCSV()">Export All to CSV</button>
+                        <button class="action-btn" onclick="clearVault()">Clear Vault</button>
                     </div>
                 </div>
+                <div class="grid-container" id="vaultGrid"></div>
             </div>
         </section>
-
-        <!-- Plans Section -->
-        <section id="plans-section" class="view-section">
-            <div class="studio-view">
-                <div class="studio-header">
-                    <h1 class="studio-title">Execution Plans</h1>
-                    <p style="color: #666;">Step-by-step roadmaps generated by Consultant.</p>
-                </div>
-                <div class="grid-container">
-                    <div class="asset-card" style="border-left: 4px solid #39FF14;">
-                        <div class="asset-name">"888 Bowl" Special Launch</div>
-                        <div class="asset-meta">Status: In Progress • 8 Steps</div>
-                    </div>
-                    <div class="asset-card" style="border-left: 4px solid #39FF14;">
-                        <div class="asset-name">Industrial Narrative Pivot</div>
-                        <div class="asset-meta">Status: Draft • 12 Steps</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div style="position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 11px; color: rgba(57, 255, 20, 0.2);">
-            Consultant: Built for Operators.
-        </div>
     </div>
 
     <script>
-        // Fix for Modal Access
+        // State
+        let conversationHistory = [];
+        let isStreaming = false;
+
+        // Modal Handlers
         function openPricing() {
-            const modal = document.getElementById('pricingModal');
-            modal.style.display = 'flex';
+            document.getElementById('pricingModal').style.display = 'flex';
         }
 
         function closePricing() {
-            const modal = document.getElementById('pricingModal');
-            modal.style.display = 'none';
+            document.getElementById('pricingModal').style.display = 'none';
         }
 
-        // View Switching Logic (No "Coming Soon")
-        function switchView(viewId) {
-            // Remove active from all sections
-            document.querySelectorAll('.view-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            // Remove active from all nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+        function checkoutPlan(planId, price) {
+            alert(`Initiating Base44 Checkout for ${planId.toUpperCase()} Tier ($${price}/mo) with 30-day trial.`);
+            closePricing();
+        }
 
-            // Activate target section
+        // Multi-Workspace Management
+        function onWorkspaceChange() {
+            const ws = document.getElementById('clientWorkspace').value;
+            const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
+            document.getElementById('vaultWorkspaceLabel').textContent = `Showing cached briefings for workspace: ${wsText}`;
+            renderVault();
+        }
+
+        function createWorkspace() {
+            const name = prompt("Enter new client or project workspace name:");
+            if (!name) return;
+            const select = document.getElementById('clientWorkspace');
+            const opt = document.createElement('option');
+            const key = 'ws_' + Date.now();
+            opt.value = key;
+            opt.textContent = `📁 ${name}`;
+            select.appendChild(opt);
+            select.value = key;
+            onWorkspaceChange();
+        }
+
+        // Interactive Strategy Builder
+        function launchStrategyBuilder() {
+            const focus = document.getElementById('intakeFocus').value;
+            const constraint = document.getElementById('intakeConstraint').value;
+            const goal = document.getElementById('intakeGoal').value.trim() || 'Maximize ROI and brand equity';
+
+            const prompt = `EXECUTE STRATEGY INTAKE:\nFocus Vertical: ${focus}\nOperational Constraints: ${constraint}\nPrimary Execution Goal: ${goal}`;
+            document.getElementById('userInput').value = prompt;
+            sendMessage();
+        }
+
+        // View Switcher
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`${viewId}-section`).classList.add('active');
             
-            // Highlight nav item (logic to find the right one)
-            event.currentTarget.classList.add('active');
+            if (viewId === 'vault') {
+                renderVault();
+            }
+
+            const activeIdx = viewId === 'chat' ? 0 : (viewId === 'vault' ? 1 : 2);
+            document.querySelectorAll('.nav-item')[activeIdx]?.classList.add('active');
+        }
+
+        function onLensChange() {
+            const lens = document.getElementById('strategyLens').value;
+            const input = document.getElementById('userInput');
+            if (lens === 'trust_auditor') {
+                input.placeholder = "Paste campaign copy or workflow to run Trust & Telemetry Audit...";
+            } else if (lens === 'hyperlocal') {
+                input.placeholder = "Enter neighborhood, local market, or diner visibility goal...";
+            } else if (lens === 'saas_operator') {
+                input.placeholder = "Enter SaaS model, tier pricing, or unit economics question...";
+            } else {
+                input.placeholder = "Ask a strategic question or enter copy to audit...";
+            }
+        }
+
+        function insertAuditTemplate() {
+            const lens = document.getElementById('strategyLens');
+            lens.value = 'trust_auditor';
+            onLensChange();
+            document.getElementById('userInput').value = "Audit this strategy: Local business targeting neighborhood residents with a community huddle approach and zero discounts.";
+            document.getElementById('userInput').focus();
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Format Telemetry Output
+        function formatTelemetryOutput(text) {
+            return text.replace(/\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-badge"><strong>[$1]</strong> = $2</div>')
+                       .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#fff; display:block; margin-top:8px; margin-bottom:2px;">$1</strong>')
+                       .replace(/\n/g, '<br>');
+        }
+
+        // Send & Stream Message
+        async function sendMessage() {
+            if (isStreaming) return;
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const hero = document.getElementById('heroSection');
+            if (hero) hero.style.display = 'none';
+
+            input.value = '';
+            const chatArea = document.getElementById('chatArea');
+
+            const userRow = document.createElement('div');
+            userRow.className = 'message-row user';
+            userRow.innerHTML = `<div class="message-card">${escapeHtml(text)}</div>`;
+            chatArea.appendChild(userRow);
+
+            conversationHistory.push({ role: 'user', content: text });
+
+            const assistantRow = document.createElement('div');
+            assistantRow.className = 'message-row assistant';
+            const card = document.createElement('div');
+            card.className = 'message-card';
+            card.innerHTML = '<em>Calculating telemetry...</em>';
+            assistantRow.appendChild(card);
+            chatArea.appendChild(assistantRow);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            isStreaming = true;
+            const lens = document.getElementById('strategyLens').value;
+            let fullResponse = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: conversationHistory,
+                        lens: lens,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) throw new Error('API request failed');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                card.innerHTML = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.replace('data: ', '').trim();
+                            if (dataStr === '[DONE]') break;
+                            try {
+                                const parsed = JSON.parse(dataStr);
+                                if (parsed.token) {
+                                    fullResponse += parsed.token;
+                                    card.innerHTML = formatTelemetryOutput(fullResponse);
+                                    chatArea.scrollTop = chatArea.scrollHeight;
+                                }
+                            } catch (err) {}
+                        }
+                    }
+                }
+
+                // Add Actions
+                const actions = document.createElement('div');
+                actions.className = 'memo-actions';
+                actions.innerHTML = `
+                    <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save to Vault
+                    </button>
+                    <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Metrics CSV
+                    </button>
+                    <button class="action-btn" onclick="exportBrief()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print Memo
+                    </button>
+                `;
+                card.appendChild(actions);
+                conversationHistory.push({ role: 'assistant', content: fullResponse });
+
+            } catch (err) {
+                card.innerHTML = `<span style="color:#ff5555;">Execution error: ${err.message}</span>`;
+            } finally {
+                isStreaming = false;
+            }
+        }
+
+        function escapeHtml(string) {
+            const entityMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return String(string).replace(/[&<>"']/g, s => entityMap[s]);
+        }
+
+        // CSV Extraction for Competitive Edge
+        function extractMetricsCSV(text) {
+            const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
+            let match;
+            const rows = [['Metric', 'Value']];
+            while ((match = regex.exec(text)) !== null) {
+                rows.push([match[1].trim(), match[2].trim()]);
+            }
+            return rows.map(r => `"${r[0]}","${r[1]}"`).join('\n');
+        }
+
+        function copyMetricsCSV(text) {
+            const csv = extractMetricsCSV(text);
+            if (!csv || csv === '"Metric","Value"') {
+                alert("No telemetry metrics found to export.");
+                return;
+            }
+            navigator.clipboard.writeText(csv).then(() => {
+                alert("Telemetry Metrics copied to clipboard in CSV format.");
+            });
+        }
+
+        function exportVaultCSV() {
+            const items = getVaultItems();
+            if (items.length === 0) {
+                alert("Vault is empty.");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Title,Date,Workspace,Metric,Value\n";
+            items.forEach(item => {
+                const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
+                let match;
+                while ((match = regex.exec(item.content)) !== null) {
+                    csvContent += `"${item.title.replace(/"/g, '""')}","${item.date}","${item.workspace}","${match[1]}","${match[2]}"\n`;
+                }
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `consultant_metrics_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Vault LocalStorage Logic
+        function getVaultItems() {
+            try {
+                const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+                const ws = document.getElementById('clientWorkspace').value;
+                return all.filter(i => !i.workspace || i.workspace === ws || ws === 'default');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function updateVaultCount() {
+            const count = getVaultItems().length;
+            document.getElementById('vaultCount').textContent = count;
+        }
+
+        function saveToVault(idx) {
+            const item = conversationHistory[idx] || conversationHistory[conversationHistory.length - 1];
+            if (!item || item.role !== 'assistant') return;
+
+            const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            const ws = document.getElementById('clientWorkspace').value;
+            const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 40) || "Strategic Briefing";
+            
+            all.unshift({
+                id: Date.now(),
+                workspace: ws,
+                title: title,
+                content: item.content,
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 100)));
+            updateVaultCount();
+            alert("Briefing saved to workspace Vault.");
+        }
+
+        function renderVault() {
+            const grid = document.getElementById('vaultGrid');
+            grid.innerHTML = '';
+            const items = getVaultItems();
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="color:#666; grid-column: 1/-1;">No saved memos in this workspace. Run a briefing and click "Save to Vault".</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.innerHTML = `
+                    <div class="asset-name">${escapeHtml(item.title)}</div>
+                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#39FF14;">${item.workspace}</span></div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #aaa; max-height: 75px; overflow: hidden;">
+                        ${formatTelemetryOutput(item.content.substring(0, 150))}...
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            updateVaultCount();
+        }
+
+        function clearVault() {
+            if (confirm("Clear saved vault briefings for this workspace?")) {
+                const ws = document.getElementById('clientWorkspace').value;
+                let all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+                all = all.filter(i => i.workspace !== ws);
+                localStorage.setItem('consultant_vault', JSON.stringify(all));
+                renderVault();
+            }
+        }
+
+        function exportBrief() {
+            window.print();
         }
 
         // Live Clock
@@ -558,6 +1142,7 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+        updateVaultCount();
 
         // Close modal when clicking outside
         window.onclick = function(event) {
@@ -567,12 +1152,10 @@
             }
         }
 
-        // Register Service Worker for PWA
+        // Service Worker for PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered successfully!', reg.scope))
-                    .catch(err => console.log('Service Worker registration failed:', err));
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
