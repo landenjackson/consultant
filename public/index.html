@@ -847,10 +847,10 @@
                     <div class="quick-tasks-container">
                         <div class="section-label">⚡ 1-Click Operations Tasks</div>
                         <div class="quick-task-grid">
-                            <div class="quick-task-card" onclick="quickTask('bannerman')">
+                            <div class="quick-task-card" onclick="quickTask('trade_analysis')">
                                 <div class="quick-task-icon">📍</div>
-                                <div class="quick-task-title">Bannerman Trade</div>
-                                <div class="quick-task-desc">Foot traffic & zero-discount audit</div>
+                                <div class="quick-task-title">Trade Analysis</div>
+                                <div class="quick-task-desc">Foot traffic & market density audit</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('trust')">
                                 <div class="quick-task-icon">🛡️</div>
@@ -862,10 +862,10 @@
                                 <div class="quick-task-title">Unit Economics</div>
                                 <div class="quick-task-desc">CAC, LTV & churn model</div>
                             </div>
-                            <div class="quick-task-card" onclick="quickTask('relaunch')">
-                                <div class="quick-task-icon">🥞</div>
-                                <div class="quick-task-title">Diner Campaign</div>
-                                <div class="quick-task-desc">Analog Connection roadmap</div>
+                            <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
+                                <div class="quick-task-icon">🚀</div>
+                                <div class="quick-task-title">Campaign Strategy</div>
+                                <div class="quick-task-desc">Multi-channel growth roadmap</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('competitor')">
                                 <div class="quick-task-icon">🔍</div>
@@ -1054,18 +1054,18 @@
         // 1-Click Operations Launchers
         function quickTask(type) {
             const input = document.getElementById('userInput');
-            if (type === 'bannerman') {
+            if (type === 'trade_analysis') {
                 document.getElementById('strategyLens').value = 'hyperlocal';
-                input.value = "Run a live trade area and commercial foot-traffic analysis for Bannerman Crossings Tallahassee. Focus on zero-discount neighborhood acquisition.";
+                input.value = "Run a comprehensive trade area and commercial foot-traffic density analysis. Evaluate neighborhood capture geometry and margin-defense strategy.";
             } else if (type === 'trust') {
                 document.getElementById('strategyLens').value = 'trust_auditor';
                 input.value = "Audit our automated B2B sales sequence against empirical consumer trust boundaries. Output Trust Alignment Index and Autonomy Risk Tier.";
             } else if (type === 'saas') {
                 document.getElementById('strategyLens').value = 'saas_operator';
                 input.value = "Evaluate our $15.99 / $39.99 / $79.99 subscription model. Model CAC, LTV/CAC ratio, and churn mitigation protocol.";
-            } else if (type === 'relaunch') {
-                document.getElementById('strategyLens').value = 'hyperlocal';
-                input.value = "Draft a seasonal 'Analog Connection' flyer and community huddle rollout plan for Ma's Diner. Zero coupons, high-texture storytelling.";
+            } else if (type === 'campaign_strategy') {
+                document.getElementById('strategyLens').value = 'standard';
+                input.value = "Develop a high-density, multi-channel campaign strategy. Focus on organic reach, zero discount mechanics, and high-conversion positioning.";
             } else if (type === 'competitor') {
                 document.getElementById('strategyLens').value = 'standard';
                 input.value = "Execute a live competitor reconnaissance scan via Tavily. Extract live market movements and positioning vulnerabilities.";
