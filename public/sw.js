@@ -1,28 +1,14 @@
-const CACHE_NAME = 'consultant-studio-v1.6-' + Date.now();
+// Unregister old service workers and purge caches
+self.addEventListener('install', () => self.skipWaiting());
 
-// Install: Skip waiting immediately
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-});
-
-// Activate: Delete ALL old caches immediately
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => caches.delete(key)));
-    }).then(() => self.clients.claim())
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => self.registration.unregister())
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch Strategy: Network-First ALWAYS (fallback to cache only if offline)
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request)
-      .then((networkResponse) => {
-        return networkResponse;
-      })
-      .catch(() => {
-        return caches.match(e.request);
-      })
-  );
+self.addEventListener('fetch', (event) => {
+  event.respondWith(fetch(event.request));
 });
