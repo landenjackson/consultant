@@ -78,6 +78,7 @@
             border-radius: 4px;
             font-size: 10px;
             font-weight: 700;
+            color: #39FF14;
         }
 
         /* Controls Block */
@@ -261,9 +262,10 @@
 
         .hero-section {
             text-align: center;
-            max-width: 600px;
+            max-width: 680px;
             margin: 10px auto;
             padding: 0 10px;
+            width: 100%;
         }
 
         .hero-avatar {
@@ -281,24 +283,102 @@
             font-weight: 700;
         }
 
+        /* One-Click Quick Launch Pills */
+        .quick-tasks-container {
+            margin-top: 14px;
+            text-align: left;
+        }
+
+        .quick-task-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .quick-task-card {
+            background: #161616;
+            border: 1px solid #282828;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .quick-task-card:hover {
+            border-color: #39FF14;
+            background: #1c1c1c;
+            transform: translateY(-2px);
+        }
+
+        .quick-task-icon {
+            font-size: 16px;
+        }
+
+        .quick-task-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .quick-task-desc {
+            font-size: 10.5px;
+            color: #777;
+            line-height: 1.3;
+        }
+
         /* Strategy Builder Card */
         .intake-card {
             background: #161616;
             border: 1px solid #282828;
             border-radius: 14px;
             padding: 16px;
-            margin-top: 12px;
+            margin-top: 14px;
             text-align: left;
+        }
+
+        .intake-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
         .intake-title {
             font-size: 12.5px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .intake-mode-toggle {
+            display: flex;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #252525;
+            color: #39FF14;
         }
 
         .intake-grid {
@@ -308,7 +388,7 @@
             margin-bottom: 10px;
         }
 
-        .intake-field select, .intake-field input {
+        .intake-field select, .intake-field input, .intake-field textarea {
             width: 100%;
             background: #111;
             border: 1px solid #333;
@@ -317,6 +397,18 @@
             border-radius: 6px;
             font-size: 12px;
             outline: none;
+            font-family: inherit;
+        }
+
+        .custom-task-container {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .custom-task-container.active {
+            display: flex;
         }
 
         .btn-launch-intake {
@@ -329,6 +421,11 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .btn-launch-intake:hover {
+            opacity: 0.9;
         }
 
         /* Message Bubbles */
@@ -589,6 +686,10 @@
             }
             .hero-section h1 { font-size: 20px !important; }
             .hero-section p { font-size: 13px !important; }
+            .quick-task-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
             .intake-grid {
                 grid-template-columns: 1fr;
                 gap: 6px;
@@ -662,7 +763,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
-            <span class="tag-pill">v1.5</span>
+            <span class="tag-pill">v1.6</span>
         </div>
 
         <div class="controls-block">
@@ -742,32 +843,109 @@
                     <h1 style="font-size: 22px; margin-bottom: 4px;">Consultant Studio</h1>
                     <p style="color: #888; font-size: 13px;">Surgical operational strategy with real-time telemetry.</p>
 
+                    <!-- Quick Task Launch Grid -->
+                    <div class="quick-tasks-container">
+                        <div class="section-label">⚡ 1-Click Operations Tasks</div>
+                        <div class="quick-task-grid">
+                            <div class="quick-task-card" onclick="quickTask('bannerman')">
+                                <div class="quick-task-icon">📍</div>
+                                <div class="quick-task-title">Bannerman Trade</div>
+                                <div class="quick-task-desc">Foot traffic & zero-discount audit</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('trust')">
+                                <div class="quick-task-icon">🛡️</div>
+                                <div class="quick-task-title">Trust Audit</div>
+                                <div class="quick-task-desc">Scan copy for autonomy risks</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('saas')">
+                                <div class="quick-task-icon">💼</div>
+                                <div class="quick-task-title">Unit Economics</div>
+                                <div class="quick-task-desc">CAC, LTV & churn model</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('relaunch')">
+                                <div class="quick-task-icon">🥞</div>
+                                <div class="quick-task-title">Diner Campaign</div>
+                                <div class="quick-task-desc">Analog Connection roadmap</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('competitor')">
+                                <div class="quick-task-icon">🔍</div>
+                                <div class="quick-task-title">Competitor Scan</div>
+                                <div class="quick-task-desc">Live trade signals via Tavily</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('pricing')">
+                                <div class="quick-task-icon">💵</div>
+                                <div class="quick-task-title">Pricing Pivot</div>
+                                <div class="quick-task-desc">Margin protection strategy</div>
+                            </div>
+                            <div class="quick-task-card" onclick="quickTask('fsu_trust')">
+                                <div class="quick-task-icon">📊</div>
+                                <div class="quick-task-title">SPSS Trust Score</div>
+                                <div class="quick-task-desc">Human-in-the-loop validation</div>
+                            </div>
+                            <div class="quick-task-card" onclick="setCustomTaskMode()">
+                                <div class="quick-task-icon">✏️</div>
+                                <div class="quick-task-title">Create Task +</div>
+                                <div class="quick-task-desc">Define custom mission</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Task / Strategy Intake Builder -->
                     <div class="intake-card">
-                        <div class="intake-title">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                            Strategy Intake Builder
-                        </div>
-                        <div class="intake-grid">
-                            <div class="intake-field">
-                                <select id="intakeFocus">
-                                    <option value="Local Neighborhood Retail & Diner">Local Retail / Diner</option>
-                                    <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS / Pricing</option>
-                                    <option value="Industrial Narrative & Modern Tech Pivot">Industrial Tech Pivot</option>
-                                    <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth Sprint</option>
-                                </select>
+                        <div class="intake-header">
+                            <div class="intake-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                <span id="intakeModeTitle">Strategy Intake Builder</span>
                             </div>
-                            <div class="intake-field">
-                                <select id="intakeConstraint">
-                                    <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Integrity</option>
-                                    <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Required</option>
-                                    <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Budget</option>
-                                </select>
-                            </div>
-                            <div class="intake-field">
-                                <input type="text" id="intakeGoal" placeholder="Goal (e.g. 5% neighbor lift)">
+                            <div class="intake-mode-toggle">
+                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Preset</button>
+                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Create Custom Task</button>
                             </div>
                         </div>
-                        <button class="btn-launch-intake" onclick="launchStrategyBuilder()">Build Telemetry Brief</button>
+
+                        <!-- Preset Mode Form -->
+                        <div id="presetTaskForm">
+                            <div class="intake-grid">
+                                <div class="intake-field">
+                                    <select id="intakeFocus">
+                                        <option value="Local Neighborhood Retail & Diner">Local Retail / Diner</option>
+                                        <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS / Pricing</option>
+                                        <option value="Industrial Narrative & Modern Tech Pivot">Industrial Tech Pivot</option>
+                                        <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth Sprint</option>
+                                        <option value="State Agency Survey & Data Operations">Survey & Data Operations</option>
+                                        <option value="Brand Positioning & Market Recon">Competitor & Market Recon</option>
+                                    </select>
+                                </div>
+                                <div class="intake-field">
+                                    <select id="intakeConstraint">
+                                        <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Integrity</option>
+                                        <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Required</option>
+                                        <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Budget</option>
+                                        <option value="128 BPM Tech Electro High Cadence">High Velocity Execution</option>
+                                    </select>
+                                </div>
+                                <div class="intake-field">
+                                    <input type="text" id="intakeGoal" placeholder="Goal (e.g. 5% neighbor lift)">
+                                </div>
+                            </div>
+                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Build Telemetry Brief</button>
+                        </div>
+
+                        <!-- Create Your Own Task Mode Form -->
+                        <div id="customTaskForm" class="custom-task-container">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                                <div class="intake-field">
+                                    <input type="text" id="customTaskName" placeholder="Task Name (e.g. Q3 Pipeline Audit)">
+                                </div>
+                                <div class="intake-field">
+                                    <input type="text" id="customTarget" placeholder="Client / Target (e.g. Ma's Diner)">
+                                </div>
+                            </div>
+                            <div class="intake-field">
+                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific requirements or rules (e.g. Scan competitors via Tavily, output CAC and margin benchmarks)..."></textarea>
+                            </div>
+                            <button class="btn-launch-intake" onclick="launchCustomTask()">Run Custom Telemetry Task</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -845,11 +1023,76 @@
             onWorkspaceChange();
         }
 
-        function launchStrategyBuilder() {
+        // Task Mode Toggle (Preset vs Custom)
+        function toggleTaskMode(mode) {
+            const presetForm = document.getElementById('presetTaskForm');
+            const customForm = document.getElementById('customTaskForm');
+            const btnPreset = document.getElementById('btnModePreset');
+            const btnCustom = document.getElementById('btnModeCustom');
+            const title = document.getElementById('intakeModeTitle');
+
+            if (mode === 'custom') {
+                presetForm.style.display = 'none';
+                customForm.classList.add('active');
+                btnPreset.classList.remove('active');
+                btnCustom.classList.add('active');
+                title.textContent = "Create Custom Operation Task";
+            } else {
+                presetForm.style.display = 'block';
+                customForm.classList.remove('active');
+                btnPreset.classList.add('active');
+                btnCustom.classList.remove('active');
+                title.textContent = "Strategy Intake Builder";
+            }
+        }
+
+        function setCustomTaskMode() {
+            toggleTaskMode('custom');
+            document.getElementById('customTaskName').focus();
+        }
+
+        // 1-Click Operations Launchers
+        function quickTask(type) {
+            const input = document.getElementById('userInput');
+            if (type === 'bannerman') {
+                document.getElementById('strategyLens').value = 'hyperlocal';
+                input.value = "Run a live trade area and commercial foot-traffic analysis for Bannerman Crossings Tallahassee. Focus on zero-discount neighborhood acquisition.";
+            } else if (type === 'trust') {
+                document.getElementById('strategyLens').value = 'trust_auditor';
+                input.value = "Audit our automated B2B sales sequence against empirical consumer trust boundaries. Output Trust Alignment Index and Autonomy Risk Tier.";
+            } else if (type === 'saas') {
+                document.getElementById('strategyLens').value = 'saas_operator';
+                input.value = "Evaluate our $15.99 / $39.99 / $79.99 subscription model. Model CAC, LTV/CAC ratio, and churn mitigation protocol.";
+            } else if (type === 'relaunch') {
+                document.getElementById('strategyLens').value = 'hyperlocal';
+                input.value = "Draft a seasonal 'Analog Connection' flyer and community huddle rollout plan for Ma's Diner. Zero coupons, high-texture storytelling.";
+            } else if (type === 'competitor') {
+                document.getElementById('strategyLens').value = 'standard';
+                input.value = "Execute a live competitor reconnaissance scan via Tavily. Extract live market movements and positioning vulnerabilities.";
+            } else if (type === 'pricing') {
+                document.getElementById('strategyLens').value = 'saas_operator';
+                input.value = "Model a margin-protection pricing strategy that eliminates promotional discounting while raising perceived value.";
+            } else if (type === 'fsu_trust') {
+                document.getElementById('strategyLens').value = 'trust_auditor';
+                input.value = "Apply the FSU SPSS trust boundary framework to evaluate where AI should build the skeleton vs where human operators must hold the gate.";
+            }
+            onLensChange();
+            sendMessage();
+        }
+
+        function launchPresetBuilder() {
             const focus = document.getElementById('intakeFocus').value;
             const constraint = document.getElementById('intakeConstraint').value;
             const goal = document.getElementById('intakeGoal').value.trim() || 'Maximize ROI and brand equity';
             document.getElementById('userInput').value = `EXECUTE STRATEGY INTAKE:\nFocus: ${focus}\nConstraint: ${constraint}\nGoal: ${goal}`;
+            sendMessage();
+        }
+
+        function launchCustomTask() {
+            const name = document.getElementById('customTaskName').value.trim() || 'Custom Operation Task';
+            const target = document.getElementById('customTarget').value.trim() || 'General Strategy';
+            const instructions = document.getElementById('customTaskInstructions').value.trim() || 'Provide full telemetry briefing and execution protocol.';
+            document.getElementById('userInput').value = `CUSTOM TASK: [${name.toUpperCase()}]\nTarget: ${target}\nOperational Directives: ${instructions}\nDeliverable: Provide system context, quantitative telemetry metrics, and exact frontline steps.`;
             sendMessage();
         }
 
@@ -996,7 +1239,7 @@
             try {
                 const fullResponse = await fetchInference(conversationHistory, lens);
                 
-                // Simulate fast smooth streaming text
+                // Fast smooth streaming text simulation
                 card.innerHTML = '';
                 const words = fullResponse.split(' ');
                 let rendered = '';
