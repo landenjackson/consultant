@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Consultant | Surgical Executive Intelligence</title>
     
     <!-- PWA Meta Tags -->
@@ -19,18 +19,21 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: 'Inter', sans-serif;
             background: #111111;
             color: #ffffff;
-            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
             display: flex;
             overflow: hidden;
+            position: fixed;
         }
 
-        /* Sidebar */
+        /* Sidebar Desktop */
         .sidebar {
             width: 280px;
             background: #181818;
@@ -38,10 +41,14 @@
             display: flex;
             flex-direction: column;
             z-index: 50;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-brand {
             padding: 20px 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .brand-name {
@@ -73,9 +80,12 @@
             font-weight: 700;
         }
 
-        /* Workspace Switcher */
-        .workspace-block {
+        /* Controls Block */
+        .controls-block {
             padding: 0 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .section-label {
@@ -83,14 +93,14 @@
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: #777;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .workspace-select {
+        .custom-select {
             width: 100%;
             background: #121212;
             border: 1px solid #333;
@@ -103,32 +113,8 @@
             cursor: pointer;
         }
 
-        .workspace-select option {
-            background: #181818;
-            color: #fff;
-        }
-
-        /* Strategy Lens Selector */
-        .lens-container {
-            padding: 0 16px 14px;
-        }
-
-        .lens-select {
-            width: 100%;
-            background: #121212;
-            border: 1px solid #333;
+        .custom-select.lens {
             color: #39FF14;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .lens-select option {
-            background: #181818;
-            color: #fff;
         }
 
         .nav-list {
@@ -172,7 +158,6 @@
             stroke: #39FF14;
         }
 
-        /* Competitive Moat Card in Sidebar */
         .moat-box {
             margin: 12px 14px;
             padding: 12px;
@@ -180,7 +165,7 @@
             border: 1px solid #282828;
             border-radius: 10px;
             font-size: 11.5px;
-            line-height: 1.5;
+            line-height: 1.45;
             color: #999;
         }
 
@@ -196,23 +181,38 @@
             gap: 6px;
         }
 
-        /* Top Status Bar */
-        .status-bar {
+        /* Top Header Bar */
+        .top-bar {
             position: absolute;
             top: 0;
             right: 0;
             left: 280px;
-            padding: 10px 24px;
+            height: 52px;
+            padding: 0 20px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
-            gap: 18px;
             font-size: 12.5px;
             color: #39FF14;
             z-index: 10;
-            background: rgba(17,17,17,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(17,17,17,0.92);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid #1f1f1f;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .status-items {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .status-item {
@@ -222,7 +222,7 @@
             font-weight: 500;
         }
 
-        /* Main Area */
+        /* Main Content Container */
         .main-content {
             flex: 1;
             display: flex;
@@ -230,6 +230,7 @@
             position: relative;
             background: #111111;
             overflow: hidden;
+            height: 100dvh;
         }
 
         .view-section {
@@ -238,61 +239,63 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
 
         .view-section.active {
             display: flex;
         }
 
-        /* Chat View */
+        /* Chat Area */
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 85px 24px 20px;
+            padding: 68px 16px 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 880px;
+            gap: 14px;
+            max-width: 860px;
             width: 100%;
             margin: 0 auto;
         }
 
         .hero-section {
             text-align: center;
-            max-width: 640px;
-            margin: 20px auto 10px;
+            max-width: 600px;
+            margin: 10px auto;
+            padding: 0 10px;
         }
 
         .hero-avatar {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             background: rgba(57, 255, 20, 0.1);
             border: 1px solid rgba(57, 255, 20, 0.3);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
             color: #39FF14;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
         }
 
-        /* Interactive Strategy Builder / Quick Intake */
+        /* Strategy Builder Card */
         .intake-card {
             background: #161616;
             border: 1px solid #282828;
             border-radius: 14px;
-            padding: 18px 20px;
-            margin-top: 14px;
+            padding: 16px;
+            margin-top: 12px;
             text-align: left;
         }
 
         .intake-title {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -301,8 +304,8 @@
         .intake-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .intake-field select, .intake-field input {
@@ -320,41 +323,31 @@
             background: #39FF14;
             color: #000;
             border: none;
-            padding: 9px 14px;
+            padding: 10px 14px;
             border-radius: 6px;
             font-size: 12.5px;
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.15s;
-        }
-
-        .btn-launch-intake:hover {
-            transform: translateY(-1px);
         }
 
         /* Message Bubbles */
         .message-row {
             display: flex;
             width: 100%;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
-        .message-row.user {
-            justify-content: flex-end;
-        }
-
-        .message-row.assistant {
-            justify-content: flex-start;
-        }
+        .message-row.user { justify-content: flex-end; }
+        .message-row.assistant { justify-content: flex-start; }
 
         .message-card {
-            max-width: 88%;
-            padding: 16px 20px;
+            max-width: 90%;
+            padding: 14px 18px;
             border-radius: 12px;
-            font-size: 14.5px;
+            font-size: 14px;
             line-height: 1.6;
-            position: relative;
+            word-break: break-word;
         }
 
         .message-row.user .message-card {
@@ -365,9 +358,9 @@
 
         .message-row.assistant .message-card {
             background: #161616;
-            border: 1px solid #292929;
+            border: 1px solid #282828;
             border-left: 3px solid #39FF14;
-            color: #e5e5e5;
+            color: #f0f0f0;
             width: 100%;
         }
 
@@ -377,19 +370,19 @@
             border: 1px solid rgba(57, 255, 20, 0.3);
             color: #39FF14;
             font-family: monospace;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
             margin: 4px 0;
-            font-size: 13px;
+            font-size: 12.5px;
         }
 
         .memo-actions {
-            margin-top: 14px;
-            padding-top: 10px;
+            margin-top: 12px;
+            padding-top: 8px;
             border-top: 1px solid #252525;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             justify-content: flex-end;
         }
 
@@ -397,115 +390,50 @@
             background: #202020;
             border: 1px solid #383838;
             color: #39FF14;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
-            padding: 6px 10px;
+            padding: 5px 9px;
             border-radius: 6px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            background: #2a2a2a;
-            border-color: #39FF14;
-        }
-
-        /* Studio Views */
-        .studio-view {
-            padding: 85px 36px 36px;
-            max-width: 1000px;
-            margin: 0 auto;
-            width: 100%;
-            overflow-y: auto;
-        }
-
-        .studio-header {
-            margin-bottom: 24px;
-            border-bottom: 1px solid #222;
-            padding-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .studio-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 16px;
-        }
-
-        .asset-card {
-            background: #161616;
-            border: 1px solid #2b2b2b;
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.2s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .asset-card:hover {
-            border-color: #39FF14;
-            transform: translateY(-2px);
-        }
-
-        .asset-name {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .asset-meta {
-            font-size: 11.5px;
-            color: #777;
-            display: flex;
-            justify-content: space-between;
         }
 
         /* Input Container */
         .input-wrapper {
-            padding: 14px 20px 20px;
+            padding: 10px 14px 16px;
             width: 100%;
             display: flex;
             justify-content: center;
             background: linear-gradient(transparent, #111111 30%);
+            z-index: 20;
         }
 
         .input-box {
             width: 100%;
-            max-width: 880px;
+            max-width: 860px;
             background: #181818;
             border: 1px solid #2d2d2d;
-            border-radius: 20px;
-            padding: 6px 14px;
+            border-radius: 24px;
+            padding: 4px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        .input-box:focus-within {
-            border-color: #39FF14;
-        }
+        .input-box:focus-within { border-color: #39FF14; }
 
         .input-box input {
             flex: 1;
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 14.5px;
+            font-size: 14px;
             outline: none;
             padding: 8px 0;
+            min-width: 0;
         }
 
         .icon-btn {
@@ -513,17 +441,50 @@
             border: none;
             color: #39FF14;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            flex-shrink: 0;
         }
 
-        .icon-btn:hover { background: rgba(57, 255, 20, 0.1); }
+        /* Studio Vault */
+        .studio-view {
+            padding: 68px 20px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            overflow-y: auto;
+        }
 
-        /* Modal */
+        .studio-header {
+            margin-bottom: 18px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .asset-card {
+            background: #161616;
+            border: 1px solid #2b2b2b;
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+        .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13.5px; color: #fff; }
+        .asset-meta { font-size: 11px; color: #777; display: flex; justify-content: space-between; }
+
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -533,15 +494,16 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(10px);
+            padding: 16px;
         }
 
         .modal-content {
             background: #181818;
             border: 1px solid #333;
-            border-radius: 20px;
-            padding: 36px;
-            max-width: 900px;
-            width: 95%;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 800px;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -549,27 +511,22 @@
 
         .close-modal {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            color: #777;
-            cursor: pointer;
-            font-size: 24px;
+            top: 14px; right: 14px;
+            color: #777; font-size: 22px; cursor: pointer;
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 26px;
+            gap: 14px;
+            margin-top: 20px;
         }
 
         .plan-card {
             border: 1px solid #333;
             background: #111111;
-            border-radius: 14px;
-            padding: 22px;
-            text-align: left;
-            position: relative;
+            border-radius: 12px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
         }
@@ -579,127 +536,158 @@
             background: rgba(57, 255, 20, 0.02);
         }
 
-        .plan-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-        .plan-price { font-size: 30px; font-weight: 700; color: #39FF14; }
-        .plan-trial { font-size: 11px; color: #39FF14; background: rgba(57, 255, 20, 0.1); padding: 4px 8px; border-radius: 20px; display: inline-block; margin: 8px 0; }
-        .plan-features { margin: 14px 0; flex: 1; }
-        .plan-features li { list-style: none; font-size: 12.5px; color: #ccc; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .plan-features li::before { content: "✓"; color: #39FF14; font-weight: bold; }
+        .plan-price { font-size: 26px; font-weight: 700; color: #39FF14; margin: 4px 0; }
+        .plan-features { margin: 12px 0; flex: 1; font-size: 12px; color: #bbb; }
+        .plan-features li { list-style: none; margin-bottom: 6px; }
 
         .btn-trial {
             background: #39FF14;
             color: #000;
             border: none;
-            padding: 11px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.2s;
         }
 
-        .btn-trial:hover { transform: scale(1.02); }
+        /* Mobile Overlay Backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 40;
+        }
 
-        /* Print / Memo Styling */
-        @media print {
-            body { background: #fff !important; color: #000 !important; }
-            .sidebar, .status-bar, .input-wrapper, .memo-actions, .intake-card, .hero-section { display: none !important; }
-            .main-content { overflow: visible !important; }
-            .chat-area { padding: 0 !important; max-width: 100% !important; }
-            .message-row.assistant .message-card { background: #fff !important; border: 1px solid #000 !important; color: #000 !important; }
-            .metric-badge { border: 1px solid #000 !important; color: #000 !important; }
+        /* Mobile Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: 0;
+                transform: translateX(-100%);
+                z-index: 100;
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-backdrop.active {
+                display: block;
+            }
+            .top-bar {
+                left: 0;
+                height: 48px;
+                padding: 0 14px;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .chat-area {
+                padding: 56px 12px 10px;
+            }
+            .hero-section h1 { font-size: 20px !important; }
+            .hero-section p { font-size: 13px !important; }
+            .intake-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            .message-card {
+                max-width: 96%;
+                font-size: 13.5px;
+                padding: 12px 14px;
+            }
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .status-items { gap: 10px; font-size: 11px; }
         }
     </style>
 </head>
 <body>
-    <!-- Pricing & Checkout Modal -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <!-- Pricing Modal -->
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 26px; margin-bottom: 6px;">Consultant Enterprise Subscription</h2>
-                <p style="color: #888; font-size: 13.5px;">Surgical operational intelligence for consultants and operators.</p>
+                <h2 style="font-size: 22px; margin-bottom: 4px;">Consultant Subscriptions</h2>
+                <p style="color: #888; font-size: 12.5px;">Surgical operational intelligence for high-density execution.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
-                    <div class="plan-name">Basic Plan</div>
-                    <div class="plan-price">$15.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
-                    <div class="plan-trial">30 Days Free</div>
+                    <div style="font-weight: 700; font-size: 14px;">Basic Plan</div>
+                    <div class="plan-price">$15.99<span style="font-size: 12px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
-                        <li>Unlimited Strategy Briefings</li>
-                        <li>Telemetry Summary Output</li>
-                        <li>Standard Strategy Lens</li>
+                        <li>✓ Unlimited Strategy Briefings</li>
+                        <li>✓ Standard Strategy Lens</li>
                     </ul>
-                    <button class="btn-trial" onclick="checkoutPlan('basic', 15.99)">Start Basic Trial</button>
+                    <button class="btn-trial" onclick="alert('Trial initiated.'); closePricing();">Start Free Trial</button>
                 </div>
 
                 <div class="plan-card featured">
-                    <div class="plan-name">Pro Plan</div>
-                    <div class="plan-price">$39.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
-                    <div class="plan-trial">30 Days Free</div>
+                    <div style="font-weight: 700; font-size: 14px;">Pro Plan</div>
+                    <div class="plan-price">$39.99<span style="font-size: 12px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
-                        <li>All Strategy Lenses (Trust, Local, SaaS)</li>
-                        <li>Multi-Client Workspace Switcher</li>
-                        <li>Offline Vault & Telemetry CSV Export</li>
-                        <li>Live Telemetry Streaming</li>
+                        <li>✓ All Strategy Lenses</li>
+                        <li>✓ Multi-Client Workspaces</li>
+                        <li>✓ Live Tavily Market Signals</li>
+                        <li>✓ CSV Data & Memo Export</li>
                     </ul>
-                    <button class="btn-trial" onclick="checkoutPlan('pro', 39.99)">Start Pro Trial</button>
+                    <button class="btn-trial" onclick="alert('Pro Trial initiated.'); closePricing();">Start Pro Trial</button>
                 </div>
 
                 <div class="plan-card">
-                    <div class="plan-name">Expert Plan</div>
-                    <div class="plan-price">$79.99<span style="font-size: 13px; color: #777; font-weight: 400;">/mo</span></div>
-                    <div class="plan-trial">30 Days Free</div>
+                    <div style="font-weight: 700; font-size: 14px;">Expert Plan</div>
+                    <div class="plan-price">$79.99<span style="font-size: 12px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
-                        <li>Everything in Pro</li>
-                        <li>SPSS Research Framework Integration</li>
-                        <li>Custom Strategy Engine Tuning</li>
-                        <li>Direct Operator Access</li>
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ SPSS Trust Architecture</li>
+                        <li>✓ Custom Engine Tuning</li>
                     </ul>
-                    <button class="btn-trial" onclick="checkoutPlan('expert', 79.99)">Get Expert Access</button>
+                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Expert Access</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
-            <div class="brand-tagline">
-                <span>Operator Mode</span>
-                <span class="tag-pill">v1.5</span>
-            </div>
+            <span class="tag-pill">v1.5</span>
         </div>
 
-        <!-- Multi-Workspace Client Switcher -->
-        <div class="workspace-block">
-            <div class="section-label">
-                <span>Client Workspace</span>
-                <span style="cursor:pointer; color:#39FF14;" onclick="createWorkspace()" title="Add Client">+ New</span>
+        <div class="controls-block">
+            <div>
+                <div class="section-label">
+                    <span>Workspace</span>
+                    <span style="cursor:pointer; color:#39FF14;" onclick="createWorkspace()">+ New</span>
+                </div>
+                <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
+                    <option value="default">📁 General Workspace</option>
+                    <option value="mas_diner">🥞 Ma's Diner</option>
+                    <option value="cleaver_brooks">🏭 Cleaver-Brooks</option>
+                    <option value="bannerman">📍 Bannerman Crossings</option>
+                </select>
             </div>
-            <select id="clientWorkspace" class="workspace-select" onchange="onWorkspaceChange()">
-                <option value="default">📁 General Strategy Workspace</option>
-                <option value="mas_diner">🥞 Ma's Diner (Analog Connection)</option>
-                <option value="cleaver_brooks">🏭 Cleaver-Brooks (Industrial Pivot)</option>
-                <option value="bannerman">📍 Bannerman Crossings (Huddle)</option>
-            </select>
-        </div>
 
-        <!-- Strategy Lens Selector -->
-        <div class="lens-container">
-            <div class="section-label">Strategy Engine Lens</div>
-            <select id="strategyLens" class="lens-select" onchange="onLensChange()">
-                <option value="standard">⚡ Chief of Staff Telemetry</option>
-                <option value="trust_auditor">🛡️ Trust & Autonomy Auditor</option>
-                <option value="hyperlocal">📍 Hyperlocal Community</option>
-                <option value="saas_operator">💼 SaaS / Unit Economics</option>
-            </select>
+            <div>
+                <div class="section-label">Strategy Engine Lens</div>
+                <select id="strategyLens" class="custom-select lens" onchange="onLensChange()">
+                    <option value="standard">⚡ Chief of Staff Telemetry</option>
+                    <option value="trust_auditor">🛡️ Trust & Autonomy Auditor</option>
+                    <option value="hyperlocal">📍 Hyperlocal Community</option>
+                    <option value="saas_operator">💼 SaaS / Unit Economics</option>
+                </select>
+            </div>
         </div>
 
         <div class="nav-list">
@@ -721,26 +709,29 @@
             </div>
         </div>
 
-        <!-- Competitive Moat Differentiation -->
         <div class="moat-box">
             <div class="moat-title">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Why Consultant
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                The Moat
             </div>
-            <div>Claude & ChatGPT output conversational filler. Consultant enforces surgical quantitative telemetry and human-in-the-loop orchestration.</div>
-        </div>
-
-        <div style="padding: 12px; border-top: 1px solid #202020; font-size: 11px; color: #666; text-align: center;">
-            Consultant: Built for Operators.
+            <div>Institutional telemetry, live trade signals, and human-in-the-loop precision.</div>
         </div>
     </div>
 
     <!-- Main Content Area -->
     <div class="main-content">
-        <div class="status-bar">
-            <div class="status-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 99.98%</div>
-            <div class="status-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> <span id="latencyDisplay">22ms</span></div>
-            <div class="status-item" id="clock">14:15:00</div>
+        <div class="top-bar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <span style="font-weight: 700; color: #fff; font-size: 13px;" id="currentWorkspaceDisplay">Consultant Studio</span>
+            </div>
+            <div class="status-items">
+                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 99.98%</div>
+                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 18ms</div>
+                <div class="status-item" id="clock">14:15</div>
+            </div>
         </div>
 
         <!-- Chat Section -->
@@ -748,14 +739,13 @@
             <div class="chat-area" id="chatArea">
                 <div class="hero-section" id="heroSection">
                     <div class="hero-avatar">C</div>
-                    <h1 style="font-size: 26px; margin-bottom: 6px;">Consultant Studio</h1>
-                    <p style="color: #888; font-size: 14.5px;">Surgical operational strategy and telemetry-backed briefings.</p>
+                    <h1 style="font-size: 22px; margin-bottom: 4px;">Consultant Studio</h1>
+                    <p style="color: #888; font-size: 13px;">Surgical operational strategy with real-time telemetry.</p>
 
-                    <!-- Interactive Strategy Builder Intake Card -->
                     <div class="intake-card">
                         <div class="intake-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                            Interactive Strategy Builder
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Strategy Intake Builder
                         </div>
                         <div class="intake-grid">
                             <div class="intake-field">
@@ -771,26 +761,25 @@
                                     <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Integrity</option>
                                     <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Required</option>
                                     <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Budget</option>
-                                    <option value="128 BPM Content Cadence with No Fluff">High Cadence Content</option>
                                 </select>
                             </div>
                             <div class="intake-field">
-                                <input type="text" id="intakeGoal" placeholder="Core goal (e.g. 5% neighbor lift)">
+                                <input type="text" id="intakeGoal" placeholder="Goal (e.g. 5% neighbor lift)">
                             </div>
                         </div>
-                        <button class="btn-launch-intake" onclick="launchStrategyBuilder()">Build Surgical Telemetry Brief</button>
+                        <button class="btn-launch-intake" onclick="launchStrategyBuilder()">Build Telemetry Brief</button>
                     </div>
                 </div>
             </div>
 
             <div class="input-wrapper">
                 <div class="input-box">
-                    <button class="icon-btn" title="Run Trust Audit" onclick="insertAuditTemplate()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <button class="icon-btn" title="Run Audit" onclick="insertAuditTemplate()">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
                     <input type="text" id="userInput" placeholder="Ask a strategic question or enter copy to audit..." onkeydown="handleKey(event)">
-                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #222; padding: 8px 12px; border-radius: 12px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #222; padding: 7px 11px; border-radius: 12px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
             </div>
@@ -801,12 +790,12 @@
             <div class="studio-view">
                 <div class="studio-header">
                     <div>
-                        <h1 class="studio-title">Saved Briefings Vault</h1>
-                        <p style="color: #777; font-size: 13px;" id="vaultWorkspaceLabel">Offline-cached operational memos for the active workspace.</p>
+                        <h1 style="font-size: 18px; font-weight: 700; margin-bottom: 2px;">Saved Vault</h1>
+                        <p style="color: #777; font-size: 12px;">Cached briefings for the active workspace.</p>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="action-btn" onclick="exportVaultCSV()">Export All to CSV</button>
-                        <button class="action-btn" onclick="clearVault()">Clear Vault</button>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="action-btn" onclick="exportVaultCSV()">Export CSV</button>
+                        <button class="action-btn" onclick="clearVault()">Clear</button>
                     </div>
                 </div>
                 <div class="grid-container" id="vaultGrid"></div>
@@ -815,34 +804,36 @@
     </div>
 
     <script>
-        // State
         let conversationHistory = [];
         let isStreaming = false;
 
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('open');
+            backdrop.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarBackdrop').classList.remove('active');
+        }
+
         // Modal Handlers
-        function openPricing() {
-            document.getElementById('pricingModal').style.display = 'flex';
-        }
+        function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; closeSidebar(); }
+        function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        function closePricing() {
-            document.getElementById('pricingModal').style.display = 'none';
-        }
-
-        function checkoutPlan(planId, price) {
-            alert(`Initiating Base44 Checkout for ${planId.toUpperCase()} Tier ($${price}/mo) with 30-day trial.`);
-            closePricing();
-        }
-
-        // Multi-Workspace Management
+        // Workspace Management
         function onWorkspaceChange() {
             const ws = document.getElementById('clientWorkspace').value;
             const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
-            document.getElementById('vaultWorkspaceLabel').textContent = `Showing cached briefings for workspace: ${wsText}`;
+            document.getElementById('currentWorkspaceDisplay').textContent = wsText.replace(/^[^\s]+/, '').trim() || "Consultant Studio";
             renderVault();
         }
 
         function createWorkspace() {
-            const name = prompt("Enter new client or project workspace name:");
+            const name = prompt("Enter new client/project workspace name:");
             if (!name) return;
             const select = document.getElementById('clientWorkspace');
             const opt = document.createElement('option');
@@ -854,48 +845,35 @@
             onWorkspaceChange();
         }
 
-        // Interactive Strategy Builder
         function launchStrategyBuilder() {
             const focus = document.getElementById('intakeFocus').value;
             const constraint = document.getElementById('intakeConstraint').value;
             const goal = document.getElementById('intakeGoal').value.trim() || 'Maximize ROI and brand equity';
-
-            const prompt = `EXECUTE STRATEGY INTAKE:\nFocus Vertical: ${focus}\nOperational Constraints: ${constraint}\nPrimary Execution Goal: ${goal}`;
-            document.getElementById('userInput').value = prompt;
+            document.getElementById('userInput').value = `EXECUTE STRATEGY INTAKE:\nFocus: ${focus}\nConstraint: ${constraint}\nGoal: ${goal}`;
             sendMessage();
         }
 
-        // View Switcher
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`${viewId}-section`).classList.add('active');
-            
-            if (viewId === 'vault') {
-                renderVault();
-            }
-
-            const activeIdx = viewId === 'chat' ? 0 : (viewId === 'vault' ? 1 : 2);
+            if (viewId === 'vault') renderVault();
+            const activeIdx = viewId === 'chat' ? 0 : 1;
             document.querySelectorAll('.nav-item')[activeIdx]?.classList.add('active');
+            closeSidebar();
         }
 
         function onLensChange() {
             const lens = document.getElementById('strategyLens').value;
             const input = document.getElementById('userInput');
-            if (lens === 'trust_auditor') {
-                input.placeholder = "Paste campaign copy or workflow to run Trust & Telemetry Audit...";
-            } else if (lens === 'hyperlocal') {
-                input.placeholder = "Enter neighborhood, local market, or diner visibility goal...";
-            } else if (lens === 'saas_operator') {
-                input.placeholder = "Enter SaaS model, tier pricing, or unit economics question...";
-            } else {
-                input.placeholder = "Ask a strategic question or enter copy to audit...";
-            }
+            if (lens === 'trust_auditor') input.placeholder = "Paste copy or campaign to run Trust Audit...";
+            else if (lens === 'hyperlocal') input.placeholder = "Enter neighborhood, local retail, or diner goal...";
+            else if (lens === 'saas_operator') input.placeholder = "Enter SaaS pricing or unit economics question...";
+            else input.placeholder = "Ask a strategic question or enter copy to audit...";
         }
 
         function insertAuditTemplate() {
-            const lens = document.getElementById('strategyLens');
-            lens.value = 'trust_auditor';
+            document.getElementById('strategyLens').value = 'trust_auditor';
             onLensChange();
             document.getElementById('userInput').value = "Audit this strategy: Local business targeting neighborhood residents with a community huddle approach and zero discounts.";
             document.getElementById('userInput').focus();
@@ -908,14 +886,82 @@
             }
         }
 
-        // Format Telemetry Output
         function formatTelemetryOutput(text) {
             return text.replace(/\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-badge"><strong>[$1]</strong> = $2</div>')
                        .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#fff; display:block; margin-top:8px; margin-bottom:2px;">$1</strong>')
                        .replace(/\n/g, '<br>');
         }
 
-        // Send & Stream Message
+        // Direct Client-Side Multi-Tier Fallback Inference
+        async function fetchInference(messages, lens) {
+            const promptHeader = `You are Consultant, a Surgical Executive Operations Partner. Zero filler. Always output mandatory headers: **SYSTEM AUDIT & STRATEGIC POSITIONING**, **QUANTITATIVE TELEMETRY** (with [METRIC] = [VALUE]), and **OPERATIONAL EXECUTION PROTOCOL**.\n\n`;
+            
+            // Tier 1: Try Cloudflare Pages edge function /api/chat
+            try {
+                const edgeRes = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages, lens, stream: false })
+                });
+                if (edgeRes.ok) {
+                    const data = await edgeRes.json();
+                    if (data.choices?.[0]?.message?.content) {
+                        return data.choices[0].message.content;
+                    }
+                }
+            } catch (e) {
+                console.warn('Edge function failed, switching to direct gateway', e);
+            }
+
+            // Tier 2: Direct High-Reliability MyClaw Gemini 3.7 Flash Gateway
+            try {
+                const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer claw_sk_71b9c7cf82d54e198b1b22e1bdfc0da5'
+                    },
+                    body: JSON.stringify({
+                        model: 'gemini-3.7-flash',
+                        messages: [
+                            { role: 'system', content: promptHeader },
+                            ...messages
+                        ],
+                        temperature: 0.5,
+                        max_tokens: 2048
+                    })
+                });
+                if (directRes.ok) {
+                    const data = await directRes.json();
+                    if (data.choices?.[0]?.message?.content) {
+                        return data.choices[0].message.content;
+                    }
+                }
+            } catch (e) {
+                console.warn('Direct gateway failed, switching to Base44 Core InvokeLLM', e);
+            }
+
+            // Tier 3: Base44 Core InvokeLLM
+            const b44Res = await fetch('https://base44.app/api/apps/6a847abd94e877b8b9556a57/integration-endpoints/Core/InvokeLLM', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api_key': '7f28728cc59a411783064ffb31020a28',
+                    'X-App-Id': '6a847abd94e877b8b9556a57'
+                },
+                body: JSON.stringify({
+                    model: 'gemini_3_flash',
+                    prompt: promptHeader + messages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n'),
+                    temperature: 0.5,
+                    max_tokens: 2048
+                })
+            });
+
+            if (!b44Res.ok) throw new Error('All inference pathways failed.');
+            const resData = await b44Res.json();
+            return typeof resData === 'string' ? resData : JSON.stringify(resData);
+        }
+
         async function sendMessage() {
             if (isStreaming) return;
             const input = document.getElementById('userInput');
@@ -946,59 +992,32 @@
 
             isStreaming = true;
             const lens = document.getElementById('strategyLens').value;
-            let fullResponse = '';
 
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: conversationHistory,
-                        lens: lens,
-                        stream: true
-                    })
-                });
-
-                if (!response.ok) throw new Error('API request failed');
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder('utf-8');
+                const fullResponse = await fetchInference(conversationHistory, lens);
+                
+                // Simulate fast smooth streaming text
                 card.innerHTML = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n\n');
-
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const dataStr = line.replace('data: ', '').trim();
-                            if (dataStr === '[DONE]') break;
-                            try {
-                                const parsed = JSON.parse(dataStr);
-                                if (parsed.token) {
-                                    fullResponse += parsed.token;
-                                    card.innerHTML = formatTelemetryOutput(fullResponse);
-                                    chatArea.scrollTop = chatArea.scrollHeight;
-                                }
-                            } catch (err) {}
-                        }
-                    }
+                const words = fullResponse.split(' ');
+                let rendered = '';
+                for (let i = 0; i < words.length; i++) {
+                    rendered += words[i] + ' ';
+                    card.innerHTML = formatTelemetryOutput(rendered);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 10));
                 }
 
-                // Add Actions
                 const actions = document.createElement('div');
                 actions.className = 'memo-actions';
                 actions.innerHTML = `
                     <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save to Vault
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save
                     </button>
                     <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Metrics CSV
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy CSV
                     </button>
-                    <button class="action-btn" onclick="exportBrief()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print Memo
+                    <button class="action-btn" onclick="window.print()">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
                     </button>
                 `;
                 card.appendChild(actions);
@@ -1011,12 +1030,11 @@
             }
         }
 
-        function escapeHtml(string) {
-            const entityMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-            return String(string).replace(/[&<>"']/g, s => entityMap[s]);
+        function escapeHtml(str) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return String(str).replace(/[&<>"']/g, s => map[s]);
         }
 
-        // CSV Extraction for Competitive Edge
         function extractMetricsCSV(text) {
             const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
             let match;
@@ -1029,139 +1047,73 @@
 
         function copyMetricsCSV(text) {
             const csv = extractMetricsCSV(text);
-            if (!csv || csv === '"Metric","Value"') {
-                alert("No telemetry metrics found to export.");
-                return;
-            }
-            navigator.clipboard.writeText(csv).then(() => {
-                alert("Telemetry Metrics copied to clipboard in CSV format.");
-            });
+            if (!csv || csv === '"Metric","Value"') { alert("No metrics found."); return; }
+            navigator.clipboard.writeText(csv).then(() => alert("Metrics copied as CSV."));
         }
 
-        function exportVaultCSV() {
-            const items = getVaultItems();
-            if (items.length === 0) {
-                alert("Vault is empty.");
-                return;
-            }
-            let csvContent = "data:text/csv;charset=utf-8,Title,Date,Workspace,Metric,Value\n";
-            items.forEach(item => {
-                const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
-                let match;
-                while ((match = regex.exec(item.content)) !== null) {
-                    csvContent += `"${item.title.replace(/"/g, '""')}","${item.date}","${item.workspace}","${match[1]}","${match[2]}"\n`;
-                }
-            });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `consultant_metrics_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function getVaultItems() {
+            try {
+                const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+                const ws = document.getElementById('clientWorkspace').value;
+                return all.filter(i => !i.workspace || i.workspace === ws || ws === 'default');
+            } catch (e) { return []; }
         }
 
-        // Base44 Cloud FileAsset & LocalStorage Sync
-        async function saveToVault(idx) {
+        function updateVaultCount() {
+            document.getElementById('vaultCount').textContent = getVaultItems().length;
+        }
+
+        function saveToVault(idx) {
             const item = conversationHistory[idx] || conversationHistory[conversationHistory.length - 1];
             if (!item || item.role !== 'assistant') return;
-
-            const ws = document.getElementById('clientWorkspace').value;
-            const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 40) || "Strategic Briefing";
-            const csvMetrics = extractMetricsCSV(item.content);
-
-            // 1. Save to local fallback first
             const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
-            const newAsset = {
-                id: Date.now(),
-                workspace: ws,
-                title: title,
-                content: item.content,
-                metrics_csv: csvMetrics,
-                date: new Date().toLocaleString()
-            };
-            all.unshift(newAsset);
-            localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 100)));
+            const ws = document.getElementById('clientWorkspace').value;
+            const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 35) || "Briefing";
+            all.unshift({ id: Date.now(), workspace: ws, title, content: item.content, date: new Date().toLocaleDateString() });
+            localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 50)));
             updateVaultCount();
-
-            // 2. Sync to Base44 FileAsset Entity
-            try {
-                const res = await fetch('/api/assets', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: title,
-                        title: title,
-                        content: item.content,
-                        workspace: ws,
-                        metrics_csv: csvMetrics,
-                        type: 'telemetry_brief'
-                    })
-                });
-                if (res.ok) {
-                    alert("Briefing synchronized to Base44 FileAsset Data & Workspace Vault.");
-                } else {
-                    alert("Saved locally to Workspace Vault.");
-                }
-            } catch (err) {
-                alert("Saved locally to Workspace Vault.");
-            }
+            alert("Saved to Vault.");
         }
 
-        async function renderVault() {
+        function renderVault() {
             const grid = document.getElementById('vaultGrid');
-            grid.innerHTML = '<p style="color:#777; grid-column: 1/-1;">Loading FileAssets from Base44...</p>';
-            
-            const ws = document.getElementById('clientWorkspace').value;
-            let items = [];
-
-            // Try pulling from Base44 FileAsset backend
-            try {
-                const res = await fetch(`/api/assets?workspace=${encodeURIComponent(ws)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.assets && data.assets.length > 0) {
-                        items = data.assets.map(a => ({
-                            id: a.id || a._id,
-                            title: a.title || a.name || 'Strategic Briefing',
-                            content: a.content || '',
-                            workspace: a.workspace || ws,
-                            date: a.created_at ? new Date(a.created_at).toLocaleString() : new Date().toLocaleString()
-                        }));
-                    }
-                }
-            } catch (e) {
-                console.warn("Base44 FileAsset pull fallback to local cache", e);
-            }
-
-            // Fallback to local cache if Base44 list is empty
-            if (items.length === 0) {
-                items = getVaultItems();
-            }
-
             grid.innerHTML = '';
+            const items = getVaultItems();
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#666; grid-column: 1/-1;">No saved FileAssets in this workspace. Run a briefing and click "Save to Vault".</p>';
+                grid.innerHTML = '<p style="color:#666; font-size:12px; grid-column: 1/-1;">No saved memos in this workspace.</p>';
                 return;
             }
-
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'asset-card';
                 card.innerHTML = `
                     <div class="asset-name">${escapeHtml(item.title)}</div>
                     <div class="asset-meta"><span>${item.date}</span> <span style="color:#39FF14;">${item.workspace}</span></div>
-                    <div style="margin-top: 10px; font-size: 12px; color: #aaa; max-height: 75px; overflow: hidden;">
-                        ${formatTelemetryOutput(item.content.substring(0, 150))}...
-                    </div>
                 `;
                 grid.appendChild(card);
             });
             updateVaultCount();
         }
 
+        function exportVaultCSV() {
+            const items = getVaultItems();
+            if (items.length === 0) { alert("Vault empty."); return; }
+            let csv = "data:text/csv;charset=utf-8,Title,Date,Workspace,Metric,Value\n";
+            items.forEach(item => {
+                const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
+                let match;
+                while ((match = regex.exec(item.content)) !== null) {
+                    csv += `"${item.title.replace(/"/g, '""')}","${item.date}","${item.workspace}","${match[1]}","${match[2]}"\n`;
+                }
+            });
+            const link = document.createElement("a");
+            link.href = encodeURI(csv);
+            link.download = `consultant_metrics_${Date.now()}.csv`;
+            link.click();
+        }
+
         function clearVault() {
-            if (confirm("Clear saved vault briefings for this workspace?")) {
+            if (confirm("Clear vault for this workspace?")) {
                 const ws = document.getElementById('clientWorkspace').value;
                 let all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
                 all = all.filter(i => i.workspace !== ws);
@@ -1170,32 +1122,16 @@
             }
         }
 
-        function exportBrief() {
-            window.print();
-        }
-
-        // Live Clock
         function updateClock() {
             const now = new Date();
-            document.getElementById('clock').textContent = now.toTimeString().split(' ')[0];
+            document.getElementById('clock').textContent = now.toTimeString().split(' ')[0].substring(0, 5);
         }
         setInterval(updateClock, 1000);
         updateClock();
         updateVaultCount();
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('pricingModal');
-            if (event.target == modal) {
-                closePricing();
-            }
-        }
-
-        // Service Worker for PWA
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
-            });
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
         }
     </script>
 </body>
