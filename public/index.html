@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consultant | Surgical Executive Intelligence</title>
+    <title>Consultant Studio | Telemetry & Operations Gateway</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA & Verification Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#111111">
     <meta name="google-site-verification" content="31-SLXAL0M_MPHw5PGlKlxzv4RwIAsAbJmhXqpe1GdA">
@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="/icon.svg">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -34,11 +34,11 @@
             position: fixed;
         }
 
-        /* Sidebar Desktop */
+        /* Sidebar */
         .sidebar {
             width: 280px;
-            background: #181818;
-            border-right: 1px solid #242424;
+            background: #161616;
+            border-right: 1px solid #222222;
             display: flex;
             flex-direction: column;
             z-index: 50;
@@ -46,14 +46,15 @@
         }
 
         .sidebar-brand {
-            padding: 20px 20px 14px;
+            padding: 18px 20px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid #202020;
         }
 
         .brand-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: #ffffff;
             display: flex;
@@ -63,40 +64,40 @@
         }
 
         .brand-tagline {
-            font-size: 11px;
-            color: #39FF14;
-            margin-top: 4px;
-            font-weight: 500;
+            font-size: 10.5px;
+            color: #00FF66;
+            font-family: 'JetBrains Mono', monospace;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .tag-pill {
-            background: rgba(57, 255, 20, 0.12);
-            border: 1px solid rgba(57, 255, 20, 0.3);
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.3);
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
-            color: #39FF14;
+            color: #00FF66;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Controls Block */
         .controls-block {
-            padding: 0 16px 12px;
+            padding: 14px 16px 10px;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
         .section-label {
-            font-size: 10px;
+            font-size: 9.5px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: #777;
             margin-bottom: 4px;
             font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -104,83 +105,85 @@
 
         .custom-select {
             width: 100%;
-            background: #121212;
-            border: 1px solid #333;
+            background: #111111;
+            border: 1px solid #2a2a2a;
             color: #fff;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-size: 12.5px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
             outline: none;
             cursor: pointer;
         }
 
         .custom-select.lens {
-            color: #39FF14;
+            color: #00FF66;
+            border-color: rgba(0, 255, 102, 0.25);
         }
 
         .nav-list {
             flex: 1;
-            padding: 0 12px;
+            padding: 8px 12px;
             overflow-y: auto;
         }
 
         .nav-item {
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13.5px;
-            color: #b0b0b0;
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #a0a0a0;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 3px;
+            gap: 10px;
+            margin-bottom: 2px;
             transition: all 0.2s;
         }
 
         .nav-item:hover {
-            background: rgba(57, 255, 20, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             color: #fff;
         }
 
         .nav-item.active {
-            background: rgba(57, 255, 20, 0.1);
-            color: #39FF14;
+            background: rgba(0, 255, 102, 0.08);
+            color: #00FF66;
             font-weight: 600;
+            border-left: 2px solid #00FF66;
         }
 
         .nav-item svg {
-            width: 17px;
-            height: 17px;
+            width: 16px;
+            height: 16px;
             opacity: 0.8;
         }
 
         .nav-item.active svg {
             opacity: 1;
-            stroke: #39FF14;
+            stroke: #00FF66;
         }
 
-        .moat-box {
-            margin: 12px 14px;
-            padding: 12px;
+        /* Live Security & Autonomy Gate Indicator */
+        .gate-card {
+            margin: 12px;
+            padding: 10px 12px;
             background: #121212;
-            border: 1px solid #282828;
-            border-radius: 10px;
-            font-size: 11.5px;
-            line-height: 1.45;
-            color: #999;
+            border: 1px solid #222;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #888;
         }
 
-        .moat-title {
-            color: #39FF14;
-            font-weight: 700;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+        .gate-header {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            color: #00FF66;
+            font-weight: 700;
+            font-size: 10.5px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 4px;
         }
 
         /* Top Header Bar */
@@ -189,17 +192,18 @@
             top: 0;
             right: 0;
             left: 280px;
-            height: 52px;
+            height: 50px;
             padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12.5px;
-            color: #39FF14;
+            font-size: 12px;
+            color: #00FF66;
             z-index: 10;
-            background: rgba(17,17,17,0.92);
+            background: rgba(17,17,17,0.95);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid #1f1f1f;
+            border-bottom: 1px solid #222;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .mobile-menu-btn {
@@ -214,17 +218,25 @@
         .status-items {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .status-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             font-weight: 500;
         }
 
-        /* Main Content Container */
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #00FF66;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00FF66;
+        }
+
+        /* Main Content */
         .main-content {
             flex: 1;
             display: flex;
@@ -244,19 +256,17 @@
             overflow: hidden;
         }
 
-        .view-section.active {
-            display: flex;
-        }
+        .view-section.active { display: flex; }
 
         /* Chat Area */
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 68px 16px 16px;
+            padding: 64px 16px 16px;
             display: flex;
             flex-direction: column;
             gap: 14px;
-            max-width: 860px;
+            max-width: 880px;
             width: 100%;
             margin: 0 auto;
         }
@@ -264,29 +274,30 @@
         .hero-section {
             text-align: center;
             max-width: 680px;
-            margin: 10px auto;
+            margin: 8px auto;
             padding: 0 10px;
             width: 100%;
         }
 
         .hero-avatar {
-            width: 48px;
-            height: 48px;
-            background: rgba(57, 255, 20, 0.1);
-            border: 1px solid rgba(57, 255, 20, 0.3);
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            background: rgba(0, 255, 102, 0.08);
+            border: 1px solid rgba(0, 255, 102, 0.3);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-            color: #39FF14;
+            margin: 0 auto 10px;
+            color: #00FF66;
             font-size: 18px;
             font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* One-Click Quick Launch Pills */
+        /* Quick Task Launcher */
         .quick-tasks-container {
-            margin-top: 14px;
+            margin-top: 12px;
             text-align: left;
         }
 
@@ -294,50 +305,38 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .quick-task-card {
             background: #161616;
-            border: 1px solid #282828;
-            border-radius: 10px;
+            border: 1px solid #242424;
+            border-radius: 8px;
             padding: 10px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
 
         .quick-task-card:hover {
-            border-color: #39FF14;
-            background: #1c1c1c;
+            border-color: #00FF66;
+            background: #1a1a1a;
             transform: translateY(-2px);
         }
 
-        .quick-task-icon {
-            font-size: 16px;
-        }
+        .quick-task-icon { font-size: 15px; }
+        .quick-task-title { font-size: 11.5px; font-weight: 700; color: #fff; }
+        .quick-task-desc { font-size: 10px; color: #777; line-height: 1.3; }
 
-        .quick-task-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .quick-task-desc {
-            font-size: 10.5px;
-            color: #777;
-            line-height: 1.3;
-        }
-
-        /* Strategy Builder Card */
+        /* Strategy Intake & Custom Task Form */
         .intake-card {
             background: #161616;
-            border: 1px solid #282828;
-            border-radius: 14px;
-            padding: 16px;
-            margin-top: 14px;
+            border: 1px solid #242424;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
             text-align: left;
         }
 
@@ -345,22 +344,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .intake-title {
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .intake-mode-toggle {
             display: flex;
             background: #111;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
             border-radius: 6px;
             padding: 2px;
         }
@@ -369,17 +368,16 @@
             background: transparent;
             border: none;
             color: #888;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .mode-btn.active {
-            background: #252525;
-            color: #39FF14;
+            background: #222;
+            color: #00FF66;
         }
 
         .intake-grid {
@@ -392,7 +390,7 @@
         .intake-field select, .intake-field input, .intake-field textarea {
             width: 100%;
             background: #111;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
             color: #ccc;
             padding: 8px;
             border-radius: 6px;
@@ -401,6 +399,8 @@
             font-family: inherit;
         }
 
+        .intake-field input:focus, .intake-field textarea:focus { border-color: #00FF66; }
+
         .custom-task-container {
             display: none;
             flex-direction: column;
@@ -408,76 +408,81 @@
             margin-bottom: 10px;
         }
 
-        .custom-task-container.active {
-            display: flex;
-        }
+        .custom-task-container.active { display: flex; }
 
         .btn-launch-intake {
-            background: #39FF14;
+            background: #00FF66;
             color: #000;
             border: none;
-            padding: 10px 14px;
+            padding: 9px 14px;
             border-radius: 6px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s;
-        }
-
-        .btn-launch-intake:hover {
-            opacity: 0.9;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Message Bubbles */
-        .message-row {
-            display: flex;
-            width: 100%;
-            margin-bottom: 4px;
-        }
-
+        .message-row { display: flex; width: 100%; margin-bottom: 4px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
 
         .message-card {
             max-width: 90%;
             padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
             line-height: 1.6;
             word-break: break-word;
         }
 
         .message-row.user .message-card {
-            background: #1e1e1e;
-            border: 1px solid #333;
+            background: #1c1c1c;
+            border: 1px solid #2e2e2e;
             color: #fff;
         }
 
         .message-row.assistant .message-card {
-            background: #161616;
-            border: 1px solid #282828;
-            border-left: 3px solid #39FF14;
+            background: #141414;
+            border: 1px solid #242424;
+            border-left: 3px solid #00FF66;
             color: #f0f0f0;
             width: 100%;
         }
 
+        /* Telemetry Block & Badge Styling */
+        .telemetry-header-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #00FF66;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .metric-badge {
             display: inline-block;
-            background: rgba(57, 255, 20, 0.08);
-            border: 1px solid rgba(57, 255, 20, 0.3);
-            color: #39FF14;
-            font-family: monospace;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin: 4px 0;
-            font-size: 12.5px;
+            background: rgba(0, 255, 102, 0.06);
+            border: 1px solid rgba(0, 255, 102, 0.25);
+            color: #00FF66;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin: 3px 0;
+            font-size: 12px;
+            font-weight: 500;
         }
 
         .memo-actions {
             margin-top: 12px;
             padding-top: 8px;
-            border-top: 1px solid #252525;
+            border-top: 1px solid #222;
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
@@ -485,20 +490,23 @@
         }
 
         .action-btn {
-            background: #202020;
-            border: 1px solid #383838;
-            color: #39FF14;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            color: #00FF66;
             font-size: 11px;
             font-weight: 600;
             padding: 5px 9px;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Input Container */
+        .action-btn:hover { background: #242424; border-color: #00FF66; }
+
+        /* Input Box */
         .input-wrapper {
             padding: 10px 14px 16px;
             width: 100%;
@@ -510,10 +518,10 @@
 
         .input-box {
             width: 100%;
-            max-width: 860px;
-            background: #181818;
-            border: 1px solid #2d2d2d;
-            border-radius: 24px;
+            max-width: 880px;
+            background: #161616;
+            border: 1px solid #262626;
+            border-radius: 20px;
             padding: 4px 12px;
             display: flex;
             align-items: center;
@@ -521,14 +529,14 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        .input-box:focus-within { border-color: #39FF14; }
+        .input-box:focus-within { border-color: #00FF66; }
 
         .input-box input {
             flex: 1;
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 14px;
+            font-size: 13.5px;
             outline: none;
             padding: 8px 0;
             min-width: 0;
@@ -537,7 +545,7 @@
         .icon-btn {
             background: transparent;
             border: none;
-            color: #39FF14;
+            color: #00FF66;
             cursor: pointer;
             padding: 6px;
             border-radius: 50%;
@@ -549,7 +557,7 @@
 
         /* Studio Vault */
         .studio-view {
-            padding: 68px 20px 20px;
+            padding: 64px 20px 20px;
             max-width: 900px;
             margin: 0 auto;
             width: 100%;
@@ -557,9 +565,9 @@
         }
 
         .studio-header {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             border-bottom: 1px solid #222;
-            padding-bottom: 14px;
+            padding-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -568,19 +576,20 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 14px;
+            gap: 12px;
         }
 
         .asset-card {
             background: #161616;
-            border: 1px solid #2b2b2b;
-            border-radius: 10px;
-            padding: 14px;
+            border: 1px solid #242424;
+            border-radius: 8px;
+            padding: 12px;
             cursor: pointer;
         }
 
-        .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13.5px; color: #fff; }
-        .asset-meta { font-size: 11px; color: #777; display: flex; justify-content: space-between; }
+        .asset-card:hover { border-color: #00FF66; }
+        .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13px; color: #fff; }
+        .asset-meta { font-size: 11px; color: #777; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; }
 
         /* Modal Overlay */
         .modal-overlay {
@@ -596,9 +605,9 @@
         }
 
         .modal-content {
-            background: #181818;
-            border: 1px solid #333;
-            border-radius: 16px;
+            background: #161616;
+            border: 1px solid #2e2e2e;
+            border-radius: 14px;
             padding: 24px;
             max-width: 800px;
             width: 100%;
@@ -616,38 +625,39 @@
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 18px;
         }
 
         .plan-card {
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
             background: #111111;
-            border-radius: 12px;
-            padding: 18px;
+            border-radius: 10px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
         }
 
         .plan-card.featured {
-            border-color: #39FF14;
-            background: rgba(57, 255, 20, 0.02);
+            border-color: #00FF66;
+            background: rgba(0, 255, 102, 0.02);
         }
 
-        .plan-price { font-size: 26px; font-weight: 700; color: #39FF14; margin: 4px 0; }
-        .plan-features { margin: 12px 0; flex: 1; font-size: 12px; color: #bbb; }
-        .plan-features li { list-style: none; margin-bottom: 6px; }
+        .plan-price { font-size: 24px; font-weight: 700; color: #00FF66; margin: 4px 0; font-family: 'JetBrains Mono', monospace; }
+        .plan-features { margin: 10px 0; flex: 1; font-size: 11.5px; color: #bbb; }
+        .plan-features li { list-style: none; margin-bottom: 5px; }
 
         .btn-trial {
-            background: #39FF14;
+            background: #00FF66;
             color: #000;
             border: none;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 9px;
+            border-radius: 5px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11.5px;
             cursor: pointer;
             width: 100%;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Mobile Overlay Backdrop */
@@ -659,7 +669,7 @@
             z-index: 40;
         }
 
-        /* Mobile Responsive Breakpoints */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -668,43 +678,18 @@
                 z-index: 100;
                 width: 260px;
             }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-backdrop.active {
-                display: block;
-            }
-            .top-bar {
-                left: 0;
-                height: 48px;
-                padding: 0 14px;
-            }
-            .mobile-menu-btn {
-                display: block;
-            }
-            .chat-area {
-                padding: 56px 12px 10px;
-            }
-            .hero-section h1 { font-size: 20px !important; }
-            .hero-section p { font-size: 13px !important; }
-            .quick-task-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-            }
-            .intake-grid {
-                grid-template-columns: 1fr;
-                gap: 6px;
-            }
-            .message-card {
-                max-width: 96%;
-                font-size: 13.5px;
-                padding: 12px 14px;
-            }
-            .pricing-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .status-items { gap: 10px; font-size: 11px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-backdrop.active { display: block; }
+            .top-bar { left: 0; height: 46px; padding: 0 14px; }
+            .mobile-menu-btn { display: block; }
+            .chat-area { padding: 52px 10px 10px; }
+            .hero-section h1 { font-size: 19px !important; }
+            .hero-section p { font-size: 12.5px !important; }
+            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .intake-grid { grid-template-columns: 1fr; gap: 6px; }
+            .message-card { max-width: 96%; font-size: 13px; padding: 12px 14px; }
+            .pricing-grid { grid-template-columns: 1fr; gap: 8px; }
+            .status-items { gap: 10px; font-size: 10.5px; }
         }
     </style>
 </head>
@@ -716,14 +701,14 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 22px; margin-bottom: 4px;">Consultant Subscriptions</h2>
-                <p style="color: #888; font-size: 12.5px;">Surgical operational intelligence for high-density execution.</p>
+                <h2 style="font-size: 20px; margin-bottom: 4px;">Consultant Subscriptions</h2>
+                <p style="color: #888; font-size: 12px;">Surgical operational intelligence for high-density execution.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 14px;">Basic Plan</div>
-                    <div class="plan-price">$15.99<span style="font-size: 12px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Basic Tier</div>
+                    <div class="plan-price">$15.99<span style="font-size: 11px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Unlimited Strategy Briefings</li>
                         <li>✓ Standard Strategy Lens</li>
@@ -732,20 +717,20 @@
                 </div>
 
                 <div class="plan-card featured">
-                    <div style="font-weight: 700; font-size: 14px;">Pro Plan</div>
-                    <div class="plan-price">$39.99<span style="font-size: 12px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Pro Operator</div>
+                    <div class="plan-price">$39.99<span style="font-size: 11px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ All Strategy Lenses</li>
                         <li>✓ Multi-Client Workspaces</li>
-                        <li>✓ Live Tavily Market Signals</li>
-                        <li>✓ CSV Data & Memo Export</li>
+                        <li>✓ Live Tavily Trade Signals</li>
+                        <li>✓ CSV & Memo Export</li>
                     </ul>
                     <button class="btn-trial" onclick="alert('Pro Trial initiated.'); closePricing();">Start Pro Trial</button>
                 </div>
 
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 14px;">Expert Plan</div>
-                    <div class="plan-price">$79.99<span style="font-size: 12px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Expert Studio</div>
+                    <div class="plan-price">$79.99<span style="font-size: 11px; color: #777;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Everything in Pro</li>
                         <li>✓ SPSS Trust Architecture</li>
@@ -761,17 +746,17 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
-            <span class="tag-pill">v1.6</span>
+            <span class="tag-pill">v1.7 FINAL</span>
         </div>
 
         <div class="controls-block">
             <div>
                 <div class="section-label">
                     <span>Workspace</span>
-                    <span style="cursor:pointer; color:#39FF14;" onclick="createWorkspace()">+ New</span>
+                    <span style="cursor:pointer; color:#00FF66;" onclick="createWorkspace()">+ New</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
                     <option value="default">📁 General Workspace</option>
@@ -795,7 +780,7 @@
         <div class="nav-list">
             <div class="nav-item active" onclick="switchView('chat')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Strategy Chat
+                Telemetry Studio
             </div>
             <div class="nav-item" onclick="switchView('vault')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -811,12 +796,13 @@
             </div>
         </div>
 
-        <div class="moat-box">
-            <div class="moat-title">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                The Moat
+        <!-- Autonomy & Verification Gate Badge -->
+        <div class="gate-card">
+            <div class="gate-header">
+                <span>VERIFICATION GATE</span>
+                <span style="color:#00FF66;">● ENFORCED</span>
             </div>
-            <div>Institutional telemetry, live trade signals, and human-in-the-loop precision.</div>
+            <div>Human-in-the-loop validation active. Zero hallucination risk. Direct edge inference.</div>
         </div>
     </div>
 
@@ -830,8 +816,8 @@
                 <span style="font-weight: 700; color: #fff; font-size: 13px;" id="currentWorkspaceDisplay">Consultant Studio</span>
             </div>
             <div class="status-items">
-                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 99.98%</div>
-                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 18ms</div>
+                <div class="status-item"><span class="status-dot"></span> LIVE EDGE</div>
+                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 12ms</div>
                 <div class="status-item" id="clock">14:15</div>
             </div>
         </div>
@@ -841,47 +827,47 @@
             <div class="chat-area" id="chatArea">
                 <div class="hero-section" id="heroSection">
                     <div class="hero-avatar">C</div>
-                    <h1 style="font-size: 22px; margin-bottom: 4px;">Consultant Studio</h1>
-                    <p style="color: #888; font-size: 13px;">Surgical operational strategy with real-time telemetry.</p>
+                    <h1 style="font-size: 21px; margin-bottom: 4px; font-weight: 700;">Consultant Studio</h1>
+                    <p style="color: #888; font-size: 13px;">Structured Telemetry Engine & Human-in-the-Loop Operations.</p>
 
-                    <!-- Quick Task Launch Grid -->
+                    <!-- Quick Operations Launcher -->
                     <div class="quick-tasks-container">
                         <div class="section-label">⚡ 1-Click Operations Tasks</div>
                         <div class="quick-task-grid">
                             <div class="quick-task-card" onclick="quickTask('trade_analysis')">
                                 <div class="quick-task-icon">📍</div>
                                 <div class="quick-task-title">Trade Analysis</div>
-                                <div class="quick-task-desc">Foot traffic & market density audit</div>
+                                <div class="quick-task-desc">Foot traffic & density</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('trust')">
                                 <div class="quick-task-icon">🛡️</div>
                                 <div class="quick-task-title">Trust Audit</div>
-                                <div class="quick-task-desc">Scan copy for autonomy risks</div>
+                                <div class="quick-task-desc">Scan autonomy risk</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('saas')">
                                 <div class="quick-task-icon">💼</div>
                                 <div class="quick-task-title">Unit Economics</div>
-                                <div class="quick-task-desc">CAC, LTV & churn model</div>
+                                <div class="quick-task-desc">CAC, LTV & churn</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
                                 <div class="quick-task-icon">🚀</div>
                                 <div class="quick-task-title">Campaign Strategy</div>
-                                <div class="quick-task-desc">Multi-channel growth roadmap</div>
+                                <div class="quick-task-desc">Multi-channel growth</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('competitor')">
                                 <div class="quick-task-icon">🔍</div>
                                 <div class="quick-task-title">Competitor Scan</div>
-                                <div class="quick-task-desc">Live trade signals via Tavily</div>
+                                <div class="quick-task-desc">Tavily live signals</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('pricing')">
                                 <div class="quick-task-icon">💵</div>
                                 <div class="quick-task-title">Pricing Pivot</div>
-                                <div class="quick-task-desc">Margin protection strategy</div>
+                                <div class="quick-task-desc">Margin defense</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('fsu_trust')">
                                 <div class="quick-task-icon">📊</div>
                                 <div class="quick-task-title">SPSS Trust Score</div>
-                                <div class="quick-task-desc">Human-in-the-loop validation</div>
+                                <div class="quick-task-desc">Human gate math</div>
                             </div>
                             <div class="quick-task-card" onclick="setCustomTaskMode()">
                                 <div class="quick-task-icon">✏️</div>
@@ -891,11 +877,11 @@
                         </div>
                     </div>
 
-                    <!-- Custom Task / Strategy Intake Builder -->
+                    <!-- Strategy Builder / Custom Task -->
                     <div class="intake-card">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                                 <span id="intakeModeTitle">Strategy Intake Builder</span>
                             </div>
                             <div class="intake-mode-toggle">
@@ -904,17 +890,17 @@
                             </div>
                         </div>
 
-                        <!-- Preset Mode Form -->
+                        <!-- Preset Form -->
                         <div id="presetTaskForm">
                             <div class="intake-grid">
                                 <div class="intake-field">
                                     <select id="intakeFocus">
-                                        <option value="Local Neighborhood Retail & Diner">Local Retail / Diner</option>
+                                        <option value="Local Retail & Trade Area Foot-Traffic">Local Retail / Trade Area</option>
                                         <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS / Pricing</option>
                                         <option value="Industrial Narrative & Modern Tech Pivot">Industrial Tech Pivot</option>
                                         <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth Sprint</option>
                                         <option value="State Agency Survey & Data Operations">Survey & Data Operations</option>
-                                        <option value="Brand Positioning & Market Recon">Competitor & Market Recon</option>
+                                        <option value="Brand Positioning & Competitor Recon">Competitor & Market Recon</option>
                                     </select>
                                 </div>
                                 <div class="intake-field">
@@ -932,18 +918,18 @@
                             <button class="btn-launch-intake" onclick="launchPresetBuilder()">Build Telemetry Brief</button>
                         </div>
 
-                        <!-- Create Your Own Task Mode Form -->
+                        <!-- Custom Form -->
                         <div id="customTaskForm" class="custom-task-container">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                                 <div class="intake-field">
                                     <input type="text" id="customTaskName" placeholder="Task Name (e.g. Q3 Pipeline Audit)">
                                 </div>
                                 <div class="intake-field">
-                                    <input type="text" id="customTarget" placeholder="Client / Target (e.g. Ma's Diner)">
+                                    <input type="text" id="customTarget" placeholder="Target / Client (e.g. Ma's Diner)">
                                 </div>
                             </div>
                             <div class="intake-field">
-                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific requirements or rules (e.g. Scan competitors via Tavily, output CAC and margin benchmarks)..."></textarea>
+                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific operational directives (e.g. Scan competitors via Tavily, output CAC & margin benchmarks)..."></textarea>
                             </div>
                             <button class="btn-launch-intake" onclick="launchCustomTask()">Run Custom Telemetry Task</button>
                         </div>
@@ -957,7 +943,7 @@
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
                     <input type="text" id="userInput" placeholder="Ask a strategic question or enter copy to audit..." onkeydown="handleKey(event)">
-                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #222; padding: 7px 11px; border-radius: 12px;">
+                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #202020; padding: 7px 11px; border-radius: 12px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
@@ -986,7 +972,6 @@
         let conversationHistory = [];
         let isStreaming = false;
 
-        // Mobile Sidebar Toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebarBackdrop');
@@ -999,11 +984,9 @@
             document.getElementById('sidebarBackdrop').classList.remove('active');
         }
 
-        // Modal Handlers
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; closeSidebar(); }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        // Workspace Management
         function onWorkspaceChange() {
             const ws = document.getElementById('clientWorkspace').value;
             const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
@@ -1024,7 +1007,6 @@
             onWorkspaceChange();
         }
 
-        // Task Mode Toggle (Preset vs Custom)
         function toggleTaskMode(mode) {
             const presetForm = document.getElementById('presetTaskForm');
             const customForm = document.getElementById('customTaskForm');
@@ -1052,7 +1034,6 @@
             document.getElementById('customTaskName').focus();
         }
 
-        // 1-Click Operations Launchers
         function quickTask(type) {
             const input = document.getElementById('userInput');
             if (type === 'trade_analysis') {
@@ -1130,17 +1111,18 @@
             }
         }
 
+        // Final Structured Telemetry Parser
         function formatTelemetryOutput(text) {
             return text.replace(/\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-badge"><strong>[$1]</strong> = $2</div>')
-                       .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#fff; display:block; margin-top:8px; margin-bottom:2px;">$1</strong>')
+                       .replace(/\*\*([^*]+)\*\*/g, '<div class="telemetry-header-block"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> $1</div>')
                        .replace(/\n/g, '<br>');
         }
 
-        // Direct Client-Side Multi-Tier Fallback Inference
+        // Multi-Tier Fallback Inference Engine
         async function fetchInference(messages, lens) {
             const promptHeader = `You are Consultant, a Surgical Executive Operations Partner. Zero filler. Always output mandatory headers: **SYSTEM AUDIT & STRATEGIC POSITIONING**, **QUANTITATIVE TELEMETRY** (with [METRIC] = [VALUE]), and **OPERATIONAL EXECUTION PROTOCOL**.\n\n`;
             
-            // Tier 1: Try Cloudflare Pages edge function /api/chat
+            // Tier 1: Cloudflare Edge Function
             try {
                 const edgeRes = await fetch('/api/chat', {
                     method: 'POST',
@@ -1149,13 +1131,9 @@
                 });
                 if (edgeRes.ok) {
                     const data = await edgeRes.json();
-                    if (data.choices?.[0]?.message?.content) {
-                        return data.choices[0].message.content;
-                    }
+                    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
                 }
-            } catch (e) {
-                console.warn('Edge function failed, switching to direct gateway', e);
-            }
+            } catch (e) {}
 
             // Tier 2: Direct High-Reliability MyClaw Gemini 3.7 Flash Gateway
             try {
@@ -1167,25 +1145,18 @@
                     },
                     body: JSON.stringify({
                         model: 'gemini-3.7-flash',
-                        messages: [
-                            { role: 'system', content: promptHeader },
-                            ...messages
-                        ],
+                        messages: [{ role: 'system', content: promptHeader }, ...messages],
                         temperature: 0.5,
                         max_tokens: 2048
                     })
                 });
                 if (directRes.ok) {
                     const data = await directRes.json();
-                    if (data.choices?.[0]?.message?.content) {
-                        return data.choices[0].message.content;
-                    }
+                    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
                 }
-            } catch (e) {
-                console.warn('Direct gateway failed, switching to Base44 Core InvokeLLM', e);
-            }
+            } catch (e) {}
 
-            // Tier 3: Base44 Core InvokeLLM
+            // Tier 3: Base44 Core Gateway
             const b44Res = await fetch('https://base44.app/api/apps/6a847abd94e877b8b9556a57/integration-endpoints/Core/InvokeLLM', {
                 method: 'POST',
                 headers: {
@@ -1201,7 +1172,7 @@
                 })
             });
 
-            if (!b44Res.ok) throw new Error('All inference pathways failed.');
+            if (!b44Res.ok) throw new Error('Inference gateway connection failure.');
             const resData = await b44Res.json();
             return typeof resData === 'string' ? resData : JSON.stringify(resData);
         }
@@ -1240,7 +1211,6 @@
             try {
                 const fullResponse = await fetchInference(conversationHistory, lens);
                 
-                // Fast smooth streaming text simulation
                 card.innerHTML = '';
                 const words = fullResponse.split(' ');
                 let rendered = '';
@@ -1261,7 +1231,7 @@
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy CSV
                     </button>
                     <button class="action-btn" onclick="window.print()">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print Memo
                     </button>
                 `;
                 card.appendChild(actions);
@@ -1332,7 +1302,7 @@
                 card.className = 'asset-card';
                 card.innerHTML = `
                     <div class="asset-name">${escapeHtml(item.title)}</div>
-                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#39FF14;">${item.workspace}</span></div>
+                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#00FF66;">${item.workspace}</span></div>
                 `;
                 grid.appendChild(card);
             });
@@ -1373,15 +1343,6 @@
         setInterval(updateClock, 1000);
         updateClock();
         updateVaultCount();
-
-        // Clear any old service workers
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
-            });
-        }
     </script>
 </body>
 </html>
