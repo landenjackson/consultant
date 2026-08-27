@@ -7,7 +7,7 @@
     
     <!-- PWA & Verification Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#141414">
+    <meta name="theme-color" content="#121214">
     <meta name="google-site-verification" content="31-SLXAL0M_MPHw5PGlKlxzv4RwIAsAbJmhXqpe1GdA">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,8 +25,8 @@
         
         body {
             font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #141414;
-            color: #f5f5f7;
+            background: #111113;
+            color: #f4f4f5;
             height: 100dvh;
             width: 100vw;
             display: flex;
@@ -38,8 +38,8 @@
         /* Sidebar */
         .sidebar {
             width: 280px;
-            background: #1a1a1c;
-            border-right: 1px solid #262629;
+            background: #171719;
+            border-right: 1px solid #232326;
             display: flex;
             flex-direction: column;
             z-index: 50;
@@ -51,7 +51,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #262629;
+            border-bottom: 1px solid #232326;
         }
 
         .brand-name {
@@ -65,13 +65,13 @@
         }
 
         .tag-pill {
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(4, 120, 87, 0.15);
             border: 1px solid rgba(16, 185, 129, 0.3);
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
-            color: #34d399;
+            color: #10b981;
         }
 
         .controls-block {
@@ -85,7 +85,7 @@
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #8e8e93;
+            color: #71717a;
             margin-bottom: 5px;
             font-weight: 600;
             display: flex;
@@ -95,8 +95,8 @@
 
         .custom-select {
             width: 100%;
-            background: #141414;
-            border: 1px solid #2c2c30;
+            background: #121214;
+            border: 1px solid #27272a;
             color: #ffffff;
             padding: 9px 12px;
             border-radius: 8px;
@@ -108,12 +108,12 @@
         }
 
         .custom-select:focus {
-            border-color: #10b981;
+            border-color: #059669;
         }
 
         .custom-select.lens {
-            color: #34d399;
-            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            border-color: rgba(5, 150, 105, 0.35);
         }
 
         .nav-list {
@@ -137,13 +137,13 @@
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             color: #ffffff;
         }
 
         .nav-item.active {
-            background: rgba(16, 185, 129, 0.1);
-            color: #34d399;
+            background: rgba(5, 150, 105, 0.12);
+            color: #10b981;
             font-weight: 600;
         }
 
@@ -155,26 +155,26 @@
 
         .nav-item.active svg {
             opacity: 1;
-            stroke: #34d399;
+            stroke: #10b981;
         }
 
         /* Human-in-the-Loop Partner Card */
         .partner-card {
             margin: 14px;
             padding: 12px 14px;
-            background: #141414;
-            border: 1px solid #262629;
+            background: #121214;
+            border: 1px solid #232326;
             border-radius: 10px;
             font-size: 11.5px;
             line-height: 1.45;
-            color: #8e8e93;
+            color: #71717a;
         }
 
         .partner-header {
             display: flex;
             align-items: center;
             gap: 6px;
-            color: #34d399;
+            color: #10b981;
             font-weight: 600;
             font-size: 11.5px;
             margin-bottom: 4px;
@@ -192,12 +192,12 @@
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
-            color: #8e8e93;
+            color: #71717a;
             z-index: 10;
-            background: rgba(20, 20, 20, 0.85);
+            background: rgba(17, 17, 19, 0.88);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid #262629;
+            border-bottom: 1px solid #232326;
         }
 
         .mobile-menu-btn {
@@ -219,8 +219,8 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(16, 185, 129, 0.1);
-            color: #34d399;
+            background: rgba(5, 150, 105, 0.12);
+            color: #10b981;
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 12px;
@@ -230,9 +230,9 @@
         .status-dot {
             width: 7px;
             height: 7px;
-            background: #10b981;
+            background: #059669;
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+            box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
         }
 
         /* Main Content */
@@ -241,7 +241,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #141414;
+            background: #111113;
             overflow: hidden;
             height: 100dvh;
         }
@@ -281,7 +281,7 @@
         .hero-avatar {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #047857, #065f46);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -290,7 +290,7 @@
             color: #ffffff;
             font-size: 20px;
             font-weight: 700;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 4px 16px rgba(4, 120, 87, 0.3);
         }
 
         .hero-title {
@@ -303,7 +303,7 @@
 
         .hero-subtitle {
             font-size: 14px;
-            color: #8e8e93;
+            color: #a1a1aa;
             line-height: 1.5;
         }
 
@@ -321,8 +321,8 @@
         }
 
         .quick-task-card {
-            background: #1c1c1e;
-            border: 1px solid #2c2c30;
+            background: #171719;
+            border: 1px solid #26262a;
             border-radius: 10px;
             padding: 12px;
             cursor: pointer;
@@ -333,19 +333,19 @@
         }
 
         .quick-task-card:hover {
-            border-color: rgba(16, 185, 129, 0.5);
-            background: #242428;
+            border-color: rgba(4, 120, 87, 0.6);
+            background: #1f1f23;
             transform: translateY(-2px);
         }
 
         .quick-task-icon { font-size: 16px; margin-bottom: 2px; }
         .quick-task-title { font-size: 12.5px; font-weight: 600; color: #ffffff; }
-        .quick-task-desc { font-size: 11px; color: #8e8e93; line-height: 1.35; }
+        .quick-task-desc { font-size: 11px; color: #71717a; line-height: 1.35; }
 
         /* Strategy Intake & Custom Task Card */
         .intake-card {
-            background: #1a1a1c;
-            border: 1px solid #2a2a2e;
+            background: #171719;
+            border: 1px solid #26262a;
             border-radius: 14px;
             padding: 16px 18px;
             margin-top: 16px;
@@ -370,8 +370,8 @@
 
         .intake-mode-toggle {
             display: flex;
-            background: #141414;
-            border: 1px solid #2a2a2e;
+            background: #121214;
+            border: 1px solid #26262a;
             border-radius: 8px;
             padding: 2px;
         }
@@ -379,7 +379,7 @@
         .mode-btn {
             background: transparent;
             border: none;
-            color: #8e8e93;
+            color: #71717a;
             font-size: 11.5px;
             font-weight: 600;
             padding: 4px 10px;
@@ -389,8 +389,8 @@
         }
 
         .mode-btn.active {
-            background: #27272a;
-            color: #34d399;
+            background: #242428;
+            color: #10b981;
         }
 
         .intake-grid {
@@ -402,9 +402,9 @@
 
         .intake-field select, .intake-field input, .intake-field textarea {
             width: 100%;
-            background: #141414;
-            border: 1px solid #2c2c30;
-            color: #f5f5f7;
+            background: #121214;
+            border: 1px solid #27272a;
+            color: #f4f4f5;
             padding: 9px 12px;
             border-radius: 8px;
             font-size: 12.5px;
@@ -414,7 +414,7 @@
         }
 
         .intake-field select:focus, .intake-field input:focus, .intake-field textarea:focus {
-            border-color: #10b981;
+            border-color: #059669;
         }
 
         .custom-task-container {
@@ -427,7 +427,7 @@
         .custom-task-container.active { display: flex; }
 
         .btn-launch-intake {
-            background: #10b981;
+            background: #047857;
             color: #ffffff;
             border: none;
             padding: 10px 16px;
@@ -444,11 +444,11 @@
         }
 
         .btn-launch-intake:hover {
-            background: #059669;
+            background: #065f46;
             transform: translateY(-1px);
         }
 
-        /* Message Bubbles - Elegant & Human */
+        /* Message Bubbles */
         .message-row { display: flex; width: 100%; margin-bottom: 6px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
@@ -463,24 +463,24 @@
         }
 
         .message-row.user .message-card {
-            background: #242428;
-            border: 1px solid #333338;
+            background: #232328;
+            border: 1px solid #2f2f36;
             color: #ffffff;
             border-bottom-right-radius: 4px;
         }
 
         .message-row.assistant .message-card {
-            background: #18181a;
-            border: 1px solid #28282c;
+            background: #161618;
+            border: 1px solid #242428;
             color: #e4e4e7;
             width: 100%;
             border-bottom-left-radius: 4px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Friendly Section Headers */
+        /* Forest/Emerald Section Headers */
         .friendly-section-header {
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 700;
             color: #ffffff;
             margin-top: 14px;
@@ -493,20 +493,20 @@
         .friendly-section-header::before {
             content: '';
             display: inline-block;
-            width: 3px;
+            width: 3.5px;
             height: 14px;
-            background: #10b981;
+            background: #059669;
             border-radius: 2px;
         }
 
-        /* Clean Metric Pill */
+        /* Deep Forest Green Metric Pill */
         .metric-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            color: #34d399;
+            background: rgba(4, 120, 87, 0.12);
+            border: 1px solid rgba(5, 150, 105, 0.35);
+            color: #10b981;
             padding: 4px 10px;
             border-radius: 8px;
             margin: 4px 0;
@@ -515,14 +515,14 @@
         }
 
         .metric-pill strong {
-            color: #a7f3d0;
+            color: #6ee7b7;
             font-weight: 600;
         }
 
         .memo-actions {
             margin-top: 14px;
             padding-top: 10px;
-            border-top: 1px solid #27272a;
+            border-top: 1px solid #242428;
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -530,9 +530,9 @@
         }
 
         .action-btn {
-            background: #242428;
-            border: 1px solid #333338;
-            color: #e4e4e7;
+            background: #202024;
+            border: 1px solid #2e2e34;
+            color: #d4d4d8;
             font-size: 11.5px;
             font-weight: 500;
             padding: 6px 12px;
@@ -545,9 +545,9 @@
         }
 
         .action-btn:hover {
-            background: #2c2c30;
-            color: #34d399;
-            border-color: rgba(16, 185, 129, 0.4);
+            background: #27272e;
+            color: #10b981;
+            border-color: rgba(4, 120, 87, 0.5);
         }
 
         /* Input Container */
@@ -556,15 +556,15 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            background: linear-gradient(transparent, #141414 30%);
+            background: linear-gradient(transparent, #111113 30%);
             z-index: 20;
         }
 
         .input-box {
             width: 100%;
             max-width: 840px;
-            background: #1a1a1c;
-            border: 1px solid #2c2c30;
+            background: #171719;
+            border: 1px solid #27272b;
             border-radius: 24px;
             padding: 6px 14px;
             display: flex;
@@ -575,7 +575,7 @@
         }
 
         .input-box:focus-within {
-            border-color: #10b981;
+            border-color: #059669;
         }
 
         .input-box input {
@@ -597,7 +597,7 @@
         .icon-btn {
             background: transparent;
             border: none;
-            color: #34d399;
+            color: #10b981;
             cursor: pointer;
             padding: 6px;
             border-radius: 50%;
@@ -623,7 +623,7 @@
 
         .studio-header {
             margin-bottom: 20px;
-            border-bottom: 1px solid #262629;
+            border-bottom: 1px solid #232326;
             padding-bottom: 14px;
             display: flex;
             justify-content: space-between;
@@ -637,17 +637,17 @@
         }
 
         .asset-card {
-            background: #1a1a1c;
-            border: 1px solid #28282c;
+            background: #171719;
+            border: 1px solid #26262a;
             border-radius: 10px;
             padding: 14px;
             cursor: pointer;
             transition: border-color 0.2s;
         }
 
-        .asset-card:hover { border-color: #10b981; }
+        .asset-card:hover { border-color: #059669; }
         .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13.5px; color: #ffffff; }
-        .asset-meta { font-size: 11.5px; color: #8e8e93; display: flex; justify-content: space-between; }
+        .asset-meta { font-size: 11.5px; color: #71717a; display: flex; justify-content: space-between; }
 
         /* Modal Overlay */
         .modal-overlay {
@@ -663,8 +663,8 @@
         }
 
         .modal-content {
-            background: #1a1a1c;
-            border: 1px solid #2c2c30;
+            background: #171719;
+            border: 1px solid #27272b;
             border-radius: 16px;
             padding: 28px;
             max-width: 780px;
@@ -677,7 +677,7 @@
         .close-modal {
             position: absolute;
             top: 16px; right: 16px;
-            color: #8e8e93; font-size: 22px; cursor: pointer;
+            color: #71717a; font-size: 22px; cursor: pointer;
         }
 
         .pricing-grid {
@@ -688,8 +688,8 @@
         }
 
         .plan-card {
-            border: 1px solid #2c2c30;
-            background: #141414;
+            border: 1px solid #26262a;
+            background: #121214;
             border-radius: 12px;
             padding: 18px;
             display: flex;
@@ -697,16 +697,16 @@
         }
 
         .plan-card.featured {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.03);
+            border-color: #047857;
+            background: rgba(4, 120, 87, 0.04);
         }
 
-        .plan-price { font-size: 26px; font-weight: 700; color: #34d399; margin: 6px 0; }
+        .plan-price { font-size: 26px; font-weight: 700; color: #10b981; margin: 6px 0; }
         .plan-features { margin: 12px 0; flex: 1; font-size: 12px; color: #a1a1aa; }
         .plan-features li { list-style: none; margin-bottom: 6px; }
 
         .btn-trial {
-            background: #10b981;
+            background: #047857;
             color: #ffffff;
             border: none;
             padding: 10px;
@@ -716,6 +716,8 @@
             cursor: pointer;
             width: 100%;
         }
+
+        .btn-trial:hover { background: #065f46; }
 
         /* Mobile Overlay Backdrop */
         .sidebar-backdrop {
@@ -759,7 +761,7 @@
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
                 <h2 style="font-size: 22px; margin-bottom: 4px; font-weight: 700;">Consultant Subscriptions</h2>
-                <p style="color: #8e8e93; font-size: 13px;">Professional strategic intelligence for modern operators.</p>
+                <p style="color: #71717a; font-size: 13px;">Professional strategic intelligence for modern operators.</p>
             </div>
 
             <div class="pricing-grid">
@@ -803,7 +805,7 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
             <span class="tag-pill">Partner</span>
@@ -813,7 +815,7 @@
             <div>
                 <div class="section-label">
                     <span>Active Client</span>
-                    <span style="cursor:pointer; color:#34d399;" onclick="createWorkspace()">+ New</span>
+                    <span style="cursor:pointer; color:#10b981;" onclick="createWorkspace()">+ New</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
                     <option value="default">📁 General Workspace</option>
@@ -936,7 +938,7 @@
                     <div class="intake-card">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                                 <span id="intakeModeTitle">Guided Strategy Builder</span>
                             </div>
                             <div class="intake-mode-toggle">
@@ -998,7 +1000,7 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
                     <input type="text" id="userInput" placeholder="Ask a strategic question, enter copy to review, or define a goal..." onkeydown="handleKey(event)">
-                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #10b981; color:#fff; padding: 7px 12px; border-radius: 16px;">
+                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #047857; color:#fff; padding: 7px 12px; border-radius: 16px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
@@ -1011,7 +1013,7 @@
                 <div class="studio-header">
                     <div>
                         <h1 style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Saved Briefings</h1>
-                        <p style="color: #8e8e93; font-size: 13px;">Archived strategies and reports for this workspace.</p>
+                        <p style="color: #71717a; font-size: 13px;">Archived strategies and reports for this workspace.</p>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button class="action-btn" onclick="exportVaultCSV()">Export CSV</button>
@@ -1166,20 +1168,14 @@
             }
         }
 
-        // Clean, Professional Formatting Engine (Zero Code Look, Elegant Typography)
+        // Refined Dark Forest Green Telemetry Parser
         function formatTelemetryOutput(text) {
             return text
-                // Clean Level 3 Headers: ### Header
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
-                // Bold Headers: **Header**
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
-                // Metric Badges: [Name: Value] or [Name = Value]
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
-                // Clean Bullet Points: • Item or * Item
-                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#10b981; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                // Clean Numbered Lists: 1. Item
-                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:8px 0;"><span style="color:#34d399; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
-                // Natural Paragraph Spacing
+                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#059669; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:8px 0;"><span style="color:#10b981; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
                 .replace(/\n\n/g, '<div style="height:12px;"></div>')
                 .replace(/\n/g, '<br>');
         }
@@ -1223,7 +1219,7 @@
             assistantRow.className = 'message-row assistant';
             const card = document.createElement('div');
             card.className = 'message-card';
-            card.innerHTML = '<em style="color:#8e8e93;">Consultant is drafting recommendations...</em>';
+            card.innerHTML = '<em style="color:#71717a;">Consultant is drafting recommendations...</em>';
             assistantRow.appendChild(card);
             chatArea.appendChild(assistantRow);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1254,7 +1250,7 @@
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Metrics
                     </button>
                     <button class="action-btn" onclick="exportToGoogleDrive('${escapeHtml(fullResponse)}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Google Doc
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Google Doc
                     </button>
                     <button class="action-btn" onclick="window.print()">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
@@ -1276,7 +1272,7 @@
         }
 
         function extractMetricsCSV(text) {
-            const regex = /\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g;
+            const regex = /\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g;
             let match;
             const rows = [['Metric', 'Value']];
             while ((match = regex.exec(text)) !== null) {
@@ -1330,7 +1326,7 @@
             grid.innerHTML = '';
             const items = getVaultItems();
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#8e8e93; font-size:13px; grid-column: 1/-1;">No saved briefings in this workspace yet.</p>';
+                grid.innerHTML = '<p style="color:#71717a; font-size:13px; grid-column: 1/-1;">No saved briefings in this workspace yet.</p>';
                 return;
             }
             items.forEach(item => {
@@ -1338,7 +1334,7 @@
                 card.className = 'asset-card';
                 card.innerHTML = `
                     <div class="asset-name">${escapeHtml(item.title)}</div>
-                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#34d399;">${item.workspace}</span></div>
+                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#10b981;">${item.workspace}</span></div>
                 `;
                 grid.appendChild(card);
             });
@@ -1350,7 +1346,7 @@
             if (items.length === 0) { alert("Vault is empty."); return; }
             let csv = "data:text/csv;charset=utf-8,Title,Date,Workspace,Metric,Value\n";
             items.forEach(item => {
-                const regex = /\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g;
+                const regex = /\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g;
                 let match;
                 while ((match = regex.exec(item.content)) !== null) {
                     csv += `"${item.title.replace(/"/g, '""')}","${item.date}","${item.workspace}","${match[1]}","${match[2]}"\n`;
