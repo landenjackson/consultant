@@ -1118,64 +1118,48 @@
                        .replace(/\n/g, '<br>');
         }
 
-        // Multi-Tier Fallback Inference Engine
+        // Robust Direct Client Inference Pipeline
         async function fetchInference(messages, lens) {
             const promptHeader = `You are Consultant, a Surgical Executive Operations Partner. Zero filler. Always output mandatory headers: **SYSTEM AUDIT & STRATEGIC POSITIONING**, **QUANTITATIVE TELEMETRY** (with [METRIC] = [VALUE]), and **OPERATIONAL EXECUTION PROTOCOL**.\n\n`;
             
-            // Tier 1: Cloudflare Edge Function
+            // Tier 1: Direct same-origin /api/chat
             try {
                 const edgeRes = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages, lens, stream: false })
+                    body: JSON.stringify({ messages, lens })
                 });
                 if (edgeRes.ok) {
                     const data = await edgeRes.json();
                     if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Local API failed, falling back to direct gateway', e);
+            }
 
-            // Tier 2: Direct High-Reliability Verified Gemini 3.7 Flash Gateway
-            try {
-                const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
-                        'User-Agent': 'Mozilla/5.0'
-                    },
-                    body: JSON.stringify({
-                        model: 'gemini-3.7-flash',
-                        messages: [{ role: 'system', content: promptHeader }, ...messages],
-                        temperature: 0.5,
-                        max_tokens: 2048
-                    })
-                });
-                if (directRes.ok) {
-                    const data = await directRes.json();
-                    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
-                }
-            } catch (e) {}
-
-            // Tier 3: Base44 Core Gateway
-            const b44Res = await fetch('https://base44.app/api/apps/6a847abd94e877b8b9556a57/integration-endpoints/Core/InvokeLLM', {
+            // Tier 2: Direct High-Reliability Gemini 3.7 Flash Gateway
+            const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'api_key': '7f28728cc59a411783064ffb31020a28',
-                    'X-App-Id': '6a847abd94e877b8b9556a57'
+                    'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
+                    'User-Agent': 'Mozilla/5.0'
                 },
                 body: JSON.stringify({
-                    model: 'gemini_3_flash',
-                    prompt: promptHeader + messages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n'),
+                    model: 'gemini-3.7-flash',
+                    messages: [{ role: 'system', content: promptHeader }, ...messages],
                     temperature: 0.5,
                     max_tokens: 2048
                 })
             });
 
-            if (!b44Res.ok) throw new Error('Inference gateway connection failure.');
-            const resData = await b44Res.json();
-            return typeof resData === 'string' ? resData : JSON.stringify(resData);
+            if (!directRes.ok) {
+                const errText = await directRes.text();
+                throw new Error(`Inference Gateway error (${directRes.status}): ${errText}`);
+            }
+
+            const data = await directRes.json();
+            return data.choices?.[0]?.message?.content || "Telemetry calculated.";
         }
 
         async function sendMessage() {
