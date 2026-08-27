@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consultant Studio | Telemetry & Operations Gateway</title>
+    <title>Consultant | Strategic Operations Partner</title>
     
     <!-- PWA & Verification Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#111111">
+    <meta name="theme-color" content="#141414">
     <meta name="google-site-verification" content="31-SLXAL0M_MPHw5PGlKlxzv4RwIAsAbJmhXqpe1GdA">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon.svg">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -24,80 +24,70 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: #111111;
-            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #141414;
+            color: #f5f5f7;
             height: 100dvh;
             width: 100vw;
             display: flex;
             overflow: hidden;
             position: fixed;
+            letter-spacing: -0.01em;
         }
 
         /* Sidebar */
         .sidebar {
             width: 280px;
-            background: #161616;
-            border-right: 1px solid #222222;
+            background: #1a1a1c;
+            border-right: 1px solid #262629;
             display: flex;
             flex-direction: column;
             z-index: 50;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .sidebar-brand {
-            padding: 18px 20px 14px;
+            padding: 20px 20px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #202020;
+            border-bottom: 1px solid #262629;
         }
 
         .brand-name {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .brand-tagline {
-            font-size: 10.5px;
-            color: #00FF66;
-            font-family: 'JetBrains Mono', monospace;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            letter-spacing: -0.02em;
         }
 
         .tag-pill {
-            background: rgba(0, 255, 102, 0.1);
-            border: 1px solid rgba(0, 255, 102, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 9.5px;
-            font-weight: 700;
-            color: #00FF66;
-            font-family: 'JetBrains Mono', monospace;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #34d399;
         }
 
         .controls-block {
-            padding: 14px 16px 10px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .section-label {
-            font-size: 9.5px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #777;
-            margin-bottom: 4px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.05em;
+            color: #8e8e93;
+            margin-bottom: 5px;
+            font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -105,20 +95,25 @@
 
         .custom-select {
             width: 100%;
-            background: #111111;
-            border: 1px solid #2a2a2a;
-            color: #fff;
-            padding: 7px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
+            background: #141414;
+            border: 1px solid #2c2c30;
+            color: #ffffff;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
             outline: none;
             cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .custom-select:focus {
+            border-color: #10b981;
         }
 
         .custom-select.lens {
-            color: #00FF66;
-            border-color: rgba(0, 255, 102, 0.25);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.3);
         }
 
         .nav-list {
@@ -128,61 +123,60 @@
         }
 
         .nav-item {
-            padding: 9px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #a0a0a0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            color: #a1a1aa;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 2px;
+            gap: 11px;
+            margin-bottom: 3px;
             transition: all 0.2s;
+            font-weight: 500;
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
         }
 
         .nav-item.active {
-            background: rgba(0, 255, 102, 0.08);
-            color: #00FF66;
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
             font-weight: 600;
-            border-left: 2px solid #00FF66;
         }
 
         .nav-item svg {
-            width: 16px;
-            height: 16px;
-            opacity: 0.8;
+            width: 17px;
+            height: 17px;
+            opacity: 0.85;
         }
 
         .nav-item.active svg {
             opacity: 1;
-            stroke: #00FF66;
+            stroke: #34d399;
         }
 
-        /* Live Security & Autonomy Gate Indicator */
-        .gate-card {
-            margin: 12px;
-            padding: 10px 12px;
-            background: #121212;
-            border: 1px solid #222;
-            border-radius: 8px;
-            font-size: 11px;
-            line-height: 1.4;
-            color: #888;
+        /* Human-in-the-Loop Partner Card */
+        .partner-card {
+            margin: 14px;
+            padding: 12px 14px;
+            background: #141414;
+            border: 1px solid #262629;
+            border-radius: 10px;
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #8e8e93;
         }
 
-        .gate-header {
+        .partner-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            color: #00FF66;
-            font-weight: 700;
-            font-size: 10.5px;
-            font-family: 'JetBrains Mono', monospace;
+            gap: 6px;
+            color: #34d399;
+            font-weight: 600;
+            font-size: 11.5px;
             margin-bottom: 4px;
         }
 
@@ -192,25 +186,25 @@
             top: 0;
             right: 0;
             left: 280px;
-            height: 50px;
-            padding: 0 20px;
+            height: 54px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
-            color: #00FF66;
+            font-size: 13px;
+            color: #8e8e93;
             z-index: 10;
-            background: rgba(17,17,17,0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #222;
-            font-family: 'JetBrains Mono', monospace;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #262629;
         }
 
         .mobile-menu-btn {
             display: none;
             background: transparent;
             border: none;
-            color: #fff;
+            color: #ffffff;
             cursor: pointer;
             padding: 6px;
         }
@@ -218,22 +212,27 @@
         .status-items {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
-        .status-item {
-            display: flex;
+        .status-badge {
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-weight: 500;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .status-dot {
-            width: 6px;
-            height: 6px;
-            background: #00FF66;
+            width: 7px;
+            height: 7px;
+            background: #10b981;
             border-radius: 50%;
-            box-shadow: 0 0 6px #00FF66;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
         }
 
         /* Main Content */
@@ -242,7 +241,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #111111;
+            background: #141414;
             overflow: hidden;
             height: 100dvh;
         }
@@ -262,81 +261,94 @@
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 64px 16px 16px;
+            padding: 70px 20px 20px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            max-width: 880px;
+            gap: 16px;
+            max-width: 840px;
             width: 100%;
             margin: 0 auto;
         }
 
         .hero-section {
             text-align: center;
-            max-width: 680px;
-            margin: 8px auto;
+            max-width: 640px;
+            margin: 12px auto;
             padding: 0 10px;
             width: 100%;
         }
 
         .hero-avatar {
-            width: 44px;
-            height: 44px;
-            background: rgba(0, 255, 102, 0.08);
-            border: 1px solid rgba(0, 255, 102, 0.3);
-            border-radius: 10px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
-            color: #00FF66;
-            font-size: 18px;
+            margin: 0 auto 12px;
+            color: #ffffff;
+            font-size: 20px;
             font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+        }
+
+        .hero-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: #8e8e93;
+            line-height: 1.5;
         }
 
         /* Quick Task Launcher */
         .quick-tasks-container {
-            margin-top: 12px;
+            margin-top: 18px;
             text-align: left;
         }
 
         .quick-task-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 6px;
+            gap: 10px;
+            margin-top: 8px;
         }
 
         .quick-task-card {
-            background: #161616;
-            border: 1px solid #242424;
-            border-radius: 8px;
-            padding: 10px;
+            background: #1c1c1e;
+            border: 1px solid #2c2c30;
+            border-radius: 10px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
         }
 
         .quick-task-card:hover {
-            border-color: #00FF66;
-            background: #1a1a1a;
+            border-color: rgba(16, 185, 129, 0.5);
+            background: #242428;
             transform: translateY(-2px);
         }
 
-        .quick-task-icon { font-size: 15px; }
-        .quick-task-title { font-size: 11.5px; font-weight: 700; color: #fff; }
-        .quick-task-desc { font-size: 10px; color: #777; line-height: 1.3; }
+        .quick-task-icon { font-size: 16px; margin-bottom: 2px; }
+        .quick-task-title { font-size: 12.5px; font-weight: 600; color: #ffffff; }
+        .quick-task-desc { font-size: 11px; color: #8e8e93; line-height: 1.35; }
 
-        /* Strategy Intake & Custom Task Form */
+        /* Strategy Intake & Custom Task Card */
         .intake-card {
-            background: #161616;
-            border: 1px solid #242424;
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 12px;
+            background: #1a1a1c;
+            border: 1px solid #2a2a2e;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-top: 16px;
             text-align: left;
         }
 
@@ -344,208 +356,248 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .intake-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .intake-mode-toggle {
             display: flex;
-            background: #111;
-            border: 1px solid #2a2a2a;
-            border-radius: 6px;
+            background: #141414;
+            border: 1px solid #2a2a2e;
+            border-radius: 8px;
             padding: 2px;
         }
 
         .mode-btn {
             background: transparent;
             border: none;
-            color: #888;
-            font-size: 10.5px;
+            color: #8e8e93;
+            font-size: 11.5px;
             font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.15s;
         }
 
         .mode-btn.active {
-            background: #222;
-            color: #00FF66;
+            background: #27272a;
+            color: #34d399;
         }
 
         .intake-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .intake-field select, .intake-field input, .intake-field textarea {
             width: 100%;
-            background: #111;
-            border: 1px solid #2a2a2a;
-            color: #ccc;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 12px;
+            background: #141414;
+            border: 1px solid #2c2c30;
+            color: #f5f5f7;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
             outline: none;
             font-family: inherit;
+            transition: border-color 0.2s;
         }
 
-        .intake-field input:focus, .intake-field textarea:focus { border-color: #00FF66; }
+        .intake-field select:focus, .intake-field input:focus, .intake-field textarea:focus {
+            border-color: #10b981;
+        }
 
         .custom-task-container {
             display: none;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .custom-task-container.active { display: flex; }
 
         .btn-launch-intake {
-            background: #00FF66;
-            color: #000;
+            background: #10b981;
+            color: #ffffff;
             border: none;
-            padding: 9px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
-            font-family: 'JetBrains Mono', monospace;
+            transition: background-color 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        /* Message Bubbles */
-        .message-row { display: flex; width: 100%; margin-bottom: 4px; }
+        .btn-launch-intake:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* Message Bubbles - Elegant & Human */
+        .message-row { display: flex; width: 100%; margin-bottom: 6px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
 
         .message-card {
-            max-width: 90%;
-            padding: 14px 18px;
-            border-radius: 10px;
-            font-size: 13.5px;
-            line-height: 1.6;
+            max-width: 88%;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.65;
             word-break: break-word;
         }
 
         .message-row.user .message-card {
-            background: #1c1c1c;
-            border: 1px solid #2e2e2e;
-            color: #fff;
+            background: #242428;
+            border: 1px solid #333338;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
         }
 
         .message-row.assistant .message-card {
-            background: #141414;
-            border: 1px solid #242424;
-            border-left: 3px solid #00FF66;
-            color: #f0f0f0;
+            background: #18181a;
+            border: 1px solid #28282c;
+            color: #e4e4e7;
             width: 100%;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Telemetry Block & Badge Styling */
-        .telemetry-header-block {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11.5px;
+        /* Friendly Section Headers */
+        .friendly-section-header {
+            font-size: 14px;
             font-weight: 700;
-            color: #00FF66;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 10px;
-            margin-bottom: 4px;
+            color: #ffffff;
+            margin-top: 14px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .metric-badge {
+        .friendly-section-header::before {
+            content: '';
             display: inline-block;
-            background: rgba(0, 255, 102, 0.06);
-            border: 1px solid rgba(0, 255, 102, 0.25);
-            color: #00FF66;
-            font-family: 'JetBrains Mono', monospace;
-            padding: 3px 8px;
-            border-radius: 5px;
-            margin: 3px 0;
-            font-size: 12px;
-            font-weight: 500;
+            width: 3px;
+            height: 14px;
+            background: #10b981;
+            border-radius: 2px;
+        }
+
+        /* Clean Metric Pill */
+        .metric-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin: 4px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .metric-pill strong {
+            color: #a7f3d0;
+            font-weight: 600;
         }
 
         .memo-actions {
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px solid #222;
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid #27272a;
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
             justify-content: flex-end;
         }
 
         .action-btn {
-            background: #1c1c1c;
-            border: 1px solid #333;
-            color: #00FF66;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 5px 9px;
-            border-radius: 5px;
+            background: #242428;
+            border: 1px solid #333338;
+            color: #e4e4e7;
+            font-size: 11.5px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-family: 'JetBrains Mono', monospace;
+            gap: 6px;
+            transition: all 0.15s;
         }
 
-        .action-btn:hover { background: #242424; border-color: #00FF66; }
+        .action-btn:hover {
+            background: #2c2c30;
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
 
-        /* Input Box */
+        /* Input Container */
         .input-wrapper {
-            padding: 10px 14px 16px;
+            padding: 12px 20px 20px;
             width: 100%;
             display: flex;
             justify-content: center;
-            background: linear-gradient(transparent, #111111 30%);
+            background: linear-gradient(transparent, #141414 30%);
             z-index: 20;
         }
 
         .input-box {
             width: 100%;
-            max-width: 880px;
-            background: #161616;
-            border: 1px solid #262626;
-            border-radius: 20px;
-            padding: 4px 12px;
+            max-width: 840px;
+            background: #1a1a1c;
+            border: 1px solid #2c2c30;
+            border-radius: 24px;
+            padding: 6px 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s;
         }
 
-        .input-box:focus-within { border-color: #00FF66; }
+        .input-box:focus-within {
+            border-color: #10b981;
+        }
 
         .input-box input {
             flex: 1;
             background: transparent;
             border: none;
-            color: #fff;
-            font-size: 13.5px;
+            color: #ffffff;
+            font-size: 14px;
             outline: none;
             padding: 8px 0;
             min-width: 0;
+            font-family: inherit;
+        }
+
+        .input-box input::placeholder {
+            color: #71717a;
         }
 
         .icon-btn {
             background: transparent;
             border: none;
-            color: #00FF66;
+            color: #34d399;
             cursor: pointer;
             padding: 6px;
             border-radius: 50%;
@@ -553,21 +605,26 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Studio Vault */
         .studio-view {
-            padding: 64px 20px 20px;
-            max-width: 900px;
+            padding: 70px 24px 24px;
+            max-width: 880px;
             margin: 0 auto;
             width: 100%;
             overflow-y: auto;
         }
 
         .studio-header {
-            margin-bottom: 16px;
-            border-bottom: 1px solid #222;
-            padding-bottom: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #262629;
+            padding-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -576,40 +633,41 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
+            gap: 14px;
         }
 
         .asset-card {
-            background: #161616;
-            border: 1px solid #242424;
-            border-radius: 8px;
-            padding: 12px;
+            background: #1a1a1c;
+            border: 1px solid #28282c;
+            border-radius: 10px;
+            padding: 14px;
             cursor: pointer;
+            transition: border-color 0.2s;
         }
 
-        .asset-card:hover { border-color: #00FF66; }
-        .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13px; color: #fff; }
-        .asset-meta { font-size: 11px; color: #777; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; }
+        .asset-card:hover { border-color: #10b981; }
+        .asset-name { font-weight: 600; margin-bottom: 4px; font-size: 13.5px; color: #ffffff; }
+        .asset-meta { font-size: 11.5px; color: #8e8e93; display: flex; justify-content: space-between; }
 
         /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(17,17,17,0.95);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
             padding: 16px;
         }
 
         .modal-content {
-            background: #161616;
-            border: 1px solid #2e2e2e;
-            border-radius: 14px;
-            padding: 24px;
-            max-width: 800px;
+            background: #1a1a1c;
+            border: 1px solid #2c2c30;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 780px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -618,46 +676,45 @@
 
         .close-modal {
             position: absolute;
-            top: 14px; right: 14px;
-            color: #777; font-size: 22px; cursor: pointer;
+            top: 16px; right: 16px;
+            color: #8e8e93; font-size: 22px; cursor: pointer;
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 18px;
+            gap: 14px;
+            margin-top: 20px;
         }
 
         .plan-card {
-            border: 1px solid #2a2a2a;
-            background: #111111;
-            border-radius: 10px;
-            padding: 16px;
+            border: 1px solid #2c2c30;
+            background: #141414;
+            border-radius: 12px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
         }
 
         .plan-card.featured {
-            border-color: #00FF66;
-            background: rgba(0, 255, 102, 0.02);
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.03);
         }
 
-        .plan-price { font-size: 24px; font-weight: 700; color: #00FF66; margin: 4px 0; font-family: 'JetBrains Mono', monospace; }
-        .plan-features { margin: 10px 0; flex: 1; font-size: 11.5px; color: #bbb; }
-        .plan-features li { list-style: none; margin-bottom: 5px; }
+        .plan-price { font-size: 26px; font-weight: 700; color: #34d399; margin: 6px 0; }
+        .plan-features { margin: 12px 0; flex: 1; font-size: 12px; color: #a1a1aa; }
+        .plan-features li { list-style: none; margin-bottom: 6px; }
 
         .btn-trial {
-            background: #00FF66;
-            color: #000;
+            background: #10b981;
+            color: #ffffff;
             border: none;
-            padding: 9px;
-            border-radius: 5px;
-            font-weight: 700;
-            font-size: 11.5px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
             cursor: pointer;
             width: 100%;
-            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Mobile Overlay Backdrop */
@@ -665,31 +722,31 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 40;
         }
 
-        /* Mobile Responsive */
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
                 top: 0; bottom: 0; left: 0;
                 transform: translateX(-100%);
                 z-index: 100;
-                width: 260px;
+                width: 270px;
             }
             .sidebar.open { transform: translateX(0); }
             .sidebar-backdrop.active { display: block; }
-            .top-bar { left: 0; height: 46px; padding: 0 14px; }
+            .top-bar { left: 0; height: 50px; padding: 0 16px; }
             .mobile-menu-btn { display: block; }
-            .chat-area { padding: 52px 10px 10px; }
-            .hero-section h1 { font-size: 19px !important; }
-            .hero-section p { font-size: 12.5px !important; }
-            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-            .intake-grid { grid-template-columns: 1fr; gap: 6px; }
-            .message-card { max-width: 96%; font-size: 13px; padding: 12px 14px; }
-            .pricing-grid { grid-template-columns: 1fr; gap: 8px; }
-            .status-items { gap: 10px; font-size: 10.5px; }
+            .chat-area { padding: 60px 14px 14px; }
+            .hero-title { font-size: 20px !important; }
+            .hero-subtitle { font-size: 13px !important; }
+            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .intake-grid { grid-template-columns: 1fr; gap: 8px; }
+            .message-card { max-width: 95%; font-size: 13.5px; padding: 14px 16px; }
+            .pricing-grid { grid-template-columns: 1fr; gap: 10px; }
+            .status-items { gap: 10px; font-size: 11px; }
         }
     </style>
 </head>
@@ -701,42 +758,42 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 20px; margin-bottom: 4px;">Consultant Subscriptions</h2>
-                <p style="color: #888; font-size: 12px;">Surgical operational intelligence for high-density execution.</p>
+                <h2 style="font-size: 22px; margin-bottom: 4px; font-weight: 700;">Consultant Subscriptions</h2>
+                <p style="color: #8e8e93; font-size: 13px;">Professional strategic intelligence for modern operators.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 13px;">Basic Tier</div>
-                    <div class="plan-price">$15.99<span style="font-size: 11px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 14px;">Starter</div>
+                    <div class="plan-price">$15.99<span style="font-size: 12px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Unlimited Strategy Briefings</li>
-                        <li>✓ Standard Strategy Lens</li>
+                        <li>✓ Standard Advisory Lens</li>
                     </ul>
                     <button class="btn-trial" onclick="alert('Trial initiated.'); closePricing();">Start Free Trial</button>
                 </div>
 
                 <div class="plan-card featured">
-                    <div style="font-weight: 700; font-size: 13px;">Pro Operator</div>
-                    <div class="plan-price">$39.99<span style="font-size: 11px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 14px;">Pro Operator</div>
+                    <div class="plan-price">$39.99<span style="font-size: 12px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ All Strategy Lenses</li>
+                        <li>✓ All Strategic Lenses</li>
                         <li>✓ Multi-Client Workspaces</li>
-                        <li>✓ Live Tavily Trade Signals</li>
-                        <li>✓ CSV & Memo Export</li>
+                        <li>✓ Real-Time Market Signals</li>
+                        <li>✓ 1-Click Google Doc & CSV Export</li>
                     </ul>
                     <button class="btn-trial" onclick="alert('Pro Trial initiated.'); closePricing();">Start Pro Trial</button>
                 </div>
 
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 13px;">Expert Studio</div>
-                    <div class="plan-price">$79.99<span style="font-size: 11px; color: #777;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 14px;">Executive Studio</div>
+                    <div class="plan-price">$79.99<span style="font-size: 12px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Everything in Pro</li>
                         <li>✓ SPSS Trust Architecture</li>
-                        <li>✓ Custom Engine Tuning</li>
+                        <li>✓ Dedicated Partner Sessions</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Expert Access</button>
+                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Executive Access</button>
                 </div>
             </div>
         </div>
@@ -746,17 +803,17 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
                 Consultant
             </div>
-            <span class="tag-pill">v1.7 FINAL</span>
+            <span class="tag-pill">Partner</span>
         </div>
 
         <div class="controls-block">
             <div>
                 <div class="section-label">
-                    <span>Workspace</span>
-                    <span style="cursor:pointer; color:#00FF66;" onclick="createWorkspace()">+ New</span>
+                    <span>Active Client</span>
+                    <span style="cursor:pointer; color:#34d399;" onclick="createWorkspace()">+ New</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
                     <option value="default">📁 General Workspace</option>
@@ -767,12 +824,12 @@
             </div>
 
             <div>
-                <div class="section-label">Strategy Engine Lens</div>
+                <div class="section-label">Strategic Perspective</div>
                 <select id="strategyLens" class="custom-select lens" onchange="onLensChange()">
-                    <option value="standard">⚡ Chief of Staff Telemetry</option>
-                    <option value="trust_auditor">🛡️ Trust & Autonomy Auditor</option>
-                    <option value="hyperlocal">📍 Hyperlocal Community</option>
-                    <option value="saas_operator">💼 SaaS / Unit Economics</option>
+                    <option value="standard">⚡ Chief of Staff Direction</option>
+                    <option value="trust_auditor">🛡️ Trust & Credibility Audit</option>
+                    <option value="hyperlocal">📍 Local Community Growth</option>
+                    <option value="saas_operator">💼 Business Economics & SaaS</option>
                 </select>
             </div>
         </div>
@@ -780,45 +837,43 @@
         <div class="nav-list">
             <div class="nav-item active" onclick="switchView('chat')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Telemetry Studio
+                Advisory Studio
             </div>
             <div class="nav-item" onclick="switchView('vault')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Saved Vault (<span id="vaultCount">0</span>)
+                Saved Briefings (<span id="vaultCount">0</span>)
             </div>
             <div class="nav-item" onclick="window.location.href='/standards.html'">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Operator Standard
+                Our Standards
             </div>
             <div class="nav-item" onclick="openPricing()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                Plans & Billing
+                Plans & Access
             </div>
         </div>
 
-        <!-- Autonomy & Verification Gate Badge -->
-        <div class="gate-card">
-            <div class="gate-header">
-                <span>VERIFICATION GATE</span>
-                <span style="color:#00FF66;">● ENFORCED</span>
+        <div class="partner-card">
+            <div class="partner-header">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Human-in-the-Loop
             </div>
-            <div>Human-in-the-loop validation active. Zero hallucination risk. Direct edge inference.</div>
+            <div>AI provides high-speed research; you provide final judgment, ethics, and strategy.</div>
         </div>
     </div>
 
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="top-bar">
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
                 <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
-                <span style="font-weight: 700; color: #fff; font-size: 13px;" id="currentWorkspaceDisplay">Consultant Studio</span>
+                <span style="font-weight: 600; color: #ffffff; font-size: 14px;" id="currentWorkspaceDisplay">Consultant Studio</span>
             </div>
             <div class="status-items">
-                <div class="status-item"><span class="status-dot"></span> LIVE EDGE</div>
-                <div class="status-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 12ms</div>
-                <div class="status-item" id="clock">14:15</div>
+                <div class="status-badge"><span class="status-dot"></span> Ready</div>
+                <div id="clock" style="font-size: 12px; color: #71717a;">14:15</div>
             </div>
         </div>
 
@@ -827,52 +882,52 @@
             <div class="chat-area" id="chatArea">
                 <div class="hero-section" id="heroSection">
                     <div class="hero-avatar">C</div>
-                    <h1 style="font-size: 21px; margin-bottom: 4px; font-weight: 700;">Consultant Studio</h1>
-                    <p style="color: #888; font-size: 13px;">Structured Telemetry Engine & Human-in-the-Loop Operations.</p>
+                    <h1 class="hero-title">How can I assist your strategy today?</h1>
+                    <p class="hero-subtitle">Clear, executive-level insights and practical growth recommendations.</p>
 
-                    <!-- Quick Operations Launcher -->
+                    <!-- Quick Task Launcher -->
                     <div class="quick-tasks-container">
-                        <div class="section-label">⚡ 1-Click Operations Tasks</div>
+                        <div class="section-label">Common Strategic Tasks</div>
                         <div class="quick-task-grid">
                             <div class="quick-task-card" onclick="quickTask('trade_analysis')">
                                 <div class="quick-task-icon">📍</div>
-                                <div class="quick-task-title">Trade Analysis</div>
-                                <div class="quick-task-desc">Foot traffic & density</div>
+                                <div class="quick-task-title">Trade Area Analysis</div>
+                                <div class="quick-task-desc">Foot traffic & customer density</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('trust')">
                                 <div class="quick-task-icon">🛡️</div>
-                                <div class="quick-task-title">Trust Audit</div>
-                                <div class="quick-task-desc">Scan autonomy risk</div>
+                                <div class="quick-task-title">Trust & Copy Audit</div>
+                                <div class="quick-task-desc">Scan messaging for credibility</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('saas')">
                                 <div class="quick-task-icon">💼</div>
                                 <div class="quick-task-title">Unit Economics</div>
-                                <div class="quick-task-desc">CAC, LTV & churn</div>
+                                <div class="quick-task-desc">CAC, LTV & healthy retention</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
                                 <div class="quick-task-icon">🚀</div>
                                 <div class="quick-task-title">Campaign Strategy</div>
-                                <div class="quick-task-desc">Multi-channel growth</div>
+                                <div class="quick-task-desc">Multi-channel growth roadmap</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('competitor')">
                                 <div class="quick-task-icon">🔍</div>
                                 <div class="quick-task-title">Competitor Scan</div>
-                                <div class="quick-task-desc">Tavily live signals</div>
+                                <div class="quick-task-desc">Real-time market insights</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('pricing')">
                                 <div class="quick-task-icon">💵</div>
-                                <div class="quick-task-title">Pricing Pivot</div>
-                                <div class="quick-task-desc">Margin defense</div>
+                                <div class="quick-task-title">Pricing Strategy</div>
+                                <div class="quick-task-desc">Protect margins and value</div>
                             </div>
                             <div class="quick-task-card" onclick="quickTask('fsu_trust')">
                                 <div class="quick-task-icon">📊</div>
-                                <div class="quick-task-title">SPSS Trust Score</div>
-                                <div class="quick-task-desc">Human gate math</div>
+                                <div class="quick-task-title">Trust Framework</div>
+                                <div class="quick-task-desc">Empirical research alignment</div>
                             </div>
                             <div class="quick-task-card" onclick="setCustomTaskMode()">
                                 <div class="quick-task-icon">✏️</div>
-                                <div class="quick-task-title">Create Task +</div>
-                                <div class="quick-task-desc">Define custom mission</div>
+                                <div class="quick-task-title">Custom Objective</div>
+                                <div class="quick-task-desc">Define a new goal</div>
                             </div>
                         </div>
                     </div>
@@ -881,57 +936,57 @@
                     <div class="intake-card">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                <span id="intakeModeTitle">Strategy Intake Builder</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                <span id="intakeModeTitle">Guided Strategy Builder</span>
                             </div>
                             <div class="intake-mode-toggle">
-                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Preset</button>
-                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Create Custom Task</button>
+                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Guided</button>
+                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Custom Task</button>
                             </div>
                         </div>
 
-                        <!-- Preset Form -->
+                        <!-- Guided Form -->
                         <div id="presetTaskForm">
                             <div class="intake-grid">
                                 <div class="intake-field">
                                     <select id="intakeFocus">
-                                        <option value="Local Retail & Trade Area Foot-Traffic">Local Retail / Trade Area</option>
-                                        <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS / Pricing</option>
-                                        <option value="Industrial Narrative & Modern Tech Pivot">Industrial Tech Pivot</option>
-                                        <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth Sprint</option>
+                                        <option value="Local Retail & Trade Area Foot-Traffic">Local Retail & Community Growth</option>
+                                        <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS & Sustainable Pricing</option>
+                                        <option value="Industrial Narrative & Modern Tech Pivot">Industrial Brand & Tech Pivot</option>
+                                        <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth & Operator Brand</option>
                                         <option value="State Agency Survey & Data Operations">Survey & Data Operations</option>
-                                        <option value="Brand Positioning & Competitor Recon">Competitor & Market Recon</option>
+                                        <option value="Brand Positioning & Competitor Recon">Brand Positioning & Market Recon</option>
                                     </select>
                                 </div>
                                 <div class="intake-field">
                                     <select id="intakeConstraint">
-                                        <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Integrity</option>
-                                        <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Required</option>
-                                        <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Budget</option>
-                                        <option value="128 BPM Tech Electro High Cadence">High Velocity Execution</option>
+                                        <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Brand Equity</option>
+                                        <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Verification</option>
+                                        <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Capital Focus</option>
+                                        <option value="High-Paced Execution">High-Velocity Delivery</option>
                                     </select>
                                 </div>
                                 <div class="intake-field">
-                                    <input type="text" id="intakeGoal" placeholder="Goal (e.g. 5% neighbor lift)">
+                                    <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% local resident lift)">
                                 </div>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Build Telemetry Brief</button>
+                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Generate Strategic Brief</button>
                         </div>
 
                         <!-- Custom Form -->
                         <div id="customTaskForm" class="custom-task-container">
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                                 <div class="intake-field">
-                                    <input type="text" id="customTaskName" placeholder="Task Name (e.g. Q3 Pipeline Audit)">
+                                    <input type="text" id="customTaskName" placeholder="Project Name (e.g. Q3 Growth Review)">
                                 </div>
                                 <div class="intake-field">
-                                    <input type="text" id="customTarget" placeholder="Target / Client (e.g. Ma's Diner)">
+                                    <input type="text" id="customTarget" placeholder="Client / Focus Area (e.g. Ma's Diner)">
                                 </div>
                             </div>
                             <div class="intake-field">
-                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific operational directives (e.g. Scan competitors via Tavily, output CAC & margin benchmarks)..."></textarea>
+                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific questions, background, or goals to analyze..."></textarea>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchCustomTask()">Run Custom Telemetry Task</button>
+                            <button class="btn-launch-intake" onclick="launchCustomTask()">Generate Strategic Plan</button>
                         </div>
                     </div>
                 </div>
@@ -939,11 +994,11 @@
 
             <div class="input-wrapper">
                 <div class="input-box">
-                    <button class="icon-btn" title="Run Audit" onclick="insertAuditTemplate()">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
-                    <input type="text" id="userInput" placeholder="Ask a strategic question or enter copy to audit..." onkeydown="handleKey(event)">
-                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #202020; padding: 7px 11px; border-radius: 12px;">
+                    <input type="text" id="userInput" placeholder="Ask a strategic question, enter copy to review, or define a goal..." onkeydown="handleKey(event)">
+                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #10b981; color:#fff; padding: 7px 12px; border-radius: 16px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
@@ -955,10 +1010,10 @@
             <div class="studio-view">
                 <div class="studio-header">
                     <div>
-                        <h1 style="font-size: 18px; font-weight: 700; margin-bottom: 2px;">Saved Vault</h1>
-                        <p style="color: #777; font-size: 12px;">Cached briefings for the active workspace.</p>
+                        <h1 style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">Saved Briefings</h1>
+                        <p style="color: #8e8e93; font-size: 13px;">Archived strategies and reports for this workspace.</p>
                     </div>
-                    <div style="display: flex; gap: 6px;">
+                    <div style="display: flex; gap: 8px;">
                         <button class="action-btn" onclick="exportVaultCSV()">Export CSV</button>
                         <button class="action-btn" onclick="clearVault()">Clear</button>
                     </div>
@@ -1019,13 +1074,13 @@
                 customForm.classList.add('active');
                 btnPreset.classList.remove('active');
                 btnCustom.classList.add('active');
-                title.textContent = "Create Custom Operation Task";
+                title.textContent = "Create Custom Objective";
             } else {
                 presetForm.style.display = 'block';
                 customForm.classList.remove('active');
                 btnPreset.classList.add('active');
                 btnCustom.classList.remove('active');
-                title.textContent = "Strategy Intake Builder";
+                title.textContent = "Guided Strategy Builder";
             }
         }
 
@@ -1038,25 +1093,25 @@
             const input = document.getElementById('userInput');
             if (type === 'trade_analysis') {
                 document.getElementById('strategyLens').value = 'hyperlocal';
-                input.value = "Run a comprehensive trade area and commercial foot-traffic density analysis. Evaluate neighborhood capture geometry and margin-defense strategy.";
+                input.value = "Please analyze our local trade area foot-traffic and neighborhood customer density. Focus on sustainable pricing power and zero discounts.";
             } else if (type === 'trust') {
                 document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = "Audit our automated B2B sales sequence against empirical consumer trust boundaries. Output Trust Alignment Index and Autonomy Risk Tier.";
+                input.value = "Review our current marketing and sales outreach messaging for trust, ethical positioning, and human connection.";
             } else if (type === 'saas') {
                 document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = "Evaluate our $15.99 / $39.99 / $79.99 subscription model. Model CAC, LTV/CAC ratio, and churn mitigation protocol.";
+                input.value = "Evaluate our pricing model and unit economics ($15.99, $39.99, $79.99 tiers) with a focus on healthy retention and sustainable margins.";
             } else if (type === 'campaign_strategy') {
                 document.getElementById('strategyLens').value = 'standard';
-                input.value = "Develop a high-density, multi-channel campaign strategy. Focus on organic reach, zero discount mechanics, and high-conversion positioning.";
+                input.value = "Develop a multi-channel campaign strategy centered on authentic positioning, high-value storytelling, and customer retention.";
             } else if (type === 'competitor') {
                 document.getElementById('strategyLens').value = 'standard';
-                input.value = "Execute a live competitor reconnaissance scan via Tavily. Extract live market movements and positioning vulnerabilities.";
+                input.value = "Provide an objective market scan of current competitor positioning and opportunities for differentiation.";
             } else if (type === 'pricing') {
                 document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = "Model a margin-protection pricing strategy that eliminates promotional discounting while raising perceived value.";
+                input.value = "Outline a pricing strategy that protects profit margins and elevates brand value without relying on discounts.";
             } else if (type === 'fsu_trust') {
                 document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = "Apply the FSU SPSS trust boundary framework to evaluate where AI should build the skeleton vs where human operators must hold the gate.";
+                input.value = "Apply the human-in-the-loop trust framework: how should we balance automated research with human judgment to earn customer confidence?";
             }
             onLensChange();
             sendMessage();
@@ -1065,16 +1120,16 @@
         function launchPresetBuilder() {
             const focus = document.getElementById('intakeFocus').value;
             const constraint = document.getElementById('intakeConstraint').value;
-            const goal = document.getElementById('intakeGoal').value.trim() || 'Maximize ROI and brand equity';
-            document.getElementById('userInput').value = `EXECUTE STRATEGY INTAKE:\nFocus: ${focus}\nConstraint: ${constraint}\nGoal: ${goal}`;
+            const goal = document.getElementById('intakeGoal').value.trim() || 'Achieve strong growth and brand equity';
+            document.getElementById('userInput').value = `Please build a strategic brief with this focus:\n• Core Area: ${focus}\n• Strategic Approach: ${constraint}\n• Main Goal: ${goal}`;
             sendMessage();
         }
 
         function launchCustomTask() {
-            const name = document.getElementById('customTaskName').value.trim() || 'Custom Operation Task';
-            const target = document.getElementById('customTarget').value.trim() || 'General Strategy';
-            const instructions = document.getElementById('customTaskInstructions').value.trim() || 'Provide full telemetry briefing and execution protocol.';
-            document.getElementById('userInput').value = `CUSTOM TASK: [${name.toUpperCase()}]\nTarget: ${target}\nOperational Directives: ${instructions}\nDeliverable: Provide system context, quantitative telemetry metrics, and exact frontline steps.`;
+            const name = document.getElementById('customTaskName').value.trim() || 'Strategic Review';
+            const target = document.getElementById('customTarget').value.trim() || 'General Business';
+            const instructions = document.getElementById('customTaskInstructions').value.trim() || 'Provide a comprehensive strategy and clear recommendations.';
+            document.getElementById('userInput').value = `Strategic Goal: ${name}\nFocus Area: ${target}\nObjectives & Context: ${instructions}`;
             sendMessage();
         }
 
@@ -1091,16 +1146,16 @@
         function onLensChange() {
             const lens = document.getElementById('strategyLens').value;
             const input = document.getElementById('userInput');
-            if (lens === 'trust_auditor') input.placeholder = "Paste copy or campaign to run Trust Audit...";
-            else if (lens === 'hyperlocal') input.placeholder = "Enter neighborhood, local retail, or diner goal...";
-            else if (lens === 'saas_operator') input.placeholder = "Enter SaaS pricing or unit economics question...";
-            else input.placeholder = "Ask a strategic question or enter copy to audit...";
+            if (lens === 'trust_auditor') input.placeholder = "Paste copy or campaign ideas to review for trust and credibility...";
+            else if (lens === 'hyperlocal') input.placeholder = "Enter your neighborhood, local retail, or customer retention goal...";
+            else if (lens === 'saas_operator') input.placeholder = "Enter your pricing or unit economics questions...";
+            else input.placeholder = "Ask a strategic question, enter copy to review, or define a goal...";
         }
 
         function insertAuditTemplate() {
             document.getElementById('strategyLens').value = 'trust_auditor';
             onLensChange();
-            document.getElementById('userInput').value = "Audit this strategy: Local business targeting neighborhood residents with a community huddle approach and zero discounts.";
+            document.getElementById('userInput').value = "Review this local business campaign: engaging neighborhood residents with a community-first approach and zero discounts.";
             document.getElementById('userInput').focus();
         }
 
@@ -1111,42 +1166,27 @@
             }
         }
 
-        // Final Structured Telemetry Parser
+        // Friendly & Professional Telemetry Parser
         function formatTelemetryOutput(text) {
-            return text.replace(/\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-badge"><strong>[$1]</strong> = $2</div>')
-                       .replace(/\*\*([^*]+)\*\*/g, '<div class="telemetry-header-block"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> $1</div>')
+            return text.replace(/\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
+                       .replace(/\*\*([^*]+)\*\*/g, '<div class="friendly-section-header">$1</div>')
                        .replace(/\n/g, '<br>');
         }
 
-        // Direct Tunnel Inference Call to Whitelisted Server
         async function fetchInference(messages, lens) {
-            // First try same-origin, then fallback directly to the verified tunnel endpoint
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages, lens })
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
-                }
-            } catch (e) {}
-
-            // Direct Cloudflare Tunnel to Whitelisted IP Node (100% Reliable & Fast)
-            const tunnelRes = await fetch('https://cause-enjoy-rose-visited.trycloudflare.com/api/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ messages, lens })
             });
 
-            if (!tunnelRes.ok) {
-                const errData = await tunnelRes.json().catch(() => ({}));
-                throw new Error(errData.error || `Server responded with ${tunnelRes.status}`);
+            const data = await res.json().catch(() => ({}));
+            
+            if (!res.ok) {
+                throw new Error(data.error || `Advisor service unavailable (${res.status})`);
             }
 
-            const data = await tunnelRes.json();
-            return data.choices?.[0]?.message?.content || "Telemetry output calculated.";
+            return data.choices?.[0]?.message?.content || "Strategic plan generated.";
         }
 
         async function sendMessage() {
@@ -1172,7 +1212,7 @@
             assistantRow.className = 'message-row assistant';
             const card = document.createElement('div');
             card.className = 'message-card';
-            card.innerHTML = '<em>Calculating telemetry...</em>';
+            card.innerHTML = '<em style="color:#8e8e93;">Consultant is drafting recommendations...</em>';
             assistantRow.appendChild(card);
             chatArea.appendChild(assistantRow);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1190,30 +1230,30 @@
                     rendered += words[i] + ' ';
                     card.innerHTML = formatTelemetryOutput(rendered);
                     chatArea.scrollTop = chatArea.scrollHeight;
-                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 10));
+                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 12));
                 }
 
                 const actions = document.createElement('div');
                 actions.className = 'memo-actions';
                 actions.innerHTML = `
                     <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save Briefing
                     </button>
                     <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy CSV
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Metrics
                     </button>
                     <button class="action-btn" onclick="exportToGoogleDrive('${escapeHtml(fullResponse)}')">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Export Doc
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Google Doc
                     </button>
                     <button class="action-btn" onclick="window.print()">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print Memo
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
                     </button>
                 `;
                 card.appendChild(actions);
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
             } catch (err) {
-                card.innerHTML = `<span style="color:#ff5555;">Execution error: ${err.message}</span>`;
+                card.innerHTML = `<span style="color:#f87171;">Note: ${err.message}</span>`;
             } finally {
                 isStreaming = false;
             }
@@ -1225,7 +1265,7 @@
         }
 
         function extractMetricsCSV(text) {
-            const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
+            const regex = /\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g;
             let match;
             const rows = [['Metric', 'Value']];
             while ((match = regex.exec(text)) !== null) {
@@ -1236,8 +1276,8 @@
 
         function copyMetricsCSV(text) {
             const csv = extractMetricsCSV(text);
-            if (!csv || csv === '"Metric","Value"') { alert("No metrics found."); return; }
-            navigator.clipboard.writeText(csv).then(() => alert("Metrics copied as CSV."));
+            if (!csv || csv === '"Metric","Value"') { alert("No metrics identified in this response."); return; }
+            navigator.clipboard.writeText(csv).then(() => alert("Key metrics copied as a clean table."));
         }
 
         function exportToGoogleDrive(content) {
@@ -1245,7 +1285,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Telemetry_Briefing_${Date.now()}.doc`;
+            link.download = `Strategic_Briefing_${Date.now()}.doc`;
             link.click();
             alert("Briefing exported as an editable Document ready for Google Drive / Docs.");
         }
@@ -1267,11 +1307,11 @@
             if (!item || item.role !== 'assistant') return;
             const all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             const ws = document.getElementById('clientWorkspace').value;
-            const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 35) || "Briefing";
+            const title = item.content.split('\n')[0].replace(/[*#]/g, '').trim().substring(0, 35) || "Strategic Plan";
             all.unshift({ id: Date.now(), workspace: ws, title, content: item.content, date: new Date().toLocaleDateString() });
             localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 50)));
             updateVaultCount();
-            alert("Saved to Vault.");
+            alert("Briefing saved to your client workspace.");
         }
 
         function renderVault() {
@@ -1279,7 +1319,7 @@
             grid.innerHTML = '';
             const items = getVaultItems();
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#666; font-size:12px; grid-column: 1/-1;">No saved memos in this workspace.</p>';
+                grid.innerHTML = '<p style="color:#8e8e93; font-size:13px; grid-column: 1/-1;">No saved briefings in this workspace yet.</p>';
                 return;
             }
             items.forEach(item => {
@@ -1287,7 +1327,7 @@
                 card.className = 'asset-card';
                 card.innerHTML = `
                     <div class="asset-name">${escapeHtml(item.title)}</div>
-                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#00FF66;">${item.workspace}</span></div>
+                    <div class="asset-meta"><span>${item.date}</span> <span style="color:#34d399;">${item.workspace}</span></div>
                 `;
                 grid.appendChild(card);
             });
@@ -1296,10 +1336,10 @@
 
         function exportVaultCSV() {
             const items = getVaultItems();
-            if (items.length === 0) { alert("Vault empty."); return; }
+            if (items.length === 0) { alert("Vault is empty."); return; }
             let csv = "data:text/csv;charset=utf-8,Title,Date,Workspace,Metric,Value\n";
             items.forEach(item => {
-                const regex = /\[([A-Z_]+)\]\s*=\s*([^\n\r<]+)/g;
+                const regex = /\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g;
                 let match;
                 while ((match = regex.exec(item.content)) !== null) {
                     csv += `"${item.title.replace(/"/g, '""')}","${item.date}","${item.workspace}","${match[1]}","${match[2]}"\n`;
@@ -1312,7 +1352,7 @@
         }
 
         function clearVault() {
-            if (confirm("Clear vault for this workspace?")) {
+            if (confirm("Clear saved briefings for this workspace?")) {
                 const ws = document.getElementById('clientWorkspace').value;
                 let all = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
                 all = all.filter(i => i.workspace !== ws);
