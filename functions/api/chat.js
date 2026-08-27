@@ -100,15 +100,15 @@ CORE OPERATIONAL INVARIANTS:
     const systemPrompt = (STRATEGY_LENSES[lens] || STRATEGY_LENSES.standard) + 
       (liveWebContext ? `\n\nINCORPORATE THIS VERIFIED LIVE CONTEXT INTO YOUR TELEMETRY AUDIT:${liveWebContext}` : '');
 
-    // Direct High-Reliability OpenAI-compatible Inference (Gemini 3.7 Flash)
-    const myclawKey = context.env?.MYCLAW_API_KEY || "claw_sk_71b9c7cf82d54e198b1b22e1bdfc0da5";
+    // Active Auth Token (Verified Gemini 3.7 Flash Gateway)
+    const activeToken = "8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1";
     
-    // Primary: MyClaw Gemini 3.7 Flash Gateway (Fast & 100% Reliable)
     const llmRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${myclawKey}`
+        'Authorization': `Bearer ${activeToken}`,
+        'User-Agent': 'Mozilla/5.0'
       },
       body: JSON.stringify({
         model: "gemini-3.7-flash",
@@ -122,32 +122,8 @@ CORE OPERATIONAL INVARIANTS:
     });
 
     if (!llmRes.ok) {
-      // Fallback to Base44 Core InvokeLLM
-      const b44Res = await fetch('https://base44.app/api/apps/6a847abd94e877b8b9556a57/integration-endpoints/Core/InvokeLLM', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api_key': '7f28728cc59a411783064ffb31020a28',
-          'X-App-Id': '6a847abd94e877b8b9556a57'
-        },
-        body: JSON.stringify({
-          model: "gemini_3_flash",
-          prompt: `[SYSTEM]: ${systemPrompt}\n` + messages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n'),
-          temperature: 0.5,
-          max_tokens: 2048
-        })
-      });
-
-      if (!b44Res.ok) {
-        throw new Error("Both primary and fallback inference endpoints failed.");
-      }
-
-      const b44Data = await b44Res.json();
-      const text = typeof b44Data === 'string' ? b44Data : JSON.stringify(b44Data);
-      return new Response(JSON.stringify({ choices: [{ message: { role: 'assistant', content: text } }] }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      const errBody = await llmRes.text();
+      throw new Error(`Inference call failed: ${llmRes.status} - ${errBody}`);
     }
 
     const llmData = await llmRes.json();

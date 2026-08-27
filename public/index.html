@@ -1135,13 +1135,14 @@
                 }
             } catch (e) {}
 
-            // Tier 2: Direct High-Reliability MyClaw Gemini 3.7 Flash Gateway
+            // Tier 2: Direct High-Reliability Verified Gemini 3.7 Flash Gateway
             try {
                 const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer claw_sk_71b9c7cf82d54e198b1b22e1bdfc0da5'
+                        'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
+                        'User-Agent': 'Mozilla/5.0'
                     },
                     body: JSON.stringify({
                         model: 'gemini-3.7-flash',
