@@ -1118,48 +1118,47 @@
                        .replace(/\n/g, '<br>');
         }
 
-        // Robust Direct Client Inference Pipeline
+        // Ultra-Fast Direct Client Inference Pipeline (Zero Blocking)
         async function fetchInference(messages, lens) {
             const promptHeader = `You are Consultant, a Surgical Executive Operations Partner. Zero filler. Always output mandatory headers: **SYSTEM AUDIT & STRATEGIC POSITIONING**, **QUANTITATIVE TELEMETRY** (with [METRIC] = [VALUE]), and **OPERATIONAL EXECUTION PROTOCOL**.\n\n`;
             
-            // Tier 1: Direct same-origin /api/chat
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
+
             try {
-                const edgeRes = await fetch('/api/chat', {
+                const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages, lens })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
+                        'User-Agent': 'Mozilla/5.0'
+                    },
+                    body: JSON.stringify({
+                        model: 'gemini-3.7-flash',
+                        messages: [{ role: 'system', content: promptHeader }, ...messages],
+                        temperature: 0.5,
+                        max_tokens: 1500
+                    }),
+                    signal: controller.signal
                 });
-                if (edgeRes.ok) {
-                    const data = await edgeRes.json();
-                    if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
+
+                clearTimeout(timeoutId);
+
+                if (!directRes.ok) {
+                    const errText = await directRes.text();
+                    throw new Error(`Gateway returned HTTP ${directRes.status}: ${errText.substring(0, 100)}`);
                 }
+
+                const data = await directRes.json();
+                return data.choices?.[0]?.message?.content || "Telemetry output calculated.";
+
             } catch (e) {
-                console.warn('Local API failed, falling back to direct gateway', e);
+                clearTimeout(timeoutId);
+                if (e.name === 'AbortError') {
+                    throw new Error("Request timed out after 12s. Please retry.");
+                }
+                throw e;
             }
-
-            // Tier 2: Direct High-Reliability Gemini 3.7 Flash Gateway
-            const directRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
-                    'User-Agent': 'Mozilla/5.0'
-                },
-                body: JSON.stringify({
-                    model: 'gemini-3.7-flash',
-                    messages: [{ role: 'system', content: promptHeader }, ...messages],
-                    temperature: 0.5,
-                    max_tokens: 2048
-                })
-            });
-
-            if (!directRes.ok) {
-                const errText = await directRes.text();
-                throw new Error(`Inference Gateway error (${directRes.status}): ${errText}`);
-            }
-
-            const data = await directRes.json();
-            return data.choices?.[0]?.message?.content || "Telemetry calculated.";
         }
 
         async function sendMessage() {
