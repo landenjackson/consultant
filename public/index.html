@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="/icon.svg">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -24,7 +24,7 @@
         }
         
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #090a0c;
             color: #f1f5f9;
             height: 100dvh;
@@ -35,7 +35,7 @@
             letter-spacing: -0.015em;
         }
 
-        /* Sidebar - Linear Studio Grade */
+        /* Sidebar */
         .sidebar {
             width: 270px;
             background: #0d0f12;
@@ -55,27 +55,23 @@
         }
 
         .brand-name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
             color: #ffffff;
             display: flex;
             align-items: center;
             gap: 9px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.02em;
         }
 
         .tag-pill {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(34, 197, 94, 0.12);
             border: 1px solid rgba(34, 197, 94, 0.3);
-            padding: 2px 7px;
-            border-radius: 4px;
-            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 700;
             color: #4ade80;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.04em;
         }
 
         .controls-block {
@@ -86,16 +82,15 @@
         }
 
         .section-label {
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #64748b;
+            letter-spacing: 0.05em;
+            color: #71717a;
             margin-bottom: 5px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-family: 'JetBrains Mono', monospace;
         }
 
         .custom-select {
@@ -110,6 +105,7 @@
             outline: none;
             cursor: pointer;
             transition: all 0.2s;
+            font-family: inherit;
         }
 
         .custom-select:focus {
@@ -173,7 +169,7 @@
             background: #0f1311;
             border: 1px solid rgba(34, 197, 94, 0.2);
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 11.5px;
             line-height: 1.45;
             color: #8da295;
         }
@@ -184,10 +180,8 @@
             gap: 6px;
             color: #4ade80;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 11.5px;
             margin-bottom: 3px;
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
         }
 
         /* Top Header Bar */
@@ -201,8 +195,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
-            color: #64748b;
+            font-size: 12.5px;
+            color: #71717a;
             z-index: 10;
             background: rgba(9, 10, 12, 0.92);
             backdrop-filter: blur(12px);
@@ -232,11 +226,10 @@
             background: rgba(34, 197, 94, 0.08);
             color: #4ade80;
             padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
+            border-radius: 6px;
+            font-size: 11.5px;
             font-weight: 700;
             border: 1px solid rgba(34, 197, 94, 0.25);
-            font-family: 'JetBrains Mono', monospace;
         }
 
         .status-dot {
@@ -282,7 +275,7 @@
             margin: 0 auto;
         }
 
-        /* Executive Command Header (No Avatar / Non-ChatGPT) */
+        /* Executive Command Header */
         .hero-section {
             text-align: left;
             max-width: 860px;
@@ -310,11 +303,10 @@
         }
 
         .command-kicker {
-            font-size: 10.5px;
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
             color: #4ade80;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             font-weight: 700;
         }
 
@@ -326,14 +318,14 @@
         }
 
         .command-meta {
-            font-size: 11px;
-            color: #64748b;
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: #71717a;
             display: flex;
             gap: 12px;
+            font-weight: 600;
         }
 
-        /* Operations Launch Grid (Linear / Monospaced Headers) */
+        /* Operations Launch Grid */
         .quick-tasks-container {
             margin-top: 10px;
         }
@@ -373,10 +365,11 @@
         }
 
         .task-index {
-            font-size: 9.5px;
-            font-family: 'JetBrains Mono', monospace;
-            color: #64748b;
-            font-weight: 600;
+            font-size: 10px;
+            color: #71717a;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
 
         .task-icon-svg {
@@ -422,7 +415,6 @@
             display: flex;
             align-items: center;
             gap: 7px;
-            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
@@ -438,14 +430,14 @@
         .mode-btn {
             background: transparent;
             border: none;
-            color: #64748b;
+            color: #71717a;
             font-size: 11px;
             font-weight: 600;
             padding: 3px 8px;
             border-radius: 3px;
             cursor: pointer;
             transition: all 0.15s;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: inherit;
         }
 
         .mode-btn.active {
@@ -501,9 +493,9 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            font-family: 'JetBrains Mono', monospace;
             letter-spacing: 0.02em;
             text-transform: uppercase;
+            font-family: inherit;
         }
 
         .btn-launch-intake:hover {
@@ -511,7 +503,7 @@
             transform: translateY(-1px);
         }
 
-        /* Message Cards - Terminal Studio Look */
+        /* Message Cards */
         .message-row { display: flex; width: 100%; margin-bottom: 6px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
@@ -542,7 +534,7 @@
 
         /* High-Detail Section Headers */
         .friendly-section-header {
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 800;
             color: #ffffff;
             margin-top: 14px;
@@ -554,14 +546,15 @@
         }
 
         .friendly-section-header::before {
-            content: '//';
-            color: #22c55e;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            font-size: 12px;
+            content: '';
+            display: inline-block;
+            width: 3.5px;
+            height: 14px;
+            background: #22c55e;
+            border-radius: 2px;
         }
 
-        /* Metric Pill with Monospace Value */
+        /* Metric Pill */
         .metric-pill {
             display: inline-flex;
             align-items: center;
@@ -572,13 +565,12 @@
             padding: 3px 9px;
             border-radius: 4px;
             margin: 3px 0;
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 600;
         }
 
         .metric-pill strong {
             color: #86efac;
-            font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
         }
 
@@ -596,7 +588,7 @@
             background: #11141a;
             border: 1px solid #1f242e;
             color: #cbd5e1;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 4px;
@@ -605,7 +597,7 @@
             align-items: center;
             gap: 5px;
             transition: all 0.15s;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: inherit;
         }
 
         .action-btn:hover {
@@ -614,7 +606,7 @@
             border-color: rgba(34, 197, 94, 0.4);
         }
 
-        /* Docked Industrial Input Bar (Linear Style) */
+        /* Docked Input Bar */
         .input-wrapper {
             padding: 10px 18px 16px;
             width: 100%;
@@ -656,7 +648,7 @@
         }
 
         .input-box input::placeholder {
-            color: #475569;
+            color: #71717a;
         }
 
         .send-btn-docked {
@@ -665,15 +657,15 @@
             border: none;
             padding: 6px 12px;
             border-radius: 4px;
-            font-size: 11.5px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
-            font-family: 'JetBrains Mono', monospace;
             letter-spacing: 0.03em;
             transition: all 0.15s;
+            font-family: inherit;
         }
 
         .send-btn-docked:hover {
@@ -683,7 +675,7 @@
         .icon-btn {
             background: transparent;
             border: none;
-            color: #64748b;
+            color: #71717a;
             cursor: pointer;
             padding: 4px;
             display: flex;
@@ -730,7 +722,7 @@
 
         .asset-card:hover { border-color: #22c55e; }
         .asset-name { font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #ffffff; }
-        .asset-meta { font-size: 11px; color: #64748b; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; }
+        .asset-meta { font-size: 11.5px; color: #71717a; display: flex; justify-content: space-between; }
 
         /* Modal Overlay */
         .modal-overlay {
@@ -760,7 +752,7 @@
         .close-modal {
             position: absolute;
             top: 14px; right: 14px;
-            color: #64748b; font-size: 20px; cursor: pointer;
+            color: #71717a; font-size: 20px; cursor: pointer;
         }
 
         .pricing-grid {
@@ -784,8 +776,8 @@
             background: rgba(34, 197, 94, 0.04);
         }
 
-        .plan-price { font-size: 24px; font-weight: 800; color: #4ade80; margin: 4px 0; font-family: 'JetBrains Mono', monospace; }
-        .plan-features { margin: 10px 0; flex: 1; font-size: 11.5px; color: #94a3b8; }
+        .plan-price { font-size: 24px; font-weight: 800; color: #4ade80; margin: 4px 0; }
+        .plan-features { margin: 10px 0; flex: 1; font-size: 12px; color: #94a3b8; }
         .plan-features li { list-style: none; margin-bottom: 5px; }
 
         .btn-trial {
@@ -795,11 +787,11 @@
             padding: 8px;
             border-radius: 4px;
             font-weight: 800;
-            font-size: 11px;
+            font-size: 11.5px;
             cursor: pointer;
             width: 100%;
-            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
+            font-family: inherit;
         }
 
         .btn-trial:hover { background: #4ade80; }
@@ -843,14 +835,14 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 20px; margin-bottom: 2px; font-weight: 800; font-family: 'JetBrains Mono', monospace;">CONSULTANT ACCESS TIERS</h2>
-                <p style="color: #64748b; font-size: 12px;">Strategic intelligence infrastructure for modern operators.</p>
+                <h2 style="font-size: 20px; margin-bottom: 2px; font-weight: 800;">Consultant Access Plans</h2>
+                <p style="color: #71717a; font-size: 13px;">Strategic intelligence infrastructure for modern operators.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 13px;">STARTER</div>
-                    <div class="plan-price">$15.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Starter</div>
+                    <div class="plan-price">$15.99<span style="font-size: 11px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Unlimited Strategy Briefings</li>
                         <li>✓ Standard Advisory Lens</li>
@@ -859,8 +851,8 @@
                 </div>
 
                 <div class="plan-card featured">
-                    <div style="font-weight: 700; font-size: 13px;">PRO OPERATOR</div>
-                    <div class="plan-price">$39.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Pro Operator</div>
+                    <div class="plan-price">$39.99<span style="font-size: 11px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ All Strategic Lenses</li>
                         <li>✓ Multi-Client Workspaces</li>
@@ -871,8 +863,8 @@
                 </div>
 
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 13px;">EXECUTIVE STUDIO</div>
-                    <div class="plan-price">$79.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">Executive Studio</div>
+                    <div class="plan-price">$79.99<span style="font-size: 11px; color: #71717a; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Everything in Pro</li>
                         <li>✓ SPSS Trust Architecture</li>
@@ -891,14 +883,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" width="18" height="18"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                 Consultant
             </div>
-            <span class="tag-pill">STUDIO v1.8</span>
+            <span class="tag-pill">Studio</span>
         </div>
 
         <div class="controls-block">
             <div>
                 <div class="section-label">
-                    <span>WORKSPACE</span>
-                    <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ ADD</span>
+                    <span>Active Workspace</span>
+                    <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ Add</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
                     <option value="default">General Workspace</option>
@@ -909,7 +901,7 @@
             </div>
 
             <div>
-                <div class="section-label">STRATEGIC LENS</div>
+                <div class="section-label">Strategic Perspective</div>
                 <select id="strategyLens" class="custom-select lens" onchange="onLensChange()">
                     <option value="standard">Chief of Staff Direction</option>
                     <option value="trust_auditor">Trust & Credibility Audit</option>
@@ -941,7 +933,7 @@
         <div class="partner-card">
             <div class="partner-header">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                Human Gate
+                Human-in-the-Loop
             </div>
             <div>AI synthesizes research; human operator holds final decision gate.</div>
         </div>
@@ -954,11 +946,11 @@
                 <button class="mobile-menu-btn" onclick="toggleSidebar()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
-                <span style="font-weight: 700; color: #ffffff; font-size: 13px; font-family: 'JetBrains Mono', monospace;" id="currentWorkspaceDisplay">WORKSPACE // GENERAL</span>
+                <span style="font-weight: 700; color: #ffffff; font-size: 13.5px;" id="currentWorkspaceDisplay">General Workspace</span>
             </div>
             <div class="status-items">
-                <div class="status-badge"><span class="status-dot"></span> LIVE EDGE</div>
-                <div id="clock" style="font-size: 11px; color: #64748b; font-family: 'JetBrains Mono', monospace;">14:15</div>
+                <div class="status-badge"><span class="status-dot"></span> Ready</div>
+                <div id="clock" style="font-size: 12px; color: #71717a; font-weight:600;">14:15</div>
             </div>
         </div>
 
@@ -967,26 +959,25 @@
             <div class="chat-area" id="chatArea">
                 <div class="hero-section" id="heroSection">
                     
-                    <!-- Linear / Studio Command Banner -->
+                    <!-- Command Banner -->
                     <div class="command-banner">
                         <div class="command-title-group">
                             <span class="command-kicker">Strategic Intelligence Engine</span>
-                            <h1 class="command-title">Executive Operations & Telemetry Studio</h1>
+                            <h1 class="command-title">Executive Operations & Strategy Studio</h1>
                         </div>
                         <div class="command-meta">
-                            <span>LATENCY: 14ms</span>
-                            <span>MODEL: GEMINI-3.7</span>
+                            <span>Ready</span>
                         </div>
                     </div>
 
-                    <!-- Operations Matrix (Clean SVG Icons + Monospace Index) -->
+                    <!-- Operations Matrix -->
                     <div class="quick-tasks-container">
-                        <div class="section-label">SELECT OPERATIONAL PROTOCOL</div>
+                        <div class="section-label">Select Strategic Task</div>
                         <div class="quick-task-grid">
                             
                             <div class="quick-task-card" onclick="quickTask('trade_analysis')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">01 // TRADE</span>
+                                    <span class="task-index">Trade Area</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                                 </div>
                                 <div class="quick-task-title">Trade Area Geometry</div>
@@ -995,16 +986,16 @@
 
                             <div class="quick-task-card" onclick="quickTask('trust')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">02 // TRUST</span>
+                                    <span class="task-index">Trust Audit</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 </div>
                                 <div class="quick-task-title">Trust & Copy Audit</div>
-                                <div class="quick-task-desc">Reputation & human gate</div>
+                                <div class="quick-task-desc">Reputation & credibility</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('saas')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">03 // ECON</span>
+                                    <span class="task-index">Economics</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 </div>
                                 <div class="quick-task-title">Unit Economics</div>
@@ -1013,7 +1004,7 @@
 
                             <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">04 // CAMPAIGN</span>
+                                    <span class="task-index">Campaign</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 </div>
                                 <div class="quick-task-title">Campaign Strategy</div>
@@ -1022,7 +1013,7 @@
 
                             <div class="quick-task-card" onclick="quickTask('competitor')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">05 // RECON</span>
+                                    <span class="task-index">Recon</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                                 </div>
                                 <div class="quick-task-title">Competitor Scan</div>
@@ -1031,7 +1022,7 @@
 
                             <div class="quick-task-card" onclick="quickTask('pricing')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">06 // PRICING</span>
+                                    <span class="task-index">Pricing</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                                 </div>
                                 <div class="quick-task-title">Pricing Pivot</div>
@@ -1040,16 +1031,16 @@
 
                             <div class="quick-task-card" onclick="quickTask('fsu_trust')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">07 // SPSS</span>
+                                    <span class="task-index">Research</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                                 </div>
                                 <div class="quick-task-title">SPSS Trust Score</div>
-                                <div class="quick-task-desc">Empirical p &lt; .001 model</div>
+                                <div class="quick-task-desc">Empirical trust model</div>
                             </div>
 
                             <div class="quick-task-card" onclick="setCustomTaskMode()">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">08 // CUSTOM</span>
+                                    <span class="task-index">Custom</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 </div>
                                 <div class="quick-task-title">Custom Objective</div>
@@ -1064,11 +1055,11 @@
                         <div class="intake-header">
                             <div class="intake-title">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                <span id="intakeModeTitle">GUIDED STRATEGY BUILDER</span>
+                                <span id="intakeModeTitle">Guided Strategy Builder</span>
                             </div>
                             <div class="intake-mode-toggle">
-                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">GUIDED</button>
-                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">CUSTOM</button>
+                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Guided</button>
+                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Custom</button>
                             </div>
                         </div>
 
@@ -1097,7 +1088,7 @@
                                     <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% resident acquisition)">
                                 </div>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">RUN STRATEGIC BRIEF</button>
+                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Run Strategic Brief</button>
                         </div>
 
                         <!-- Custom Form -->
@@ -1113,21 +1104,21 @@
                             <div class="intake-field">
                                 <textarea id="customTaskInstructions" rows="2" placeholder="Specific questions, background, or goals to analyze..."></textarea>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchCustomTask()">INITIALIZE CUSTOM PLAN</button>
+                            <button class="btn-launch-intake" onclick="launchCustomTask()">Generate Custom Plan</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Docked Linear Style Input Bar -->
+            <!-- Docked Input Bar -->
             <div class="input-wrapper">
                 <div class="input-box">
                     <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
-                    <input type="text" id="userInput" placeholder="Initialize command, query trade signals, or enter copy..." onkeydown="handleKey(event)">
+                    <input type="text" id="userInput" placeholder="Ask a strategic question, enter copy to review, or define a goal..." onkeydown="handleKey(event)">
                     <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
-                        <span>RUN</span>
+                        <span>Send</span>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 </div>
@@ -1139,12 +1130,12 @@
             <div class="studio-view">
                 <div class="studio-header">
                     <div>
-                        <h1 style="font-size: 18px; font-weight: 800; margin-bottom: 2px; font-family: 'JetBrains Mono', monospace;">SAVED TELEMETRY VAULT</h1>
-                        <p style="color: #64748b; font-size: 12px;">Archived strategies and reports for this workspace.</p>
+                        <h1 style="font-size: 18px; font-weight: 800; margin-bottom: 2px;">Saved Briefings</h1>
+                        <p style="color: #71717a; font-size: 12.5px;">Archived strategies and reports for this workspace.</p>
                     </div>
                     <div style="display: flex; gap: 6px;">
-                        <button class="action-btn" onclick="exportVaultCSV()">EXPORT CSV</button>
-                        <button class="action-btn" onclick="clearVault()">CLEAR</button>
+                        <button class="action-btn" onclick="exportVaultCSV()">Export CSV</button>
+                        <button class="action-btn" onclick="clearVault()">Clear</button>
                     </div>
                 </div>
                 <div class="grid-container" id="vaultGrid"></div>
@@ -1174,7 +1165,7 @@
         function onWorkspaceChange() {
             const ws = document.getElementById('clientWorkspace').value;
             const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
-            document.getElementById('currentWorkspaceDisplay').textContent = `WORKSPACE // ${wsText.toUpperCase()}`;
+            document.getElementById('currentWorkspaceDisplay').textContent = wsText;
             renderVault();
         }
 
@@ -1203,13 +1194,13 @@
                 customForm.classList.add('active');
                 btnPreset.classList.remove('active');
                 btnCustom.classList.add('active');
-                title.textContent = "CUSTOM OBJECTIVE PROTOCOL";
+                title.textContent = "Custom Task Builder";
             } else {
                 presetForm.style.display = 'block';
                 customForm.classList.remove('active');
                 btnPreset.classList.add('active');
                 btnCustom.classList.remove('active');
-                title.textContent = "GUIDED STRATEGY BUILDER";
+                title.textContent = "Guided Strategy Builder";
             }
         }
 
@@ -1278,7 +1269,7 @@
             if (lens === 'trust_auditor') input.placeholder = "Enter messaging or copy to audit for trust and brand credibility...";
             else if (lens === 'hyperlocal') input.placeholder = "Enter neighborhood, commercial real estate, or local trade goal...";
             else if (lens === 'saas_operator') input.placeholder = "Enter pricing, CAC, LTV, or unit economics parameters...";
-            else input.placeholder = "Initialize command, query trade signals, or enter copy...";
+            else input.placeholder = "Ask a strategic question, enter copy to review, or define a goal...";
         }
 
         function insertAuditTemplate() {
@@ -1295,14 +1286,14 @@
             }
         }
 
-        // Luminous Emerald / Studio Parser
+        // Clean, Natural Typography Parser
         function formatTelemetryOutput(text) {
             return text
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
                 .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:4px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:6px 0;"><span style="color:#4ade80; font-family:\'JetBrains Mono\',monospace; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:6px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
                 .replace(/\n\n/g, '<div style="height:10px;"></div>')
                 .replace(/\n/g, '<br>');
         }
@@ -1346,7 +1337,7 @@
             assistantRow.className = 'message-row assistant';
             const card = document.createElement('div');
             card.className = 'message-card';
-            card.innerHTML = '<em style="color:#64748b; font-family:\'JetBrains Mono\',monospace; font-size:12px;">// SYNTHESIZING STRATEGIC TELEMETRY...</em>';
+            card.innerHTML = '<em style="color:#71717a; font-size:13px;">Consultant is drafting recommendations...</em>';
             assistantRow.appendChild(card);
             chatArea.appendChild(assistantRow);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1371,16 +1362,16 @@
                 actions.className = 'memo-actions';
                 actions.innerHTML = `
                     <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> SAVE
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save
                     </button>
                     <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> CSV
                     </button>
                     <button class="action-btn" onclick="exportToGoogleDrive('${escapeHtml(fullResponse)}')">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> DOC
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Doc
                     </button>
                     <button class="action-btn" onclick="window.print()">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> PRINT
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
                     </button>
                 `;
                 card.appendChild(actions);
@@ -1453,7 +1444,7 @@
             grid.innerHTML = '';
             const items = getVaultItems();
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#64748b; font-size:12px; font-family:\'JetBrains Mono\',monospace; grid-column: 1/-1;">// NO ARCHIVED BRIEFINGS IN THIS WORKSPACE</p>';
+                grid.innerHTML = '<p style="color:#71717a; font-size:12.5px; grid-column: 1/-1;">No saved briefings in this workspace yet.</p>';
                 return;
             }
             items.forEach(item => {
