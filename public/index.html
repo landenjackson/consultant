@@ -1168,9 +1168,17 @@
 
         // Friendly & Professional Telemetry Parser
         function formatTelemetryOutput(text) {
-            return text.replace(/\[([A-Za-z0-9_\s]+)\]\s*=\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
-                       .replace(/\*\*([^*]+)\*\*/g, '<div class="friendly-section-header">$1</div>')
-                       .replace(/\n/g, '<br>');
+            return text
+                // Clean up headers
+                .replace(/\*\*([^*]+)\*\*/g, '<div class="friendly-section-header">$1</div>')
+                // Clean up metrics: [Name] = Value
+                .replace(/\[([A-Za-z0-9_\s\/\-\$\.]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
+                // Format clean bullet lists
+                .replace(/^[\*\-]\s+(.+)$/gm, '<div style="display:flex; gap:8px; margin:4px 0;"><span style="color:#10b981; font-weight:bold;">•</span><span>$1</span></div>')
+                // Format clean numbered lists
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; gap:8px; margin:6px 0;"><span style="color:#10b981; font-weight:700;">$1.</span><span>$2</span></div>')
+                .replace(/\n\n/g, '<div style="height:10px;"></div>')
+                .replace(/\n/g, '<br>');
         }
 
         async function fetchInference(messages, lens) {
