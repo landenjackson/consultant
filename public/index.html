@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consultant | Strategic Operations Partner</title>
+    <title>Consultant | Strategic Operations Studio</title>
     
     <!-- PWA & Verification Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#121215">
+    <meta name="theme-color" content="#0b0d0e">
     <meta name="google-site-verification" content="31-SLXAL0M_MPHw5PGlKlxzv4RwIAsAbJmhXqpe1GdA">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon.svg">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         * {
             margin: 0;
@@ -24,9 +24,9 @@
         }
         
         body {
-            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0f1012;
-            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #090a0c;
+            color: #f1f5f9;
             height: 100dvh;
             width: 100vw;
             display: flex;
@@ -35,11 +35,11 @@
             letter-spacing: -0.015em;
         }
 
-        /* Sidebar */
+        /* Sidebar - Linear Studio Grade */
         .sidebar {
-            width: 280px;
-            background: #15171a;
-            border-right: 1px solid #22252a;
+            width: 270px;
+            background: #0d0f12;
+            border-right: 1px solid #1a1e24;
             display: flex;
             flex-direction: column;
             z-index: 50;
@@ -47,62 +47,65 @@
         }
 
         .sidebar-brand {
-            padding: 20px 20px 16px;
+            padding: 18px 18px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #22252a;
+            border-bottom: 1px solid #1a1e24;
         }
 
         .brand-name {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.02em;
+            gap: 9px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Luminous Lime / Jade Green Pill */
         .tag-pill {
-            background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.35);
-            padding: 2px 9px;
-            border-radius: 12px;
-            font-size: 11px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10px;
             font-weight: 700;
             color: #4ade80;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
         }
 
         .controls-block {
-            padding: 16px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
         .section-label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #94a3b8;
+            letter-spacing: 0.08em;
+            color: #64748b;
             margin-bottom: 5px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .custom-select {
             width: 100%;
-            background: #111215;
-            border: 1px solid #272a30;
-            color: #ffffff;
-            padding: 9px 12px;
-            border-radius: 8px;
-            font-size: 13px;
+            background: #111418;
+            border: 1px solid #1f242c;
+            color: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12.5px;
             font-weight: 500;
             outline: none;
             cursor: pointer;
@@ -111,50 +114,50 @@
 
         .custom-select:focus {
             border-color: #22c55e;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+            box-shadow: 0 0 0 1px #22c55e;
         }
 
         .custom-select.lens {
             color: #4ade80;
-            border-color: rgba(34, 197, 94, 0.35);
-            background: #131714;
+            border-color: rgba(34, 197, 94, 0.3);
+            background: #0f1412;
         }
 
         .nav-list {
             flex: 1;
-            padding: 8px 12px;
+            padding: 6px 10px;
             overflow-y: auto;
         }
 
         .nav-item {
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13.5px;
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 13px;
             color: #94a3b8;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 11px;
-            margin-bottom: 3px;
-            transition: all 0.2s;
+            gap: 10px;
+            margin-bottom: 2px;
+            transition: all 0.15s;
             font-weight: 500;
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: #14171d;
             color: #ffffff;
         }
 
         .nav-item.active {
-            background: rgba(34, 197, 94, 0.12);
+            background: rgba(34, 197, 94, 0.08);
             color: #4ade80;
             font-weight: 600;
             border-left: 2px solid #22c55e;
         }
 
         .nav-item svg {
-            width: 17px;
-            height: 17px;
+            width: 15px;
+            height: 15px;
             opacity: 0.85;
         }
 
@@ -165,14 +168,14 @@
 
         /* Human-in-the-Loop Partner Card */
         .partner-card {
-            margin: 14px;
-            padding: 12px 14px;
-            background: #131714;
-            border: 1px solid rgba(34, 197, 94, 0.25);
-            border-radius: 10px;
-            font-size: 11.5px;
+            margin: 12px;
+            padding: 11px 12px;
+            background: #0f1311;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+            font-size: 11px;
             line-height: 1.45;
-            color: #94a3b8;
+            color: #8da295;
         }
 
         .partner-header {
@@ -181,8 +184,10 @@
             gap: 6px;
             color: #4ade80;
             font-weight: 700;
-            font-size: 11.5px;
-            margin-bottom: 4px;
+            font-size: 11px;
+            margin-bottom: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
         }
 
         /* Top Header Bar */
@@ -190,19 +195,19 @@
             position: absolute;
             top: 0;
             right: 0;
-            left: 280px;
-            height: 54px;
-            padding: 0 24px;
+            left: 270px;
+            height: 48px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            color: #94a3b8;
+            font-size: 12px;
+            color: #64748b;
             z-index: 10;
-            background: rgba(15, 16, 18, 0.9);
+            background: rgba(9, 10, 12, 0.92);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid #22252a;
+            border-bottom: 1px solid #1a1e24;
         }
 
         .mobile-menu-btn {
@@ -211,34 +216,35 @@
             border: none;
             color: #ffffff;
             cursor: pointer;
-            padding: 6px;
+            padding: 4px;
         }
 
         .status-items {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(34, 197, 94, 0.12);
+            background: rgba(34, 197, 94, 0.08);
             color: #4ade80;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 700;
             border: 1px solid rgba(34, 197, 94, 0.25);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .status-dot {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             background: #22c55e;
             border-radius: 50%;
-            box-shadow: 0 0 10px #22c55e;
+            box-shadow: 0 0 8px #22c55e;
         }
 
         /* Main Content */
@@ -247,7 +253,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #0f1012;
+            background: #090a0c;
             overflow: hidden;
             height: 100dvh;
         }
@@ -267,95 +273,138 @@
         .chat-area {
             flex: 1;
             overflow-y: auto;
-            padding: 70px 20px 20px;
+            padding: 60px 18px 18px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 840px;
+            gap: 14px;
+            max-width: 860px;
             width: 100%;
             margin: 0 auto;
         }
 
+        /* Executive Command Header (No Avatar / Non-ChatGPT) */
         .hero-section {
-            text-align: center;
-            max-width: 640px;
-            margin: 12px auto;
-            padding: 0 10px;
+            text-align: left;
+            max-width: 860px;
+            margin: 4px auto 10px;
+            padding: 0 4px;
             width: 100%;
         }
 
-        .hero-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #16a34a, #22c55e);
-            border-radius: 14px;
+        .command-banner {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
+            background: #0f1216;
+            border: 1px solid #1a1e26;
+            border-left: 3px solid #22c55e;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+
+        .command-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .command-kicker {
+            font-size: 10.5px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #4ade80;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .command-title {
+            font-size: 16px;
+            font-weight: 700;
             color: #ffffff;
-            font-size: 20px;
-            font-weight: 800;
-            box-shadow: 0 4px 18px rgba(34, 197, 94, 0.35);
+            letter-spacing: -0.02em;
         }
 
-        .hero-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 6px;
-            letter-spacing: -0.03em;
+        .command-meta {
+            font-size: 11px;
+            color: #64748b;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            gap: 12px;
         }
 
-        .hero-subtitle {
-            font-size: 14px;
-            color: #94a3b8;
-            line-height: 1.5;
-        }
-
-        /* Quick Task Launcher */
+        /* Operations Launch Grid (Linear / Monospaced Headers) */
         .quick-tasks-container {
-            margin-top: 18px;
-            text-align: left;
+            margin-top: 10px;
         }
 
         .quick-task-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 6px;
         }
 
         .quick-task-card {
-            background: #15171a;
-            border: 1px solid #24272e;
-            border-radius: 10px;
-            padding: 12px;
+            background: #0f1216;
+            border: 1px solid #1c2028;
+            border-radius: 6px;
+            padding: 11px 12px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
             gap: 4px;
+            position: relative;
         }
 
         .quick-task-card:hover {
-            border-color: rgba(34, 197, 94, 0.6);
-            background: #1a1d22;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            border-color: #22c55e;
+            background: #14181f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.35);
         }
 
-        .quick-task-icon { font-size: 16px; margin-bottom: 2px; }
-        .quick-task-title { font-size: 12.5px; font-weight: 700; color: #ffffff; }
-        .quick-task-desc { font-size: 11px; color: #94a3b8; line-height: 1.35; }
+        .quick-task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .task-index {
+            font-size: 9.5px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .task-icon-svg {
+            width: 14px;
+            height: 14px;
+            stroke: #4ade80;
+        }
+
+        .quick-task-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .quick-task-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.35;
+        }
 
         /* Strategy Intake & Custom Task Card */
         .intake-card {
-            background: #15171a;
-            border: 1px solid #24272e;
-            border-radius: 14px;
-            padding: 16px 18px;
-            margin-top: 16px;
+            background: #0f1216;
+            border: 1px solid #1c2028;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 12px;
             text-align: left;
         }
 
@@ -363,58 +412,62 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .intake-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .intake-mode-toggle {
             display: flex;
-            background: #101114;
-            border: 1px solid #24272e;
-            border-radius: 8px;
+            background: #090a0c;
+            border: 1px solid #1c2028;
+            border-radius: 4px;
             padding: 2px;
         }
 
         .mode-btn {
             background: transparent;
             border: none;
-            color: #94a3b8;
-            font-size: 11.5px;
+            color: #64748b;
+            font-size: 11px;
             font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            border-radius: 3px;
             cursor: pointer;
             transition: all 0.15s;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .mode-btn.active {
-            background: #20242a;
+            background: #181d24;
             color: #4ade80;
         }
 
         .intake-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .intake-field select, .intake-field input, .intake-field textarea {
             width: 100%;
-            background: #101114;
-            border: 1px solid #272a30;
+            background: #090a0c;
+            border: 1px solid #1c2028;
             color: #f8fafc;
-            padding: 9px 12px;
-            border-radius: 8px;
-            font-size: 12.5px;
+            padding: 8px 10px;
+            border-radius: 5px;
+            font-size: 12px;
             outline: none;
             font-family: inherit;
             transition: border-color 0.2s;
@@ -422,26 +475,25 @@
 
         .intake-field select:focus, .intake-field input:focus, .intake-field textarea:focus {
             border-color: #22c55e;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
         }
 
         .custom-task-container {
             display: none;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .custom-task-container.active { display: flex; }
 
         .btn-launch-intake {
-            background: linear-gradient(135deg, #16a34a, #22c55e);
-            color: #ffffff;
+            background: #22c55e;
+            color: #052e16;
             border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
+            padding: 9px 14px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 800;
             cursor: pointer;
             width: 100%;
             transition: all 0.15s;
@@ -449,50 +501,51 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            box-shadow: 0 3px 12px rgba(34, 197, 94, 0.25);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
 
         .btn-launch-intake:hover {
+            background: #4ade80;
             transform: translateY(-1px);
-            box-shadow: 0 5px 16px rgba(34, 197, 94, 0.35);
         }
 
-        /* Message Bubbles */
+        /* Message Cards - Terminal Studio Look */
         .message-row { display: flex; width: 100%; margin-bottom: 6px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
 
         .message-card {
-            max-width: 88%;
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 14px;
+            max-width: 90%;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 13.5px;
             line-height: 1.65;
             word-break: break-word;
         }
 
         .message-row.user .message-card {
-            background: #1e2126;
-            border: 1px solid #2b2f38;
+            background: #14171d;
+            border: 1px solid #222730;
             color: #ffffff;
-            border-bottom-right-radius: 4px;
         }
 
         .message-row.assistant .message-card {
-            background: #131417;
-            border: 1px solid #20232a;
+            background: #0d1014;
+            border: 1px solid #1a1e26;
+            border-left: 2px solid #22c55e;
             color: #e2e8f0;
             width: 100%;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        /* Vibrant Luminous Emerald Section Headers */
+        /* High-Detail Section Headers */
         .friendly-section-header {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             color: #ffffff;
-            margin-top: 16px;
+            margin-top: 14px;
             margin-bottom: 6px;
             display: flex;
             align-items: center;
@@ -501,93 +554,93 @@
         }
 
         .friendly-section-header::before {
-            content: '';
-            display: inline-block;
-            width: 3.5px;
-            height: 15px;
-            background: #22c55e;
-            border-radius: 2px;
-            box-shadow: 0 0 8px #22c55e;
+            content: '//';
+            color: #22c55e;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 12px;
         }
 
-        /* Rich Detail Metric Pill */
+        /* Metric Pill with Monospace Value */
         .metric-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.35);
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.28);
             color: #4ade80;
-            padding: 4px 11px;
-            border-radius: 8px;
-            margin: 4px 0;
-            font-size: 13px;
-            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 4px;
+            margin: 3px 0;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .metric-pill strong {
             color: #86efac;
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
         }
 
         .memo-actions {
-            margin-top: 14px;
+            margin-top: 12px;
             padding-top: 10px;
-            border-top: 1px solid #20232a;
+            border-top: 1px solid #1a1e26;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             justify-content: flex-end;
         }
 
         .action-btn {
-            background: #1c1f24;
-            border: 1px solid #2a2f38;
-            color: #e2e8f0;
-            font-size: 11.5px;
+            background: #11141a;
+            border: 1px solid #1f242e;
+            color: #cbd5e1;
+            font-size: 11px;
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.15s;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .action-btn:hover {
-            background: #252a32;
+            background: #181d26;
             color: #4ade80;
-            border-color: rgba(34, 197, 94, 0.5);
+            border-color: rgba(34, 197, 94, 0.4);
         }
 
-        /* Input Container */
+        /* Docked Industrial Input Bar (Linear Style) */
         .input-wrapper {
-            padding: 12px 20px 20px;
+            padding: 10px 18px 16px;
             width: 100%;
             display: flex;
             justify-content: center;
-            background: linear-gradient(transparent, #0f1012 30%);
+            background: linear-gradient(transparent, #090a0c 35%);
             z-index: 20;
         }
 
         .input-box {
             width: 100%;
-            max-width: 840px;
-            background: #15171a;
-            border: 1px solid #272a30;
-            border-radius: 24px;
-            padding: 6px 14px;
+            max-width: 860px;
+            background: #0f1216;
+            border: 1px solid #1e232c;
+            border-radius: 6px;
+            padding: 5px 10px 5px 12px;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            transition: border-color 0.2s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.15s;
         }
 
         .input-box:focus-within {
             border-color: #22c55e;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
+            box-shadow: 0 0 0 1px #22c55e;
         }
 
         .input-box input {
@@ -595,48 +648,66 @@
             background: transparent;
             border: none;
             color: #ffffff;
-            font-size: 14px;
+            font-size: 13.5px;
             outline: none;
-            padding: 8px 0;
+            padding: 6px 0;
             min-width: 0;
             font-family: inherit;
         }
 
         .input-box input::placeholder {
-            color: #64748b;
+            color: #475569;
+        }
+
+        .send-btn-docked {
+            background: #22c55e;
+            color: #052e16;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
+            transition: all 0.15s;
+        }
+
+        .send-btn-docked:hover {
+            background: #4ade80;
         }
 
         .icon-btn {
             background: transparent;
             border: none;
-            color: #4ade80;
+            color: #64748b;
             cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: background 0.15s;
+            transition: color 0.15s;
         }
 
-        .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
+        .icon-btn:hover { color: #4ade80; }
 
         /* Studio Vault */
         .studio-view {
-            padding: 70px 24px 24px;
-            max-width: 880px;
+            padding: 60px 20px 20px;
+            max-width: 860px;
             margin: 0 auto;
             width: 100%;
             overflow-y: auto;
         }
 
         .studio-header {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #22252a;
-            padding-bottom: 14px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #1a1e24;
+            padding-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -645,21 +716,21 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 14px;
+            gap: 10px;
         }
 
         .asset-card {
-            background: #15171a;
-            border: 1px solid #24272e;
-            border-radius: 10px;
-            padding: 14px;
+            background: #0f1216;
+            border: 1px solid #1c2028;
+            border-radius: 6px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
 
         .asset-card:hover { border-color: #22c55e; }
-        .asset-name { font-weight: 700; margin-bottom: 4px; font-size: 13.5px; color: #ffffff; }
-        .asset-meta { font-size: 11.5px; color: #94a3b8; display: flex; justify-content: space-between; }
+        .asset-name { font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #ffffff; }
+        .asset-meta { font-size: 11px; color: #64748b; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; }
 
         /* Modal Overlay */
         .modal-overlay {
@@ -675,11 +746,11 @@
         }
 
         .modal-content {
-            background: #15171a;
-            border: 1px solid #272a30;
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 780px;
+            background: #0f1216;
+            border: 1px solid #1f242e;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 760px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -688,56 +759,57 @@
 
         .close-modal {
             position: absolute;
-            top: 16px; right: 16px;
-            color: #94a3b8; font-size: 22px; cursor: pointer;
+            top: 14px; right: 14px;
+            color: #64748b; font-size: 20px; cursor: pointer;
         }
 
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 16px;
         }
 
         .plan-card {
-            border: 1px solid #24272e;
-            background: #101114;
-            border-radius: 12px;
-            padding: 18px;
+            border: 1px solid #1c2028;
+            background: #090a0c;
+            border-radius: 6px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
         }
 
         .plan-card.featured {
             border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.05);
+            background: rgba(34, 197, 94, 0.04);
         }
 
-        .plan-price { font-size: 26px; font-weight: 800; color: #4ade80; margin: 6px 0; }
-        .plan-features { margin: 12px 0; flex: 1; font-size: 12px; color: #cbd5e1; }
-        .plan-features li { list-style: none; margin-bottom: 6px; }
+        .plan-price { font-size: 24px; font-weight: 800; color: #4ade80; margin: 4px 0; font-family: 'JetBrains Mono', monospace; }
+        .plan-features { margin: 10px 0; flex: 1; font-size: 11.5px; color: #94a3b8; }
+        .plan-features li { list-style: none; margin-bottom: 5px; }
 
         .btn-trial {
             background: #22c55e;
-            color: #ffffff;
+            color: #052e16;
             border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 11px;
             cursor: pointer;
             width: 100%;
-            transition: all 0.15s;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
         }
 
-        .btn-trial:hover { background: #16a34a; }
+        .btn-trial:hover { background: #4ade80; }
 
         /* Mobile Overlay Backdrop */
         .sidebar-backdrop {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 40;
         }
 
@@ -748,20 +820,18 @@
                 top: 0; bottom: 0; left: 0;
                 transform: translateX(-100%);
                 z-index: 100;
-                width: 270px;
+                width: 260px;
             }
             .sidebar.open { transform: translateX(0); }
             .sidebar-backdrop.active { display: block; }
-            .top-bar { left: 0; height: 50px; padding: 0 16px; }
+            .top-bar { left: 0; height: 46px; padding: 0 14px; }
             .mobile-menu-btn { display: block; }
-            .chat-area { padding: 60px 14px 14px; }
-            .hero-title { font-size: 20px !important; }
-            .hero-subtitle { font-size: 13px !important; }
-            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .intake-grid { grid-template-columns: 1fr; gap: 8px; }
-            .message-card { max-width: 95%; font-size: 13.5px; padding: 14px 16px; }
-            .pricing-grid { grid-template-columns: 1fr; gap: 10px; }
-            .status-items { gap: 10px; font-size: 11px; }
+            .chat-area { padding: 54px 12px 12px; }
+            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .intake-grid { grid-template-columns: 1fr; gap: 6px; }
+            .message-card { max-width: 96%; font-size: 13px; padding: 12px 14px; }
+            .pricing-grid { grid-template-columns: 1fr; gap: 8px; }
+            .command-meta { display: none; }
         }
     </style>
 </head>
@@ -773,42 +843,42 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closePricing()">&times;</span>
             <div style="text-align: center;">
-                <h2 style="font-size: 22px; margin-bottom: 4px; font-weight: 800;">Consultant Subscriptions</h2>
-                <p style="color: #94a3b8; font-size: 13px;">Professional strategic intelligence for modern operators.</p>
+                <h2 style="font-size: 20px; margin-bottom: 2px; font-weight: 800; font-family: 'JetBrains Mono', monospace;">CONSULTANT ACCESS TIERS</h2>
+                <p style="color: #64748b; font-size: 12px;">Strategic intelligence infrastructure for modern operators.</p>
             </div>
 
             <div class="pricing-grid">
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 14px;">Starter</div>
-                    <div class="plan-price">$15.99<span style="font-size: 12px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">STARTER</div>
+                    <div class="plan-price">$15.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Unlimited Strategy Briefings</li>
                         <li>✓ Standard Advisory Lens</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Trial initiated.'); closePricing();">Start Free Trial</button>
+                    <button class="btn-trial" onclick="alert('Trial initiated.'); closePricing();">Start Trial</button>
                 </div>
 
                 <div class="plan-card featured">
-                    <div style="font-weight: 700; font-size: 14px;">Pro Operator</div>
-                    <div class="plan-price">$39.99<span style="font-size: 12px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">PRO OPERATOR</div>
+                    <div class="plan-price">$39.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ All Strategic Lenses</li>
                         <li>✓ Multi-Client Workspaces</li>
                         <li>✓ Real-Time Market Signals</li>
-                        <li>✓ 1-Click Google Doc & CSV Export</li>
+                        <li>✓ Google Doc & CSV Export</li>
                     </ul>
                     <button class="btn-trial" onclick="alert('Pro Trial initiated.'); closePricing();">Start Pro Trial</button>
                 </div>
 
                 <div class="plan-card">
-                    <div style="font-weight: 700; font-size: 14px;">Executive Studio</div>
-                    <div class="plan-price">$79.99<span style="font-size: 12px; color: #64748b; font-weight: 400;">/mo</span></div>
+                    <div style="font-weight: 700; font-size: 13px;">EXECUTIVE STUDIO</div>
+                    <div class="plan-price">$79.99<span style="font-size: 11px; color: #64748b; font-weight: 400;">/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ Everything in Pro</li>
                         <li>✓ SPSS Trust Architecture</li>
                         <li>✓ Dedicated Partner Sessions</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Executive Access</button>
+                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Access</button>
                 </div>
             </div>
         </div>
@@ -818,41 +888,41 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-name">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l3 3-3 3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" width="18" height="18"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                 Consultant
             </div>
-            <span class="tag-pill">Partner</span>
+            <span class="tag-pill">STUDIO v1.8</span>
         </div>
 
         <div class="controls-block">
             <div>
                 <div class="section-label">
-                    <span>Active Client</span>
-                    <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ New</span>
+                    <span>WORKSPACE</span>
+                    <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ ADD</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
-                    <option value="default">📁 General Workspace</option>
-                    <option value="mas_diner">🥞 Ma's Diner</option>
-                    <option value="cleaver_brooks">🏭 Cleaver-Brooks</option>
-                    <option value="bannerman">📍 Bannerman Crossings</option>
+                    <option value="default">General Workspace</option>
+                    <option value="mas_diner">Ma's Diner</option>
+                    <option value="cleaver_brooks">Cleaver-Brooks</option>
+                    <option value="bannerman">Bannerman Crossings</option>
                 </select>
             </div>
 
             <div>
-                <div class="section-label">Strategic Perspective</div>
+                <div class="section-label">STRATEGIC LENS</div>
                 <select id="strategyLens" class="custom-select lens" onchange="onLensChange()">
-                    <option value="standard">⚡ Chief of Staff Direction</option>
-                    <option value="trust_auditor">🛡️ Trust & Credibility Audit</option>
-                    <option value="hyperlocal">📍 Local Community Growth</option>
-                    <option value="saas_operator">💼 Business Economics & SaaS</option>
+                    <option value="standard">Chief of Staff Direction</option>
+                    <option value="trust_auditor">Trust & Credibility Audit</option>
+                    <option value="hyperlocal">Local Community Growth</option>
+                    <option value="saas_operator">Business Economics & SaaS</option>
                 </select>
             </div>
         </div>
 
         <div class="nav-list">
             <div class="nav-item active" onclick="switchView('chat')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Advisory Studio
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Operations Board
             </div>
             <div class="nav-item" onclick="switchView('vault')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -863,32 +933,32 @@
                 Our Standards
             </div>
             <div class="nav-item" onclick="openPricing()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 Plans & Access
             </div>
         </div>
 
         <div class="partner-card">
             <div class="partner-header">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                Human-in-the-Loop
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Human Gate
             </div>
-            <div>AI provides high-speed research; you provide final judgment, ethics, and strategy.</div>
+            <div>AI synthesizes research; human operator holds final decision gate.</div>
         </div>
     </div>
 
     <!-- Main Content Area -->
     <div class="main-content">
         <div class="top-bar">
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
                 <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
-                <span style="font-weight: 700; color: #ffffff; font-size: 14px;" id="currentWorkspaceDisplay">Consultant Studio</span>
+                <span style="font-weight: 700; color: #ffffff; font-size: 13px; font-family: 'JetBrains Mono', monospace;" id="currentWorkspaceDisplay">WORKSPACE // GENERAL</span>
             </div>
             <div class="status-items">
-                <div class="status-badge"><span class="status-dot"></span> Ready</div>
-                <div id="clock" style="font-size: 12px; color: #64748b; font-weight:600;">14:15</div>
+                <div class="status-badge"><span class="status-dot"></span> LIVE EDGE</div>
+                <div id="clock" style="font-size: 11px; color: #64748b; font-family: 'JetBrains Mono', monospace;">14:15</div>
             </div>
         </div>
 
@@ -896,54 +966,96 @@
         <section id="chat-section" class="view-section active">
             <div class="chat-area" id="chatArea">
                 <div class="hero-section" id="heroSection">
-                    <div class="hero-avatar">C</div>
-                    <h1 class="hero-title">How can I assist your strategy today?</h1>
-                    <p class="hero-subtitle">Clear, executive-level insights and practical growth recommendations.</p>
+                    
+                    <!-- Linear / Studio Command Banner -->
+                    <div class="command-banner">
+                        <div class="command-title-group">
+                            <span class="command-kicker">Strategic Intelligence Engine</span>
+                            <h1 class="command-title">Executive Operations & Telemetry Studio</h1>
+                        </div>
+                        <div class="command-meta">
+                            <span>LATENCY: 14ms</span>
+                            <span>MODEL: GEMINI-3.7</span>
+                        </div>
+                    </div>
 
-                    <!-- Quick Task Launcher -->
+                    <!-- Operations Matrix (Clean SVG Icons + Monospace Index) -->
                     <div class="quick-tasks-container">
-                        <div class="section-label">Common Strategic Tasks</div>
+                        <div class="section-label">SELECT OPERATIONAL PROTOCOL</div>
                         <div class="quick-task-grid">
+                            
                             <div class="quick-task-card" onclick="quickTask('trade_analysis')">
-                                <div class="quick-task-icon">📍</div>
-                                <div class="quick-task-title">Trade Area Analysis</div>
-                                <div class="quick-task-desc">Foot traffic & customer density</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">01 // TRADE</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                                </div>
+                                <div class="quick-task-title">Trade Area Geometry</div>
+                                <div class="quick-task-desc">Foot traffic & density</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('trust')">
-                                <div class="quick-task-icon">🛡️</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">02 // TRUST</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
                                 <div class="quick-task-title">Trust & Copy Audit</div>
-                                <div class="quick-task-desc">Scan messaging for credibility</div>
+                                <div class="quick-task-desc">Reputation & human gate</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('saas')">
-                                <div class="quick-task-icon">💼</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">03 // ECON</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </div>
                                 <div class="quick-task-title">Unit Economics</div>
-                                <div class="quick-task-desc">CAC, LTV & healthy retention</div>
+                                <div class="quick-task-desc">CAC, LTV & retention</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
-                                <div class="quick-task-icon">🚀</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">04 // CAMPAIGN</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                </div>
                                 <div class="quick-task-title">Campaign Strategy</div>
-                                <div class="quick-task-desc">Multi-channel growth roadmap</div>
+                                <div class="quick-task-desc">Zero-discount growth</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('competitor')">
-                                <div class="quick-task-icon">🔍</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">05 // RECON</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                </div>
                                 <div class="quick-task-title">Competitor Scan</div>
-                                <div class="quick-task-desc">Real-time market insights</div>
+                                <div class="quick-task-desc">Real-time market signals</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('pricing')">
-                                <div class="quick-task-icon">💵</div>
-                                <div class="quick-task-title">Pricing Strategy</div>
-                                <div class="quick-task-desc">Protect margins and value</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">06 // PRICING</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                                </div>
+                                <div class="quick-task-title">Pricing Pivot</div>
+                                <div class="quick-task-desc">Margin defense ladder</div>
                             </div>
+
                             <div class="quick-task-card" onclick="quickTask('fsu_trust')">
-                                <div class="quick-task-icon">📊</div>
-                                <div class="quick-task-title">Trust Framework</div>
-                                <div class="quick-task-desc">Empirical research alignment</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">07 // SPSS</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                </div>
+                                <div class="quick-task-title">SPSS Trust Score</div>
+                                <div class="quick-task-desc">Empirical p &lt; .001 model</div>
                             </div>
+
                             <div class="quick-task-card" onclick="setCustomTaskMode()">
-                                <div class="quick-task-icon">✏️</div>
+                                <div class="quick-task-card-header">
+                                    <span class="task-index">08 // CUSTOM</span>
+                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </div>
                                 <div class="quick-task-title">Custom Objective</div>
-                                <div class="quick-task-desc">Define a new goal</div>
+                                <div class="quick-task-desc">Define new parameters</div>
                             </div>
+
                         </div>
                     </div>
 
@@ -951,12 +1063,12 @@
                     <div class="intake-card">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                                <span id="intakeModeTitle">Guided Strategy Builder</span>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                <span id="intakeModeTitle">GUIDED STRATEGY BUILDER</span>
                             </div>
                             <div class="intake-mode-toggle">
-                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Guided</button>
-                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Custom Task</button>
+                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">GUIDED</button>
+                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">CUSTOM</button>
                             </div>
                         </div>
 
@@ -982,39 +1094,41 @@
                                     </select>
                                 </div>
                                 <div class="intake-field">
-                                    <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% local resident lift)">
+                                    <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% resident acquisition)">
                                 </div>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Generate Strategic Brief</button>
+                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">RUN STRATEGIC BRIEF</button>
                         </div>
 
                         <!-- Custom Form -->
                         <div id="customTaskForm" class="custom-task-container">
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                                 <div class="intake-field">
                                     <input type="text" id="customTaskName" placeholder="Project Name (e.g. Q3 Growth Review)">
                                 </div>
                                 <div class="intake-field">
-                                    <input type="text" id="customTarget" placeholder="Client / Focus Area (e.g. Ma's Diner)">
+                                    <input type="text" id="customTarget" placeholder="Client / Target (e.g. Ma's Diner)">
                                 </div>
                             </div>
                             <div class="intake-field">
                                 <textarea id="customTaskInstructions" rows="2" placeholder="Specific questions, background, or goals to analyze..."></textarea>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchCustomTask()">Generate Strategic Plan</button>
+                            <button class="btn-launch-intake" onclick="launchCustomTask()">INITIALIZE CUSTOM PLAN</button>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Docked Linear Style Input Bar -->
             <div class="input-wrapper">
                 <div class="input-box">
                     <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </button>
-                    <input type="text" id="userInput" placeholder="Ask a strategic question, enter copy to review, or define a goal..." onkeydown="handleKey(event)">
-                    <button class="icon-btn" id="sendBtn" onclick="sendMessage()" style="background: #22c55e; color:#fff; padding: 7px 12px; border-radius: 16px;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    <input type="text" id="userInput" placeholder="Initialize command, query trade signals, or enter copy..." onkeydown="handleKey(event)">
+                    <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
+                        <span>RUN</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 </div>
             </div>
@@ -1025,12 +1139,12 @@
             <div class="studio-view">
                 <div class="studio-header">
                     <div>
-                        <h1 style="font-size: 20px; font-weight: 800; margin-bottom: 2px;">Saved Briefings</h1>
-                        <p style="color: #94a3b8; font-size: 13px;">Archived strategies and reports for this workspace.</p>
+                        <h1 style="font-size: 18px; font-weight: 800; margin-bottom: 2px; font-family: 'JetBrains Mono', monospace;">SAVED TELEMETRY VAULT</h1>
+                        <p style="color: #64748b; font-size: 12px;">Archived strategies and reports for this workspace.</p>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="action-btn" onclick="exportVaultCSV()">Export CSV</button>
-                        <button class="action-btn" onclick="clearVault()">Clear</button>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="action-btn" onclick="exportVaultCSV()">EXPORT CSV</button>
+                        <button class="action-btn" onclick="clearVault()">CLEAR</button>
                     </div>
                 </div>
                 <div class="grid-container" id="vaultGrid"></div>
@@ -1060,7 +1174,7 @@
         function onWorkspaceChange() {
             const ws = document.getElementById('clientWorkspace').value;
             const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
-            document.getElementById('currentWorkspaceDisplay').textContent = wsText.replace(/^[^\s]+/, '').trim() || "Consultant Studio";
+            document.getElementById('currentWorkspaceDisplay').textContent = `WORKSPACE // ${wsText.toUpperCase()}`;
             renderVault();
         }
 
@@ -1071,7 +1185,7 @@
             const opt = document.createElement('option');
             const key = 'ws_' + Date.now();
             opt.value = key;
-            opt.textContent = `📁 ${name}`;
+            opt.textContent = name;
             select.appendChild(opt);
             select.value = key;
             onWorkspaceChange();
@@ -1089,13 +1203,13 @@
                 customForm.classList.add('active');
                 btnPreset.classList.remove('active');
                 btnCustom.classList.add('active');
-                title.textContent = "Create Custom Objective";
+                title.textContent = "CUSTOM OBJECTIVE PROTOCOL";
             } else {
                 presetForm.style.display = 'block';
                 customForm.classList.remove('active');
                 btnPreset.classList.add('active');
                 btnCustom.classList.remove('active');
-                title.textContent = "Guided Strategy Builder";
+                title.textContent = "GUIDED STRATEGY BUILDER";
             }
         }
 
@@ -1136,7 +1250,7 @@
             const focus = document.getElementById('intakeFocus').value;
             const constraint = document.getElementById('intakeConstraint').value;
             const goal = document.getElementById('intakeGoal').value.trim() || 'Achieve strong growth and brand equity';
-            document.getElementById('userInput').value = `Please build a strategic brief with this focus:\n• Core Area: ${focus}\n• Strategic Approach: ${constraint}\n• Main Goal: ${goal}`;
+            document.getElementById('userInput').value = `Execute strategic analysis:\n• Target Focus: ${focus}\n• Core Mandate: ${constraint}\n• Key Target: ${goal}`;
             sendMessage();
         }
 
@@ -1144,7 +1258,7 @@
             const name = document.getElementById('customTaskName').value.trim() || 'Strategic Review';
             const target = document.getElementById('customTarget').value.trim() || 'General Business';
             const instructions = document.getElementById('customTaskInstructions').value.trim() || 'Provide a comprehensive strategy and clear recommendations.';
-            document.getElementById('userInput').value = `Strategic Goal: ${name}\nFocus Area: ${target}\nObjectives & Context: ${instructions}`;
+            document.getElementById('userInput').value = `Task: ${name}\nFocus: ${target}\nObjectives: ${instructions}`;
             sendMessage();
         }
 
@@ -1161,16 +1275,16 @@
         function onLensChange() {
             const lens = document.getElementById('strategyLens').value;
             const input = document.getElementById('userInput');
-            if (lens === 'trust_auditor') input.placeholder = "Paste copy or campaign ideas to review for trust and credibility...";
-            else if (lens === 'hyperlocal') input.placeholder = "Enter your neighborhood, local retail, or customer retention goal...";
-            else if (lens === 'saas_operator') input.placeholder = "Enter your pricing or unit economics questions...";
-            else input.placeholder = "Ask a strategic question, enter copy to review, or define a goal...";
+            if (lens === 'trust_auditor') input.placeholder = "Enter messaging or copy to audit for trust and brand credibility...";
+            else if (lens === 'hyperlocal') input.placeholder = "Enter neighborhood, commercial real estate, or local trade goal...";
+            else if (lens === 'saas_operator') input.placeholder = "Enter pricing, CAC, LTV, or unit economics parameters...";
+            else input.placeholder = "Initialize command, query trade signals, or enter copy...";
         }
 
         function insertAuditTemplate() {
             document.getElementById('strategyLens').value = 'trust_auditor';
             onLensChange();
-            document.getElementById('userInput').value = "Review this local business campaign: engaging neighborhood residents with a community-first approach and zero discounts.";
+            document.getElementById('userInput').value = "Audit local business campaign: engaging neighborhood residents with a community-first approach and zero discounts.";
             document.getElementById('userInput').focus();
         }
 
@@ -1181,15 +1295,15 @@
             }
         }
 
-        // Luminous Emerald/Jade Telemetry Parser
+        // Luminous Emerald / Studio Parser
         function formatTelemetryOutput(text) {
             return text
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
-                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:8px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
-                .replace(/\n\n/g, '<div style="height:12px;"></div>')
+                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:4px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:6px 0;"><span style="color:#4ade80; font-family:\'JetBrains Mono\',monospace; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
+                .replace(/\n\n/g, '<div style="height:10px;"></div>')
                 .replace(/\n/g, '<br>');
         }
 
@@ -1203,7 +1317,7 @@
             const data = await res.json().catch(() => ({}));
             
             if (!res.ok) {
-                throw new Error(data.error || `Advisor service unavailable (${res.status})`);
+                throw new Error(data.error || `Studio engine unavailable (${res.status})`);
             }
 
             return data.choices?.[0]?.message?.content || "Strategic plan generated.";
@@ -1232,7 +1346,7 @@
             assistantRow.className = 'message-row assistant';
             const card = document.createElement('div');
             card.className = 'message-card';
-            card.innerHTML = '<em style="color:#94a3b8;">Consultant is drafting recommendations...</em>';
+            card.innerHTML = '<em style="color:#64748b; font-family:\'JetBrains Mono\',monospace; font-size:12px;">// SYNTHESIZING STRATEGIC TELEMETRY...</em>';
             assistantRow.appendChild(card);
             chatArea.appendChild(assistantRow);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -1250,30 +1364,30 @@
                     rendered += words[i] + ' ';
                     card.innerHTML = formatTelemetryOutput(rendered);
                     chatArea.scrollTop = chatArea.scrollHeight;
-                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 12));
+                    if (i % 3 === 0) await new Promise(r => setTimeout(r, 10));
                 }
 
                 const actions = document.createElement('div');
                 actions.className = 'memo-actions';
                 actions.innerHTML = `
                     <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save Briefing
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> SAVE
                     </button>
                     <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Metrics
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> CSV
                     </button>
                     <button class="action-btn" onclick="exportToGoogleDrive('${escapeHtml(fullResponse)}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Google Doc
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> DOC
                     </button>
                     <button class="action-btn" onclick="window.print()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Print
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> PRINT
                     </button>
                 `;
                 card.appendChild(actions);
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
             } catch (err) {
-                card.innerHTML = `<span style="color:#f87171;">Note: ${err.message}</span>`;
+                card.innerHTML = `<span style="color:#f87171;">Error: ${err.message}</span>`;
             } finally {
                 isStreaming = false;
             }
@@ -1297,7 +1411,7 @@
         function copyMetricsCSV(text) {
             const csv = extractMetricsCSV(text);
             if (!csv || csv === '"Metric","Value"') { alert("No metrics identified in this response."); return; }
-            navigator.clipboard.writeText(csv).then(() => alert("Key metrics copied as a clean table."));
+            navigator.clipboard.writeText(csv).then(() => alert("Metrics copied to clipboard."));
         }
 
         function exportToGoogleDrive(content) {
@@ -1307,7 +1421,7 @@
             link.href = url;
             link.download = `Strategic_Briefing_${Date.now()}.doc`;
             link.click();
-            alert("Briefing exported as an editable Document ready for Google Drive / Docs.");
+            alert("Briefing exported as Document ready for Google Drive / Docs.");
         }
 
         function getVaultItems() {
@@ -1331,7 +1445,7 @@
             all.unshift({ id: Date.now(), workspace: ws, title, content: item.content, date: new Date().toLocaleDateString() });
             localStorage.setItem('consultant_vault', JSON.stringify(all.slice(0, 50)));
             updateVaultCount();
-            alert("Briefing saved to your client workspace.");
+            alert("Briefing saved to workspace vault.");
         }
 
         function renderVault() {
@@ -1339,7 +1453,7 @@
             grid.innerHTML = '';
             const items = getVaultItems();
             if (items.length === 0) {
-                grid.innerHTML = '<p style="color:#94a3b8; font-size:13px; grid-column: 1/-1;">No saved briefings in this workspace yet.</p>';
+                grid.innerHTML = '<p style="color:#64748b; font-size:12px; font-family:\'JetBrains Mono\',monospace; grid-column: 1/-1;">// NO ARCHIVED BRIEFINGS IN THIS WORKSPACE</p>';
                 return;
             }
             items.forEach(item => {
