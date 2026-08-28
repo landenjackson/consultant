@@ -890,7 +890,7 @@
                         <li>✓ Unlimited Strategy Briefings</li>
                         <li>✓ Standard Advisory Lens</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Trial initiated.'); closePricing();">Start Trial</button>
+                    <button class="btn-trial" onclick="redirectToStripe('starter')">Start 7-Day Free Trial</button>
                 </div>
 
                 <div class="plan-card featured">
@@ -902,7 +902,7 @@
                         <li>✓ Real-Time Market Signals</li>
                         <li>✓ Google Doc & CSV Export</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Pro Trial initiated.'); closePricing();">Start Pro Trial</button>
+                    <button class="btn-trial" onclick="redirectToStripe('pro')">Get Pro Access</button>
                 </div>
 
                 <div class="plan-card">
@@ -913,7 +913,7 @@
                         <li>✓ SPSS Trust Architecture</li>
                         <li>✓ Dedicated Partner Sessions</li>
                     </ul>
-                    <button class="btn-trial" onclick="alert('Expert Trial initiated.'); closePricing();">Get Access</button>
+                    <button class="btn-trial" onclick="redirectToStripe('executive')">Get Executive Access</button>
                 </div>
             </div>
         </div>
@@ -1204,6 +1204,22 @@
 
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; closeSidebar(); }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
+
+        // Live Stripe Payment Link Redirection
+        const STRIPE_LINKS = {
+            starter: "https://buy.stripe.com/test_starter",
+            pro: "https://buy.stripe.com/test_pro",
+            executive: "https://buy.stripe.com/test_executive"
+        };
+
+        function redirectToStripe(plan) {
+            const link = STRIPE_LINKS[plan];
+            if (link && !link.includes('test_')) {
+                window.location.href = link;
+            } else {
+                alert(`Starting ${plan.toUpperCase()} checkout. Please set your Stripe Payment Link in Stripe dashboard.`);
+            }
+        }
 
         function onWorkspaceChange() {
             const ws = document.getElementById('clientWorkspace').value;
