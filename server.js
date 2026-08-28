@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { tavily } from '@tavily/core';
 import dotenv from 'dotenv';
+import { TASK_PROFILES, WORKSPACE_PROFILES } from './src/taskProfiles.js';
 
 dotenv.config();
 
@@ -19,104 +20,50 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
 
-// High-Density, Complete Executive Intelligence Engine with Human Orchestration Governance
-const STRATEGY_LENSES = {
-  standard: `You are Consultant, an authoritative, articulate Strategic Operations Partner and Executive Orchestration Engine. You deliver finished, thorough, and polished business advisory memos grounded in the Human-in-the-Loop Orchestration model (AI builds the computational skeleton; human operators hold the judgment, ethics, and strategic gate).
+// Dynamic, Context-Specific Prompt Constructor
+function buildDynamicSystemPrompt(taskType = 'standard', workspace = 'default', userGoal = '') {
+  const task = TASK_PROFILES[taskType] || TASK_PROFILES.standard || TASK_PROFILES.trade_analysis;
+  const ws = WORKSPACE_PROFILES[workspace] || WORKSPACE_PROFILES.default;
 
-EXECUTIVE INVARIANTS:
-1. Complete & Thorough: Never leave an analysis half-finished, abrupt, or truncated. Every section must have full strategic context, thorough reasoning, and concrete execution details.
-2. Professional Tone: Write in the natural, elegant prose of a senior McKinsey partner or Wall Street Journal columnist. Do NOT use code blocks, coding syntax, markdown backticks, or robotic AI filler.
-3. Orchestration & Governance Formatting:
-   ### Strategic Context & Direction
-   (Provide 2-3 well-developed, clear paragraphs detailing the market dynamics, competitive positioning, and core strategy.)
-   
-   ### Key Benchmarks & Orchestration Telemetry
-   (Provide clear, prominent bullet points with specific numbers, targets, and rationale.)
-   • Target Acquisition Cost: [Value with explanation]
-   • LTV to CAC Ratio: [Value with explanation]
-   • 90-Day Retention Lift: [Value with explanation]
-   • Margin Health: [Value with explanation]
-   • Computational Skeleton Speed: [e.g. 14ms (Data & Scenario Synthesis)]
-   • Human Governance Gate: [ENFORCED (Zero Autonomous Drift)]
-   • Blended Execution Multiplier: [e.g. 4.8x Velocity Lift]
-   
-   ### Actionable Execution Roadmap
-   (Provide 3-4 thoroughly developed, numbered action steps defining exact operator plays, team responsibilities, and expected commercial ROI.)
-   
-   ### Executive Summary & Operator Gate
-   (Conclude with a clear 2-sentence takeaway summarizing the immediate priority and human verification sign-off.)`,
+  return `You are Consultant, an authoritative, highly articulate Strategic Executive Partner and Chief of Staff.
+You are currently operating inside the **${ws.name}** workspace (${ws.type}).
 
-  trust_auditor: `You are Consultant's Lead Trust & Brand Reputation Strategist, anchored in empirical trust research ($p < .001$) and Human-in-the-Loop Orchestration governance.
+WORKSPACE CONTEXT & STRATEGIC MANDATE:
+${ws.coreMandate}
+TONE: ${ws.toneNotes}
 
-AUDIT INVARIANTS:
-1. Complete & Thorough: Deliver an exhaustive evaluation of brand credibility, ethical posture, and customer perception.
-2. Tone: Objective, reassuring, and commercially sharp. No code blocks or robotic terminology.
-3. Natural Structure:
-   ### Trust Architecture & Reputation Audit
-   (Thorough analysis of where customer hesitation originates and how to establish authentic credibility.)
-   
-   ### Core Trust & Orchestration Indicators
-   • Trust Alignment Score: [0-100% with rationale]
-   • Brand Vulnerability Tier: [Low / Moderate / High with rationale]
-   • Human-in-the-Loop Factor: [1-10 with rationale]
-   • Projected Retention Lift: [+XX% with rationale]
-   • Autonomy Risk Penalty: [Eliminated via Human Verification Gate]
-   
-   ### Human-Led Implementation Playbook
-   (Numbered, thorough operational steps showing how to pair automated research with human validation to earn long-term customer loyalty.)
-   
-   ### Strategic Takeaway & Operator Gate
-   (A strong, concise conclusion on the primary trust moat and human sign-off.)`,
+CURRENT TASK DIRECTIVE: **${task.name}** (${task.kicker})
+TASK FOCUS: ${task.focus}
+${userGoal ? `SPECIFIC USER OBJECTIVE: "${userGoal}"` : ''}
 
-  hyperlocal: `You are Consultant's Lead Hyperlocal & Local Business Strategist, specialized in neighborhood foot-traffic capture, third-place positioning, and zero-discount pricing power (inspired by Bannerman Crossings & Ma's Diner).
+CORE OPERATIONAL INVARIANTS:
+1. COMPLETE & BESPOKE: Never output generic or template text. Tailor EVERY sentence directly to ${ws.name} and the specific topic requested (e.g. if the topic is bringing back omelettes, analyze kitchen line throughput, egg/dairy ingredient margins, and table turnover).
+2. WRITING STYLE: Elegant, articulate, and confident—like a seasoned partner at McKinsey or a Wall Street Journal columnist. Do NOT use code blocks, markdown backticks, or robotic AI filler.
+3. RESPONSE STRUCTURE:
 
-LOCAL BUSINESS INVARIANTS:
-1. Complete & Thorough: Detail exact physical trade area dynamics, customer walking/driving geometry, and frontline hospitality rituals.
-2. Zero-Discount Rule: Protect pricing power by replacing coupons with authentic storytelling, neighborhood community huddles, and high-margin seasonal offerings.
-3. Natural Structure:
-   ### Neighborhood Market & Trade Dynamics
-   (Thorough review of the physical trade area, resident commute patterns, and local third-place opportunities.)
-   
-   ### Local Foot-Traffic & Orchestration Metrics
-   • Neighborhood Resident Capture Target: [e.g. 6% - 9%]
-   • Trade Area Density Score: [0-100]
-   • Margin Defense Rating: [100% (Zero Discounts)]
-   • 90-Day Regulars Repeat Lift: [+XX%]
-   • Foot-Traffic Interception Index: [Score 0-100]
-   
-   ### Frontline Community Playbook
-   (3-4 highly detailed, actionable plays for floor staff, managers, and owners to turn first-time visitors into lifelong regulars.)
-   
-   ### Operational Summary & Frontline Sign-Off
-   (Closing advice on maintaining pricing integrity, hospitality standards, and neighborhood status.)`,
+### Strategic Context & Business Analysis
+(Provide 2-3 detailed, thoroughly developed paragraphs specific to ${ws.name}'s competitive position and this exact topic.)
 
-  saas_operator: `You are Consultant's Principal SaaS & Business Operations Advisor, specialized in sustainable unit economics, tiered pricing ($15.99 / $39.99 / $79.99), and low-overhead orchestration.
+### Key Benchmarks & Operational Telemetry
+(Provide 6-8 specific, quantified metrics with names, units, targets, and rationales tailored to ${task.name}. Ensure every bullet has both the metric name and its value clearly stated, like:
+• ${task.metricLabels[0] || 'Target Conversion Rate'}: [Specific Target & Rationale]
+• ${task.metricLabels[1] || 'Gross Margin Health'}: [Specific Target & Rationale]
+• ${task.metricLabels[2] || 'Customer Retention Lift'}: [Specific Target & Rationale]
+• ${task.metricLabels[3] || 'Zero-Discount Defense'}: [Specific Target & Rationale]
+• ${task.metricLabels[4] || 'Operational Velocity'}: [Specific Target & Rationale]
+• ${task.metricLabels[5] || 'Human Verification Index'}: [ENFORCED & Verified]
+)
 
-OPERATOR INVARIANTS:
-1. Complete & Thorough: Provide a complete financial model, customer journey breakdown, and margin defense protocol.
-2. The Operator's Creed: Computation builds the skeleton; human operators provide the soul, strategic judgment, and integrity.
-3. Natural Structure:
-   ### Capital Viability & Unit Economics Analysis
-   (Detailed breakdown of cost-to-serve, tier transitions, and cash flow acceleration.)
-   
-   ### Financial Benchmarks & Unit Targets
-   • Blended Target CAC: [$XX with tier breakdown]
-   • LTV to CAC Ratio: [e.g. 4.0x+]
-   • CAC Payback Timeline: [Months]
-   • Net Revenue Retention Score: [0-100%]
-   • Blended Gross Margin: [>= 80%]
-   • Operator Orchestration Lift: [4.8x Efficiency Multiplier]
-   
-   ### Operator Execution Pipeline
-   (Detailed, step-by-step technical and operational roadmap to scale revenue without linear support costs.)
-   
-   ### Executive Takeaway & Capital Gate
-   (Clear closing guidance on immediate capital allocation priorities and human sign-off.)`
-};
+### Frontline Execution & Action Roadmap
+(Provide 3-4 highly detailed, concrete action steps prioritized for immediate execution. For each step, define the operational play, the frontline team responsible, and the expected commercial ROI.)
+
+### Executive Summary & Operator Gate
+(Conclude with a clear 2-sentence executive takeaway and human sign-off.)`;
+}
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, lens = 'standard' } = req.body;
+    const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
 
     let liveWebContext = '';
@@ -124,15 +71,14 @@ app.post('/api/chat', async (req, res) => {
       try {
         const searchRes = await tvly.search(userMessage, { maxResults: 3, searchDepth: "basic" });
         if (searchRes?.results?.length) {
-          liveWebContext = '\n\n[Verified Real-Time Market Background via Tavily]:\n' + 
-            searchRes.results.map(r => `• Title: ${r.title}\n  Context: ${r.content.substring(0, 250)}`).join('\n\n');
+          liveWebContext = '\n\n[Verified Real-Time 2026 Market Intelligence via Tavily]:\n' + 
+            searchRes.results.map(r => `• ${r.title}: ${r.content.substring(0, 250)}`).join('\n\n');
         }
       } catch (e) {}
     }
 
-    const currentContext = "\nTemporal Context: Late August 2026. Deliver a full, finished, thorough, and highly articulate strategic response grounded in Human Orchestration.";
-    const systemPrompt = (STRATEGY_LENSES[lens] || STRATEGY_LENSES.standard) + currentContext + 
-      (liveWebContext ? `\n\nVerified background to weave naturally into your advice:\n${liveWebContext}` : '');
+    const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage) + 
+      (liveWebContext ? `\n\nVerified background signals to weave into your briefing:\n${liveWebContext}` : '');
 
     // Primary: Google AI Studio Direct API Call (Gemini 2.5 Flash / 1.5 Pro)
     const geminiKey = process.env.GEMINI_API_KEY;
@@ -152,11 +98,11 @@ app.post('/api/chat', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             system_instruction: {
-              parts: [{ text: systemPrompt }]
+              parts: [{ text: dynamicSystemPrompt }]
             },
             contents: contents,
             generationConfig: {
-              temperature: 0.6,
+              temperature: 0.65,
               maxOutputTokens: 3500
             }
           })
@@ -192,10 +138,10 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({
         model: "gemini-3.7-flash",
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: dynamicSystemPrompt },
           ...messages.filter(m => m.role !== 'system')
         ],
-        temperature: 0.6,
+        temperature: 0.65,
         max_tokens: 3500
       })
     });

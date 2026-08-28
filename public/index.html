@@ -1266,8 +1266,12 @@
             document.getElementById('customTaskName').focus();
         }
 
+        let currentTaskType = 'trade_analysis';
+
         function quickTask(type) {
+            currentTaskType = type;
             const input = document.getElementById('userInput');
+            const ws = document.getElementById('clientWorkspace')?.value || 'default';
             if (type === 'trade_analysis') {
                 document.getElementById('strategyLens').value = 'hyperlocal';
                 input.value = "Please analyze our local trade area foot-traffic and neighborhood customer density. Focus on sustainable pricing power and zero discounts.";
@@ -1355,11 +1359,12 @@
                 .replace(/\n/g, '<br>');
         }
 
-        async function fetchInference(messages, lens) {
+        async function fetchInference(messages, lens, taskType) {
+            const workspace = document.getElementById('clientWorkspace')?.value || 'default';
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages, lens })
+                body: JSON.stringify({ messages, lens, taskType, workspace })
             });
 
             const data = await res.json().catch(() => ({}));
@@ -1403,7 +1408,7 @@
             const lens = document.getElementById('strategyLens').value;
 
             try {
-                const fullResponse = await fetchInference(conversationHistory, lens);
+                const fullResponse = await fetchInference(conversationHistory, lens, currentTaskType);
                 
                 card.innerHTML = '';
                 const words = fullResponse.split(' ');
