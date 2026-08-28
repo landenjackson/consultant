@@ -1207,17 +1207,15 @@
 
         // Live Stripe Payment Link Redirection
         const STRIPE_LINKS = {
-            starter: "https://buy.stripe.com/test_starter",
-            pro: "https://buy.stripe.com/test_pro",
-            executive: "https://buy.stripe.com/test_executive"
+            starter: "https://buy.stripe.com/test_aFa28t6NY3Ze3fy8xses000",
+            pro: "https://buy.stripe.com/test_aFa28t6NY3Ze3fy8xses000",
+            executive: "https://buy.stripe.com/test_aFa28t6NY3Ze3fy8xses000"
         };
 
         function redirectToStripe(plan) {
-            const link = STRIPE_LINKS[plan];
-            if (link && !link.includes('test_')) {
+            const link = STRIPE_LINKS[plan] || STRIPE_LINKS.starter;
+            if (link) {
                 window.location.href = link;
-            } else {
-                alert(`Starting ${plan.toUpperCase()} checkout. Please set your Stripe Payment Link in Stripe dashboard.`);
             }
         }
 
