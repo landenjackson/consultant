@@ -14,6 +14,7 @@
     "@base44/sdk": "^0.8.43",
     "@tavily/core": "^0.7.8",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.22.2",
     "node-fetch": "^3.3.2"
   }
