@@ -3,6 +3,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { tavily } from '@tavily/core';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,9 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const tvly = tavily({ apiKey: "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" });
+const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
 
-// High-Density, Complete Executive Intelligence Engine (Zero Truncation, Fully Finished Delivery)
+// High-Density, Complete Executive Intelligence Engine
 const STRATEGY_LENSES = {
   standard: `You are Consultant, an authoritative, articulate, and complete Strategic Executive Partner and Chief of Staff. You deliver finished, thorough, and polished business advisory memos.
 
@@ -124,11 +127,59 @@ app.post('/api/chat', async (req, res) => {
     const systemPrompt = (STRATEGY_LENSES[lens] || STRATEGY_LENSES.standard) + currentContext + 
       (liveWebContext ? `\n\nVerified background to weave naturally into your advice:\n${liveWebContext}` : '');
 
+    // Primary: Google AI Studio Direct API Call (Gemini 2.5 Flash / 1.5 Pro)
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (geminiKey) {
+      try {
+        const googleAiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+        
+        const contents = messages
+          .filter(m => m.role !== 'system')
+          .map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }]
+          }));
+
+        const googleRes = await fetch(googleAiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: systemPrompt }]
+            },
+            contents: contents,
+            generationConfig: {
+              temperature: 0.6,
+              maxOutputTokens: 3500
+            }
+          })
+        });
+
+        if (googleRes.ok) {
+          const googleData = await googleRes.json();
+          const textContent = googleData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (textContent) {
+            return res.status(200).json({
+              choices: [{
+                message: {
+                  role: 'assistant',
+                  content: textContent
+                }
+              }]
+            });
+          }
+        }
+      } catch (googleErr) {
+        console.warn("Direct Google AI Studio call failed, failing over to MyClaw gateway:", googleErr.message);
+      }
+    }
+
+    // High-Reliability Fallback: MyClaw Gateway
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1',
+        'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
         'User-Agent': 'Mozilla/5.0'
       },
       body: JSON.stringify({
