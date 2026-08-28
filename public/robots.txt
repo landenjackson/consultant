@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /standards.html
+Allow: /manifest.json
+Allow: /icon.svg
+
+Sitemap: https://consultant-app.com/sitemap.xml
