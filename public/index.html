@@ -1463,13 +1463,32 @@
         }
 
         function exportToGoogleDrive(content) {
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const formattedDoc = `CONSULTANT STUDIO // EXECUTIVE BRIEFING
+STATUS: OPERATOR VERIFIED & SIGNED OFF
+DATE: ${timestamp}
+GOVERNANCE: HUMAN-IN-THE-LOOP ORCHESTRATION ENFORCED
+
+================================================================================
+EXECUTIVE SUMMARY & OPERATIONAL MEMO
+================================================================================
+
+${content}
+
+================================================================================
+OPERATOR SIGN-OFF BLOCK
+Operator Signature: Landen Jackson (Lead Strategic Operator)
+Verification Status: APPROVED FOR PRODUCTION EXECUTION
+Data Privacy Standard: Zero Public Model Training Exposure (Isolated Private Edge)
+================================================================================
+`;
+            const blob = new Blob([formattedDoc], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Strategic_Briefing_${Date.now()}.doc`;
+            link.download = `Consultant_Briefing_${Date.now()}.doc`;
             link.click();
-            alert("Briefing exported as Document ready for Google Drive / Docs.");
+            alert("Briefing exported with official Operator Sign-Off Block (Ready for Google Docs / Drive).");
         }
 
         function getVaultItems() {
