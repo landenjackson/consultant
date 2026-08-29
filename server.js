@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { TASK_PROFILES } from './src/taskProfiles.js';
+import { CATEGORY_CALCULATORS } from './src/categoryCalculators.js';
 import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
 
 dotenv.config();
@@ -18,42 +18,45 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Build a Strictly Categorized, Domain-Enforced System Prompt
+// Precise, Non-Generic, Category-Decoupled System Prompt Builder
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
-  const task = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
+  const calc = CATEGORY_CALCULATORS[taskType] || CATEGORY_CALCULATORS.trade_analysis;
   const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
+  const metrics = calc.generateMetrics(workspace);
 
-  return `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
+  return `You are Consultant, a Chief of Staff and Senior Partner at an elite management consultancy.
 
-CRITICAL MANDATE: STRICT ECONOMIC & UNIT REALISM FOR WORKSPACE: **${eco.name}**
-👉 CLIENT BUSINESS TYPE: ${eco.businessType}
-👉 ACTIVE CATEGORY: ${task.categoryName} (${task.objectiveFocus})
-👉 TARGET DIRECTIVE: "${userGoal || task.categoryName}"
+CRITICAL DIRECTIVE: ZERO FLUFF, 100% CATEGORY & TOPIC PRECISION.
+👉 TARGET OBJECTIVE: "${userGoal || calc.name}"
+👉 ACTIVE CATEGORY: **${calc.name}**
+👉 WORKSPACE / COMPANY: **${eco.name}** (${eco.businessType})
+👉 CATEGORY FORMULA LOGIC: ${calc.formulaLogic}
 
-STRICT METRIC & NUMBER BOUNDARIES (NO CROSS-DOMAIN CONTAMINATION):
-1. USE ONLY VALID ECONOMIC UNITS FOR THIS WORKSPACE:
-   - Allowed Units for ${eco.name}: ${eco.allowedFinancialUnits}
-   - Realistic Benchmark Ranges:
-     ${JSON.stringify(eco.realisticRanges, null, 2)}
-   - FORBIDDEN UNITS: ${eco.forbiddenMetrics}
-   - NEVER put diner/restaurant numbers (covers, food prime costs, table turns) in Cleaver-Brooks or SaaS workspaces.
-   - NEVER put software/SaaS numbers (CAC, LTV, MRR, ARR, churn) in Ma's Diner or Cleaver-Brooks workspaces.
-   - NEVER put industrial boiler engineering metrics into Ma's Diner or Bannerman Crossings.
+STRICT EXECUTION INVARIANTS:
+1. DECOUPLED CATEGORY DIFFERENTIATION:
+   - If the category is **Trade Area**, analyze physical foot-traffic, pedestrian walking catchments, rush hour interception, and table/seat capacity.
+   - If the category is **Pricing Strategy**, analyze price elasticity, menu/package profit contribution, premium tier spreads, and zero-discount margins.
+   - If the category is **Trust Audit**, analyze customer skepticism, review sentiment, server recognition, and human verification gates.
+   - If the category is **Competitor Recon**, analyze competitor pricing spreads, single-source integration, switching barriers, and defensive moats.
+   - If the category is **Unit Economics**, analyze CAC, LTV, payback velocity, gross margins, and churn.
+   - If the category is **SPSS Research**, analyze p-values ($p < .001$), correlation ($r = 0.38$), and human-in-the-loop trust recovery.
 
-2. TELEMETRY TABLE FORMAT:
-   - Output 6 distinct metrics strictly matching ${eco.name}'s industry economics and the topic "${userGoal || task.categoryName}".
-   - Format: "• Metric Title: [Prominent Value] — [Plain-English operational rationale]"
+2. MANDATORY EXACT TELEMETRY TABLE:
+   You MUST generate exactly the 6 metrics below, mathematically and operationally tailored to "${userGoal || calc.name}" for ${eco.name}:
+${metrics.map(m => `   • **${m.name}**: [${m.value}] — ${m.desc}`).join('\n')}
 
-3. TONE & VOCABULARY:
-   - Boardroom partner standard (WSJ / McKinsey). Direct, candid, practical, and articulate. Zero robotic AI filler.
+3. TONE & FORMAT:
+   - Senior Partner / WSJ Columnist standard. Direct, candid, practical, and articulate.
+   - Zero generic filler ("In an environment marked by...", "occupies a distinct high ground").
+   - Exactly 2 dense, punchy paragraphs per section.
 
 STRUCTURE:
 
 ### Strategic Reality & Operational Realities
-(2 direct paragraphs analyzing "${userGoal || task.categoryName}" specifically for ${eco.name} within its industry realities.)
+(2 direct paragraphs analyzing what's actually happening on the ground regarding "${userGoal || calc.name}" for ${eco.name} under the ${calc.name} lens.)
 
 ### Operational Telemetry & Targets
-(6 distinct, calculated metrics strictly adhering to ${eco.name}'s allowed units and realistic economic ranges.)
+(Provide the 6 distinct, category-specific metrics above formatted cleanly with bold names and bold values.)
 
 ### Frontline Action Plan
 1. [Action Step 1 & Specific Role Owner]
@@ -71,7 +74,7 @@ app.post('/api/chat', async (req, res) => {
 
     const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
 
-    // Primary Google AI Studio Direct Call
+    // Primary Google AI Studio Direct Call (<3s latency)
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
@@ -92,8 +95,8 @@ app.post('/api/chat', async (req, res) => {
             system_instruction: { parts: [{ text: dynamicSystemPrompt }] },
             contents: contents,
             generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 900
+              temperature: 0.65,
+              maxOutputTokens: 850
             }
           })
         });
@@ -124,8 +127,8 @@ app.post('/api/chat', async (req, res) => {
           { role: 'system', content: dynamicSystemPrompt },
           ...messages.filter(m => m.role !== 'system').slice(-2)
         ],
-        temperature: 0.7,
-        max_tokens: 900
+        temperature: 0.65,
+        max_tokens: 850
       })
     });
 
