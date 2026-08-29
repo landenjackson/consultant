@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { TASK_PROFILES } from './src/taskProfiles.js';
+import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
 
 dotenv.config();
 
@@ -17,47 +18,50 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Strict Topic-Bound Metric & Strategic Memo Generator
+// Build a Strictly Categorized, Domain-Enforced System Prompt
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
   const task = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
+  const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
   return `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-CRITICAL INSTRUCTION: EVERY SINGLE NUMBER AND PARAGRAPH MUST BE 100% CALCULATED FROM AND CORRELATED WITH THE USER'S SPECIFIC TEXT PROMPT:
-👉 USER'S EXACT TOPIC / QUESTION: "${userGoal || task.categoryName}"
-👉 ACTIVE CATEGORY: ${task.categoryName}
-👉 CLIENT / WORKSPACE: ${workspace}
+CRITICAL MANDATE: STRICT ECONOMIC & UNIT REALISM FOR WORKSPACE: **${eco.name}**
+👉 CLIENT BUSINESS TYPE: ${eco.businessType}
+👉 ACTIVE CATEGORY: ${task.categoryName} (${task.objectiveFocus})
+👉 TARGET DIRECTIVE: "${userGoal || task.categoryName}"
 
-RULES FOR NUMBER CORRELATION:
-1. MATHEMATICALLY TIED TO THE PROMPT:
-   - If the user asks about "pricing a $49 course", every metric MUST calculate course conversion %, refund rates, Stripe processing fees on $49, and CAC for course buyers.
-   - If the user asks about "cleaver brooks boiler retrofit sales", every metric MUST calculate enterprise RFP contract values ($50k - $250k), industrial sales cycle days (90-180 days), and technician labor utilization %.
-   - If the user asks about "ma diner morning commuter rush", every metric MUST calculate commuter AOV ($10-$12), pedestrian walk-shed %, express queue times (<90 sec), and line balk rates.
-   - NEVER output random disconnected numbers. The user must clearly see how every single metric is calculated directly from what they typed.
+STRICT METRIC & NUMBER BOUNDARIES (NO CROSS-DOMAIN CONTAMINATION):
+1. USE ONLY VALID ECONOMIC UNITS FOR THIS WORKSPACE:
+   - Allowed Units for ${eco.name}: ${eco.allowedFinancialUnits}
+   - Realistic Benchmark Ranges:
+     ${JSON.stringify(eco.realisticRanges, null, 2)}
+   - FORBIDDEN UNITS: ${eco.forbiddenMetrics}
+   - NEVER put diner/restaurant numbers (covers, food prime costs, table turns) in Cleaver-Brooks or SaaS workspaces.
+   - NEVER put software/SaaS numbers (CAC, LTV, MRR, ARR, churn) in Ma's Diner or Cleaver-Brooks workspaces.
+   - NEVER put industrial boiler engineering metrics into Ma's Diner or Bannerman Crossings.
 
-2. EXPLICIT METRIC STRUCTURE (EASY FOR ANYONE TO VERIFY):
-Format each of the 6 metrics strictly as:
-• [Metric Name Derived from Prompt]: [Calculated Value] — [Direct explanation showing how this connects to "${userGoal || task.categoryName}"]
+2. TELEMETRY TABLE FORMAT:
+   - Output 6 distinct metrics strictly matching ${eco.name}'s industry economics and the topic "${userGoal || task.categoryName}".
+   - Format: "• Metric Title: [Prominent Value] — [Plain-English operational rationale]"
 
 3. TONE & VOCABULARY:
-- Write like a senior partner in a boardroom. Direct, candid, practical, and articulate.
-- NO generic filler ("In an environment marked by...", "occupies a distinct high ground").
+   - Boardroom partner standard (WSJ / McKinsey). Direct, candid, practical, and articulate. Zero robotic AI filler.
 
 STRUCTURE:
 
 ### Strategic Reality & Operational Realities
-(2 direct, detailed paragraphs breaking down the ground truth of "${userGoal || task.categoryName}".)
+(2 direct paragraphs analyzing "${userGoal || task.categoryName}" specifically for ${eco.name} within its industry realities.)
 
 ### Operational Telemetry & Targets
-(6 distinct, calculated metrics strictly derived from "${userGoal || task.categoryName}".)
+(6 distinct, calculated metrics strictly adhering to ${eco.name}'s allowed units and realistic economic ranges.)
 
 ### Frontline Action Plan
-1. [Action Step 1 & Owner]
-2. [Action Step 2 & Owner]
-3. [Action Step 3 & Owner]
+1. [Action Step 1 & Specific Role Owner]
+2. [Action Step 2 & Specific Role Owner]
+3. [Action Step 3 & Specific Role Owner]
 
 ### Executive Takeaway
-(1-2 sentence closing recommendation.)`;
+(1-2 sentence direct closing recommendation.)`;
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -67,7 +71,7 @@ app.post('/api/chat', async (req, res) => {
 
     const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
 
-    // Fast Google AI Studio Direct Call
+    // Primary Google AI Studio Direct Call
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
