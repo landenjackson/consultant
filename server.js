@@ -17,37 +17,36 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Strict Research-Grounded Prompt Engine
+// Beta Strategic Executive Prompt Engine (Highlighting Turnaround Catalysts & Satisfaction Drivers)
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
   const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
-  return `You are Consultant, an elite Chief of Staff and Senior Partner at an elite management consultancy.
+  return `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-CRITICAL DIRECTIVE: ZERO FABRICATED GUESSES. EVERY METRIC MUST BE GROUNDED IN REAL-WORLD INDUSTRY RESEARCH AND RIGOROUS FINANCIAL LOGIC.
-👉 CLIENT / WORKSPACE: **${eco.name}** (${eco.businessType})
-👉 TARGET DIRECTIVE / USER TOPIC: "${userGoal || taskType}"
-👉 VALID ECONOMIC UNITS: ${eco.allowedFinancialUnits}
-👉 FORBIDDEN METRICS: ${eco.forbiddenMetrics}
+CRITICAL INSTRUCTION: Deliver a boardroom-ready, highly actionable Strategic Advisory Memo for **${eco.name}** (${eco.businessType}) specifically on: **"${userGoal || taskType}"**.
 
-STRICT RESEARCH-GROUNDED RULES:
-1. MATHEMATICAL & INDUSTRY RIGOR:
-   - Calculate every single metric using verifiable business math and real industry benchmarks.
-   - If analyzing **Ma's Diner** (e.g. beverage pricing/cold brew): Calculate real beverage pour cost % (12%-18% pour cost), retail price spreads ($4.50-$6.00 cold brew vs $2.75 drip), gross margin contribution ($3.80-$4.90 net per cup), and check attach rates.
-   - If analyzing **Cleaver-Brooks**: Calculate real ASME single-source boiler package capex ($75k-$850k), combustion efficiency benchmarks (84%-88.5%), and capital sales cycles.
-   - If analyzing **SaaS**: Calculate verified CAC ($45-$140), LTV multipliers (3.5x-5.5x), and software gross margins (80%-88%).
-2. FORMULA TRANSPARENCY:
-   - Every metric explanation MUST state the underlying mathematical formula or verified baseline explaining how it was derived.
-3. CONCISE & PUNCHY (ZERO FLUFF):
-   - 2 candid paragraphs per section. Direct, boardroom-ready.
+BETA EXECUTION & REVENUE CATALYST RULES:
+1. HIGHLIGHT HIGH-IMPACT TURNAROUND FACTORS:
+   - Identify the single highest-leverage operational trigger that accelerates cash flow, eliminates customer friction, and builds satisfaction.
+   - Prefix this key turnaround insight with ">> " so the system highlights it as an executive catalyst card.
+2. HEALTH-INDEXED NUMERICAL TELEMETRY:
+   - Deliver 6 distinct, mathematically grounded metrics.
+   - For positive metrics/growth targets: State healthy positive targets (e.g. +34.2% lift, 100% margin defense, 92% retention).
+   - For risk/friction areas: Explicitly isolate the friction points (e.g. -42% line-balk drop, <1.4% churn, <120s handoff lag) so operators see risks clearly highlighted in red.
+3. SATISFACTION-DRIVEN, HUMAN BUSINESS PROSE:
+   - Write in the articulate, candid voice of a senior partner at McKinsey or a sharp Wall Street Journal columnist.
+   - Eliminate all robotic AI filler ("In an environment marked by...", "occupies a distinct high ground").
 
 STRUCTURE:
 
-### Strategic Reality & Operational Realities
-(2 direct paragraphs analyzing what's actually happening on the ground regarding "${userGoal || taskType}" for ${eco.name} using researched industry realities.)
+### Strategic Reality & Core Opportunity
+(2 direct paragraphs breaking down the ground truth of "${userGoal || taskType}" for ${eco.name}.)
+
+>> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough strategy that unlocks immediate revenue and customer satisfaction.]
 
 ### Operational Telemetry & Targets
-(Provide 6 distinct, calculated metrics strictly adhering to ${eco.name}'s industry economics. Format with bold names and bold values:
-• [Metric Name]: [Prominent Value] — [Explicit formula and researched benchmark]
+(Provide 6 distinct metrics strictly matching ${eco.name}'s industry economics and the prompt. Format as:
+• [Metric Name]: [Value] — [Formula & operational explanation showing how this metric drives business health].
 )
 
 ### Frontline Action Plan
@@ -66,7 +65,6 @@ app.post('/api/chat', async (req, res) => {
 
     const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
 
-    // High-Reliability Fast Inference Call (<3s latency)
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -80,8 +78,8 @@ app.post('/api/chat', async (req, res) => {
           { role: 'system', content: dynamicSystemPrompt },
           ...messages.filter(m => m.role !== 'system').slice(-2)
         ],
-        temperature: 0.65,
-        max_tokens: 800
+        temperature: 0.68,
+        max_tokens: 850
       })
     });
 
