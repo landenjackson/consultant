@@ -1291,28 +1291,31 @@
         function quickTask(type) {
             currentTaskType = type;
             const input = document.getElementById('userInput');
-            const ws = document.getElementById('clientWorkspace')?.value || 'default';
+            const wsSelect = document.getElementById('clientWorkspace');
+            const ws = wsSelect ? wsSelect.value : 'default';
+            const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : 'our business';
+
             if (type === 'trade_analysis') {
                 document.getElementById('strategyLens').value = 'hyperlocal';
-                input.value = "Please analyze our local trade area foot-traffic and neighborhood customer density. Focus on sustainable pricing power and zero discounts.";
+                input.value = `Perform an in-depth Trade Area & Foot-Traffic Geometry audit for ${wsName}. Analyze local catchment radiuses, pedestrian density, and neighbor acquisition without margin-eroding discounts.`;
             } else if (type === 'trust') {
                 document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = "Review our current marketing and sales outreach messaging for trust, ethical positioning, and human connection.";
+                input.value = `Conduct a comprehensive Trust & Brand Reputation Architecture audit for ${wsName}. Audit customer skepticism bottlenecks, transparency friction, and human-in-the-loop validation gates.`;
             } else if (type === 'saas') {
                 document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = "Evaluate our pricing model and unit economics ($15.99, $39.99, $79.99 tiers) with a focus on healthy retention and sustainable margins.";
+                input.value = `Dissect the Unit Economics & Capital Viability for ${wsName}. Model customer acquisition costs (CAC), lifetime value (LTV), payback timelines, and gross margin defense.`;
             } else if (type === 'campaign_strategy') {
                 document.getElementById('strategyLens').value = 'standard';
-                input.value = "Develop a multi-channel campaign strategy centered on authentic positioning, high-value storytelling, and customer retention.";
+                input.value = `Develop an actionable Zero-Discount Campaign Strategy for ${wsName}. Structure multi-channel brand momentum, high-texture storytelling, and customer retention protocols.`;
             } else if (type === 'competitor') {
                 document.getElementById('strategyLens').value = 'standard';
-                input.value = "Provide an objective market scan of current competitor positioning and opportunities for differentiation.";
+                input.value = `Execute a real-time Competitor Market Reconnaissance & Moat Defense analysis for ${wsName}. Identify competitor pricing vulnerabilities, underserved demand white space, and defensive switching barriers.`;
             } else if (type === 'pricing') {
                 document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = "Outline a pricing strategy that protects profit margins and elevates brand value without relying on discounts.";
+                input.value = `Architect a Value-Based Pricing Strategy & Margin Defense framework for ${wsName}. Model willingness-to-pay elasticity, premium anchoring, and profit margin preservation.`;
             } else if (type === 'fsu_trust') {
                 document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = "Apply the human-in-the-loop trust framework: how should we balance automated research with human judgment to earn customer confidence?";
+                input.value = `Apply the FSU Empirical Trust Framework (p < .001 statistical boundaries) to ${wsName}. Model customer retention correlation (r = 0.38) and synchronous human operator gates.`;
             }
             onLensChange();
             sendMessage();
