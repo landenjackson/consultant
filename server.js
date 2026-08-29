@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { tavily } from '@tavily/core';
 import dotenv from 'dotenv';
-import { CATEGORY_CALCULATORS } from './src/categoryCalculators.js';
 import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
 
 dotenv.config();
@@ -18,45 +18,50 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Precise, Non-Generic, Category-Decoupled System Prompt Builder
-function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
-  const calc = CATEGORY_CALCULATORS[taskType] || CATEGORY_CALCULATORS.trade_analysis;
+const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
+
+// Build a dynamic research query from user prompt and workspace
+function buildResearchQuery(userGoal, taskType, workspace) {
+  const ws = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
+  if (userGoal && userGoal.length > 5) {
+    return `${ws.name} ${userGoal} benchmarks statistics 2026`;
+  }
+  return `${ws.name} ${taskType} operational economics industry data`;
+}
+
+// Build a Grounded, Researched System Prompt with Live Evidence
+function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '', liveResearch = '') {
   const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
-  const metrics = calc.generateMetrics(workspace);
 
   return `You are Consultant, a Chief of Staff and Senior Partner at an elite management consultancy.
 
-CRITICAL DIRECTIVE: ZERO FLUFF, 100% CATEGORY & TOPIC PRECISION.
-👉 TARGET OBJECTIVE: "${userGoal || calc.name}"
-👉 ACTIVE CATEGORY: **${calc.name}**
-👉 WORKSPACE / COMPANY: **${eco.name}** (${eco.businessType})
-👉 CATEGORY FORMULA LOGIC: ${calc.formulaLogic}
+CRITICAL DIRECTIVE: ZERO FABRICATED GUESSES. EVERY METRIC MUST BE GROUNDED IN REAL ECONOMIC EVIDENCE.
+👉 CLIENT / WORKSPACE: **${eco.name}** (${eco.businessType})
+👉 TARGET TOPIC: "${userGoal || taskType}"
+👉 VALID FINANCIAL UNITS FOR THIS DOMAIN: ${eco.allowedFinancialUnits}
+👉 FORBIDDEN METRICS: ${eco.forbiddenMetrics}
 
-STRICT EXECUTION INVARIANTS:
-1. DECOUPLED CATEGORY DIFFERENTIATION:
-   - If the category is **Trade Area**, analyze physical foot-traffic, pedestrian walking catchments, rush hour interception, and table/seat capacity.
-   - If the category is **Pricing Strategy**, analyze price elasticity, menu/package profit contribution, premium tier spreads, and zero-discount margins.
-   - If the category is **Trust Audit**, analyze customer skepticism, review sentiment, server recognition, and human verification gates.
-   - If the category is **Competitor Recon**, analyze competitor pricing spreads, single-source integration, switching barriers, and defensive moats.
-   - If the category is **Unit Economics**, analyze CAC, LTV, payback velocity, gross margins, and churn.
-   - If the category is **SPSS Research**, analyze p-values ($p < .001$), correlation ($r = 0.38$), and human-in-the-loop trust recovery.
+${liveResearch ? `LIVE 2026 INDUSTRY RESEARCH & BENCHMARKS (USE THESE REAL NUMBERS):\n${liveResearch}\n` : ''}
 
-2. MANDATORY EXACT TELEMETRY TABLE:
-   You MUST generate exactly the 6 metrics below, mathematically and operationally tailored to "${userGoal || calc.name}" for ${eco.name}:
-${metrics.map(m => `   • **${m.name}**: [${m.value}] — ${m.desc}`).join('\n')}
-
-3. TONE & FORMAT:
-   - Senior Partner / WSJ Columnist standard. Direct, candid, practical, and articulate.
-   - Zero generic filler ("In an environment marked by...", "occupies a distinct high ground").
-   - Exactly 2 dense, punchy paragraphs per section.
+STRICT RESEARCH-GROUNDED RULES:
+1. NO CANNED OR FABRICATED GUESSES:
+   - Calculate every single metric using real industry formulas, verified financial data, and the live research context provided above.
+   - If analyzing **Ma's Diner**, calculate real restaurant prime costs (food prime 28-32%, labor 28-34%), actual table dwell minutes (28-40 min), and pedestrian walk-shed % from local demographics.
+   - If analyzing **Cleaver-Brooks**, calculate real industrial boiler package capex ($75k-$850k), ASME combustion efficiencies (84-88.5%), and capital sales cycles (90-270 days).
+   - If analyzing **SaaS / Agency**, calculate real CAC ($45-$140), LTV multipliers (3.5x-5.5x), and gross margins (>80%).
+2. METRIC CITATION & FORMULA TRANSPARENCY:
+   - For every metric, show the exact underlying formula or researched baseline in the explanation:
+     • [Metric Name]: [Calculated Value] — [Explicit formula / real-world industry benchmark explaining how this number was derived].
+3. ZERO FLUFF / WSJ COLUMNIST STANDARD:
+   - 2 candid paragraphs per section. Direct, opinionated, boardroom-ready.
 
 STRUCTURE:
 
 ### Strategic Reality & Operational Realities
-(2 direct paragraphs analyzing what's actually happening on the ground regarding "${userGoal || calc.name}" for ${eco.name} under the ${calc.name} lens.)
+(2 direct paragraphs analyzing what's actually happening on the ground regarding "${userGoal || taskType}" for ${eco.name} using researched industry realities.)
 
 ### Operational Telemetry & Targets
-(Provide the 6 distinct, category-specific metrics above formatted cleanly with bold names and bold values.)
+(Provide 6 distinct, calculated metrics strictly derived from research and domain formulas. Format with bold names and bold values.)
 
 ### Frontline Action Plan
 1. [Action Step 1 & Specific Role Owner]
@@ -72,9 +77,23 @@ app.post('/api/chat', async (req, res) => {
     const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
 
-    const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
+    // Fast, targeted live web research via Tavily (<1.2s)
+    let liveResearch = '';
+    const searchQuery = buildResearchQuery(userMessage, taskType, workspace);
+    try {
+      const searchRes = await tvly.search(searchQuery, { maxResults: 2, searchDepth: "basic" });
+      if (searchRes?.results?.length) {
+        liveResearch = searchRes.results
+          .map(r => `• Source: ${r.title} (${r.url})\n  Data: ${r.content.substring(0, 300)}`)
+          .join('\n\n');
+      }
+    } catch (e) {
+      console.warn("Tavily search skipped/failed, proceeding with domain economic baseline.");
+    }
 
-    // Primary Google AI Studio Direct Call (<3s latency)
+    const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage, liveResearch);
+
+    // Primary: Google AI Studio Direct API Call
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
@@ -113,7 +132,7 @@ app.post('/api/chat', async (req, res) => {
       } catch (e) {}
     }
 
-    // Secondary Gateway Fallback
+    // Secondary: High-Reliability Gateway Fallback
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
