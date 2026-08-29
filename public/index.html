@@ -1275,7 +1275,7 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; closeSidebar(); }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        // Live Stripe Payment Link Redirection
+        // Live Stripe Subscription Management & Session Handling
         const STRIPE_LINKS = {
             starter: "https://buy.stripe.com/test_aFa28t6NY3Ze3fy8xses000",
             pro: "https://buy.stripe.com/test_eVqdRba0a53ibM4cNIes001",
@@ -1286,6 +1286,25 @@
             const link = STRIPE_LINKS[plan] || STRIPE_LINKS.starter;
             if (link) {
                 window.location.href = link;
+            }
+        }
+
+        // Check for post-checkout success return
+        function checkSubscriptionStatus() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('session') === 'success' || params.get('checkout') === 'success') {
+                localStorage.setItem('consultant_pro_active', 'true');
+                const toast = document.createElement('div');
+                toast.className = 'turnaround-catalyst';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '24px';
+                toast.style.right = '24px';
+                toast.style.zIndex = '9999';
+                toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.6)';
+                toast.innerHTML = '<span class="turnaround-icon">★</span><div><strong>Subscription Confirmed!</strong> Full Pro / Executive features unlocked.</div>';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 6000);
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
@@ -1671,6 +1690,7 @@ Data Privacy Standard: Zero Public Model Training Exposure (Isolated Private Edg
         setInterval(updateClock, 1000);
         updateClock();
         updateVaultCount();
+        checkSubscriptionStatus();
     </script>
 </body>
 </html>
