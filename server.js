@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { tavily } from '@tavily/core';
 import dotenv from 'dotenv';
 import { TASK_PROFILES } from './src/taskProfiles.js';
 
@@ -18,41 +17,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
-
-// High-Speed, Sub-5-Second Concise Executive Prompt Builder
+// Fast, High-Density System Prompt
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
   const task = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
 
   return `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-MANDATE: Output a high-density, concise Strategic Advisory Memo in under 5 seconds.
+MANDATE: Output a crisp, high-density Strategic Advisory Memo in under 3 seconds.
 👉 OBJECTIVE: "${userGoal || task.categoryName}"
 👉 CATEGORY: ${task.categoryName} (${task.objectiveFocus})
 👉 WORKSPACE: ${workspace}
 
-LATENCY & CONCISENESS RULES:
-1. PUNCHY & DIRECT: Keep paragraphs to 2 dense sentences. Zero conversational filler, zero corporate poetry.
-2. DEDICATED TELEMETRY: Output exactly 6 quantified metrics specific to "${userGoal || task.categoryName}".
-3. FAST EXECUTION ROADMAP: 3 numbered action steps.
-
-OUTPUT STRUCTURE:
+LATENCY CONSTRAINTS:
+1. PUNCHY: 2 dense paragraphs for strategic context.
+2. TELEMETRY: Exactly 6 quantified metrics formatted as:
+   • [Metric Title]: [Prominent Value] — [1-sentence explanation]
+3. ROADMAP: Exactly 3 numbered steps.
+4. SUMMARY: 1-sentence sign-off.
 
 ### Strategic Context & Operational Realities
-(2 concise, dense paragraphs analyzing "${userGoal || task.categoryName}".)
+(2 concise paragraphs analyzing "${userGoal || task.categoryName}".)
 
 ### Key Benchmarks & Operational Telemetry
-(Provide 6 distinct metrics formatted as:
-• [Metric Name]: [Prominent Value] — [1-sentence explanation]
-)
+(Provide 6 distinct metrics matching ${task.categoryName}.)
 
 ### Frontline Execution & Action Roadmap
-1. [Action Step 1: Specific operational play & owner]
-2. [Action Step 2: Specific operational play & owner]
-3. [Action Step 3: Specific operational play & owner]
+1. [Action Step 1 & Owner]
+2. [Action Step 2 & Owner]
+3. [Action Step 3 & Owner]
 
 ### Executive Summary & Operator Gate
-(1-2 sentence executive takeaway and human sign-off.)`;
+(1-sentence takeaway & sign-off.)`;
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -62,55 +57,7 @@ app.post('/api/chat', async (req, res) => {
 
     const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
 
-    // Primary: Google AI Studio Direct API Call (Gemini 2.5 Flash / 1.5 Flash / 3.7 Flash)
-    const geminiKey = process.env.GEMINI_API_KEY;
-    if (geminiKey) {
-      try {
-        const googleAiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-        
-        const contents = messages
-          .filter(m => m.role !== 'system')
-          .slice(-4) // Keep context lean for sub-3s latency
-          .map(m => ({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: m.content }]
-          }));
-
-        const googleRes = await fetch(googleAiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: dynamicSystemPrompt }]
-            },
-            contents: contents,
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 1200 // Caps generation to ~3-4 seconds flat
-            }
-          })
-        });
-
-        if (googleRes.ok) {
-          const googleData = await googleRes.json();
-          const textContent = googleData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (textContent) {
-            return res.status(200).json({
-              choices: [{
-                message: {
-                  role: 'assistant',
-                  content: textContent
-                }
-              }]
-            });
-          }
-        }
-      } catch (googleErr) {
-        console.warn("Direct Google AI Studio call failed, failing over to MyClaw gateway:", googleErr.message);
-      }
-    }
-
-    // High-Reliability Fallback: MyClaw Gateway
+    // Direct High-Speed Gemini Flash Call (<3s latency)
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -122,10 +69,10 @@ app.post('/api/chat', async (req, res) => {
         model: "gemini-3.7-flash",
         messages: [
           { role: 'system', content: dynamicSystemPrompt },
-          ...messages.filter(m => m.role !== 'system').slice(-4)
+          ...messages.filter(m => m.role !== 'system').slice(-2)
         ],
         temperature: 0.7,
-        max_tokens: 1200
+        max_tokens: 800 // Hard cap to guarantee 2-3s response time
       })
     });
 
