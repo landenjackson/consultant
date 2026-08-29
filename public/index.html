@@ -597,24 +597,42 @@
             border-radius: 2px;
         }
 
-        /* Metric Pill */
-        .metric-pill {
-            display: inline-flex;
+        /* High-Legibility Telemetry Rows */
+        .metric-card-row {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(34, 197, 94, 0.08);
-            border: 1px solid rgba(34, 197, 94, 0.28);
-            color: #4ade80;
-            padding: 3px 9px;
-            border-radius: 4px;
-            margin: 3px 0;
-            font-size: 12.5px;
-            font-weight: 600;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #111418;
+            border: 1px solid #1e232c;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 6px 0;
         }
 
-        .metric-pill strong {
-            color: #86efac;
+        .metric-title-badge {
+            font-size: 12px;
             font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .metric-value-pill {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #4ade80;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .metric-desc-text {
+            font-size: 12px;
+            color: #94a3b8;
+            flex: 1 1 100%;
+            margin-top: 2px;
+            line-height: 1.4;
         }
 
         .memo-actions {
@@ -1347,15 +1365,29 @@
             }
         }
 
-        // Clean, Natural Typography Parser
+        // High-Legibility & Non-Code Output Parser (Clean Numbers, Bold Labels)
         function formatTelemetryOutput(text) {
             return text
+                // Header Styling (Section Titles)
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
+                // Bold Highlights
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
+                // High-Legibility Metrics: • Metric Name: Value — Description
+                .replace(/^[\*\•\-]\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)$/gm, 
+                    '<div class="metric-card-row">' +
+                        '<div class="metric-title-badge">$1</div>' +
+                        '<div class="metric-value-pill">$2</div>' +
+                        '<div class="metric-desc-text">$3</div>' +
+                    '</div>'
+                )
+                // Fallback Metric Pills: [Name: Value]
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
-                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:4px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:6px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
-                .replace(/\n\n/g, '<div style="height:10px;"></div>')
+                // Standard Bullet Points
+                .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
+                // Numbered Steps
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:7px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
+                // Natural Paragraph Spacing
+                .replace(/\n\n/g, '<div style="height:12px;"></div>')
                 .replace(/\n/g, '<br>');
         }
 
