@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { tavily } from '@tavily/core';
 import dotenv from 'dotenv';
-import { TASK_PROFILES, WORKSPACE_PROFILES } from './src/taskProfiles.js';
+import { TASK_PROFILES } from './src/taskProfiles.js';
 
 dotenv.config();
 
@@ -20,47 +20,45 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
 
-// High-Density, Non-Repetitive Dynamic Executive Prompt Builder
+// Build a 100% Unique, Dynamic Prompt for Each Specific Category & Subject
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
   const task = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
-  const ws = WORKSPACE_PROFILES[workspace] || WORKSPACE_PROFILES.default;
 
-  return `You are Consultant, a Chief of Staff and Surgical Strategic Partner.
+  return `You are Consultant, an authoritative Strategic Operations Partner and Chief of Staff.
 
-MISSION & MANDATE:
-Deliver a fresh, bespoke, and authoritative Strategic Advisory Memo for **${ws.name}** (${ws.type}) specifically analyzing: **"${userGoal || task.name}"**.
+CRITICAL DIRECTIVE: YOU MUST GENERATE A 100% UNIQUE ADVISORY MEMO EXCLUSIVELY FOR THIS SPECIFIC TASK CATEGORY AND USER SUBJECT.
 
-STRICT NON-REPETITION & HIGH-DENSITY RULES:
-1. ZERO CANNED BOILERPLATE: Every sentence must directly dissect the EXACT words, product, or challenge in: "${userGoal || task.name}".
-   - If the subject is "omelettes" for Ma's Diner: analyze egg/cheese prime costs, 3-pan prep line speed, morning ticket turnaround under 7 minutes, and server breakfast check add-ons.
-   - If the subject is a custom business idea: build custom unit economics, customer acquisition steps, and pricing boundaries specifically for that idea.
-   - DO NOT repeat phrases from previous templates or generate canned history lessons.
-2. CRYSTAL CLEAR NUMBERS (READABLE FOR EVERYONE):
-   - Every single metric MUST be explicitly stated with a prominent title, readable value, and practical 1-sentence real-world explanation.
-   - Format: "• Metric Name: Value (e.g. 24.5%) — Clear explanation."
-   - NEVER output blank titles or empty bullet lines.
-3. WRITING STYLE: Articulate, grounded, and executive—like a senior partner at McKinsey or a Wall Street Journal columnist. No code blocks, no robotic AI filler.
+ACTIVE STRATEGIC CATEGORY: **${task.categoryName}**
+CATEGORY MANDATE & SCOPE: ${task.objectiveFocus}
+CURRENT TOPIC / CLIENT GOAL: "${userGoal || task.categoryName}" (Workspace: ${workspace})
 
-MANDATORY 4-PART STRUCTURE:
+STRICT NON-REPETITION & RELEVANCE RULES:
+1. STRICT TOPIC RELEVANCE: All analysis, terminology, and metrics must directly analyze "${userGoal || task.categoryName}".
+   - If the subject is NOT about food/omelettes, DO NOT mention food, eggs, kitchens, or dining.
+   - If the subject is SaaS pricing, focus strictly on software margins, CAC, LTV, and churn.
+   - If the subject is Trade Area, focus on geography, foot traffic, pedestrian catchments, and store capacity.
+   - If the subject is Competitor Recon, focus on moats, pricing spreads, and switching barriers.
+2. BESPOKE TELEMETRY TABLE (CATEGORY SPECIFIC):
+   - You MUST generate 6 specific metrics tailored exclusively to ${task.categoryName} and the topic: "${userGoal || task.categoryName}".
+   - Format: "• Metric Title: [Value] — Operational rationale."
+   - Examples of required metric types for this category:
+     ${task.requiredMetricTypes.map(m => `• ${m}`).join('\n     ')}
+3. WRITING STYLE: Articulate, executive, and direct (WSJ columnist / McKinsey Chief of Staff standard). No robotic AI filler, no code syntax, no markdown backticks.
 
-### Strategic Context & Operational Realities
-(2-3 well-developed, clear paragraphs detailing the market dynamics, operational constraints, and specific strategic opportunities for "${userGoal || task.name}" at ${ws.name}.)
+MANDATORY 4-PART ADVISORY MEMO STRUCTURE:
+
+### Strategic Context & Market Realities
+(2-3 deep, highly articulate paragraphs specifically dissecting the market dynamics, operational constraints, and commercial reality of "${userGoal || task.categoryName}" under the ${task.categoryName} lens.)
 
 ### Key Benchmarks & Operational Telemetry
-(Provide 6-8 specific, quantified metrics directly calculating the economics of "${userGoal || task.name}". Ensure every metric is clearly named, easy to read, and immediately understandable to any business manager:
-• Target Prime Cost / Unit Cost: [Value, e.g. 24.5%] — [Operational rationale]
-• Operational Turnaround Time / Ticket Speed: [Value, e.g. 6.5 Minutes] — [Operational rationale]
-• Average Ticket / Revenue Expansion: [Value, e.g. +$3.40 / +22.5%] — [Operational rationale]
-• Zero-Discount Margin Defense: [100% (Strict Zero Discounts)] — [Operational rationale]
-• Peak Capacity & Retention Lift: [Value, e.g. +32.0%] — [Operational rationale]
-• Human-in-the-Loop Governance: [ENFORCED] — [Operational rationale]
-)
+(Provide 6 distinct, quantified metrics calculated specifically for this topic and category. Every line must have a bold title, bold value, and clean 1-sentence rationale.)
 
 ### Frontline Execution & Action Roadmap
-(Provide 3-4 concrete, numbered steps prioritized for immediate execution. For each step, define the operational action, the frontline staff responsible, and the expected commercial ROI.)
+(Provide 3-4 concrete, numbered operational steps prioritized for immediate execution. Address:
+${task.roadmapDirectives.map((d, i) => `${i+1}. ${d}`).join('\n')})
 
 ### Executive Summary & Operator Gate
-(Conclude with a clear 2-sentence takeaway on immediate priorities and human sign-off.)`;
+(2-sentence concluding summary with human operator verification sign-off.)`;
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -104,7 +102,7 @@ app.post('/api/chat', async (req, res) => {
             },
             contents: contents,
             generationConfig: {
-              temperature: 0.7,
+              temperature: 0.75,
               maxOutputTokens: 3500
             }
           })
@@ -143,7 +141,7 @@ app.post('/api/chat', async (req, res) => {
           { role: 'system', content: dynamicSystemPrompt },
           ...messages.filter(m => m.role !== 'system')
         ],
-        temperature: 0.7,
+        temperature: 0.75,
         max_tokens: 3500
       })
     });
