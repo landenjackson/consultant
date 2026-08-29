@@ -597,7 +597,7 @@
             border-radius: 2px;
         }
 
-        /* High-Legibility Telemetry Rows */
+        /* Beta Telemetry Health Badges (Green = Good/Target, Red = Risk/Friction, Amber = Caution) */
         .metric-card-row {
             display: flex;
             align-items: center;
@@ -605,13 +605,25 @@
             gap: 8px;
             background: #111418;
             border: 1px solid #1e232c;
+            border-left: 3.5px solid #22c55e;
             border-radius: 6px;
-            padding: 8px 12px;
+            padding: 9px 12px;
             margin: 6px 0;
+            transition: all 0.2s;
+        }
+
+        .metric-card-row.risk {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .metric-card-row.caution {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.04);
         }
 
         .metric-title-badge {
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: -0.01em;
@@ -619,22 +631,60 @@
 
         .metric-value-pill {
             background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid rgba(34, 197, 94, 0.35);
             color: #22c55e;
             padding: 3px 10px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 800;
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             letter-spacing: -0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .metric-value-pill.risk {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.35);
+            color: #ef4444;
+        }
+
+        .metric-value-pill.caution {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.35);
+            color: #f59e0b;
         }
 
         .metric-desc-text {
             font-size: 12px;
             color: #94a3b8;
             flex: 1 1 100%;
+            margin-top: 3px;
+            line-height: 1.45;
+        }
+
+        /* High-Impact Turnaround Catalyst Call-Out */
+        .turnaround-catalyst {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.28);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            color: #f1f5f9;
+            font-size: 13px;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+        }
+
+        .turnaround-icon {
+            color: #22c55e;
+            font-weight: 800;
+            font-size: 14px;
+            line-height: 1;
             margin-top: 2px;
-            line-height: 1.4;
         }
 
         .memo-actions {
@@ -1370,26 +1420,36 @@
             }
         }
 
-        // High-Legibility & Non-Code Output Parser (Clean Numbers, Bold Labels)
+        // Beta Telemetry Parser with Green (Good), Red (Risk), Amber (Caution) Logic
         function formatTelemetryOutput(text) {
             return text
                 // Header Styling (Section Titles)
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
+                // Turnaround Catalyst Call-outs: >> Text or 💡 Text
+                .replace(/^(\>\>|💡)\s*(.+)$/gm, '<div class="turnaround-catalyst"><span class="turnaround-icon">★</span><div>$2</div></div>')
                 // Bold Highlights
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
-                // High-Legibility Metrics: • Metric Name: Value — Description
-                .replace(/^[\*\•\-]\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)$/gm, 
-                    '<div class="metric-card-row">' +
-                        '<div class="metric-title-badge">$1</div>' +
-                        '<div class="metric-value-pill">$2</div>' +
-                        '<div class="metric-desc-text">$3</div>' +
-                    '</div>'
-                )
+                // Metric Rows with Automated Color Correlation (Green = Good, Red = Risk/Drop, Amber = Caution)
+                .replace(/^[\*\•\-]\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)$/gm, function(match, title, val, desc) {
+                    const cleanVal = val.trim();
+                    const isRisk = /(-[0-9]|drop|loss|risk|friction|drag|churn|balk|high risk)/i.test(cleanVal + ' ' + title);
+                    const isCaution = /(caution|moderate|delayed|extended)/i.test(cleanVal + ' ' + title);
+                    
+                    const rowClass = isRisk ? 'metric-card-row risk' : (isCaution ? 'metric-card-row caution' : 'metric-card-row');
+                    const pillClass = isRisk ? 'metric-value-pill risk' : (isCaution ? 'metric-value-pill caution' : 'metric-value-pill');
+                    const statusDot = isRisk ? '🔴' : (isCaution ? '🟡' : '🟢');
+
+                    return `<div class="${rowClass}">
+                        <div class="metric-title-badge">${statusDot} ${title.trim()}</div>
+                        <div class="${pillClass}">${cleanVal}</div>
+                        <div class="metric-desc-text">${desc.trim()}</div>
+                    </div>`;
+                })
                 // Fallback Metric Pills: [Name: Value]
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
                 // Standard Bullet Points
                 .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                // Numbered Steps
+                // Numbered Action Steps
                 .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:7px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
                 // Natural Paragraph Spacing
                 .replace(/\n\n/g, '<div style="height:12px;"></div>')
