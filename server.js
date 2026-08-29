@@ -20,43 +20,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY || "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" });
 
-// Build a 100% Unique, Dynamic Prompt for Each Specific Category & Subject
+// High-Speed, Sub-5-Second Concise Executive Prompt Builder
 function buildDynamicSystemPrompt(taskType = 'trade_analysis', workspace = 'default', userGoal = '') {
   const task = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
 
-  return `You are Consultant, a Chief of Staff and Senior Partner at an elite management consultancy (McKinsey / BCG standard).
+  return `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-PRIMARY MANDATE:
-Deliver a 100% bespoke, highly professional Strategic Advisory Memo addressing the user's exact operational objective:
-👉 TARGET OBJECTIVE: "${userGoal || task.categoryName}"
-👉 ACTIVE CATEGORY: **${task.categoryName}**
-👉 CORE CATEGORY FOCUS: ${task.objectiveFocus}
+MANDATE: Output a high-density, concise Strategic Advisory Memo in under 5 seconds.
+👉 OBJECTIVE: "${userGoal || task.categoryName}"
+👉 CATEGORY: ${task.categoryName} (${task.objectiveFocus})
+👉 WORKSPACE: ${workspace}
 
-STRICT PROFESSIONAL EXECUTION RULES:
-1. DEEP TOPIC & INDUSTRY ALIGNMENT:
-   - Identify the exact business/industry implied in the prompt (e.g., if analyzing a diner, examine restaurant food prime costs, kitchen line turnaround, and table turns; if analyzing Cleaver-Brooks, examine industrial boiler manufacturing, technical workforce retention, and thermal engineering client sales cycles; if analyzing a SaaS or custom business, examine its specific unit economics).
-   - DO NOT output generic corporate fluff, canned descriptions, or repetitive boilerplate.
-2. CATEGORY-SPECIFIC QUANTITATIVE TELEMETRY:
-   - You MUST generate 6 specific, quantified metrics calculated exclusively for this exact business and category.
-   - Format every line with a prominent title, value, and real-world explanation:
-     • [Metric Title]: [Prominent Value] — [1-sentence operational rationale]
-3. TONE & FORMAT:
-   - Articulate, authoritative, and boardroom-ready.
-   - Structure with clean headers (###), bold highlights, and clean numbered roadmaps.
+LATENCY & CONCISENESS RULES:
+1. PUNCHY & DIRECT: Keep paragraphs to 2 dense sentences. Zero conversational filler, zero corporate poetry.
+2. DEDICATED TELEMETRY: Output exactly 6 quantified metrics specific to "${userGoal || task.categoryName}".
+3. FAST EXECUTION ROADMAP: 3 numbered action steps.
 
-MANDATORY 4-PART ADVISORY MEMO STRUCTURE:
+OUTPUT STRUCTURE:
 
 ### Strategic Context & Operational Realities
-(2-3 detailed paragraphs specifically dissecting the market dynamics, operational constraints, and commercial realities of "${userGoal || task.categoryName}".)
+(2 concise, dense paragraphs analyzing "${userGoal || task.categoryName}".)
 
 ### Key Benchmarks & Operational Telemetry
-(Provide 6 distinct, quantified metrics calculated specifically for this topic and category.)
+(Provide 6 distinct metrics formatted as:
+• [Metric Name]: [Prominent Value] — [1-sentence explanation]
+)
 
 ### Frontline Execution & Action Roadmap
-(Provide 3-4 concrete, numbered operational steps prioritized for immediate execution.)
+1. [Action Step 1: Specific operational play & owner]
+2. [Action Step 2: Specific operational play & owner]
+3. [Action Step 3: Specific operational play & owner]
 
 ### Executive Summary & Operator Gate
-(2-sentence concluding summary with human operator verification sign-off.)`;
+(1-2 sentence executive takeaway and human sign-off.)`;
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -64,21 +60,9 @@ app.post('/api/chat', async (req, res) => {
     const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
 
-    let liveWebContext = '';
-    if (userMessage.length > 5 && !userMessage.toLowerCase().startsWith('ping')) {
-      try {
-        const searchRes = await tvly.search(userMessage, { maxResults: 3, searchDepth: "basic" });
-        if (searchRes?.results?.length) {
-          liveWebContext = '\n\n[Verified Real-Time 2026 Market Intelligence via Tavily]:\n' + 
-            searchRes.results.map(r => `• ${r.title}: ${r.content.substring(0, 250)}`).join('\n\n');
-        }
-      } catch (e) {}
-    }
+    const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage);
 
-    const dynamicSystemPrompt = buildDynamicSystemPrompt(taskType || lens, workspace, userMessage) + 
-      (liveWebContext ? `\n\nVerified background signals to weave into your briefing:\n${liveWebContext}` : '');
-
-    // Primary: Google AI Studio Direct API Call (Gemini 2.5 Flash / 1.5 Pro)
+    // Primary: Google AI Studio Direct API Call (Gemini 2.5 Flash / 1.5 Flash / 3.7 Flash)
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
@@ -86,6 +70,7 @@ app.post('/api/chat', async (req, res) => {
         
         const contents = messages
           .filter(m => m.role !== 'system')
+          .slice(-4) // Keep context lean for sub-3s latency
           .map(m => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: m.content }]
@@ -100,8 +85,8 @@ app.post('/api/chat', async (req, res) => {
             },
             contents: contents,
             generationConfig: {
-              temperature: 0.75,
-              maxOutputTokens: 3500
+              temperature: 0.7,
+              maxOutputTokens: 1200 // Caps generation to ~3-4 seconds flat
             }
           })
         });
@@ -137,10 +122,10 @@ app.post('/api/chat', async (req, res) => {
         model: "gemini-3.7-flash",
         messages: [
           { role: 'system', content: dynamicSystemPrompt },
-          ...messages.filter(m => m.role !== 'system')
+          ...messages.filter(m => m.role !== 'system').slice(-4)
         ],
-        temperature: 0.75,
-        max_tokens: 3500
+        temperature: 0.7,
+        max_tokens: 1200
       })
     });
 
