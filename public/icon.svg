@@ -2,45 +2,31 @@
   <defs>
     <!-- Ambient Green Glow Filter -->
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feGaussianBlur stdDeviation="3" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
-    <linearGradient id="squircleBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0e1f16" />
-      <stop offset="100%" stop-color="#08140e" />
-    </linearGradient>
-    <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.8" />
-      <stop offset="100%" stop-color="#15803d" stop-opacity="0.5" />
-    </linearGradient>
   </defs>
 
-  <!-- Outer Rounded Squircle -->
-  <rect x="8" y="8" width="104" height="104" rx="28" ry="28" 
-        fill="url(#squircleBg)" 
-        stroke="url(#strokeGrad)" 
-        stroke-width="3" />
-
   <!-- Center Stylized Sparkle Star -->
-  <path d="M 60 26 
-           C 60 44, 44 60, 26 60 
-           C 44 60, 60 76, 60 94 
-           C 60 76, 76 60, 94 60 
-           C 76 60, 60 44, 60 26 Z" 
+  <path d="M 60 16 
+           C 60 38, 38 60, 16 60 
+           C 38 60, 60 82, 60 104 
+           C 60 82, 82 60, 104 60 
+           C 82 60, 60 38, 60 16 Z" 
         fill="none" 
-        stroke="#4ade80" 
-        stroke-width="5" 
+        stroke="#22c55e" 
+        stroke-width="7" 
         stroke-linecap="round" 
         stroke-linejoin="round"
         filter="url(#glow)" />
 
-  <!-- Lower-Left Dot -->
-  <circle cx="40" cy="80" r="5" fill="#4ade80" filter="url(#glow)" />
+  <!-- Lower-Left Calibration Dot -->
+  <circle cx="34" cy="86" r="6" fill="#4ade80" filter="url(#glow)" />
 
-  <!-- Upper-Right Plus Sign -->
-  <path d="M 82 34 L 82 46 M 76 40 L 88 40" 
+  <!-- Upper-Right Accent Spark / Plus -->
+  <path d="M 86 28 L 86 44 M 78 36 L 94 36" 
         stroke="#4ade80" 
-        stroke-width="4.5" 
+        stroke-width="5.5" 
         stroke-linecap="round" 
         filter="url(#glow)" />
 </svg>
