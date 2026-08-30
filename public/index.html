@@ -943,6 +943,47 @@
 <body>
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
+    <!-- Quick Tour Onboarding Modal -->
+    <div class="modal-overlay" id="tourModal">
+        <div class="modal-content" style="max-width:680px;">
+            <span class="close-modal" onclick="closeTourModal()">&times;</span>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="display:inline-block; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); color:#4ade80; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:8px; text-transform:uppercase;">
+                    Strategic Force-Multiplier
+                </div>
+                <h2 style="font-size: 22px; margin-bottom: 4px; font-weight: 800;">Welcome to Consultant Studio</h2>
+                <p style="color: #94a3b8; font-size: 13px;">Get up to speed in under 60 seconds. Here is how modern operators supercharge their workflow:</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+                <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">1. Workspace Isolation 📁</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Switch between Ma's Diner, Cleaver-Brooks, Bannerman Crossings, or create your own custom business. Each workspace enforces authentic industry economics.</div>
+                </div>
+
+                <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">2. 8 Strategic Protocols ⚡</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Launch Trade Area Geometry, Trust Audits, Unit Economics, or Zero-Discount Campaign Roadmaps in a single click with sub-3s execution.</div>
+                </div>
+
+                <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">3. Green/Red Telemetry 🟢🔴</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Metrics are mathematically calculated from your prompt with visual health indicators and highlighted Executive Turnaround Catalysts (★).</div>
+                </div>
+
+                <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">4. 1-Click Export & Sign-Off 🚀</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Export boardroom-ready briefs directly to Google Docs with official Operator Sign-Off blocks, or copy clean CSV data straight to your spreadsheets.</div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #1e232c; padding-top:16px;">
+                <button class="action-btn" onclick="closeTourModal(); openPricing();" style="color:#4ade80;">Start 30-Day Free Trial</button>
+                <button class="btn-trial" style="width:auto; padding:8px 18px;" onclick="closeTourModal();">Launch Studio →</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pricing Modal -->
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
@@ -1071,6 +1112,9 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
                 <span style="font-weight: 700; color: #ffffff; font-size: 13.5px;" id="currentWorkspaceDisplay">General Workspace</span>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px;" onclick="openTourModal()">
+                    📖 Quick Tour
+                </button>
             </div>
             <div class="status-items">
                 <div class="status-badge"><span class="status-dot"></span> Ready</div>
@@ -1095,8 +1139,8 @@
                                 </svg>
                             </div>
                             <div class="command-title-group">
-                                <span class="command-kicker">Strategic Operations Studio</span>
-                                <h1 class="command-title">Executive Intelligence & Telemetry Platform</h1>
+                                <span class="command-kicker">Strategic Force-Multiplier</span>
+                                <h1 class="command-title">Executive Intelligence & Operational Telemetry</h1>
                             </div>
                         </div>
                         <div class="command-meta">
@@ -1295,6 +1339,19 @@
 
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; closeSidebar(); }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
+
+        function openTourModal() { document.getElementById('tourModal').style.display = 'flex'; closeSidebar(); }
+        function closeTourModal() { 
+            document.getElementById('tourModal').style.display = 'none'; 
+            localStorage.setItem('consultant_tour_seen', 'true');
+        }
+
+        // Auto-show tour for first-time visitors
+        function checkFirstTimeUser() {
+            if (!localStorage.getItem('consultant_tour_seen')) {
+                setTimeout(() => openTourModal(), 800);
+            }
+        }
 
         // Live Stripe Subscription Management & Session Handling (30-Day Free Trial)
         const STRIPE_LINKS = {
@@ -1712,6 +1769,7 @@ Data Privacy Standard: Zero Public Model Training Exposure (Isolated Private Edg
         updateClock();
         updateVaultCount();
         checkSubscriptionStatus();
+        checkFirstTimeUser();
     </script>
 </body>
 </html>
