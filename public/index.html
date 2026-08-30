@@ -9,7 +9,7 @@
     <meta name="author" content="Landen Jackson">
     <link rel="canonical" href="https://consultant-studio.ai.studio/">
 
-    <!-- Open Graph / Facebook / LinkedIn -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://consultant-studio.ai.studio/">
     <meta property="og:title" content="Consultant Studio | Strategic Operations & Business Telemetry">
@@ -23,7 +23,7 @@
     <meta name="twitter:description" content="Surgical executive strategy, quantitative financial telemetry, and empirical trust modeling for modern founders and operators.">
     <meta name="twitter:image" content="https://consultant-studio.ai.studio/icon.svg">
 
-    <!-- JSON-LD Structured Data Schema (SEO / GEO for Google & AI Engines) -->
+    <!-- JSON-LD Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -48,9 +48,9 @@
     }
     </script>
 
-    <!-- PWA & Verification Meta Tags -->
+    <!-- PWA & Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0b0d0e">
+    <meta name="theme-color" content="#090a0c">
     <meta name="google-site-verification" content="31-SLXAL0M_MPHw5PGlKlxzv4RwIAsAbJmhXqpe1GdA">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -78,19 +78,20 @@
             letter-spacing: -0.015em;
         }
 
-        /* Sidebar */
+        /* Sidebar Nav */
         .sidebar {
-            width: 270px;
+            width: 260px;
             background: #0d0f12;
             border-right: 1px solid #1a1e24;
             display: flex;
             flex-direction: column;
             z-index: 50;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
         }
 
         .sidebar-brand {
-            padding: 18px 18px 14px;
+            padding: 16px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -205,7 +206,6 @@
             stroke: #4ade80;
         }
 
-        /* Human-in-the-Loop Partner Card */
         .partner-card {
             margin: 12px;
             padding: 11px 12px;
@@ -232,7 +232,7 @@
             position: absolute;
             top: 0;
             right: 0;
-            left: 270px;
+            left: 260px;
             height: 48px;
             padding: 0 20px;
             display: flex;
@@ -241,7 +241,7 @@
             font-size: 12.5px;
             color: #71717a;
             z-index: 10;
-            background: rgba(9, 10, 12, 0.92);
+            background: rgba(9, 10, 12, 0.94);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid #1a1e24;
@@ -283,7 +283,7 @@
             box-shadow: 0 0 8px #22c55e;
         }
 
-        /* Main Content */
+        /* Main Content Workspace Layout */
         .main-content {
             flex: 1;
             display: flex;
@@ -297,7 +297,6 @@
         .view-section {
             display: none;
             flex: 1;
-            flex-direction: column;
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -305,28 +304,51 @@
 
         .view-section.active { display: flex; }
 
-        /* Chat Area */
-        .chat-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 60px 18px 18px;
+        /* SPLIT SCREEN MASTER-DETAIL WORKSPACE (Linear / Terminal Grade) */
+        .split-workspace-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding-top: 48px;
+            overflow: hidden;
+        }
+
+        /* LEFT PANE: Mission & Protocol Launcher (36% width on desktop) */
+        .launcher-pane {
+            width: 380px;
+            background: #0b0d10;
+            border-right: 1px solid #1a1e24;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
+            padding: 16px;
+            flex-shrink: 0;
             gap: 14px;
-            max-width: 860px;
+        }
+
+        /* RIGHT PANE: Strategic Telemetry & Boardroom Canvas (64% width) */
+        .telemetry-pane {
+            flex: 1;
+            background: #090a0c;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .telemetry-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
         }
 
-        /* Executive Command Header */
-        .hero-section {
-            text-align: left;
-            max-width: 860px;
-            margin: 4px auto 10px;
-            padding: 0 4px;
-            width: 100%;
-        }
-
+        /* Command Banner */
         .command-banner {
             display: flex;
             justify-content: space-between;
@@ -334,19 +356,18 @@
             background: #0f1216;
             border: 1px solid #1a1e26;
             border-left: 3px solid #22c55e;
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-radius: 6px;
-            margin-bottom: 14px;
         }
 
         .command-title-group {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1px;
         }
 
         .command-kicker {
-            font-size: 11px;
+            font-size: 10.5px;
             color: #4ade80;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -354,112 +375,98 @@
         }
 
         .command-title {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             color: #ffffff;
             letter-spacing: -0.02em;
         }
 
-        .command-meta {
-            font-size: 11.5px;
-            color: #71717a;
-            display: flex;
-            gap: 12px;
-            font-weight: 600;
-        }
-
-        /* Operations Launch Grid */
+        /* 8 Operations Grid */
         .quick-tasks-container {
-            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .quick-task-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 6px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
         }
 
         .quick-task-card {
             background: #0f1216;
             border: 1px solid #1c2028;
             border-radius: 6px;
-            padding: 11px 12px;
+            padding: 9px 10px;
             cursor: pointer;
             transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            position: relative;
+            gap: 3px;
         }
 
         .quick-task-card:hover {
             border-color: #22c55e;
             background: #14181f;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.35);
         }
 
         .quick-task-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2px;
         }
 
         .task-index {
-            font-size: 10px;
+            font-size: 9.5px;
             color: #71717a;
             font-weight: 700;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.03em;
             text-transform: uppercase;
         }
 
         .task-icon-svg {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
             stroke: #4ade80;
         }
 
         .quick-task-title {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #ffffff;
-            letter-spacing: -0.01em;
         }
 
         .quick-task-desc {
-            font-size: 11px;
+            font-size: 10px;
             color: #94a3b8;
-            line-height: 1.35;
+            line-height: 1.3;
         }
 
-        /* Strategy Intake & Custom Task Card */
+        /* Guided Strategy & Custom Form */
         .intake-card {
             background: #0f1216;
             border: 1px solid #1c2028;
-            border-radius: 8px;
-            padding: 14px 16px;
-            margin-top: 12px;
-            text-align: left;
+            border-radius: 6px;
+            padding: 12px 14px;
         }
 
         .intake-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .intake-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
         }
 
         .intake-mode-toggle {
@@ -474,9 +481,9 @@
             background: transparent;
             border: none;
             color: #71717a;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 3px;
             cursor: pointer;
             transition: all 0.15s;
@@ -489,10 +496,10 @@
         }
 
         .intake-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .intake-field select, .intake-field input, .intake-field textarea {
@@ -500,9 +507,9 @@
             background: #090a0c;
             border: 1px solid #1c2028;
             color: #f8fafc;
-            padding: 8px 10px;
+            padding: 7px 9px;
             border-radius: 5px;
-            font-size: 12px;
+            font-size: 11.5px;
             outline: none;
             font-family: inherit;
             transition: border-color 0.2s;
@@ -515,8 +522,8 @@
         .custom-task-container {
             display: none;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .custom-task-container.active { display: flex; }
@@ -525,9 +532,9 @@
             background: #22c55e;
             color: #052e16;
             border: none;
-            padding: 9px 14px;
-            border-radius: 5px;
-            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11.5px;
             font-weight: 800;
             cursor: pointer;
             width: 100%;
@@ -546,14 +553,14 @@
             transform: translateY(-1px);
         }
 
-        /* Message Cards */
-        .message-row { display: flex; width: 100%; margin-bottom: 6px; }
+        /* Message Bubbles */
+        .message-row { display: flex; width: 100%; margin-bottom: 8px; }
         .message-row.user { justify-content: flex-end; }
         .message-row.assistant { justify-content: flex-start; }
 
         .message-card {
-            max-width: 90%;
-            padding: 14px 18px;
+            max-width: 95%;
+            padding: 16px 20px;
             border-radius: 6px;
             font-size: 13.5px;
             line-height: 1.65;
@@ -569,23 +576,25 @@
         .message-row.assistant .message-card {
             background: #0d1014;
             border: 1px solid #1a1e26;
-            border-left: 2px solid #22c55e;
+            border-left: 3px solid #22c55e;
             color: #e2e8f0;
             width: 100%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
 
         /* High-Detail Section Headers */
         .friendly-section-header {
-            font-size: 14.5px;
+            font-size: 15px;
             font-weight: 800;
             color: #ffffff;
-            margin-top: 14px;
-            margin-bottom: 6px;
+            margin-top: 16px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
             letter-spacing: -0.01em;
+            border-bottom: 1px solid #1a1e26;
+            padding-bottom: 4px;
         }
 
         .friendly-section-header::before {
@@ -597,7 +606,7 @@
             border-radius: 2px;
         }
 
-        /* Beta Telemetry Health Badges (Green = Good/Target, Red = Risk/Friction, Amber = Caution) */
+        /* Beta Telemetry Health Badges */
         .metric-card-row {
             display: flex;
             align-items: center;
@@ -664,7 +673,7 @@
             line-height: 1.45;
         }
 
-        /* High-Impact Turnaround Catalyst Call-Out */
+        /* Turnaround Catalyst */
         .turnaround-catalyst {
             background: rgba(34, 197, 94, 0.08);
             border: 1px solid rgba(34, 197, 94, 0.28);
@@ -688,7 +697,7 @@
         }
 
         .memo-actions {
-            margin-top: 12px;
+            margin-top: 14px;
             padding-top: 10px;
             border-top: 1px solid #1a1e26;
             display: flex;
@@ -719,27 +728,30 @@
             border-color: rgba(34, 197, 94, 0.4);
         }
 
-        /* Docked Input Bar */
-        .input-wrapper {
-            padding: 10px 18px 16px;
-            width: 100%;
+        /* Fixed Docked Input Bar inside Right Pane */
+        .input-dock {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 24px 18px;
+            background: linear-gradient(transparent, #090a0c 30%);
             display: flex;
             justify-content: center;
-            background: linear-gradient(transparent, #090a0c 35%);
             z-index: 20;
         }
 
         .input-box {
             width: 100%;
-            max-width: 860px;
+            max-width: 900px;
             background: #0f1216;
             border: 1px solid #1e232c;
             border-radius: 6px;
-            padding: 5px 10px 5px 12px;
+            padding: 6px 10px 6px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             transition: border-color 0.15s;
         }
 
@@ -768,7 +780,7 @@
             background: #22c55e;
             color: #052e16;
             border: none;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 800;
@@ -776,7 +788,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.02em;
             transition: all 0.15s;
             font-family: inherit;
         }
@@ -909,7 +921,6 @@
 
         .btn-trial:hover { background: #4ade80; }
 
-        /* Mobile Overlay Backdrop */
         .sidebar-backdrop {
             display: none;
             position: fixed;
@@ -918,7 +929,25 @@
             z-index: 40;
         }
 
-        /* Mobile Responsiveness */
+        /* Mobile & Responsive Adaptations */
+        @media (max-width: 1024px) {
+            .split-workspace-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .launcher-pane {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #1a1e24;
+                max-height: 480px;
+            }
+            .telemetry-pane {
+                min-height: 500px;
+                overflow: visible;
+            }
+            .input-dock { position: relative; }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -931,12 +960,9 @@
             .sidebar-backdrop.active { display: block; }
             .top-bar { left: 0; height: 46px; padding: 0 14px; }
             .mobile-menu-btn { display: block; }
-            .chat-area { padding: 54px 12px 12px; }
-            .quick-task-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-            .intake-grid { grid-template-columns: 1fr; gap: 6px; }
-            .message-card { max-width: 96%; font-size: 13px; padding: 12px 14px; }
+            .split-workspace-container { padding-top: 46px; }
+            .quick-task-grid { grid-template-columns: 1fr; }
             .pricing-grid { grid-template-columns: 1fr; gap: 8px; }
-            .command-meta { display: none; }
         }
     </style>
 </head>
@@ -957,8 +983,8 @@
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
                 <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">1. Workspace Isolation 📁</div>
-                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Switch between Ma's Diner, Cleaver-Brooks, Bannerman Crossings, or create your own custom business. Each workspace enforces authentic industry economics.</div>
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">1. Split-Screen Layout 💻</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Launch protocols on the left; review real-time boardroom memos and financial calculations on the right without losing context.</div>
                 </div>
 
                 <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
@@ -972,8 +998,8 @@
                 </div>
 
                 <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">4. 1-Click Export & Sign-Off 🚀</div>
-                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Export boardroom-ready briefs directly to Google Docs with official Operator Sign-Off blocks, or copy clean CSV data straight to your spreadsheets.</div>
+                    <div style="font-size:13px; font-weight:700; color:#ffffff; margin-bottom:4px;">4. Executive PDF & Docs 🚀</div>
+                    <div style="font-size:12px; color:#94a3b8; line-height:1.45;">Export boardroom-ready briefs directly to Google Docs or generate print-ready Executive PDFs with official Operator Governance seals.</div>
                 </div>
             </div>
 
@@ -1121,66 +1147,61 @@
             </div>
         </div>
 
-        <!-- Chat Section -->
+        <!-- Master-Detail Split Workspace Section -->
         <section id="chat-section" class="view-section active">
-            <div class="chat-area" id="chatArea">
-                <div class="hero-section" id="heroSection">
+            <div class="split-workspace-container">
+                
+                <!-- LEFT PANE: Mission & Strategic Protocol Launcher -->
+                <div class="launcher-pane">
                     
-                    <!-- Linear / Studio Command Banner with Official Logo -->
                     <div class="command-banner">
-                        <div style="display:flex; align-items:center; gap:14px;">
-                            <div style="width:38px; height:38px; flex-shrink:0;">
-                                <svg viewBox="0 0 120 120" width="38" height="38">
-                                    <path d="M 60 16 C 60 38, 38 60, 16 60 C 38 60, 60 82, 60 104 C 60 82, 82 60, 104 60 C 82 60, 60 38, 60 16 Z" fill="none" stroke="#22c55e" stroke-width="7.5" stroke-linecap="round"/>
-                                    <circle cx="34" cy="86" r="6.5" fill="#4ade80"/>
-                                    <path d="M 86 28 L 86 44 M 78 36 L 94 36" stroke="#4ade80" stroke-width="6" stroke-linecap="round"/>
-                                </svg>
-                            </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <svg viewBox="0 0 120 120" width="30" height="30">
+                                <path d="M 60 16 C 60 38, 38 60, 16 60 C 38 60, 60 82, 60 104 C 60 82, 82 60, 104 60 C 82 60, 60 38, 60 16 Z" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round"/>
+                                <circle cx="34" cy="86" r="7" fill="#4ade80"/>
+                                <path d="M 86 28 L 86 44 M 78 36 L 94 36" stroke="#4ade80" stroke-width="6.5" stroke-linecap="round"/>
+                            </svg>
                             <div class="command-title-group">
                                 <span class="command-kicker">Strategic Force-Multiplier</span>
-                                <h1 class="command-title">Executive Intelligence & Operational Telemetry</h1>
+                                <h1 class="command-title">Mission Control</h1>
                             </div>
-                        </div>
-                        <div class="command-meta">
-                            <span>Ready</span>
                         </div>
                     </div>
 
-                    <!-- Operations Matrix -->
+                    <!-- 8 Operations Grid -->
                     <div class="quick-tasks-container">
-                        <div class="section-label">Select Strategic Task</div>
+                        <div class="section-label">Select Strategic Protocol</div>
                         <div class="quick-task-grid">
-                            
                             <div class="quick-task-card" onclick="quickTask('trade_analysis')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Trade Area</span>
+                                    <span class="task-index">01 // Trade</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                                 </div>
                                 <div class="quick-task-title">Trade Area Geometry</div>
-                                <div class="quick-task-desc">Foot traffic & density</div>
+                                <div class="quick-task-desc">Catchment & foot-traffic</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('trust')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Trust Audit</span>
+                                    <span class="task-index">02 // Trust</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 </div>
                                 <div class="quick-task-title">Trust & Copy Audit</div>
-                                <div class="quick-task-desc">Reputation & credibility</div>
+                                <div class="quick-task-desc">Reputation & human gate</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('saas')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Economics</span>
+                                    <span class="task-index">03 // Econ</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 </div>
                                 <div class="quick-task-title">Unit Economics</div>
-                                <div class="quick-task-desc">CAC, LTV & retention</div>
+                                <div class="quick-task-desc">CAC, LTV & payback</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('campaign_strategy')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Campaign</span>
+                                    <span class="task-index">04 // Campaign</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 </div>
                                 <div class="quick-task-title">Campaign Strategy</div>
@@ -1189,49 +1210,48 @@
 
                             <div class="quick-task-card" onclick="quickTask('competitor')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Recon</span>
+                                    <span class="task-index">05 // Recon</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                                 </div>
                                 <div class="quick-task-title">Competitor Scan</div>
-                                <div class="quick-task-desc">Real-time market signals</div>
+                                <div class="quick-task-desc">Market moats & pricing</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('pricing')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Pricing</span>
+                                    <span class="task-index">06 // Pricing</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                                 </div>
-                                <div class="quick-task-title">Pricing Pivot</div>
+                                <div class="quick-task-title">Pricing Architecture</div>
                                 <div class="quick-task-desc">Margin defense ladder</div>
                             </div>
 
                             <div class="quick-task-card" onclick="quickTask('fsu_trust')">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Research</span>
+                                    <span class="task-index">07 // SPSS</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                                 </div>
                                 <div class="quick-task-title">SPSS Trust Score</div>
-                                <div class="quick-task-desc">Empirical trust model</div>
+                                <div class="quick-task-desc">Empirical p &lt; .001 model</div>
                             </div>
 
                             <div class="quick-task-card" onclick="setCustomTaskMode()">
                                 <div class="quick-task-card-header">
-                                    <span class="task-index">Custom</span>
+                                    <span class="task-index">08 // Custom</span>
                                     <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 </div>
-                                <div class="quick-task-title">Custom Objective</div>
-                                <div class="quick-task-desc">Define new parameters</div>
+                                <div class="quick-task-title">Custom Directive</div>
+                                <div class="quick-task-desc">Define new mission</div>
                             </div>
-
                         </div>
                     </div>
 
-                    <!-- Strategy Builder / Custom Task -->
+                    <!-- Guided & Custom Intake -->
                     <div class="intake-card">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                <span id="intakeModeTitle">Guided Strategy Builder</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                <span id="intakeModeTitle">Guided Mission Builder</span>
                             </div>
                             <div class="intake-mode-toggle">
                                 <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Guided</button>
@@ -1239,7 +1259,6 @@
                             </div>
                         </div>
 
-                        <!-- Guided Form -->
                         <div id="presetTaskForm">
                             <div class="intake-grid">
                                 <div class="intake-field">
@@ -1264,40 +1283,58 @@
                                     <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% resident acquisition)">
                                 </div>
                             </div>
-                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">Run Strategic Brief</button>
+                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">RUN STRATEGIC BRIEF</button>
                         </div>
 
-                        <!-- Custom Form -->
                         <div id="customTaskForm" class="custom-task-container">
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                            <div style="display:flex; flex-direction:column; gap:6px;">
                                 <div class="intake-field">
                                     <input type="text" id="customTaskName" placeholder="Project Name (e.g. Q3 Growth Review)">
                                 </div>
                                 <div class="intake-field">
                                     <input type="text" id="customTarget" placeholder="Client / Target (e.g. Ma's Diner)">
                                 </div>
+                                <div class="intake-field">
+                                    <textarea id="customTaskInstructions" rows="2" placeholder="Specific questions, background, or goals to analyze..."></textarea>
+                                </div>
                             </div>
-                            <div class="intake-field">
-                                <textarea id="customTaskInstructions" rows="2" placeholder="Specific questions, background, or goals to analyze..."></textarea>
-                            </div>
-                            <button class="btn-launch-intake" onclick="launchCustomTask()">Generate Custom Plan</button>
+                            <button class="btn-launch-intake" onclick="launchCustomTask()">INITIALIZE CUSTOM PLAN</button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Docked Input Bar -->
-            <div class="input-wrapper">
-                <div class="input-box">
-                    <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </button>
-                    <input type="text" id="userInput" placeholder="Ask a strategic question, enter copy to review, or define a goal..." onkeydown="handleKey(event)">
-                    <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
-                        <span>Send</span>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
+                <!-- RIGHT PANE: Strategic Telemetry & Boardroom Canvas -->
+                <div class="telemetry-pane">
+                    <div class="telemetry-feed" id="chatArea">
+                        <div class="message-row assistant" id="welcomeMessage">
+                            <div class="message-card">
+                                <div class="friendly-section-header">Executive Strategic Canvas</div>
+                                <p style="color:#94a3b8; font-size:13.5px; margin-bottom:12px;">
+                                    Select an operational protocol on the left or initialize a custom directive below. Real-time market telemetry, calculated domain benchmarks, and boardroom-ready action memos will generate dynamically in this canvas.
+                                </p>
+                                <div class="turnaround-catalyst">
+                                    <span class="turnaround-icon">★</span>
+                                    <div><strong>Zero-Loss Context:</strong> Switch between protocols anytime on the left while keeping your active business model locked in.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fixed Docked Input Bar inside Canvas -->
+                    <div class="input-dock">
+                        <div class="input-box">
+                            <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </button>
+                            <input type="text" id="userInput" placeholder="Ask a strategic question, test pricing elasticity, or enter a custom directive..." onkeydown="handleKey(event)">
+                            <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
+                                <span>Execute</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </section>
 
@@ -1322,6 +1359,7 @@
     <script>
         let conversationHistory = [];
         let isStreaming = false;
+        let currentTaskType = 'trade_analysis';
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1344,7 +1382,6 @@
             localStorage.setItem('consultant_tour_seen', 'true');
         }
 
-        // Auto-show tour for first-time visitors
         function checkFirstTimeUser() {
             if (!localStorage.getItem('consultant_tour_seen')) {
                 setTimeout(() => openTourModal(), 800);
@@ -1365,7 +1402,6 @@
             }
         }
 
-        // Check for post-checkout success return
         function checkSubscriptionStatus() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('session') === 'success' || params.get('checkout') === 'success') {
@@ -1422,7 +1458,7 @@
                 customForm.classList.remove('active');
                 btnPreset.classList.add('active');
                 btnCustom.classList.remove('active');
-                title.textContent = "Guided Strategy Builder";
+                title.textContent = "Guided Mission Builder";
             }
         }
 
@@ -1430,8 +1466,6 @@
             toggleTaskMode('custom');
             document.getElementById('customTaskName').focus();
         }
-
-        let currentTaskType = 'trade_analysis';
 
         function quickTask(type) {
             currentTaskType = type;
@@ -1498,7 +1532,7 @@
             if (lens === 'trust_auditor') input.placeholder = "Enter messaging or copy to audit for trust and brand credibility...";
             else if (lens === 'hyperlocal') input.placeholder = "Enter neighborhood, commercial real estate, or local trade goal...";
             else if (lens === 'saas_operator') input.placeholder = "Enter pricing, CAC, LTV, or unit economics parameters...";
-            else input.placeholder = "Ask a strategic question, enter copy to review, or define a goal...";
+            else input.placeholder = "Ask a strategic question, test pricing elasticity, or enter a custom directive...";
         }
 
         function insertAuditTemplate() {
@@ -1518,13 +1552,9 @@
         // Beta Telemetry Parser with Green (Good), Red (Risk), Amber (Caution) Logic
         function formatTelemetryOutput(text) {
             return text
-                // Header Styling (Section Titles)
                 .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
-                // Turnaround Catalyst Call-outs: >> Text or 💡 Text
                 .replace(/^(\>\>|💡)\s*(.+)$/gm, '<div class="turnaround-catalyst"><span class="turnaround-icon">★</span><div>$2</div></div>')
-                // Bold Highlights
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
-                // Metric Rows with Automated Color Correlation (Green = Good, Red = Risk/Drop, Amber = Caution)
                 .replace(/^[\*\•\-]\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)$/gm, function(match, title, val, desc) {
                     const cleanVal = val.trim();
                     const isRisk = /(-[0-9]|drop|loss|risk|friction|drag|churn|balk|high risk)/i.test(cleanVal + ' ' + title);
@@ -1540,13 +1570,9 @@
                         <div class="metric-desc-text">${desc.trim()}</div>
                     </div>`;
                 })
-                // Fallback Metric Pills: [Name: Value]
                 .replace(/\[([A-Za-z0-9_\s\/\-\$\.%]+?)\]\s*[:=]\s*([^\n\r<]+)/g, '<div class="metric-pill"><span>$1:</span> <strong>$2</strong></div>')
-                // Standard Bullet Points
                 .replace(/^[\*\•\-]\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:5px 0;"><span style="color:#22c55e; font-weight:bold; line-height:1.6;">•</span><span style="flex:1;">$1</span></div>')
-                // Numbered Action Steps
                 .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex; align-items:flex-start; gap:8px; margin:7px 0;"><span style="color:#4ade80; font-weight:700; min-width:20px; line-height:1.6;">$1.</span><span style="flex:1;">$2</span></div>')
-                // Natural Paragraph Spacing
                 .replace(/\n\n/g, '<div style="height:12px;"></div>')
                 .replace(/\n/g, '<br>');
         }
@@ -1574,8 +1600,8 @@
             const text = input.value.trim();
             if (!text) return;
 
-            const hero = document.getElementById('heroSection');
-            if (hero) hero.style.display = 'none';
+            const welcome = document.getElementById('welcomeMessage');
+            if (welcome) welcome.style.display = 'none';
 
             input.value = '';
             const chatArea = document.getElementById('chatArea');
@@ -1591,7 +1617,7 @@
             assistantRow.className = 'message-row assistant';
             const card = document.createElement('div');
             card.className = 'message-card';
-            card.innerHTML = '<em style="color:#71717a; font-size:13px;">Consultant is drafting recommendations...</em>';
+            card.innerHTML = '<em style="color:#71717a; font-size:13px;">Consultant is synthesizing strategic telemetry...</em>';
             assistantRow.appendChild(card);
             chatArea.appendChild(assistantRow);
             chatArea.scrollTop = chatArea.scrollHeight;
