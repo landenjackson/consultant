@@ -26,25 +26,23 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
-    const promptText = `You are an elite Business Consultant and Chief of Staff.
-User's Question/Goal: "${userMessage}"
-Business context: ${eco.name} (${eco.businessType})
+    const promptText = `You are Consultant Studio, a direct, practical business advisor for business owners.
+The user is asking: "${userMessage}"
+Context: ${eco.name}
 
-Write a clear, practical, Gen X-friendly Strategic Memorandum specifically tailored to this exact business and question. No fluff, no robotic filler.
+Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler).
 
 FORMAT:
 
 ### 1. Executive Summary & Diagnosis
-(2 direct paragraphs diagnosing the situation and explaining the solution for "${userMessage}".)
+(2 concise paragraphs diagnosing the exact situation and explaining the solution for "${userMessage}".)
 
 >> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-• Target Metric 1: Value — Plain-English explanation connecting revenue to costs.
-• Target Metric 2: Value — Plain-English explanation.
-• Target Metric 3: Value — Plain-English explanation.
-• Target Metric 4: Value — Plain-English explanation.
-• Target Metric 5: Value — Plain-English explanation.
+(Provide 5 distinct metrics with real numbers tailored to this prompt:
+• Metric Name: Value — 1-sentence plain-English explanation.
+)
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
@@ -52,7 +50,7 @@ FORMAT:
 3. Days 61–90: [Action & Role Owner]
 
 ### 4. Bottom-Line Takeaway
-(1 clear, encouraging concluding sentence.)`;
+(1 direct, encouraging concluding sentence.)`;
 
     const geminiPayload = {
       contents: [
@@ -63,7 +61,7 @@ FORMAT:
       ],
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 900
+        maxOutputTokens: 1200
       }
     };
 
