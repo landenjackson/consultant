@@ -61,11 +61,8 @@ FORMAT:
         }
       ],
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 2048,
-        thinkingConfig: {
-          thinkingBudget: 0
-        }
+        temperature: 0.7,
+        maxOutputTokens: 2048
       }
     };
 
