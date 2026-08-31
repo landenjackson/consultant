@@ -247,6 +247,119 @@
             border-bottom: 1px solid #1a1e24;
         }
 
+        /* Linear / Superhuman Global Command Palette (Cmd + K) */
+        .cmd-palette-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 14vh;
+        }
+
+        .cmd-palette-box {
+            width: 100%;
+            max-width: 600px;
+            background: #0f1216;
+            border: 1px solid #242a34;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(34, 197, 94, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: cmdSlideDown 0.15s ease-out;
+        }
+
+        @keyframes cmdSlideDown {
+            from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .cmd-input-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid #1c222c;
+        }
+
+        .cmd-search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 500;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .cmd-search-input::placeholder { color: #64748b; }
+
+        .cmd-results-list {
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .cmd-section-heading {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            padding: 8px 10px 4px;
+        }
+
+        .cmd-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.1s;
+        }
+
+        .cmd-item:hover, .cmd-item.selected {
+            background: rgba(34, 197, 94, 0.12);
+            color: #ffffff;
+            border-left: 2px solid #22c55e;
+        }
+
+        .cmd-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cmd-shortcut-badge {
+            background: #181d24;
+            border: 1px solid #28303d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-family: inherit;
+        }
+
+        .cmd-footer {
+            padding: 8px 16px;
+            background: #090a0c;
+            border-top: 1px solid #1a1f27;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #64748b;
+        }
+
         .mobile-menu-btn {
             display: none;
             background: transparent;
@@ -1049,6 +1162,78 @@
 <body>
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
+    <!-- Linear / Superhuman Global Command Palette (Cmd + K) -->
+    <div class="cmd-palette-overlay" id="cmdPaletteOverlay" onclick="closeCommandPalette(event)">
+        <div class="cmd-palette-box" onclick="event.stopPropagation()">
+            <div class="cmd-input-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="cmd-search-input" id="cmdSearchInput" placeholder="Type a command, launch protocol, or switch workspace..." oninput="filterCommandPalette()">
+                <span class="cmd-shortcut-badge">ESC</span>
+            </div>
+
+            <div class="cmd-results-list" id="cmdResultsList">
+                <div class="cmd-section-heading">Strategic Protocols</div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('trade_analysis'))">
+                    <div class="cmd-item-left"><span>📍</span><span>Trade Area & Foot-Traffic Geometry</span></div>
+                    <span class="cmd-shortcut-badge">01</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('trust'))">
+                    <div class="cmd-item-left"><span>🛡️</span><span>Trust & Brand Reputation Audit</span></div>
+                    <span class="cmd-shortcut-badge">02</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('saas'))">
+                    <div class="cmd-item-left"><span>💼</span><span>Unit Economics & Capital Viability</span></div>
+                    <span class="cmd-shortcut-badge">03</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('campaign_strategy'))">
+                    <div class="cmd-item-left"><span>🚀</span><span>Zero-Discount Campaign Strategy</span></div>
+                    <span class="cmd-shortcut-badge">04</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('competitor'))">
+                    <div class="cmd-item-left"><span>🔍</span><span>Competitor Recon & Moat Defense</span></div>
+                    <span class="cmd-shortcut-badge">05</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => quickTask('pricing'))">
+                    <div class="cmd-item-left"><span>💵</span><span>Pricing Architecture & Margins</span></div>
+                    <span class="cmd-shortcut-badge">06</span>
+                </div>
+
+                <div class="cmd-section-heading">Workspace Routing</div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('mas_diner'))">
+                    <div class="cmd-item-left"><span>🥞</span><span>Switch to Ma's Diner</span></div>
+                    <span class="cmd-shortcut-badge">W1</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('cleaver_brooks'))">
+                    <div class="cmd-item-left"><span>🏭</span><span>Switch to Cleaver-Brooks</span></div>
+                    <span class="cmd-shortcut-badge">W2</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('bannerman'))">
+                    <div class="cmd-item-left"><span>📍</span><span>Switch to Bannerman Crossings</span></div>
+                    <span class="cmd-shortcut-badge">W3</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('default'))">
+                    <div class="cmd-item-left"><span>📁</span><span>Switch to General Workspace</span></div>
+                    <span class="cmd-shortcut-badge">W0</span>
+                </div>
+
+                <div class="cmd-section-heading">Actions & Exports</div>
+                <div class="cmd-item" onclick="execCmd(openPricing)">
+                    <div class="cmd-item-left"><span>💎</span><span>Manage Plans & 30-Day Free Trial</span></div>
+                    <span class="cmd-shortcut-badge">P</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(openTourModal)">
+                    <div class="cmd-item-left"><span>📖</span><span>Review Onboarding Quick Tour</span></div>
+                    <span class="cmd-shortcut-badge">T</span>
+                </div>
+            </div>
+
+            <div class="cmd-footer">
+                <span>Navigate with <strong>↑</strong> <strong>↓</strong> and <strong>Enter</strong></span>
+                <span>ESC to Close</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Tour Onboarding Modal -->
     <div class="modal-overlay" id="tourModal">
         <div class="modal-content" style="max-width:680px;">
@@ -1219,6 +1404,10 @@
                 <span style="font-weight: 700; color: #ffffff; font-size: 13.5px;" id="currentWorkspaceDisplay">General Workspace</span>
                 <button class="action-btn" style="padding:3px 8px; font-size:11px;" onclick="openTourModal()">
                     📖 Quick Tour
+                </button>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleCommandPalette()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>Cmd + K</span>
                 </button>
             </div>
             <div class="status-items">
@@ -1583,6 +1772,57 @@
             document.getElementById('tourModal').style.display = 'none'; 
             localStorage.setItem('consultant_tour_seen', 'true');
         }
+
+        // Global Command Palette (Cmd + K) Controller
+        function toggleCommandPalette() {
+            const overlay = document.getElementById('cmdPaletteOverlay');
+            if (overlay.style.display === 'flex') {
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+                const input = document.getElementById('cmdSearchInput');
+                input.value = '';
+                filterCommandPalette();
+                setTimeout(() => input.focus(), 50);
+            }
+        }
+
+        function closeCommandPalette(e) {
+            document.getElementById('cmdPaletteOverlay').style.display = 'none';
+        }
+
+        function filterCommandPalette() {
+            const query = document.getElementById('cmdSearchInput').value.toLowerCase().trim();
+            const items = document.querySelectorAll('.cmd-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function execCmd(fn) {
+            closeCommandPalette();
+            if (typeof fn === 'function') fn();
+        }
+
+        function switchWorkspaceCmd(key) {
+            const select = document.getElementById('clientWorkspace');
+            select.value = key;
+            onWorkspaceChange();
+        }
+
+        // Global Keyboard Shortcut Listener (Cmd + K, Ctrl + K, Esc)
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                toggleCommandPalette();
+            } else if (e.key === 'Escape') {
+                const overlay = document.getElementById('cmdPaletteOverlay');
+                if (overlay && overlay.style.display === 'flex') {
+                    overlay.style.display = 'none';
+                }
+            }
+        });
 
         function checkFirstTimeUser() {
             if (!localStorage.getItem('consultant_tour_seen')) {
