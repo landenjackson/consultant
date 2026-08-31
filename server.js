@@ -38,8 +38,8 @@ STRICT P&L & UNIT-ECONOMIC RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // Direct REST call using gemini-2.5-flash with connection timeout
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Direct official Google AI Studio endpoint using models/gemini-3.6-flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
@@ -50,7 +50,7 @@ STRICT P&L & UNIT-ECONOMIC RULES:
       ],
       generationConfig: {
         temperature: 0.6,
-        maxOutputTokens: 500
+        maxOutputTokens: 650
       }
     };
 
