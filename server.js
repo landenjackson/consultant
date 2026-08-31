@@ -38,8 +38,8 @@ STRICT P&L & UNIT-ECONOMIC RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // Using models/gemini-flash-latest with 500 max tokens for instantaneous sub-2s execution
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    // Direct REST call using gemini-2.5-flash with connection timeout
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
@@ -54,11 +54,17 @@ STRICT P&L & UNIT-ECONOMIC RULES:
       }
     };
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiPayload)
+      body: JSON.stringify(geminiPayload),
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
 
     if (!response.ok) {
       const errText = await response.text();
