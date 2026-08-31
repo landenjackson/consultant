@@ -24,13 +24,14 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
     const apiKey = process.env.GEMINI_API_KEY;
+    // Server-Sent Events / Stream endpoint for instant token flushing
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const promptText = `You are Consultant Studio, a direct, practical business advisor for business owners.
 The user is asking: "${userMessage}"
-Context: ${eco.name}
+Context: ${eco.name} (${eco.businessType})
 
-Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler).
+Write a clear, practical, Gen X-friendly Strategic Memorandum tailored directly to this exact business and question. No buzzwords or robotic AI filler.
 
 FORMAT:
 
@@ -40,10 +41,9 @@ FORMAT:
 >> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-• Target Metric 1: Value — 1-sentence plain-English explanation.
-• Target Metric 2: Value — 1-sentence plain-English explanation.
-• Target Metric 3: Value — 1-sentence plain-English explanation.
-• Target Metric 4: Value — 1-sentence plain-English explanation.
+(Provide 5 distinct metrics with real numbers tailored to this prompt:
+• Metric Name: Value — 1-sentence plain-English explanation connecting revenue to costs.
+)
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
