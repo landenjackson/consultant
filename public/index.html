@@ -1181,6 +1181,48 @@
             border-color: rgba(34, 197, 94, 0.4);
         }
 
+        /* Live Voice Dictation Button & Pulsing State */
+        .mic-btn {
+            background: transparent;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .mic-btn:hover { color: #22c55e; }
+
+        .mic-btn.recording {
+            color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.15);
+            animation: micPulse 1.2s infinite;
+        }
+
+        @keyframes micPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .voice-transcript-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
         /* Fixed Docked Input Bar */
         .input-dock {
             position: absolute;
@@ -2071,13 +2113,16 @@
 
                     </div>
 
-                    <!-- Fixed Docked Input Bar inside Canvas -->
+                    <!-- Fixed Docked Input Bar inside Canvas with Voice Microphone -->
                     <div class="input-dock">
                         <div class="input-box">
                             <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             </button>
-                            <input type="text" id="userInput" placeholder="Ask a strategic question, test pricing elasticity, or enter a custom directive..." onkeydown="handleKey(event)">
+                            <button class="mic-btn" id="voiceMicBtn" title="Speak your directive (Speech-to-Text)" onclick="toggleVoiceRecording()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </button>
+                            <input type="text" id="userInput" placeholder="Ask a question, speak your directive, or enter custom parameters..." onkeydown="handleKey(event)">
                             <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
                                 <span>Execute</span>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -2237,6 +2282,82 @@
             } catch (e) {
                 return atob(cipherText);
             }
+        }
+
+        // Live Speech-to-Text Voice Dictation Engine
+        let recognition = null;
+        let isRecordingVoice = false;
+
+        function initVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.warn("Speech recognition not supported in this browser.");
+                return null;
+            }
+            const rec = new SpeechRecognition();
+            rec.continuous = false;
+            rec.interimResults = true;
+            rec.lang = 'en-US';
+
+            rec.onstart = function() {
+                isRecordingVoice = true;
+                const micBtn = document.getElementById('voiceMicBtn');
+                if (micBtn) micBtn.classList.add('recording');
+                const input = document.getElementById('userInput');
+                if (input) input.placeholder = "Listening... Speak your directive now.";
+            };
+
+            rec.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const input = document.getElementById('userInput');
+                if (input) {
+                    input.value = transcript;
+                }
+            };
+
+            rec.onerror = function(event) {
+                console.error("Speech recognition error:", event.error);
+                stopVoiceRecording();
+            };
+
+            rec.onend = function() {
+                stopVoiceRecording();
+            };
+
+            return rec;
+        }
+
+        function toggleVoiceRecording() {
+            if (!recognition) {
+                recognition = initVoiceRecognition();
+            }
+            if (!recognition) {
+                alert("Voice dictation is supported on Chrome, Safari, and Edge. Please check microphone permissions.");
+                return;
+            }
+
+            if (isRecordingVoice) {
+                recognition.stop();
+                stopVoiceRecording();
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                    stopVoiceRecording();
+                }
+            }
+        }
+
+        function stopVoiceRecording() {
+            isRecordingVoice = false;
+            const micBtn = document.getElementById('voiceMicBtn');
+            if (micBtn) micBtn.classList.remove('recording');
+            const input = document.getElementById('userInput');
+            if (input) input.placeholder = "Ask a question, speak your directive, or enter custom parameters...";
         }
 
         function toggleSidebar() {
