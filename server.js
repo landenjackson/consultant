@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-DIRECTIVE: Deliver a fast, dense, boardroom-ready advisory briefing for **${eco.name}** (${eco.businessType}).
+DIRECTIVE: Deliver an executive advisory briefing for **${eco.name}** (${eco.businessType}).
 User Question / Directive: "${userMessage}"
 
 RULES:
@@ -36,31 +36,48 @@ RULES:
 4. 3 frontline action steps with specific role owners.
 5. 1-sentence executive takeaway.`;
 
-    const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
-        'User-Agent': 'Mozilla/5.0'
-      },
-      body: JSON.stringify({
-        model: "gemini-3.7-flash",
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userMessage }
-        ],
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // Official Google Generative Language API endpoint with Gemini 2.5 Flash / Gemini 1.5 Flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const geminiPayload = {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `${systemPrompt}\n\nUser Question: ${userMessage}` }]
+        }
+      ],
+      generationConfig: {
         temperature: 0.65,
-        max_tokens: 600
-      })
+        maxOutputTokens: 750
+      }
+    };
+
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(geminiPayload)
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(500).json({ error: `Engine error: ${errText}` });
+      return res.status(500).json({ error: `Google Gemini API error: ${errText}` });
     }
 
     const data = await response.json();
-    res.json(data);
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "Strategic memorandum generated.";
+
+    res.json({
+      choices: [
+        {
+          message: {
+            role: "assistant",
+            content: content
+          }
+        }
+      ]
+    });
   } catch (err) {
     console.error('Chat endpoint error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
