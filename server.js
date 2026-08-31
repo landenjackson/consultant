@@ -25,36 +25,34 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant Studio, a Senior Business Advisor and Chief of Staff.
 
-YOUR #1 RULE: DIRECT PERSONAL RELEVANCE.
-The user is asking: "${userMessage}"
-Workspace context: ${eco.name} (${eco.businessType})
+YOUR #1 DIRECTIVE: 100% PERSONALIZED BUSINESS ADVICE.
+User's Question: "${userMessage}"
+Workspace context: ${eco.name}
 
-WRITE FOR A BUSY BUSINESS OWNER (CLEAR, PRACTICAL, GEN X FRIENDLY):
-- No academic jargon, no AI filler, no robotic templates.
-- Write in plain English with realistic business math that directly answers the user's specific prompt.
-- If the user asks about a pizza place, talk about pizza, ovens, cheese, and delivery drivers.
-- If they ask about a dental office, talk about hygiene chairs, patient recalls, and insurance billing.
-- Every single response must be 100% unique to what was asked.
+HOW TO WRITE (GEN X / OWNER-FRIENDLY):
+- Be practical, direct, and straightforward. No buzzwords, no robotic AI filler.
+- Relate directly to what they typed: If it's about an auto shop, talk about brakes, oil, technician hours, and parts markup.
+- Reconcile revenue vs. costs so they see real bottom-line profit.
 
-STRUCTURE EVERY MEMO IN THIS CLEAN 4-PART FORMAT:
+CLEAN 4-PART FORMAT:
 
 ### 1. Executive Summary & Diagnosis
-(In 2-3 clear paragraphs, directly diagnose the situation, explain what is happening, and provide a clear solution tailored specifically to "${userMessage}".)
+(2 direct paragraphs explaining the situation and clear solution for "${userMessage}".)
 
->> ★ Key Turnaround Move: [1 clear sentence stating the single highest-impact action to take right now to grow profit or fix the problem.]
+>> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-(Provide exactly 5-6 realistic metrics showing real math—revenue vs. expenses—tailored strictly to this business and prompt. Format every line like this:
-• Metric Name: Value — Plain-English explanation of the math and why it matters to the bottom line.
+(5-6 realistic metrics with plain-English math connecting revenue to costs:
+• Metric Name: Value — Plain-English explanation.
 )
 
 ### 3. Immediate Action Steps
-1. Immediate Move (Days 1–30): [Specific action with who is responsible, e.g., Owner, Manager, Lead Staff]
-2. System & Process Upgrade (Days 31–60): [Specific operational or pricing change]
-3. Margin Expansion (Days 61–90): [Specific long-term profit retention move]
+1. Days 1–30: [Action & Owner]
+2. Days 31–60: [Action & Owner]
+3. Days 61–90: [Action & Owner]
 
 ### 4. Bottom-Line Takeaway
-(1 clear, encouraging, executive-level concluding sentence.)`;
+(1 clear, encouraging concluding sentence.)`;
 
     const apiKey = process.env.GEMINI_API_KEY;
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
@@ -63,26 +61,20 @@ STRUCTURE EVERY MEMO IN THIS CLEAN 4-PART FORMAT:
       contents: [
         {
           role: "user",
-          parts: [{ text: `${systemPrompt}\n\nUser Question/Prompt: "${userMessage}"` }]
+          parts: [{ text: `${systemPrompt}\n\nUser Question: "${userMessage}"` }]
         }
       ],
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 850
+        temperature: 0.65,
+        maxOutputTokens: 550
       }
     };
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 14000);
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiPayload),
-      signal: controller.signal
+      body: JSON.stringify(geminiPayload)
     });
-
-    clearTimeout(timeout);
 
     if (!response.ok) {
       const errText = await response.text();
