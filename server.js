@@ -38,8 +38,8 @@ RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // Fast Google AI Studio endpoint using models/gemini-2.5-flash
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Official Google AI Studio endpoint using models/gemini-3.6-flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
@@ -50,7 +50,7 @@ RULES:
       ],
       generationConfig: {
         temperature: 0.65,
-        maxOutputTokens: 450
+        maxOutputTokens: 600
       }
     };
 
