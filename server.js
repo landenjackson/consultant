@@ -36,9 +36,6 @@ RULES:
 4. 3 frontline action steps with specific role owners.
 5. 1-sentence executive takeaway.`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000);
-
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -53,12 +50,9 @@ RULES:
           { role: 'user', content: userMessage }
         ],
         temperature: 0.65,
-        max_tokens: 500
-      }),
-      signal: controller.signal
+        max_tokens: 600
+      })
     });
-
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errText = await response.text();
