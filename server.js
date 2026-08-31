@@ -23,39 +23,57 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
-    const systemPrompt = `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
+    const systemPrompt = `You are Consultant Studio, a Senior Business Advisor and Chief of Staff.
 
-DIRECTIVE: Deliver a fast, dense advisory briefing for **${eco.name}** (${eco.businessType}).
-User Question / Directive: "${userMessage}"
+YOUR #1 RULE: DIRECT PERSONAL RELEVANCE.
+The user is asking: "${userMessage}"
+Workspace context: ${eco.name} (${eco.businessType})
 
-STRICT P&L & UNIT-ECONOMIC RULES:
-1. Show explicit Gross Revenue, Direct Costs (Labor/COGS/Rent), and Net Operating Profit for this exact business model.
-2. Provide 6 calculated metrics specifically modeling the numbers in the prompt.
-   Format: • [Metric Name]: [Calculated Value] — [1-sentence formula & profit impact].
-3. Include ">> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough operational lever that expands net margin.]"
-4. 3 frontline action steps with specific role owners.
-5. 1-sentence executive takeaway.`;
+WRITE FOR A BUSY BUSINESS OWNER (CLEAR, PRACTICAL, GEN X FRIENDLY):
+- No academic jargon, no AI filler, no robotic templates.
+- Write in plain English with realistic business math that directly answers the user's specific prompt.
+- If the user asks about a pizza place, talk about pizza, ovens, cheese, and delivery drivers.
+- If they ask about a dental office, talk about hygiene chairs, patient recalls, and insurance billing.
+- Every single response must be 100% unique to what was asked.
+
+STRUCTURE EVERY MEMO IN THIS CLEAN 4-PART FORMAT:
+
+### 1. Executive Summary & Diagnosis
+(In 2-3 clear paragraphs, directly diagnose the situation, explain what is happening, and provide a clear solution tailored specifically to "${userMessage}".)
+
+>> ★ Key Turnaround Move: [1 clear sentence stating the single highest-impact action to take right now to grow profit or fix the problem.]
+
+### 2. Financial & Operational Telemetry
+(Provide exactly 5-6 realistic metrics showing real math—revenue vs. expenses—tailored strictly to this business and prompt. Format every line like this:
+• Metric Name: Value — Plain-English explanation of the math and why it matters to the bottom line.
+)
+
+### 3. Immediate Action Steps
+1. Immediate Move (Days 1–30): [Specific action with who is responsible, e.g., Owner, Manager, Lead Staff]
+2. System & Process Upgrade (Days 31–60): [Specific operational or pricing change]
+3. Margin Expansion (Days 61–90): [Specific long-term profit retention move]
+
+### 4. Bottom-Line Takeaway
+(1 clear, encouraging, executive-level concluding sentence.)`;
 
     const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Direct official Google AI Studio endpoint using models/gemini-3.6-flash
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
         {
           role: "user",
-          parts: [{ text: `${systemPrompt}\n\nUser Question: ${userMessage}` }]
+          parts: [{ text: `${systemPrompt}\n\nUser Question/Prompt: "${userMessage}"` }]
         }
       ],
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 650
+        temperature: 0.7,
+        maxOutputTokens: 850
       }
     };
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    const timeout = setTimeout(() => controller.abort(), 14000);
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
@@ -72,7 +90,7 @@ STRICT P&L & UNIT-ECONOMIC RULES:
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "Strategic memorandum generated.";
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "Strategic memo generated.";
 
     res.json({
       choices: [
