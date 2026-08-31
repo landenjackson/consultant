@@ -59,7 +59,7 @@ STRICT RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Direct Google AI Studio official endpoint with 2500 maxOutputTokens to give ample room for thoughts + full response
+    // Use standard fetch without global agent blockers
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
@@ -67,7 +67,7 @@ STRICT RULES:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 2500 }
+        generationConfig: { temperature: 0.6, maxOutputTokens: 2500 }
       })
     });
 
@@ -81,7 +81,7 @@ STRICT RULES:
     const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
     const content = textPart || "Strategic memo generated.";
 
-    res.json({
+    return res.json({
       choices: [
         {
           message: {
