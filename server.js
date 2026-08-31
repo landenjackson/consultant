@@ -23,31 +23,33 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
+    const apiKey = process.env.GEMINI_API_KEY;
+
     const promptText = `You are Consultant Studio, an elite Strategic Operations Partner.
 
 CRITICAL MANDATE: ZERO VAGUENESS. 100% SPECIFIC TO THE USER'S EXACT WORDS.
 User Spoken/Typed Input: "${userMessage}"
 Workspace Context: ${eco.name} (${eco.businessType})
 
-STRICT OPERATIONAL RULES:
-1. Ground every sentence in the exact business, location, product, or challenge typed/spoken above.
-   - If analyzing Bannerman Crossings foot-traffic: Explicitly analyze the north Tallahassee corridor, Bannerman Commons pedestrian flow, morning vs. evening commuter habits, and store capture rates without discounts.
-2. Reconcile Revenue vs. Costs with 5 realistic, calculated metrics matching this exact business.
-3. Write in plain, clear, practical business English (no AI filler or corporate fluff).
+STRICT RULES:
+1. DEEP TOPIC GROUNDING (NO GENERIC TALK):
+   - Directly analyze the specific location, words, numbers, and operational details in the user's prompt.
+   - If the user talks about Bannerman Crossings foot-traffic: Explicitly analyze the north Tallahassee / Bannerman Commons residential corridor, morning vs. evening pedestrian choke points, tenant dwell times, and physical store capture rates without discounts.
+   - If they talk about an auto shop: Analyze bays, technicians, and parts.
+   - If they talk about a clinic: Analyze patients, copays, and provider chairs.
 
-FORMAT:
+2. ACCURATE NUMBERS & MATH (REVENUE VS. EXPENSES):
+   - Provide 5 distinct metrics with real calculated numbers tailored strictly to this prompt.
+   - Format: • [Metric Name]: [Calculated Value] — [1-sentence plain-English formula and financial/operational impact].
 
+3. STRUCTURE:
 ### 1. Executive Summary & Diagnosis
-(2 concise, highly specific paragraphs directly diagnosing "${userMessage}".)
+(2 dense, highly specific paragraphs breaking down the ground truth of "${userMessage}".)
 
->> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
+>> ★ Key Turnaround Move: [1 clear sentence with the single highest-leverage action.]
 
 ### 2. Financial & Operational Telemetry
-• Metric Name: Value — 1-sentence plain-English formula and financial impact.
-• Metric Name: Value — 1-sentence plain-English formula and financial impact.
-• Metric Name: Value — 1-sentence plain-English formula and financial impact.
-• Metric Name: Value — 1-sentence plain-English formula and financial impact.
-• Metric Name: Value — 1-sentence plain-English formula and financial impact.
+(5 distinct metrics strictly matching this prompt)
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
@@ -55,69 +57,23 @@ FORMAT:
 3. Days 61–90: [Action & Role Owner]
 
 ### 4. Bottom-Line Takeaway
-(1 direct, encouraging concluding sentence.)`;
+(1 direct concluding sentence.)`;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Direct Google AI Studio official API (Gemini 3.6 Flash)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
-    // Primary: Google AI Studio Direct API using gemini-3.6-flash
-    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 800 }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 1000 }
       })
     });
 
-    // If Google Free Tier is rate-limited, failover to MyClaw Gateway with Gemini 3.6
     if (!response.ok) {
-      console.warn("Primary Google API exhausted/waiting, falling over to MyClaw Gateway...");
-      response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
-          'User-Agent': 'Mozilla/5.0'
-        },
-        body: JSON.stringify({
-          model: "gemini-3.6-flash",
-          messages: [
-            { role: 'system', content: promptText },
-            { role: 'user', content: userMessage }
-          ],
-          temperature: 0.65,
-          max_tokens: 800
-        })
-      });
-
-      if (!response.ok) {
-        // Fallback to gemini-2.5-flash on MyClaw
-        response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
-            'User-Agent': 'Mozilla/5.0'
-          },
-          body: JSON.stringify({
-            model: "gemini-2.5-flash",
-            messages: [
-              { role: 'system', content: promptText },
-              { role: 'user', content: userMessage }
-            ],
-            temperature: 0.65,
-            max_tokens: 800
-          })
-        });
-      }
-
-      if (!response.ok) {
-        const errText = await response.text();
-        return res.status(500).json({ error: `Advisory engine error: ${errText}` });
-      }
-
-      const clawData = await response.json();
-      return res.json(clawData);
+      const errText = await response.text();
+      return res.status(response.status).json({ error: `Google AI Studio API (${response.status}): ${errText}` });
     }
 
     const data = await response.json();
