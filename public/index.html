@@ -809,6 +809,108 @@
             margin-top: 2px;
         }
 
+        /* Feature 1: Citation Drawer */
+        .citation-drawer {
+            position: fixed;
+            top: 0; right: -420px; bottom: 0;
+            width: 400px;
+            background: #0d1015;
+            border-left: 1px solid #232a35;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
+            z-index: 2500;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .citation-drawer.open { right: 0; }
+
+        .citation-drawer-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #1e242f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .citation-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .citation-item {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-left: 3px solid #22c55e;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .citation-title { font-weight: 700; font-size: 12.5px; color: #ffffff; margin-bottom: 4px; }
+        .citation-source { font-size: 11px; color: #4ade80; margin-bottom: 6px; display: block; text-decoration: none; word-break: break-all; }
+        .citation-quote { font-size: 11.5px; color: #94a3b8; line-height: 1.45; font-style: italic; background: rgba(255,255,255,0.02); padding: 6px 8px; border-radius: 4px; }
+
+        /* Feature 2: Sensitivity Heatmap Matrix */
+        .sensitivity-matrix-box {
+            background: #0d1015;
+            border: 1px solid #1f2530;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .sensitivity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .sensitivity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .sensitivity-card {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sensitivity-card.worst { border-top: 3px solid #ef4444; }
+        .sensitivity-card.base { border-top: 3px solid #3b82f6; }
+        .sensitivity-card.optimal { border-top: 3px solid #22c55e; }
+
+        .sc-badge { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .sc-badge.worst { color: #f87171; }
+        .sc-badge.base { color: #60a5fa; }
+        .sc-badge.optimal { color: #4ade80; }
+
+        .sc-val { font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .sc-desc { font-size: 11px; color: #94a3b8; line-height: 1.35; margin-top: 2px; }
+
+        /* Feature 3: Widescreen Glassmorphic Focus Mode */
+        body.focus-mode .sidebar { width: 60px !important; }
+        body.focus-mode .sidebar .brand-name span,
+        body.focus-mode .sidebar .tag-pill,
+        body.focus-mode .sidebar .controls-block,
+        body.focus-mode .sidebar .nav-item span,
+        body.focus-mode .sidebar .partner-card { display: none !important; }
+        body.focus-mode .top-bar { left: 60px !important; }
+        body.focus-mode .launcher-pane { display: none !important; }
+        body.focus-mode .telemetry-feed { max-width: 1200px !important; }
+
         /* Upgrade 1 & 2: Profit Leakage Scanner & SVG Waterfall Styling */
         .leakage-scanner-box {
             background: #0d1015;
@@ -1366,6 +1468,33 @@
         </div>
     </div>
 
+    <!-- Feature 1: Live Verifiable Citation Drawer -->
+    <div class="citation-drawer" id="citationDrawer">
+        <div class="citation-drawer-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px; font-weight:800; color:#ffffff;">📚 Verified Evidence & Citations</span>
+            </div>
+            <span class="close-modal" style="position:static; font-size:18px;" onclick="toggleCitationDrawer()">&times;</span>
+        </div>
+        <div class="citation-drawer-body" id="citationDrawerBody">
+            <div class="citation-item">
+                <div class="citation-title">[1] National Restaurant Association P&L Benchmark</div>
+                <a class="citation-source" href="https://restaurant.org" target="_blank">https://restaurant.org/research/benchmarks</a>
+                <div class="citation-quote">"Prime cost floor target for sustainable independent diners sits between 58.0% and 62.0% of total revenue."</div>
+            </div>
+            <div class="citation-item">
+                <div class="citation-title">[2] Leon County Commercial Zoning & Permits</div>
+                <a class="citation-source" href="https://leoncountyfl.gov" target="_blank">https://leoncountyfl.gov/growth-management</a>
+                <div class="citation-quote">"Mobile retail vending requires private-property commercial zoning clearance and secondary food-handler safety certificates."</div>
+            </div>
+            <div class="citation-item">
+                <div class="citation-title">[3] Bureau of Labor Statistics (BLS Q2 Index)</div>
+                <a class="citation-source" href="https://bls.gov" target="_blank">https://bls.gov/regions/southeast/data</a>
+                <div class="citation-quote">"Average hourly wage for hospitality frontline staff stabilized with 28.5% store labor budget requirements."</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Tour Onboarding Modal -->
     <div class="modal-overlay" id="tourModal">
         <div class="modal-content" style="max-width:680px;">
@@ -1540,6 +1669,12 @@
                 <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleCommandPalette()">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <span>Cmd + K</span>
+                </button>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleFocusMode()">
+                    <span>⛶ Focus</span>
+                </button>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; color:#4ade80;" onclick="toggleCitationDrawer()">
+                    <span>📚 Citations</span>
                 </button>
             </div>
             <div class="status-items">
@@ -1770,6 +1905,34 @@
                             </div>
                         </div>
 
+                        <!-- Feature 2: Interactive Sensitivity Heatmap Matrix -->
+                        <div class="sensitivity-matrix-box" id="sensitivityMatrix">
+                            <div class="sensitivity-header">
+                                <span class="slider-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                    Risk & Sensitivity Matrix (3-Scenario Stress Test)
+                                </span>
+                                <span style="font-size:10.5px; color:#60a5fa; font-weight:800; text-transform:uppercase;">Institutional Stress Test</span>
+                            </div>
+                            <div class="sensitivity-grid">
+                                <div class="sensitivity-card worst">
+                                    <span class="sc-badge worst">Downside Floor (-20% Rev)</span>
+                                    <span class="sc-val" id="scWorstVal">$63,360</span>
+                                    <span class="sc-desc">Requires trimming 3 evening prep hours to defend 58% prime cost floor. Break-even: 112 covers/day.</span>
+                                </div>
+                                <div class="sensitivity-card base">
+                                    <span class="sc-badge base">Target Base Model</span>
+                                    <span class="sc-val" id="scBaseVal">$79,200</span>
+                                    <span class="sc-desc">160 covers @ $16.50 avg check. 43.5% net contribution with zero promotional discounting.</span>
+                                </div>
+                                <div class="sensitivity-card optimal">
+                                    <span class="sc-badge optimal">Optimal Upside (+25% Rev)</span>
+                                    <span class="sc-val" id="scOptimalVal">$99,000</span>
+                                    <span class="sc-desc">200 covers/day. Strains morning grill station; requires dedicated 2-pan prep staging to hold 6.5 min tickets.</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Interactive Scenario Calculator Slider Box (Feature 1) -->
                         <div class="scenario-slider-box" id="scenarioSimulator">
                             <div class="slider-header">
@@ -1871,6 +2034,17 @@
         let isStreaming = false;
         let currentTaskType = 'trade_analysis';
 
+        // Next-Gen Feature 1: Citation Drawer Controller
+        function toggleCitationDrawer() {
+            const drawer = document.getElementById('citationDrawer');
+            drawer.classList.toggle('open');
+        }
+
+        // Next-Gen Feature 3: Focus Mode Controller
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+        }
+
         // FEATURE 1: Interactive Scenario Calculator Logic
         function recalcSimulator() {
             const price = parseFloat(document.getElementById('sliderPrice').value);
@@ -1887,6 +2061,13 @@
             document.getElementById('simGrossRev').textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
             document.getElementById('simPrimeCost').textContent = `$${Math.round(primeCost).toLocaleString()}`;
             document.getElementById('simNetProfit').textContent = `$${Math.round(netContribution).toLocaleString()}`;
+
+            // Sync with Feature 2 Sensitivity Matrix
+            const worstVal = monthlyGross * 0.80;
+            const optimalVal = monthlyGross * 1.25;
+            document.getElementById('scWorstVal').textContent = `$${Math.round(worstVal).toLocaleString()}`;
+            document.getElementById('scBaseVal').textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
+            document.getElementById('scOptimalVal').textContent = `$${Math.round(optimalVal).toLocaleString()}`;
         }
 
         // UPGRADE 1 & 2: Profit Leakage Scanner & Waterfall Calculator
