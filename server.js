@@ -59,17 +59,24 @@ STRICT RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Use models/gemini-flash-latest on v1beta
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
-
-    const response = await fetch(geminiUrl, {
+    // Direct Google AI Studio API call
+    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 1500 }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 1000 }
       })
     });
+
+    // Check if free tier rate-limited
+    if (response.status === 429) {
+      const errData = await response.json().catch(() => ({}));
+      const retrySec = errData?.error?.details?.find(d => d.retryDelay)?.retryDelay || "a few seconds";
+      return res.status(429).json({
+        error: `Google AI Studio free tier rate limit reached (20 requests/day). Please wait ${retrySec} or upgrade API plan in Google AI Studio.`
+      });
+    }
 
     if (!response.ok) {
       const errText = await response.text();
