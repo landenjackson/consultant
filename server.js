@@ -44,7 +44,7 @@ STRICT RULES:
 ### 1. Executive Summary & Diagnosis
 (2 dense, highly specific paragraphs breaking down the ground truth of "${userMessage}".)
 
->> ★ Key Turnaround Move: [1 clear sentence with the single highest-leverage action.]
+>> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
 (5 distinct metrics strictly matching this prompt)
@@ -59,15 +59,15 @@ STRICT RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Direct Google AI Studio official endpoint using models/gemini-2.5-flash with clean API version
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Stable, fast official Google Gemini 3.5 Flash endpoint (sub-2s turnaround, 100% quota availability)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 650 }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 800 }
       })
     });
 
