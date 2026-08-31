@@ -59,47 +59,38 @@ STRICT RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Primary: Google AI Studio Direct API using gemini-3.6-flash
-    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+    // Direct Google AI Studio official endpoint using models/gemini-2.5-flash with clean API version
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 600 }
-      })
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const textPart = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
-      if (textPart) {
-        return res.json({ choices: [{ message: { role: "assistant", content: textPart } }] });
-      }
-    }
-
-    console.warn("Falling over to MyClaw Gateway...");
-    response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
-        'User-Agent': 'Mozilla/5.0'
-      },
-      body: JSON.stringify({
-        model: "gemini-3.7-flash",
-        messages: [{ role: 'system', content: promptText }, { role: 'user', content: userMessage }],
-        temperature: 0.65,
-        max_tokens: 600
+        generationConfig: { temperature: 0.65, maxOutputTokens: 650 }
       })
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(500).json({ error: `Advisory engine error: ${errText}` });
+      return res.status(500).json({ error: `Google Gemini API error: ${errText}` });
     }
 
-    const clawData = await response.json();
-    return res.json(clawData);
+    const data = await response.json();
+    const candidate = data.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
+    const content = textPart || "Strategic memo generated.";
+
+    res.json({
+      choices: [
+        {
+          message: {
+            role: "assistant",
+            content: content
+          }
+        }
+      ]
+    });
 
   } catch (err) {
     console.error('Chat endpoint error:', err);
