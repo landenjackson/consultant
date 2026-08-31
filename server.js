@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-DIRECTIVE: Deliver an executive advisory briefing for **${eco.name}** (${eco.businessType}).
+DIRECTIVE: Deliver a fast, dense, boardroom-ready advisory briefing for **${eco.name}** (${eco.businessType}).
 User Question / Directive: "${userMessage}"
 
 RULES:
@@ -38,8 +38,8 @@ RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // Official Google Generative Language API endpoint with Gemini 2.5 Flash / Gemini 1.5 Flash
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Official Google AI Studio endpoint using models/gemini-3.7-flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
