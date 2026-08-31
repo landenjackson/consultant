@@ -111,7 +111,7 @@ CORE OPERATIONAL INVARIANTS:
         'User-Agent': 'Mozilla/5.0'
       },
       body: JSON.stringify({
-        model: "gemini-3.7-flash",
+        model: "gemini-3.6-flash",
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages.filter(m => m.role !== 'system')
