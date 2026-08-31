@@ -23,31 +23,36 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    // Pinned to Gemini 3.6 Flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+
     const promptText = `You are Consultant Studio, an elite Strategic Operations Partner.
 
-CRITICAL MANDATE: ZERO VAGUENESS. 100% SPECIFIC TO THE USER'S EXACT WORDS.
-User Spoken/Typed Input: "${userMessage}"
+CRITICAL DIRECTIVE: 100% SPECIFIC TO USER INPUT. ZERO GENERIC VAGUENESS.
+User Input: "${userMessage}"
 Workspace Context: ${eco.name} (${eco.businessType})
 
-STRICT RULES:
-1. DEEP TOPIC GROUNDING (NO GENERIC TALK):
-   - Directly analyze the specific location, words, numbers, and operational details in the user's prompt.
-   - If the user talks about Bannerman Crossings foot-traffic: Explicitly analyze the north Tallahassee / Bannerman Commons residential corridor, morning vs. evening pedestrian choke points, tenant dwell times, and physical store capture rates.
-   - If they talk about an auto shop: Analyze bays, technicians, and parts.
-   - If they talk about a clinic: Analyze patients, copays, and provider chairs.
+STRICT OPERATIONAL RULES:
+1. Ground every sentence in the exact business, location, product, or challenge typed/spoken above.
+   - If analyzing Bannerman Crossings foot-traffic: Explicitly analyze the north Tallahassee corridor, Bannerman Commons pedestrian flow, morning vs. evening commuter habits, and store capture rates without discounts.
+2. Reconcile Revenue vs. Costs with 5 realistic, calculated metrics matching this exact business.
+3. Write in plain, clear, practical business English (no AI filler or corporate fluff).
 
-2. ACCURATE NUMBERS & MATH (REVENUE VS. EXPENSES):
-   - Provide 5 distinct metrics with real calculated numbers tailored strictly to this prompt.
-   - Format: • [Metric Name]: [Calculated Value] — [1-sentence plain-English formula and financial/operational impact].
+FORMAT:
 
-3. STRUCTURE:
 ### 1. Executive Summary & Diagnosis
-(2 dense, highly specific paragraphs breaking down the ground truth of "${userMessage}".)
+(2 concise, highly specific paragraphs directly diagnosing "${userMessage}".)
 
->> ★ Key Turnaround Move: [1 clear sentence with the single highest-leverage action.]
+>> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-(5 distinct metrics strictly matching this prompt)
+• Metric Name: Value — 1-sentence plain-English formula and financial impact.
+• Metric Name: Value — 1-sentence plain-English formula and financial impact.
+• Metric Name: Value — 1-sentence plain-English formula and financial impact.
+• Metric Name: Value — 1-sentence plain-English formula and financial impact.
+• Metric Name: Value — 1-sentence plain-English formula and financial impact.
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
@@ -55,28 +60,19 @@ STRICT RULES:
 3. Days 61–90: [Action & Role Owner]
 
 ### 4. Bottom-Line Takeaway
-(1 direct concluding sentence.)`;
+(1 direct, encouraging concluding sentence.)`;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    // Direct Google AI Studio API call
-    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 1000 }
+        generationConfig: {
+          temperature: 0.65,
+          maxOutputTokens: 1000
+        }
       })
     });
-
-    // Check if free tier rate-limited
-    if (response.status === 429) {
-      const errData = await response.json().catch(() => ({}));
-      const retrySec = errData?.error?.details?.find(d => d.retryDelay)?.retryDelay || "a few seconds";
-      return res.status(429).json({
-        error: `Google AI Studio free tier rate limit reached (20 requests/day). Please wait ${retrySec} or upgrade API plan in Google AI Studio.`
-      });
-    }
 
     if (!response.ok) {
       const errText = await response.text();
