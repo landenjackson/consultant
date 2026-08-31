@@ -23,50 +23,47 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
-    const systemPrompt = `You are Consultant Studio, a Senior Business Advisor and Chief of Staff.
+    const apiKey = process.env.GEMINI_API_KEY;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
-YOUR #1 DIRECTIVE: 100% PERSONALIZED BUSINESS ADVICE.
-User's Question: "${userMessage}"
-Workspace context: ${eco.name}
+    const promptText = `You are an elite Business Consultant and Chief of Staff.
+User's Question/Goal: "${userMessage}"
+Business context: ${eco.name} (${eco.businessType})
 
-HOW TO WRITE (GEN X / OWNER-FRIENDLY):
-- Be practical, direct, and straightforward. No buzzwords, no robotic AI filler.
-- Relate directly to what they typed: If it's about an auto shop, talk about brakes, oil, technician hours, and parts markup.
-- Reconcile revenue vs. costs so they see real bottom-line profit.
+Write a clear, practical, Gen X-friendly Strategic Memorandum specifically tailored to this exact business and question. No fluff, no robotic filler.
 
-CLEAN 4-PART FORMAT:
+FORMAT:
 
 ### 1. Executive Summary & Diagnosis
-(2 direct paragraphs explaining the situation and clear solution for "${userMessage}".)
+(2 direct paragraphs diagnosing the situation and explaining the solution for "${userMessage}".)
 
 >> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-(5-6 realistic metrics with plain-English math connecting revenue to costs:
-• Metric Name: Value — Plain-English explanation.
-)
+• Target Metric 1: Value — Plain-English explanation connecting revenue to costs.
+• Target Metric 2: Value — Plain-English explanation.
+• Target Metric 3: Value — Plain-English explanation.
+• Target Metric 4: Value — Plain-English explanation.
+• Target Metric 5: Value — Plain-English explanation.
 
 ### 3. Immediate Action Steps
-1. Days 1–30: [Action & Owner]
-2. Days 31–60: [Action & Owner]
-3. Days 61–90: [Action & Owner]
+1. Days 1–30: [Action & Role Owner]
+2. Days 31–60: [Action & Role Owner]
+3. Days 61–90: [Action & Role Owner]
 
 ### 4. Bottom-Line Takeaway
 (1 clear, encouraging concluding sentence.)`;
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
         {
           role: "user",
-          parts: [{ text: `${systemPrompt}\n\nUser Question: "${userMessage}"` }]
+          parts: [{ text: promptText }]
         }
       ],
       generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 550
+        temperature: 0.7,
+        maxOutputTokens: 900
       }
     };
 
