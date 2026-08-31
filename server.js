@@ -24,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
     const apiKey = process.env.GEMINI_API_KEY;
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const promptText = `You are Consultant Studio, a direct, practical business advisor for business owners.
 The user is asking: "${userMessage}"
@@ -61,7 +61,7 @@ FORMAT:
       ],
       generationConfig: {
         temperature: 0.65,
-        maxOutputTokens: 1200
+        maxOutputTokens: 600
       }
     };
 
