@@ -1877,62 +1877,46 @@
                         </div>
                     </div>
 
-                    <!-- Guided & Custom Intake -->
-                    <div class="intake-card">
+                    <!-- Directive Builder: Document-Style Fill-in-the-Blank Workspace -->
+                    <div class="intake-card" id="directiveBuilderCard">
                         <div class="intake-header">
                             <div class="intake-title">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                <span id="intakeModeTitle">Guided Mission Builder</span>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <span id="intakeModeTitle">Directive Document Builder</span>
                             </div>
-                            <div class="intake-mode-toggle">
-                                <button class="mode-btn active" id="btnModePreset" onclick="toggleTaskMode('preset')">Guided</button>
-                                <button class="mode-btn" id="btnModeCustom" onclick="toggleTaskMode('custom')">Custom</button>
+                            <span class="tag-pill" id="activeProtocolPill" style="font-size:10px;">01 // Retail</span>
+                        </div>
+
+                        <p style="font-size:11.5px; color:#94a3b8; margin-bottom:10px; line-height:1.4;">
+                            Fill in quick 2–3 word answers below to tune your directive before generating your Strategic Memo.
+                        </p>
+
+                        <div class="intake-grid">
+                            <div class="intake-field">
+                                <label style="font-size:10.5px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:2px; display:block;">1. Business / Target Name</label>
+                                <input type="text" id="dirTargetName" value="Ma's Diner" placeholder="e.g. Tallahassee Care, Apex Gym, Midtown Law">
+                            </div>
+
+                            <div class="intake-field">
+                                <label style="font-size:10.5px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:2px; display:block;">2. Primary Goal / Deliverable</label>
+                                <input type="text" id="dirGoal" value="Boost morning commuter foot-traffic" placeholder="e.g. Cut no-shows, 30% gross margin, raise ticket">
+                            </div>
+
+                            <div class="intake-field">
+                                <label style="font-size:10.5px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:2px; display:block;">3. Operating Constraint / Budget</label>
+                                <input type="text" id="dirConstraint" value="Zero discounts / $1,000 budget" placeholder="e.g. Strict zero-discount, no new staff">
+                            </div>
+
+                            <div class="intake-field">
+                                <label style="font-size:10.5px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:2px; display:block;">4. Specific Executive Inquiry / Notes</label>
+                                <input type="text" id="dirPrompt" value="Audit 7-9am rush line speed and counter check size" placeholder="e.g. How to schedule 2 doctors without overtime">
                             </div>
                         </div>
 
-                        <div id="presetTaskForm">
-                            <div class="intake-grid">
-                                <div class="intake-field">
-                                    <select id="intakeFocus">
-                                        <option value="Local Retail & Trade Area Foot-Traffic">Local Retail & Community Growth</option>
-                                        <option value="Medical Clinic & Doctor's Office Patient Flow">Medical Practice & Patient Retention</option>
-                                        <option value="Fitness Studio & Gym Membership Economics">Fitness Studio & Member Lifetime Value</option>
-                                        <option value="Therapy & Mental Health Practice Caseload">Therapy & Counseling Cancellation Reduction</option>
-                                        <option value="Engineering Firm Billable Utilization & RFPs">Engineering Firm Multipliers & RFPs</option>
-                                        <option value="B2B Micro-SaaS & Subscription Pricing">B2B SaaS & Sustainable Pricing</option>
-                                        <option value="Industrial Narrative & Modern Tech Pivot">Industrial Brand & Tech Pivot</option>
-                                        <option value="Affiliate Growth Sprint & Operator Brand">Affiliate Growth & Operator Brand</option>
-                                    </select>
-                                </div>
-                                <div class="intake-field">
-                                    <select id="intakeConstraint">
-                                        <option value="Strict Zero-Discount & Pure Organic Visibility">Zero Discounts / High Brand Equity</option>
-                                        <option value="Strict Human-in-the-Loop Trust Boundary">Human-in-the-Loop Verification</option>
-                                        <option value="Sub-$500 Bootstrapped Execution Budget">Bootstrapped Capital Focus</option>
-                                        <option value="High-Paced Execution">High-Velocity Delivery</option>
-                                    </select>
-                                </div>
-                                <div class="intake-field">
-                                    <input type="text" id="intakeGoal" placeholder="Key objective (e.g. 5% resident acquisition)">
-                                </div>
-                            </div>
-                            <button class="btn-launch-intake" onclick="launchPresetBuilder()">RUN STRATEGIC BRIEF</button>
-                        </div>
-
-                        <div id="customTaskForm" class="custom-task-container">
-                            <div style="display:flex; flex-direction:column; gap:6px;">
-                                <div class="intake-field">
-                                    <input type="text" id="customTaskName" placeholder="Project Name (e.g. Patient Flow / Class Schedule / Q3 RFP)">
-                                </div>
-                                <div class="intake-field">
-                                    <input type="text" id="customTarget" placeholder="Business / Target (e.g. Tallahassee Therapy / Apex Fitness / Apex Engineering)">
-                                </div>
-                                <div class="intake-field">
-                                    <textarea id="customTaskInstructions" rows="2" placeholder="Specific goal (e.g. reduce doctor no-shows, increase gym retention, model engineering labor multipliers)..."></textarea>
-                                </div>
-                            </div>
-                            <button class="btn-launch-intake" onclick="launchCustomTask()">INITIALIZE CUSTOM PLAN</button>
-                        </div>
+                        <button class="btn-launch-intake" onclick="generateFromDirectiveBuilder()" style="margin-top:6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                            GENERATE STRATEGIC MEMO
+                        </button>
                     </div>
                 </div>
 
@@ -2412,48 +2396,96 @@
             document.getElementById('customTaskName').focus();
         }
 
+        // Click protocol to populate editable directive builder BEFORE sending to Strategic Memo
         function quickTask(type) {
             currentTaskType = type;
-            const input = document.getElementById('userInput');
             const wsSelect = document.getElementById('clientWorkspace');
-            const ws = wsSelect ? wsSelect.value : 'default';
-            const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : 'our business';
+            const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : "Our Business";
+
+            const protocolPill = document.getElementById('activeProtocolPill');
+            const dirTarget = document.getElementById('dirTargetName');
+            const dirGoal = document.getElementById('dirGoal');
+            const dirConstraint = document.getElementById('dirConstraint');
+            const dirPrompt = document.getElementById('dirPrompt');
+
+            dirTarget.value = wsName;
 
             if (type === 'trade_analysis') {
-                document.getElementById('strategyLens').value = 'hyperlocal';
-                input.value = `Perform an in-depth Trade Area & Foot-Traffic Geometry audit for ${wsName}. Analyze local catchment radiuses, pedestrian density, and neighbor acquisition without margin-eroding discounts.`;
+                protocolPill.textContent = "01 // Retail";
+                dirGoal.value = "Capture morning foot-traffic & expand check size";
+                dirConstraint.value = "Strict zero-discount / keep 28% food cost";
+                dirPrompt.value = "Audit 7-9am rush line speed and counter check size";
             } else if (type === 'medical') {
-                document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = `Conduct a Medical Practice & Clinic Operations audit for ${wsName}. Model patient show-rates, provider schedule utilization, clean first-pass claims denial reduction (<3.2%), and care continuity.`;
+                protocolPill.textContent = "02 // Medical";
+                dirGoal.value = "Reduce patient no-shows to < 5%";
+                dirConstraint.value = "Zero extra admin staff / maintain 34% labor";
+                dirPrompt.value = "How to automate 48hr SMS deposits & insurance pre-check";
             } else if (type === 'psychology') {
-                document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = `Architect a Mental Health & Therapy Practice Caseload Strategy for ${wsName}. Optimize private pay rates ($150-$240/hr), 24-hr cancellation fee enforcement, and 14-24 week patient care episode retention.`;
+                protocolPill.textContent = "03 // Therapy";
+                dirGoal.value = "Optimize private pay & fill 25 billable hrs/wk";
+                dirConstraint.value = "Card-on-file cancellation fee / $200/hr target";
+                dirPrompt.value = "Structure 14-week care agreements to prevent churn";
             } else if (type === 'engineering') {
-                document.getElementById('strategyLens').value = 'standard';
-                input.value = `Analyze Engineering Consulting Firm Operations & RFP Pricing for ${wsName}. Model direct labor multipliers (2.85x-3.40x), staff billable utilization (82%-88%), and scope-creep margin defense.`;
+                protocolPill.textContent = "04 // Engineering";
+                dirGoal.value = "Defend 3.1x labor multiplier on $350k RFP";
+                dirConstraint.value = "Firm fixed price / protect 85% utilization";
+                dirPrompt.value = "Model billable engineering hours vs scope-creep risk";
             } else if (type === 'fitness') {
-                document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = `Model Fitness Studio & Gym Membership Economics for ${wsName}. Audit recurring dues ($129-$229/mo), trainer split gross margins (40%-50%), and member churn mitigation (<4.2%/mo).`;
+                protocolPill.textContent = "05 // Fitness";
+                dirGoal.value = "Grow recurring members from 180 to 250";
+                dirConstraint.value = "Cap churn under 4% / $169/mo dues";
+                dirPrompt.value = "Structure trainer split margins and recovery upsells";
             } else if (type === 'saas') {
-                document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = `Dissect the Unit Economics & Capital Viability for ${wsName}. Model customer acquisition costs (CAC), lifetime value (LTV), payback timelines, and gross margin defense.`;
+                protocolPill.textContent = "06 // Finance";
+                dirGoal.value = "Recover CAC in < 4.5 months across $15-$79 tiers";
+                dirConstraint.value = "Bootstrapped $500 ad test / 82% gross margin";
+                dirPrompt.value = "Audit pricing ladder conversion and churn ceiling";
             } else if (type === 'campaign_strategy') {
-                document.getElementById('strategyLens').value = 'standard';
-                input.value = `Develop an actionable Zero-Discount Campaign Strategy for ${wsName}. Structure multi-channel brand momentum, high-texture storytelling, and customer retention protocols.`;
+                protocolPill.textContent = "07 // Marketing";
+                dirGoal.value = "Launch zero-discount high-equity brand sprint";
+                dirConstraint.value = "Organic word-of-mouth / zero paid ad reliance";
+                dirPrompt.value = "Create community huddle ritual and VIP ambassador loop";
             } else if (type === 'fsu_trust') {
-                document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = `Apply the FSU Empirical Trust Framework (p < .001 statistical boundaries) to ${wsName}. Model customer retention correlation (r = 0.38) and synchronous human operator gates.`;
+                protocolPill.textContent = "08 // Data Science";
+                dirGoal.value = "Eliminate AI autonomy risk via p < .001 trust boundary";
+                dirConstraint.value = "Enforce human operator sign-off gate";
+                dirPrompt.value = "Audit customer data privacy and retention correlation";
             } else if (type === 'compliance') {
-                document.getElementById('strategyLens').value = 'trust_auditor';
-                input.value = `Perform a Regulatory Compliance & Policy Risk Audit for ${wsName}. Audit contract fine-print friction, client risk covenants, and legal disclosure safeguards.`;
+                protocolPill.textContent = "09 // Legal";
+                dirGoal.value = "Mitigate liability and contract fine-print friction";
+                dirConstraint.value = "Standardize client service covenant";
+                dirPrompt.value = "Audit client onboarding disclosures and payment terms";
             } else if (type === 'pricing') {
-                document.getElementById('strategyLens').value = 'saas_operator';
-                input.value = `Architect a Value-Based Pricing Strategy & Margin Defense framework for ${wsName}. Model willingness-to-pay elasticity, premium anchoring, and profit margin preservation.`;
+                protocolPill.textContent = "10 // CompSci";
+                dirGoal.value = "Structure premium tier anchoring and 30-day trial";
+                dirConstraint.value = "Protect gross margin floor at 85%";
+                dirPrompt.value = "Model expansion revenue from $39 to $79 tier";
             } else if (type === 'competitor') {
-                document.getElementById('strategyLens').value = 'standard';
-                input.value = `Execute a real-time Competitor Market Reconnaissance & Commercial Moat Defense analysis for ${wsName}. Identify competitor pricing vulnerabilities and defensive switching barriers.`;
+                protocolPill.textContent = "11 // Real Estate";
+                dirGoal.value = "Audit competitor lease rates and switching barriers";
+                dirConstraint.value = "Defend $34/sq ft NNN base lease rate";
+                dirPrompt.value = "Scan neighborhood tenant mix and identify demand white-space";
             }
-            onLensChange();
+
+            // Scroll the directive builder smoothly into view for easy editing
+            document.getElementById('directiveBuilderCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function setCustomTaskMode() {
+            document.getElementById('activeProtocolPill').textContent = "12 // Custom";
+            document.getElementById('dirGoal').value = "Define custom growth or turnaround objective";
+            document.getElementById('dirConstraint').value = "Define budget or operational limits";
+            document.getElementById('dirPrompt').value = "Enter your specific business question here";
+            document.getElementById('dirPrompt').focus();
+        }
+
+        function generateFromDirectiveBuilder() {
+            const target = document.getElementById('dirTargetName').value.trim() || 'Our Business';
+            const goal = document.getElementById('dirGoal').value.trim() || 'Grow revenue and profit';
+            const constraint = document.getElementById('dirConstraint').value.trim() || 'Standard budget';
+            const prompt = document.getElementById('dirPrompt').value.trim() || 'Provide strategic guidance';
+
+            document.getElementById('userInput').value = `Target Business: ${target}\nPrimary Goal: ${goal}\nOperating Constraint: ${constraint}\nExecutive Inquiry: ${prompt}`;
             sendMessage();
         }
 
