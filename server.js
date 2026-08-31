@@ -59,15 +59,15 @@ STRICT RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Use models/gemini-2.5-flash with official standard endpoint
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Use models/gemini-flash-latest on v1beta
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 2500 }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 1500 }
       })
     });
 
