@@ -24,7 +24,6 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
     const apiKey = process.env.GEMINI_API_KEY;
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const promptText = `You are Consultant Studio, an elite Strategic Operations Partner.
 
@@ -68,20 +67,46 @@ STRICT RULES:
         }
       ],
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 550
+        temperature: 0.65,
+        maxOutputTokens: 600
       }
     };
 
-    const response = await fetch(geminiUrl, {
+    // Primary: Google AI Studio Direct API
+    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(geminiPayload)
     });
 
+    // Automatic Failover: MyClaw Gateway if Google Free Tier hits rate limit
     if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: `Google Gemini API error: ${errText}` });
+      console.warn("Primary Google API rate limited, failing over to MyClaw Gateway...");
+      response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
+          'User-Agent': 'Mozilla/5.0'
+        },
+        body: JSON.stringify({
+          model: "gemini-3.7-flash",
+          messages: [
+            { role: 'system', content: promptText },
+            { role: 'user', content: userMessage }
+          ],
+          temperature: 0.65,
+          max_tokens: 600
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        return res.status(500).json({ error: `Advisory engine error: ${errText}` });
+      }
+
+      const clawData = await response.json();
+      return res.json(clawData);
     }
 
     const data = await response.json();
