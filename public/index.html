@@ -1434,19 +1434,35 @@
 
                 <div class="cmd-section-heading">Workspace Routing</div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('mas_diner'))">
-                    <div class="cmd-item-left"><span>🥞</span><span>Switch to Ma's Diner</span></div>
+                    <div class="cmd-item-left"><span>🥞</span><span>Ma's Diner (Hospitality)</span></div>
                     <span class="cmd-shortcut-badge">W1</span>
                 </div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('cleaver_brooks'))">
-                    <div class="cmd-item-left"><span>🏭</span><span>Switch to Cleaver-Brooks</span></div>
+                    <div class="cmd-item-left"><span>🏭</span><span>Cleaver-Brooks (Industrial)</span></div>
                     <span class="cmd-shortcut-badge">W2</span>
                 </div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('bannerman'))">
-                    <div class="cmd-item-left"><span>📍</span><span>Switch to Bannerman Crossings</span></div>
+                    <div class="cmd-item-left"><span>📍</span><span>Bannerman Crossings (Real Estate)</span></div>
                     <span class="cmd-shortcut-badge">W3</span>
                 </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('healthcare_clinic'))">
+                    <div class="cmd-item-left"><span>🩺</span><span>Medical & Specialty Clinic (Health)</span></div>
+                    <span class="cmd-shortcut-badge">W4</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('fitness_wellness'))">
+                    <div class="cmd-item-left"><span>🏋️</span><span>Fitness Studio & Performance Gym</span></div>
+                    <span class="cmd-shortcut-badge">W5</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('therapy_psychology'))">
+                    <div class="cmd-item-left"><span>🧠</span><span>Therapy & Mental Health Practice</span></div>
+                    <span class="cmd-shortcut-badge">W6</span>
+                </div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('engineering_firm'))">
+                    <div class="cmd-item-left"><span>📐</span><span>Engineering Consulting Firm</span></div>
+                    <span class="cmd-shortcut-badge">W7</span>
+                </div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('default'))">
-                    <div class="cmd-item-left"><span>📁</span><span>Switch to General Workspace</span></div>
+                    <div class="cmd-item-left"><span>📁</span><span>General / Technology Workspace</span></div>
                     <span class="cmd-shortcut-badge">W0</span>
                 </div>
 
@@ -1610,9 +1626,13 @@
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
                     <option value="default">General Workspace</option>
-                    <option value="mas_diner">Ma's Diner</option>
-                    <option value="cleaver_brooks">Cleaver-Brooks</option>
-                    <option value="bannerman">Bannerman Crossings</option>
+                    <option value="mas_diner">Ma's Diner (Hospitality)</option>
+                    <option value="cleaver_brooks">Cleaver-Brooks (Industrial)</option>
+                    <option value="bannerman">Bannerman Crossings (Real Estate)</option>
+                    <option value="healthcare_clinic">Medical & Specialty Clinic (Health)</option>
+                    <option value="fitness_wellness">Fitness Studio & Gym (Fitness)</option>
+                    <option value="therapy_psychology">Therapy & Psychology (Mental Health)</option>
+                    <option value="engineering_firm">Engineering Consulting (Engineering)</option>
                 </select>
             </div>
 
