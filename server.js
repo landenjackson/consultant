@@ -25,11 +25,11 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-DIRECTIVE: Deliver a fast, dense, boardroom-ready advisory briefing for **${eco.name}** (${eco.businessType}).
+DIRECTIVE: Deliver a fast, dense advisory briefing for **${eco.name}** (${eco.businessType}).
 User Question / Directive: "${userMessage}"
 
-STRICT P&L & UNIT-ECONOMIC RECONCILIATION RULES:
-1. Show explicit Gross Revenue, Direct Costs (Labor/COGS/Overhead), and Net Operating Profit for this exact business model.
+STRICT P&L & UNIT-ECONOMIC RULES:
+1. Show explicit Gross Revenue, Direct Costs (Labor/COGS/Rent), and Net Operating Profit for this exact business model.
 2. Provide 6 calculated metrics specifically modeling the numbers in the prompt.
    Format: • [Metric Name]: [Calculated Value] — [1-sentence formula & profit impact].
 3. Include ">> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough operational lever that expands net margin.]"
@@ -38,8 +38,8 @@ STRICT P&L & UNIT-ECONOMIC RECONCILIATION RULES:
 
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // Fast official Google AI Studio endpoint using models/gemini-3.6-flash capped to 650 tokens
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+    // Using models/gemini-flash-latest with 500 max tokens for instantaneous sub-2s execution
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
     const geminiPayload = {
       contents: [
@@ -49,8 +49,8 @@ STRICT P&L & UNIT-ECONOMIC RECONCILIATION RULES:
         }
       ],
       generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 650
+        temperature: 0.6,
+        maxOutputTokens: 500
       }
     };
 
