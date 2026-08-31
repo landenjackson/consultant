@@ -809,6 +809,138 @@
             margin-top: 2px;
         }
 
+        /* Upgrade 1 & 2: Profit Leakage Scanner & SVG Waterfall Styling */
+        .leakage-scanner-box {
+            background: #0d1015;
+            border: 1px solid #232a35;
+            border-left: 3.5px solid #ef4444;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .leakage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .leakage-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .leakage-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .leakage-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .leakage-input-label {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .leakage-input {
+            background: #090a0c;
+            border: 1px solid #1e232c;
+            color: #ffffff;
+            padding: 7px 10px;
+            border-radius: 5px;
+            font-size: 12.5px;
+            font-weight: 700;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .leakage-input:focus { border-color: #22c55e; }
+
+        /* SVG Waterfall Breakdown Chart */
+        .waterfall-container {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .waterfall-bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .waterfall-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .waterfall-label {
+            width: 140px;
+            font-weight: 600;
+            color: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .waterfall-track {
+            flex: 1;
+            height: 20px;
+            background: #14181f;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .waterfall-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .waterfall-fill.gross { background: #3b82f6; }
+        .waterfall-fill.cogs { background: #ef4444; }
+        .waterfall-fill.labor { background: #f59e0b; }
+        .waterfall-fill.margin { background: #22c55e; }
+
+        .leakage-alert-card {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .leakage-alert-text { font-size: 12px; color: #fca5a5; }
+        .leakage-recoverable-val { font-size: 15px; font-weight: 800; color: #4ade80; letter-spacing: -0.02em; }
+
         /* Interactive Scenario Sliders (Feature 1) */
         .scenario-slider-box {
             background: #111418;
@@ -1576,6 +1708,68 @@
                 <div class="telemetry-pane">
                     <div class="telemetry-feed" id="chatArea">
                         
+                        <!-- Upgrade 1: Profit Leakage & Opportunity Diagnostic Scanner -->
+                        <div class="leakage-scanner-box" id="leakageScannerBox">
+                            <div class="leakage-header">
+                                <span class="leakage-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    Profit Leakage & Margin Diagnostic
+                                </span>
+                                <span style="font-size:10.5px; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:4px; font-weight:800;">ROI AUDITOR</span>
+                            </div>
+
+                            <div class="leakage-grid">
+                                <div class="leakage-input-group">
+                                    <span class="leakage-input-label">Monthly Gross Revenue ($)</span>
+                                    <input type="number" class="leakage-input" id="leakageRev" value="85000" step="1000" oninput="recalcLeakageScanner()">
+                                </div>
+                                <div class="leakage-input-group">
+                                    <span class="leakage-input-label">Actual Labor Cost (%)</span>
+                                    <input type="number" class="leakage-input" id="leakageLabor" value="34" min="10" max="60" step="0.5" oninput="recalcLeakageScanner()">
+                                </div>
+                                <div class="leakage-input-group">
+                                    <span class="leakage-input-label">Discount & Promo Slippage (%)</span>
+                                    <input type="number" class="leakage-input" id="leakagePromo" value="7.5" min="0" max="30" step="0.5" oninput="recalcLeakageScanner()">
+                                </div>
+                            </div>
+
+                            <!-- Upgrade 2: Institutional Waterfall Margin Visual Breakdown -->
+                            <div class="waterfall-container">
+                                <div style="font-size:11px; font-weight:700; color:#71717a; text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between;">
+                                    <span>Revenue Waterfall & Prime Cost Allocations</span>
+                                    <span id="waterfallMarginPct" style="color:#4ade80;">43.5% Net Margin</span>
+                                </div>
+                                <div class="waterfall-bar-group">
+                                    <div class="waterfall-row">
+                                        <span class="waterfall-label">Gross Revenue</span>
+                                        <div class="waterfall-track"><div class="waterfall-fill gross" id="wfGross" style="width:100%;">100%</div></div>
+                                    </div>
+                                    <div class="waterfall-row">
+                                        <span class="waterfall-label">Food & Prime COGS (28%)</span>
+                                        <div class="waterfall-track"><div class="waterfall-fill cogs" id="wfCogs" style="width:28%;">28.0%</div></div>
+                                    </div>
+                                    <div class="waterfall-row">
+                                        <span class="waterfall-label">Labor Allocation</span>
+                                        <div class="waterfall-track"><div class="waterfall-fill labor" id="wfLabor" style="width:34%;">34.0%</div></div>
+                                    </div>
+                                    <div class="waterfall-row">
+                                        <span class="waterfall-label">Net Contribution</span>
+                                        <div class="waterfall-track"><div class="waterfall-fill margin" id="wfMargin" style="width:38%;">38.0%</div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="leakage-alert-card">
+                                <div class="leakage-alert-text">
+                                    🔴 <strong>Identified Profit Leakage:</strong> <span id="leakageDetails">Labor Drag (5.0%) + Promo Erosion ($6,375/mo)</span>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:10px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Recoverable Profit / Yr</div>
+                                    <div class="leakage-recoverable-val" id="leakageRecoverableVal">$127,500</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Interactive Scenario Calculator Slider Box (Feature 1) -->
                         <div class="scenario-slider-box" id="scenarioSimulator">
                             <div class="slider-header">
@@ -1693,6 +1887,37 @@
             document.getElementById('simGrossRev').textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
             document.getElementById('simPrimeCost').textContent = `$${Math.round(primeCost).toLocaleString()}`;
             document.getElementById('simNetProfit').textContent = `$${Math.round(netContribution).toLocaleString()}`;
+        }
+
+        // UPGRADE 1 & 2: Profit Leakage Scanner & Waterfall Calculator
+        function recalcLeakageScanner() {
+            const rev = parseFloat(document.getElementById('leakageRev').value) || 0;
+            const laborPct = parseFloat(document.getElementById('leakageLabor').value) || 0;
+            const promoPct = parseFloat(document.getElementById('leakagePromo').value) || 0;
+
+            const targetLaborPct = 29.0;
+            const laborExcessPct = Math.max(0, laborPct - targetLaborPct);
+            const laborLeakage = (rev * (laborExcessPct / 100));
+            const promoLeakage = (rev * (promoPct / 100));
+            const totalMonthlyLeakage = laborLeakage + promoLeakage;
+            const totalAnnualLeakage = totalMonthlyLeakage * 12;
+
+            const cogsPct = 28.0;
+            const netMarginPct = Math.max(0, 100 - cogsPct - laborPct - promoPct);
+
+            // Update Waterfall Visual Bars
+            document.getElementById('wfGross').style.width = '100%';
+            document.getElementById('wfCogs').style.width = `${cogsPct}%`;
+            document.getElementById('wfCogs').textContent = `${cogsPct.toFixed(1)}%`;
+            document.getElementById('wfLabor').style.width = `${Math.min(100, laborPct)}%`;
+            document.getElementById('wfLabor').textContent = `${laborPct.toFixed(1)}%`;
+            document.getElementById('wfMargin').style.width = `${Math.min(100, netMarginPct)}%`;
+            document.getElementById('wfMargin').textContent = `${netMarginPct.toFixed(1)}%`;
+            document.getElementById('waterfallMarginPct').textContent = `${netMarginPct.toFixed(1)}% Net Margin`;
+
+            // Update Alert Text
+            document.getElementById('leakageDetails').textContent = `Labor Drag (${laborExcessPct.toFixed(1)}%) + Promo Loss ($${Math.round(promoLeakage).toLocaleString()}/mo)`;
+            document.getElementById('leakageRecoverableVal').textContent = `$${Math.round(totalAnnualLeakage).toLocaleString()}`;
         }
 
         // FEATURE 3: Client-Side WebCrypto AES-GCM 256-bit Encryption Engine
@@ -2407,6 +2632,7 @@ Data Privacy Standard: Zero Public Model Training Exposure (Isolated Private Edg
         checkSubscriptionStatus();
         checkFirstTimeUser();
         recalcSimulator();
+        recalcLeakageScanner();
     </script>
 </body>
 </html>
