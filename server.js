@@ -61,8 +61,8 @@ FORMAT:
         }
       ],
       generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 500
+        temperature: 0.7,
+        maxOutputTokens: 2048
       }
     };
 
@@ -78,7 +78,9 @@ FORMAT:
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "Strategic memo generated.";
+    const candidate = data.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
+    const content = textPart || "Strategic memo generated.";
 
     res.json({
       choices: [
