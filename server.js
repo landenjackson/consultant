@@ -68,8 +68,8 @@ STRICT RULES:
         }
       ],
       generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 750
+        temperature: 0.6,
+        maxOutputTokens: 550
       }
     };
 
