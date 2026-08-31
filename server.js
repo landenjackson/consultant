@@ -24,7 +24,6 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
     const apiKey = process.env.GEMINI_API_KEY;
-    // Server-Sent Events / Stream endpoint for instant token flushing
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const promptText = `You are Consultant Studio, a direct, practical business advisor for business owners.
@@ -41,9 +40,10 @@ FORMAT:
 >> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-(Provide 5 distinct metrics with real numbers tailored to this prompt:
-• Metric Name: Value — 1-sentence plain-English explanation connecting revenue to costs.
-)
+• Target Metric 1: Value — 1-sentence plain-English explanation connecting revenue to costs.
+• Target Metric 2: Value — 1-sentence plain-English explanation.
+• Target Metric 3: Value — 1-sentence plain-English explanation.
+• Target Metric 4: Value — 1-sentence plain-English explanation.
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
@@ -61,8 +61,8 @@ FORMAT:
         }
       ],
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048
+        temperature: 0.65,
+        maxOutputTokens: 650
       }
     };
 
