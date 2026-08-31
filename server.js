@@ -23,15 +23,10 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    // Pinned to Gemini 3.6 Flash
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
     const promptText = `You are Consultant Studio, an elite Strategic Operations Partner.
 
-CRITICAL DIRECTIVE: 100% SPECIFIC TO USER INPUT. ZERO GENERIC VAGUENESS.
-User Input: "${userMessage}"
+CRITICAL MANDATE: ZERO VAGUENESS. 100% SPECIFIC TO THE USER'S EXACT WORDS.
+User Spoken/Typed Input: "${userMessage}"
 Workspace Context: ${eco.name} (${eco.businessType})
 
 STRICT OPERATIONAL RULES:
@@ -62,21 +57,67 @@ FORMAT:
 ### 4. Bottom-Line Takeaway
 (1 direct, encouraging concluding sentence.)`;
 
-    const response = await fetch(geminiUrl, {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    // Primary: Google AI Studio Direct API using gemini-3.6-flash
+    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: {
-          temperature: 0.65,
-          maxOutputTokens: 1000
-        }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 800 }
       })
     });
 
+    // If Google Free Tier is rate-limited, failover to MyClaw Gateway with Gemini 3.6
     if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: `Google Gemini API error: ${errText}` });
+      console.warn("Primary Google API exhausted/waiting, falling over to MyClaw Gateway...");
+      response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
+          'User-Agent': 'Mozilla/5.0'
+        },
+        body: JSON.stringify({
+          model: "gemini-3.6-flash",
+          messages: [
+            { role: 'system', content: promptText },
+            { role: 'user', content: userMessage }
+          ],
+          temperature: 0.65,
+          max_tokens: 800
+        })
+      });
+
+      if (!response.ok) {
+        // Fallback to gemini-2.5-flash on MyClaw
+        response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.MYCLAW_API_KEY || '8743661c-dd5c-4c00-93c9-b7ec8030b4e1.ea5242e6-d13a-4060-9782-bc6e18274cb1'}`,
+            'User-Agent': 'Mozilla/5.0'
+          },
+          body: JSON.stringify({
+            model: "gemini-2.5-flash",
+            messages: [
+              { role: 'system', content: promptText },
+              { role: 'user', content: userMessage }
+            ],
+            temperature: 0.65,
+            max_tokens: 800
+          })
+        });
+      }
+
+      if (!response.ok) {
+        const errText = await response.text();
+        return res.status(500).json({ error: `Advisory engine error: ${errText}` });
+      }
+
+      const clawData = await response.json();
+      return res.json(clawData);
     }
 
     const data = await response.json();
