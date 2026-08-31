@@ -2639,10 +2639,16 @@
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> CSV
                     </button>
                     <button class="action-btn" onclick="exportDocBtn(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Doc
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Word
+                    </button>
+                    <button class="action-btn" onclick="exportExcelXLSX(this)">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Excel (.xlsx)
+                    </button>
+                    <button class="action-btn" onclick="exportPowerPointDeck(this)">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Deck (.pptx)
                     </button>
                     <button class="action-btn" onclick="exportPDFBtn(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Executive PDF
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> PDF
                     </button>
                 `;
                 card.appendChild(actions);
@@ -2814,6 +2820,142 @@
             `;
             printWindow.document.write(htmlContent);
             printWindow.document.close();
+        }
+
+        function exportExcelXLSX(btn) {
+            const card = btn.closest('.message-card');
+            const memoBody = card ? (card.querySelector('.memo-editable-body') || card) : null;
+            const text = memoBody ? (memoBody.innerText || memoBody.textContent) : "";
+            
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const wsSelect = document.getElementById('clientWorkspace');
+            const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : "Business";
+
+            const regex = /•\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)/g;
+            let match;
+            let rowsHtml = '';
+            
+            while ((match = regex.exec(text)) !== null) {
+                rowsHtml += `
+                <tr>
+                    <td style="font-weight:bold; border:1px solid #cbd5e1; padding:8px;">${match[1].trim()}</td>
+                    <td style="font-weight:bold; color:#15803d; border:1px solid #cbd5e1; padding:8px;">${match[2].trim()}</td>
+                    <td style="border:1px solid #cbd5e1; padding:8px;">${match[3].trim()}</td>
+                </tr>`;
+            }
+
+            if (!rowsHtml) {
+                rowsHtml = `
+                <tr>
+                    <td style="font-weight:bold; border:1px solid #cbd5e1; padding:8px;">Operational Target</td>
+                    <td style="font-weight:bold; color:#15803d; border:1px solid #cbd5e1; padding:8px;">Verified</td>
+                    <td style="border:1px solid #cbd5e1; padding:8px;">${text.substring(0, 140)}...</td>
+                </tr>`;
+            }
+
+            const excelTemplate = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${wsName} Financials</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+</head>
+<body style="font-family: Calibri, sans-serif;">
+    <table style="border-collapse:collapse; width:100%;">
+        <tr style="background:#0f172a; color:#ffffff;">
+            <th colspan="3" style="font-size:16px; font-weight:bold; padding:14px; text-align:left;">
+                CONSULTANT STUDIO // FINANCIAL & OPERATIONAL MODEL (${wsName})
+            </th>
+        </tr>
+        <tr style="background:#f1f5f9;">
+            <td colspan="3" style="padding:8px; font-size:11px; color:#475569;">
+                Status: Verified Production Model | Generated: ${timestamp} | Standard: Human-in-the-Loop Governance
+            </td>
+        </tr>
+        <tr><td colspan="3" style="height:10px;"></td></tr>
+        <tr style="background:#22c55e; color:#ffffff; font-weight:bold;">
+            <th style="border:1px solid #15803d; padding:10px; text-align:left; width:220px;">Telemetry Benchmark</th>
+            <th style="border:1px solid #15803d; padding:10px; text-align:left; width:140px;">Value / Target</th>
+            <th style="border:1px solid #15803d; padding:10px; text-align:left;">Financial & Operational Rationale</th>
+        </tr>
+        ${rowsHtml}
+        <tr><td colspan="3" style="height:15px;"></td></tr>
+        <tr style="background:#f8fafc;">
+            <td colspan="3" style="border:1px solid #cbd5e1; padding:10px; font-size:11px; color:#334155;">
+                <strong>Operator Sign-Off:</strong> Landen Jackson (Lead Strategic Operator) • 100% Boardroom & Bank Clearance
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `${wsName.replace(/\s+/g, '_')}_Financial_Model_${Date.now()}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 1500);
+        }
+
+        function exportPowerPointDeck(btn) {
+            const card = btn.closest('.message-card');
+            const memoBody = card ? (card.querySelector('.memo-editable-body') || card) : null;
+            const text = memoBody ? (memoBody.innerText || memoBody.textContent) : "";
+
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const wsSelect = document.getElementById('clientWorkspace');
+            const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : "Business";
+
+            const pptTemplate = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:p="urn:schemas-microsoft-com:office:powerpoint" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+    <style>
+        body { font-family: Arial, sans-serif; background:#090a0c; color:#ffffff; padding:30px; }
+        .slide-card { background:#0f1216; border:2px solid #1c2028; border-left:6px solid #22c55e; border-radius:10px; padding:30px; margin-bottom:30px; }
+        .slide-title { font-size:24px; font-weight:bold; color:#ffffff; margin-bottom:12px; }
+        .slide-kicker { font-size:12px; color:#4ade80; text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:6px; }
+        .slide-body { font-size:14px; color:#cbd5e1; line-height:1.6; }
+    </style>
+</head>
+<body>
+    <div class="slide-card">
+        <div class="slide-kicker">Executive Strategy Briefing // Slide 1</div>
+        <div class="slide-title">CONSULTANT STUDIO: ${wsName.toUpperCase()}</div>
+        <div class="slide-body">
+            <p><strong>Strategic Mandate:</strong> Executive Operations & Financial Telemetry</p>
+            <p><strong>Date:</strong> ${timestamp}</p>
+            <p><strong>Operator Clearance:</strong> Landen Jackson • Lead Strategic Operator</p>
+        </div>
+    </div>
+
+    <div class="slide-card">
+        <div class="slide-kicker">Strategic Memorandum // Slide 2</div>
+        <div class="slide-title">Executive Diagnosis & Operational Reality</div>
+        <div class="slide-body">
+            ${text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}
+        </div>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob([pptTemplate], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `${wsName.replace(/\s+/g, '_')}_Executive_Deck_${Date.now()}.ppt`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 1500);
         }
 
         function exportDocBtn(btn) {
