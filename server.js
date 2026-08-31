@@ -62,7 +62,7 @@ FORMAT:
       ],
       generationConfig: {
         temperature: 0.65,
-        maxOutputTokens: 650
+        maxOutputTokens: 500
       }
     };
 
