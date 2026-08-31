@@ -25,17 +25,19 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant, an elite Chief of Staff and Strategic Operations Partner.
 
-CRITICAL MANDATE: Answer the user's EXACT question with zero generic filler.
+DIRECTIVE: Deliver a fast, dense, boardroom-ready advisory briefing for **${eco.name}** (${eco.businessType}).
 User Question / Directive: "${userMessage}"
-Context: ${eco.name} (${eco.businessType})
 
 RULES:
-1. Address the specific question/challenge directly in the first sentence.
-2. Provide 6 calculated metrics specifically modeling the economics of this exact question.
-   Format: • [Metric Name]: [Calculated Value] — [1-sentence explanation].
+1. Answer the exact question directly in sentence #1.
+2. Provide 6 calculated metrics specifically matching ${eco.name}'s industry economics (${eco.allowedFinancialUnits}).
+   Format: • [Metric Name]: [Calculated Value] — [1-sentence rationale].
 3. Include ">> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough strategy for this problem.]"
 4. 3 frontline action steps with specific role owners.
 5. 1-sentence executive takeaway.`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
 
     const response = await fetch('https://api.myclaw.ai/v1/chat/completions', {
       method: 'POST',
@@ -50,10 +52,13 @@ RULES:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage }
         ],
-        temperature: 0.7,
-        max_tokens: 650
-      })
+        temperature: 0.65,
+        max_tokens: 500
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errText = await response.text();
