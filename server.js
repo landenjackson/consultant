@@ -30,7 +30,7 @@ app.post('/api/chat', async (req, res) => {
 The user is asking: "${userMessage}"
 Context: ${eco.name}
 
-Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler). Be concise so you finish all 4 sections completely without getting cut off.
+Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler).
 
 FORMAT:
 
@@ -62,7 +62,10 @@ FORMAT:
       ],
       generationConfig: {
         temperature: 0.6,
-        maxOutputTokens: 800
+        maxOutputTokens: 2048,
+        thinkingConfig: {
+          thinkingBudget: 0
+        }
       }
     };
 
