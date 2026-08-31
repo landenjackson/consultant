@@ -30,7 +30,7 @@ app.post('/api/chat', async (req, res) => {
 The user is asking: "${userMessage}"
 Context: ${eco.name}
 
-Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler).
+Write a tailored, practical memo. Use clear, plain English (no academic jargon or robotic filler). Be concise so you finish all 4 sections completely without getting cut off.
 
 FORMAT:
 
@@ -40,9 +40,10 @@ FORMAT:
 >> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
 
 ### 2. Financial & Operational Telemetry
-(Provide 5 distinct metrics with real numbers tailored to this prompt:
-• Metric Name: Value — 1-sentence plain-English explanation.
-)
+• Target Metric 1: Value — 1-sentence plain-English explanation.
+• Target Metric 2: Value — 1-sentence plain-English explanation.
+• Target Metric 3: Value — 1-sentence plain-English explanation.
+• Target Metric 4: Value — 1-sentence plain-English explanation.
 
 ### 3. Immediate Action Steps
 1. Days 1–30: [Action & Role Owner]
@@ -60,8 +61,8 @@ FORMAT:
         }
       ],
       generationConfig: {
-        temperature: 0.65,
-        maxOutputTokens: 600
+        temperature: 0.6,
+        maxOutputTokens: 800
       }
     };
 
