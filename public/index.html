@@ -2638,10 +2638,10 @@
                     <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> CSV
                     </button>
-                    <button class="action-btn" onclick="exportToGoogleDrive(this.closest('.message-card').querySelector('.memo-editable-body').innerText)">
+                    <button class="action-btn" onclick="exportDocBtn(this)">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Doc
                     </button>
-                    <button class="action-btn" onclick="printExecutivePDF(this.closest('.message-card').querySelector('.memo-editable-body').innerHTML)">
+                    <button class="action-btn" onclick="exportPDFBtn(this)">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Executive PDF
                     </button>
                 `;
@@ -2816,15 +2816,33 @@
             printWindow.document.close();
         }
 
+        function exportDocBtn(btn) {
+            const card = btn.closest('.message-card');
+            const memoBody = card ? (card.querySelector('.memo-editable-body') || card) : null;
+            const text = memoBody ? (memoBody.innerText || memoBody.textContent) : "Strategic Briefing";
+            exportToGoogleDrive(text);
+        }
+
+        function exportPDFBtn(btn) {
+            const card = btn.closest('.message-card');
+            const memoBody = card ? (card.querySelector('.memo-editable-body') || card) : null;
+            const html = memoBody ? memoBody.innerHTML : "Strategic Briefing";
+            printExecutivePDF(html);
+        }
+
         function exportToGoogleDrive(content) {
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const formattedDoc = `CONSULTANT STUDIO // EXECUTIVE BRIEFING
-STATUS: OPERATOR VERIFIED & SIGNED OFF
+            try {
+                const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const wsSelect = document.getElementById('clientWorkspace');
+                const wsName = wsSelect ? wsSelect.options[wsSelect.selectedIndex].text.replace(/^[^\w]+/, '').trim() : "Business";
+                
+                const formattedDoc = `CONSULTANT STUDIO // EXECUTIVE BRIEFING
+WORKSPACE: ${wsName}
 DATE: ${timestamp}
 GOVERNANCE: HUMAN-IN-THE-LOOP ORCHESTRATION ENFORCED
 
 ================================================================================
-EXECUTIVE SUMMARY & OPERATIONAL MEMO
+STRATEGIC MEMORANDUM & TELEMETRY
 ================================================================================
 
 ${content}
@@ -2833,16 +2851,25 @@ ${content}
 OPERATOR SIGN-OFF BLOCK
 Operator Signature: Landen Jackson (Lead Strategic Operator)
 Verification Status: APPROVED FOR PRODUCTION EXECUTION
-Data Privacy Standard: Zero Public Model Training Exposure (Isolated Private Edge)
+Standard: Boardroom-Ready / Google Drive Sync
 ================================================================================
 `;
-            const blob = new Blob([formattedDoc], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `Consultant_Briefing_${Date.now()}.doc`;
-            link.click();
-            alert("Briefing exported with official Operator Sign-Off Block (Ready for Google Docs / Drive).");
+                const blob = new Blob([formattedDoc], { type: 'application/msword;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${wsName.replace(/\s+/g, '_')}_Strategic_Memo_${Date.now()}.doc`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 1500);
+            } catch (err) {
+                console.error("Export error:", err);
+                alert("Export error: " + err.message);
+            }
         }
 
         // FEATURE 3: Encrypted Vault Management
