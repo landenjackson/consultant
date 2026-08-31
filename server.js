@@ -61,8 +61,8 @@ FORMAT:
         }
       ],
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048
+        temperature: 0.65,
+        maxOutputTokens: 1000
       }
     };
 
