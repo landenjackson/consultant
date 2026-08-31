@@ -28,13 +28,26 @@ app.post('/api/chat', async (req, res) => {
 DIRECTIVE: Deliver a fast, dense, boardroom-ready advisory briefing for **${eco.name}** (${eco.businessType}).
 User Question / Directive: "${userMessage}"
 
-RULES:
-1. Answer the exact question directly in sentence #1.
-2. Provide 6 calculated metrics specifically matching ${eco.name}'s industry economics (${eco.allowedFinancialUnits}).
-   Format: • [Metric Name]: [Calculated Value] — [1-sentence rationale].
-3. Include ">> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough strategy for this problem.]"
-4. 3 frontline action steps with specific role owners.
-5. 1-sentence executive takeaway.`;
+STRICT P&L & UNIT-ECONOMIC CORRELATION RULES:
+1. EXPLICIT REVENUE & EXPENSE RECONCILIATION:
+   - All numbers MUST strictly align with the authentic financial scale of this specific discipline.
+   - You MUST explicitly state the Gross Revenue, the Direct Costs/Overhead (COGS/Labor/Facility), and the resulting Net Operating Margin.
+   - Example 1 (Therapy/Psychology): 25 billable hrs/wk @ $185/hr = $18,500/mo Gross Revenue. Minus $3,800/mo Overhead (EHR, suite lease, billing) = $14,700/mo Net Contribution (79.5% Net Margin).
+   - Example 2 (Medical Practice): 22 patients/day @ $195 reimbursement = $94,380/mo Gross Collections. Minus $32,000 Staff Labor (34%) + $11,500 Clinic Overhead = $50,880/mo Net Margin (53.9%).
+   - Example 3 (Engineering Firm): $210/hr blended billable rate @ 3.1x labor multiplier on $68/hr direct salary = $142/hr Gross Margin per billable engineer.
+   - Example 4 (Fitness/Gym): 240 members @ $169/mo dues = $40,560/mo Recurring Revenue. Minus $17,000 Trainer Splits (42%) + $8,200 Facility Rent = $15,360/mo Net Profit.
+
+2. TELEMETRY TABLE (6 CALCULATED BENCHMARKS):
+   - Provide 6 distinct, mathematically grounded metrics with explicit formulas showing how revenue and costs connect.
+   - Format: • [Metric Name]: [Calculated Value] — [Explicit formula and financial impact on revenue vs cost].
+
+3. HIGH-IMPACT TURNAROUND CATALYST:
+   - Include ">> [HIGH-IMPACT TURNAROUND CATALYST: 1-sentence breakthrough operational lever that expands net margin.]"
+
+4. FRONTLINE ACTION PLAN & ROLE OWNERS:
+   - 3 concrete action steps with specific role owners.
+
+5. 1-SENTENCE EXECUTIVE TAKEAWAY.`;
 
     const apiKey = process.env.GEMINI_API_KEY;
     
