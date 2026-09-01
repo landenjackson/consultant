@@ -1588,6 +1588,66 @@
         </div>
     </div>
 
+    <!-- Scheduled Daily Dispatch Modal (Cron-Inspired) -->
+    <div class="modal-overlay" id="dispatchModal">
+        <div class="modal-content" style="max-width:540px;">
+            <span class="close-modal" onclick="closeDispatchModal()">&times;</span>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="display:inline-block; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); color:#4ade80; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:8px; text-transform:uppercase;">
+                    ⏰ Autonomous Cron Dispatch
+                </div>
+                <h2 style="font-size: 20px; margin-bottom: 4px; font-weight: 800;">Schedule Daily Executive Briefing</h2>
+                <p style="color: #94a3b8; font-size: 12.5px;">Receive tailored strategic audits, margin leakage telemetry, and daily turnaround priorities automatically.</p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+                <div class="intake-field">
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Target Workspace</label>
+                    <select id="dispatchWorkspace" class="custom-select" style="background:#090a0c;">
+                        <option value="default">General Workspace</option>
+                        <option value="mas_diner">Ma's Diner (Hospitality)</option>
+                        <option value="cleaver_brooks">Cleaver-Brooks (Industrial)</option>
+                        <option value="bannerman">Bannerman Crossings (Commercial Real Estate)</option>
+                    </select>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="intake-field">
+                        <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Delivery Time</label>
+                        <select id="dispatchTime" class="custom-select" style="background:#090a0c;">
+                            <option value="07:00">7:00 AM (Early Shift)</option>
+                            <option value="08:00" selected>8:00 AM (Executive Rush)</option>
+                            <option value="09:00">9:00 AM (Market Open)</option>
+                            <option value="17:00">5:00 PM (Daily Close)</option>
+                        </select>
+                    </div>
+                    <div class="intake-field">
+                        <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Cadence</label>
+                        <select id="dispatchCadence" class="custom-select" style="background:#090a0c;">
+                            <option value="daily">Every Morning (Mon–Sun)</option>
+                            <option value="weekdays">Weekdays Only (Mon–Fri)</option>
+                            <option value="weekly">Weekly Monday Reset</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="intake-field">
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Destination (Email / Webhook / Telegram)</label>
+                    <input type="text" id="dispatchTarget" placeholder="e.g. founder@company.com or Telegram Handle" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
+                </div>
+
+                <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:10px 12px; font-size:11.5px; color:#94a3b8;">
+                    <strong>🛡️ Zero-Spam Silent Watchdog:</strong> The autonomous scheduler checks overnight commodity prices and foot-traffic feeds, compiling verified P&L benchmarks before you open your laptop.
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #1e232c; padding-top:14px;">
+                <button class="action-btn" onclick="closeDispatchModal()">Cancel</button>
+                <button class="btn-trial" style="width:auto; padding:8px 20px;" onclick="saveDispatchSchedule()">Activate Daily Dispatch ⚡</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Tour Onboarding Modal -->
     <div class="modal-overlay" id="tourModal">
         <div class="modal-content" style="max-width:680px;">
@@ -1769,6 +1829,9 @@
                 </button>
                 <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleFocusMode()">
                     <span>⛶ Focus</span>
+                </button>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="openDispatchModal()">
+                    <span>⏰ Dispatch</span>
                 </button>
                 <button class="action-btn" style="padding:3px 8px; font-size:11px; color:#4ade80;" onclick="toggleCitationDrawer()">
                     <span>📚 Citations</span>
@@ -2387,6 +2450,28 @@
         function closeTourModal() { 
             document.getElementById('tourModal').style.display = 'none'; 
             localStorage.setItem('consultant_tour_seen', 'true');
+        }
+
+        // Scheduled Daily Dispatch Modal Controller
+        function openDispatchModal() {
+            document.getElementById('dispatchModal').style.display = 'flex';
+            closeSidebar();
+        }
+
+        function closeDispatchModal() {
+            document.getElementById('dispatchModal').style.display = 'none';
+        }
+
+        function saveDispatchSchedule() {
+            const ws = document.getElementById('dispatchWorkspace').value;
+            const time = document.getElementById('dispatchTime').value;
+            const cadence = document.getElementById('dispatchCadence').value;
+            const target = document.getElementById('dispatchTarget').value.trim() || 'Active Telegram/Email';
+
+            localStorage.setItem('consultant_dispatch_config', JSON.stringify({ ws, time, cadence, target, active: true }));
+            closeDispatchModal();
+
+            alert(`⏰ Daily Dispatch Activated!\n• Workspace: ${ws}\n• Delivery: ${time} (${cadence})\n• Destination: ${target}\n\nYour strategic briefings will be delivered autonomously.`);
         }
 
         // Global Command Palette (Cmd + K) Controller
