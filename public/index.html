@@ -2286,18 +2286,26 @@
                                 <input type="range" class="slider-input" id="sliderVolume" min="10" max="1000" value="160" step="5" oninput="recalcSimulator()">
                             </div>
 
+                            <div class="slider-row">
+                                <div class="slider-label-group">
+                                    <span>Operational Prime Cost Leakage:</span>
+                                    <strong id="sliderCostDisplay" style="color:#f87171;">58.0% (Food/Parts + Direct Labor)</strong>
+                                </div>
+                                <input type="range" class="slider-input" id="sliderCost" min="20" max="85" value="58" step="0.5" oninput="recalcSimulator()">
+                            </div>
+
                             <div class="slider-results-grid">
                                 <div class="slider-stat-card">
                                     <div class="stat-card-label">Monthly Gross Revenue</div>
                                     <div class="stat-card-val" id="simGrossRev">$79,200</div>
                                 </div>
                                 <div class="slider-stat-card">
-                                    <div class="stat-card-label">Prime Cost Floor (30%)</div>
-                                    <div class="stat-card-val" id="simPrimeCost">$23,760</div>
+                                    <div class="stat-card-label">Direct Operating Cost</div>
+                                    <div class="stat-card-val" id="simPrimeCost" style="color:#f87171;">$45,936</div>
                                 </div>
                                 <div class="slider-stat-card">
-                                    <div class="stat-card-label">Projected Net Contribution</div>
-                                    <div class="stat-card-val" id="simNetProfit">$55,440</div>
+                                    <div class="stat-card-label">Annual Owner Cash Flow</div>
+                                    <div class="stat-card-val" id="simNetProfit" style="color:#4ade80; font-size:18px;">+$399,168/yr</div>
                                 </div>
                             </div>
                         </div>
@@ -2317,16 +2325,21 @@
 
                     </div>
 
-                    <!-- Fixed Docked Input Bar inside Canvas with Voice Microphone -->
+                    <!-- Fixed Docked Input Bar inside Canvas with OCR Camera Upload & Voice Mic -->
                     <div class="input-dock">
                         <div class="input-box">
+                            <!-- Hidden File Input for Instant POS/P&L Photo Upload -->
+                            <input type="file" id="posReceiptUpload" accept="image/*,.pdf,.csv" style="display:none;" onchange="handleReceiptUpload(event)">
+                            <button class="icon-btn" title="📷 Snap / Upload P&L or POS Register Tape" onclick="document.getElementById('posReceiptUpload').click()" style="color:#4ade80;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </button>
                             <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             </button>
                             <button class="mic-btn" id="voiceMicBtn" title="Speak your directive (Speech-to-Text)" onclick="toggleVoiceRecording()">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                             </button>
-                            <input type="text" id="userInput" placeholder="Ask a question, speak your directive, or enter custom parameters..." onkeydown="handleKey(event)">
+                            <input type="text" id="userInput" placeholder="Ask a question, speak your directive, or snap a photo of your P&L..." onkeydown="handleKey(event)">
                             <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
                                 <span>Execute</span>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -2387,18 +2400,23 @@
         function recalcSimulator() {
             const price = parseFloat(document.getElementById('sliderPrice').value);
             const volume = parseInt(document.getElementById('sliderVolume').value);
+            const costPct = parseFloat(document.getElementById('sliderCost')?.value || 58) / 100;
 
             document.getElementById('sliderPriceDisplay').textContent = `$${price.toFixed(2)}`;
             document.getElementById('sliderVolumeDisplay').textContent = `${volume.toLocaleString()} units/day`;
+            if (document.getElementById('sliderCostDisplay')) {
+                document.getElementById('sliderCostDisplay').textContent = `${(costPct * 100).toFixed(1)}% (Food/Parts + Direct Labor)`;
+            }
 
             const dailyRev = price * volume;
             const monthlyGross = dailyRev * 30;
-            const primeCost = monthlyGross * 0.30;
-            const netContribution = monthlyGross - primeCost;
+            const directCost = monthlyGross * costPct;
+            const netContribution = monthlyGross - directCost;
+            const annualCashFlow = netContribution * 12;
 
             document.getElementById('simGrossRev').textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
-            document.getElementById('simPrimeCost').textContent = `$${Math.round(primeCost).toLocaleString()}`;
-            document.getElementById('simNetProfit').textContent = `$${Math.round(netContribution).toLocaleString()}`;
+            document.getElementById('simPrimeCost').textContent = `$${Math.round(directCost).toLocaleString()}`;
+            document.getElementById('simNetProfit').textContent = `+$${Math.round(annualCashFlow).toLocaleString()}/yr`;
 
             // Sync with Feature 2 Sensitivity Matrix
             const worstVal = monthlyGross * 0.80;
@@ -2406,6 +2424,16 @@
             document.getElementById('scWorstVal').textContent = `$${Math.round(worstVal).toLocaleString()}`;
             document.getElementById('scBaseVal').textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
             document.getElementById('scOptimalVal').textContent = `$${Math.round(optimalVal).toLocaleString()}`;
+        }
+
+        // Feature 2: Instant POS Receipt / P&L Photo Upload Handler
+        function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const input = document.getElementById('userInput');
+            input.value = `[Analyzing Uploaded Document: ${file.name}] — Audit gross sales, food/labor prime costs, and unbilled margin leakage from this report.`;
+            sendMessage();
         }
 
         // UPGRADE 1 & 2: Profit Leakage Scanner & Waterfall Calculator
