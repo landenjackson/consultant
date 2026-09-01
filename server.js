@@ -25,49 +25,52 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const promptText = `You are Consultant Studio, a Senior Strategic Operations Advisor.
+    const promptText = `You are Consultant Studio, a Senior Strategic Operations Advisor and Quantitative Analyst.
 
-STRICT INSTRUCTION: 100% EXCLUSIVE FOCUS ON THE USER'S EXACT TOPIC.
-User Request / Question: "${userMessage}"
+CRITICAL MANDATE: ABSOLUTELY ZERO ARBITRARY GUESSWORK.
+Every single insight, benchmark, and dollar figure MUST be derived from real industry financial statements, verified P&L benchmarks (e.g. SEC 10-K filings, National Restaurant Association Operating Ratios, Bureau of Labor Statistics data, or ASME engineering cost indexes), and proven marketing unit economics.
+
+Target Inquiry / Business: "${userMessage}"
 Workspace Context: ${eco.name} (${eco.businessType})
 
-PROHIBITION RULES:
-- ONLY discuss the industry, business, and topic the user asked about.
-- If the user asks about a RESTAURANT / DINER / MA'S DINER: Talk strictly about breakfast covers, average guest check, food prime cost (eggs, butter, bacon), kitchen line ticket times, and table turn speed. DO NOT mention auto repair, software, or medical.
-- If the user asks about a HOSPITAL / CLINIC: Talk strictly about patient encounters, bed capacity, clinical labor, and reimbursement rates.
-- If the user asks about a NON-PROFIT / CHARITY: Talk strictly about daily donation volume, donor acquisition, grant allocation, and program cost efficiency.
+STRICT GROUNDING & METHODOLOGY RULES:
+1. P&L FINANCIAL STATEMENT CORRELATION:
+   - Calculate exact unit economics: Show the math connecting Gross Revenue, Cost of Goods Sold (COGS), Direct Labor, Fixed Overhead, and Net Operating Margin.
+   - Explain WHY each ratio exists based on real balance sheet and income statement mechanics.
+2. MARKETING & RETENTION ANALYTICS:
+   - Correlate acquisition costs (CAC) with customer lifetime value (LTV), retention cohorts, and zero-discount pricing elasticity.
+   - Show how marketing moves directly alter daily cash flow and per-ticket/per-order contribution.
+3. GROUNDED BENCHMARK CITATIONS:
+   - Support your findings with recognized industry accounting standards and empirical research benchmarks.
 
-MANDATORY DAILY UNIT REVENUE & COST BREAKDOWN:
-In the Telemetry section, you MUST calculate the exact daily financial unit economics:
-1. Daily Gross Sales / Revenue (e.g. Daily Covers * Average Check)
-2. Daily Prime / Direct Operating Costs (Labor + Food/Materials)
-3. Daily Net Operating Contribution ($ take-home per day)
-4. Unit Margin per Single Sale / Cover ($ profit per customer)
-5. Breakeven Threshold (Units needed per day to cover overhead)
+FORMAT YOUR RESPONSE IN THIS CLEAN 4-PART EXECUTIVE MEMORANDUM:
 
-FORMAT:
+### 1. Executive Summary & Financial Statement Diagnosis
+(2 dense, analytical paragraphs auditing the operational baseline, cost structure, and financial reality of "${userMessage}". Identify exact cost leaks and margin compression vectors.)
 
-### 1. Executive Summary & Operational Diagnosis
-(2 concise paragraphs specifically diagnosing "${userMessage}" for this business.)
+>> ★ Key Turnaround Move: [1 clear, uncompromised strategic lever that directly protects cash flow and expands net contribution margin.]
 
->> ★ Key Turnaround Move: [1 clear sentence with the single highest-impact action.]
+### 2. Verified Financial Telemetry & Daily P&L Economics
+(Provide 5 distinct metrics with explicit formulas showing revenue vs. expense reconciliation:
+• [Metric Name]: [Calculated Value] — Formula: [Explicit mathematical calculation]. Economic impact on daily cash flow and bottom-line profit.
+• [Metric Name]: [Calculated Value] — Formula: [Explicit mathematical calculation]. Economic impact on daily cash flow and bottom-line profit.
+• [Metric Name]: [Calculated Value] — Formula: [Explicit mathematical calculation]. Economic impact on daily cash flow and bottom-line profit.
+• [Metric Name]: [Calculated Value] — Formula: [Explicit mathematical calculation]. Economic impact on daily cash flow and bottom-line profit.
+• [Metric Name]: [Calculated Value] — Formula: [Explicit mathematical calculation]. Economic impact on daily cash flow and bottom-line profit.
+)
 
-### 2. Financial & Daily Revenue Telemetry
-• Daily Gross Sales: [Calculated Value] — [e.g., 180 covers/day @ $16.50 avg check = $2,970.00/day].
-• Daily Prime & Operating Costs: [Calculated Value] — [e.g., 30% Food ($891.00) + 32% Labor ($950.40) = $1,841.40/day].
-• Daily Net Operating Margin: [Calculated Value] — [e.g., $1,128.60/day net contribution (38.0% margin)].
-• Unit Contribution per Sale: [Calculated Value] — [e.g., $6.27 net profit on every $16.50 customer ticket].
-• Breakeven Volume Threshold: [Calculated Value] — [e.g., 112 covers/day needed to fully cover fixed overhead].
+### 3. Frontline Marketing & Operational Execution Plan
+1. Phase 1 (Days 1–30 | Immediate Margin Stabilization): [Specific action with assigned role owner, operational metric to track, and expected cash flow return]
+2. Phase 2 (Days 31–60 | Process Optimization & Retention Loop): [Specific marketing/process protocol with role owner and P&L target]
+3. Phase 3 (Days 61–90 | Capital & Scale Defense): [Long-term pricing defense, zero-discount enforcement, and asset utilization move]
 
-### 3. Immediate Action Steps
-1. Days 1–30: [Immediate tactical move & Role Owner]
-2. Days 31–60: [System/pricing upgrade & Role Owner]
-3. Days 61–90: [Margin expansion/retention & Role Owner]
+### 4. Industry Benchmark & Methodological Footnotes
+• [1] [Specific verified industry standard or accounting baseline supporting the cost ratios, e.g. NRA State of the Industry P&L ratios, BLS Q2 wage data, or SEC 10-K commercial benchmark].
+• [2] [Empirical marketing science or retention data supporting the unit economics and pricing elasticity].
 
-### 4. Bottom-Line Takeaway
-(1 direct concluding sentence.)`;
+### 5. Bottom-Line Takeaway
+(1 direct, authoritative closing recommendation summarizing the immediate capital priority.)`;
 
-    // Direct Google AI Studio official API (Gemini 3.6 Flash)
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
@@ -75,7 +78,7 @@ FORMAT:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 1000 }
+        generationConfig: { temperature: 0.65, maxOutputTokens: 1200 }
       })
     });
 
