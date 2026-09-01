@@ -2026,7 +2026,15 @@
                             </div>
                         </div>
 
-                        <button class="btn-launch-intake" onclick="generateFromDirectiveBuilder()" style="margin-top:6px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:10px;">
+                            <span style="font-size:10px; color:#71717a; width:100%; font-weight:700; text-transform:uppercase;">Quick 1-Tap Scenarios:</span>
+                            <button type="button" class="action-btn" style="padding:2px 7px; font-size:10px;" onclick="autofillDirective('Ma\'s Diner', 'Capture morning foot-traffic & check size', 'Zero discounts / 28% food cost', 'Audit 7-9am counter line speed and beverage attach')">🥞 Diner Rush</button>
+                            <button type="button" class="action-btn" style="padding:2px 7px; font-size:10px;" onclick="autofillDirective('Midtown Dental & Clinic', 'Reduce patient no-shows under 4%', 'Zero extra admin staff', 'Automate 48hr SMS deposit and recall system')">🩺 Dental / Clinic</button>
+                            <button type="button" class="action-btn" style="padding:2px 7px; font-size:10px;" onclick="autofillDirective('Apex Performance Gym', 'Scale from 180 to 250 active members', 'Cap churn under 3.8% / $169 dues', 'Structure trainer split margins and recovery packs')">🏋️ Gym / Studio</button>
+                            <button type="button" class="action-btn" style="padding:2px 7px; font-size:10px;" onclick="autofillDirective('Summit Engineering Group', 'Defend 3.1x labor multiplier on $350k bid', 'Fixed fee / protect 85% billable time', 'Model engineering hours vs scope-creep risk')">📐 Engineering RFP</button>
+                        </div>
+
+                        <button class="btn-launch-intake" onclick="generateFromDirectiveBuilder()" style="margin-top:10px;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                             GENERATE STRATEGIC MEMO
                         </button>
@@ -2567,7 +2575,26 @@
             const ws = document.getElementById('clientWorkspace').value;
             const wsText = document.getElementById('clientWorkspace').options[document.getElementById('clientWorkspace').selectedIndex].text;
             document.getElementById('currentWorkspaceDisplay').textContent = wsText;
+            localStorage.setItem('consultant_active_workspace', ws);
             renderVault();
+        }
+
+        function loadCustomWorkspaces() {
+            try {
+                const customWs = JSON.parse(localStorage.getItem('consultant_custom_workspaces') || '[]');
+                const select = document.getElementById('clientWorkspace');
+                customWs.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.key;
+                    opt.textContent = item.name;
+                    select.appendChild(opt);
+                });
+                const savedActive = localStorage.getItem('consultant_active_workspace');
+                if (savedActive && select.querySelector(`option[value="${savedActive}"]`)) {
+                    select.value = savedActive;
+                }
+                onWorkspaceChange();
+            } catch (e) { console.error("Error loading custom workspaces:", e); }
         }
 
         function createWorkspace() {
@@ -2580,7 +2607,20 @@
             opt.textContent = name;
             select.appendChild(opt);
             select.value = key;
+
+            // Save to persistent localStorage
+            const customWs = JSON.parse(localStorage.getItem('consultant_custom_workspaces') || '[]');
+            customWs.push({ key, name });
+            localStorage.setItem('consultant_custom_workspaces', JSON.stringify(customWs));
+
             onWorkspaceChange();
+        }
+
+        function autofillDirective(target, goal, constraint, prompt) {
+            document.getElementById('dirTargetName').value = target;
+            document.getElementById('dirGoal').value = goal;
+            document.getElementById('dirConstraint').value = constraint;
+            document.getElementById('dirPrompt').value = prompt;
         }
 
         function toggleTaskMode(mode) {
@@ -3344,6 +3384,7 @@ Standard: Boardroom-Ready / Google Drive Sync
         }
         setInterval(updateClock, 1000);
         updateClock();
+        loadCustomWorkspaces();
         updateVaultCount();
         checkSubscriptionStatus();
         checkFirstTimeUser();
