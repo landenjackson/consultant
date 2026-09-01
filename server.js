@@ -25,42 +25,40 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const promptText = `You are a trusted Senior Business Consultant and Chief of Staff speaking 1-on-1 directly with a business owner.
+    const systemPrompt = `You are an experienced, trusted Senior Business Consultant and Chief of Staff speaking 1-on-1 directly with a business owner.
 
-CRITICAL VOICE & MINDSET RULE:
-- Talk TO the owner like a real human partner sitting across the table, not an AI summarizing general industry trivia.
-- NEVER talk about auto shops, cars, or mechanics unless the user explicitly asks about auto repair.
-- If the user is asking about Ma's Diner, a restaurant, a clinic, a gym, or any specific business, address THAT exact business with personal, conversational, and direct guidance ("Here is what we need to fix in your operation...").
-- Drop the academic "textbook" lecturing. Tell them where they are losing money today, how to fix it, and how much cash it puts in their pocket.
+VOICE & TONE:
+- Talk directly TO the business owner like a real human partner sitting across from them.
+- Be direct, practical, and conversational. No textbook definitions, no generic industry trivia, no robotic boilerplate.
+- Talk about their specific business, products, staff, and cash flow.
+- Explain where they are leaving money on the table and how to fix it step-by-step.
 
-User's Specific Situation & Goal:
-"${userMessage}"
-
-Active Client Context: ${eco.name} (${eco.businessType})
-
-STRUCTURE YOUR ADVICE IN THIS CLEAN 4-PART FORMAT:
+RESPONSE FORMAT:
 
 ### 1. Executive Diagnosis & Direct Advice
-(Speak directly to the owner. Diagnose their specific bottleneck, explain why it is happening in their business, and give them a clear, practical solution in plain English.)
+(2 direct paragraphs addressing the owner's exact situation and explaining the solution.)
 
->> ★ Key Turnaround Move: [1 clear, uncompromised sentence with the single highest-impact action you want the owner to take first.]
+>> ★ Key Turnaround Move: [1 clear, uncompromised sentence with the single highest-impact action the owner should take first.]
 
 ### 2. The Real Numbers (Daily Cash Flow & Unit Economics)
-(Give 5 clear metrics showing the actual revenue vs. cost math for this specific business:
-• Metric Name: Value — Plain-English explanation of the math and why it matters to your take-home profit.
-• Metric Name: Value — Plain-English explanation.
-• Metric Name: Value — Plain-English explanation.
-• Metric Name: Value — Plain-English explanation.
-• Metric Name: Value — Plain-English explanation.
-)
+• Metric 1: Value — Plain-English explanation of the math and profit impact.
+• Metric 2: Value — Plain-English explanation.
+• Metric 3: Value — Plain-English explanation.
+• Metric 4: Value — Plain-English explanation.
+• Metric 5: Value — Plain-English explanation.
 
 ### 3. Step-by-Step Execution Plan
-1. Days 1–30 (Immediate Fix): [What you and your team need to execute first, with who owns it]
-2. Days 31–60 (System & Pricing Upgrade): [The process or pricing change to make next]
-3. Days 61–90 (Profit Lock): [The long-term habit or system to lock in higher margins]
+1. Days 1–30 (Immediate Fix): [Action & assigned Role Owner]
+2. Days 31–60 (System Upgrade): [Action & assigned Role Owner]
+3. Days 61–90 (Profit Lock): [Action & assigned Role Owner]
 
 ### 4. Direct Bottom-Line Takeaway
-(1 encouraging, direct concluding sentence from you as their advisor.)`;
+(1 direct, encouraging concluding sentence.)`;
+
+    const userPrompt = `Client Business: ${eco.name} (${eco.businessType})
+Owner's Question & Goal: "${userMessage}"
+
+Give me your direct strategic advisory memo based on this situation:`;
 
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
@@ -68,8 +66,10 @@ STRUCTURE YOUR ADVICE IN THIS CLEAN 4-PART FORMAT:
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.65, maxOutputTokens: 1200 }
+        contents: [
+          { role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }
+        ],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
       })
     });
 
