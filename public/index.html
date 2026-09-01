@@ -881,6 +881,82 @@
         .citation-source { font-size: 11px; color: #4ade80; margin-bottom: 6px; display: block; text-decoration: none; word-break: break-all; }
         .citation-quote { font-size: 11.5px; color: #94a3b8; line-height: 1.45; font-style: italic; background: rgba(255,255,255,0.02); padding: 6px 8px; border-radius: 4px; }
 
+        /* Upgrade 1: Interactive Strategy Comparison Canvas */
+        .strategy-diff-box {
+            background: #0d1015;
+            border: 1px solid #1f2530;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .diff-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .diff-card {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .diff-card.strategy-a { border-left: 4px solid #22c55e; }
+        .diff-card.strategy-b { border-left: 4px solid #ef4444; }
+
+        .diff-badge {
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .diff-badge.a { color: #4ade80; }
+        .diff-badge.b { color: #f87171; }
+
+        .diff-stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #cbd5e1;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .diff-profit-hero {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-top: 4px;
+        }
+
+        /* OpenClaw Live Web Intelligence Beacon */
+        .openclaw-beacon {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #4ade80;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .openclaw-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #22c55e;
+        }
+
         /* Feature 2: Sensitivity Heatmap Matrix */
         .sensitivity-matrix-box {
             background: #0d1015;
@@ -1827,6 +1903,9 @@
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <span>Cmd + K</span>
                 </button>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleStrategyDiff()">
+                    <span>⚖️ Compare</span>
+                </button>
                 <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleFocusMode()">
                     <span>⛶ Focus</span>
                 </button>
@@ -2051,6 +2130,46 @@
                 <div class="telemetry-pane">
                     <div class="telemetry-feed" id="chatArea">
                         
+                        <!-- Upgrade 1: Interactive Strategy Comparison Diff Canvas -->
+                        <div class="strategy-diff-box" id="strategyDiffCanvas">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span style="font-size:13px; font-weight:800; color:#ffffff; text-transform:uppercase;">⚖️ Strategy Comparison & Margin Diff</span>
+                                    <span class="openclaw-beacon"><span class="openclaw-dot"></span> OpenClaw 2.0 Recon Active</span>
+                                </div>
+                                <span style="font-size:10.5px; color:#4ade80; font-weight:700;">LIVE SCENARIO DIFF</span>
+                            </div>
+
+                            <div class="diff-grid">
+                                <div class="diff-card strategy-a">
+                                    <div class="diff-badge a">Path A: Zero-Discount Strategy (Recommended)</div>
+                                    <div class="diff-stat-row"><span>Average Check / Unit:</span> <strong style="color:#ffffff;">$16.85</strong></div>
+                                    <div class="diff-stat-row"><span>Daily Customer Volume:</span> <strong>160 covers/day</strong></div>
+                                    <div class="diff-stat-row"><span>Prime Cost Drag (Food+Labor):</span> <strong>58.0%</strong></div>
+                                    <div class="diff-stat-row"><span>90-Day Retention Rate:</span> <strong style="color:#4ade80;">74.0%</strong></div>
+                                    <div style="margin-top:6px; border-top:1px solid #1c222c; padding-top:6px;">
+                                        <div style="font-size:10.5px; color:#71717a; text-transform:uppercase; font-weight:700;">Monthly Net Profit</div>
+                                        <div class="diff-profit-hero" style="color:#4ade80;">+$33,969.60/mo</div>
+                                    </div>
+                                </div>
+
+                                <div class="diff-card strategy-b">
+                                    <div class="diff-badge b">Path B: 15% Promotional Coupon Campaign</div>
+                                    <div class="diff-stat-row"><span>Average Check / Unit:</span> <strong style="color:#f87171;">$14.30 (-15%)</strong></div>
+                                    <div class="diff-stat-row"><span>Daily Customer Volume:</span> <strong>185 covers/day (+15%)</strong></div>
+                                    <div class="diff-stat-row"><span>Prime Cost Drag (Labor+Food):</span> <strong style="color:#f87171;">68.5% (Overtime)</strong></div>
+                                    <div class="diff-stat-row"><span>90-Day Retention Rate:</span> <strong style="color:#f87171;">42.0% (Deal Switchers)</strong></div>
+                                    <div style="margin-top:6px; border-top:1px solid #1c222c; padding-top:6px;">
+                                        <div style="font-size:10.5px; color:#71717a; text-transform:uppercase; font-weight:700;">Monthly Net Profit</div>
+                                        <div class="diff-profit-hero" style="color:#ef4444;">+$24,984.75/mo</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top:10px; font-size:11.5px; color:#94a3b8; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); padding:8px 12px; border-radius:4px;">
+                                ⚠️ <strong>Executive Verdict:</strong> Path B increases foot traffic by +15% but <strong>destroys -$8,984.85/month in net cash flow</strong> due to discount slippage and kitchen overtime.
+                            </div>
+                        </div>
+
                         <!-- Upgrade 1: Profit Leakage & Opportunity Diagnostic Scanner -->
                         <div class="leakage-scanner-box" id="leakageScannerBox">
                             <div class="leakage-header">
@@ -2244,6 +2363,14 @@
         let conversationHistory = [];
         let isStreaming = false;
         let currentTaskType = 'trade_analysis';
+
+        // Next-Gen Upgrade 1: Strategy Diff Canvas Toggle
+        function toggleStrategyDiff() {
+            const diffBox = document.getElementById('strategyDiffCanvas');
+            if (diffBox) {
+                diffBox.style.display = diffBox.style.display === 'none' ? 'block' : 'none';
+            }
+        }
 
         // Next-Gen Feature 1: Citation Drawer Controller
         function toggleCitationDrawer() {
