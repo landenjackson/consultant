@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
+import { TASK_PROFILES } from './src/taskProfiles.js';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure Email Transporter (SMTP / Resend / Ethereal Fallback)
+// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -46,48 +47,60 @@ const createEmailTransporter = async () => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, lens = 'standard', taskType = 'custom', workspace = 'default' } = req.body;
+    const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
     const userMessage = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
+    const profile = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const systemPrompt = `You are an experienced, trusted Senior Business Consultant and Chief of Staff speaking 1-on-1 directly with a business owner.
+    const systemPrompt = `You are an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 with a business owner.
 
-VOICE & TONE:
-- Talk directly TO the business owner like a real human partner sitting across from them.
-- Be direct, practical, and conversational. No textbook definitions, no generic industry trivia, no robotic boilerplate.
-- Talk about their specific business, products, staff, and cash flow.
-- Explain where they are leaving money on the table and how to fix it step-by-step.
+CRITICAL DIRECTIVES:
+1. ZERO-BLEED TOPIC ISOLATION:
+   - Your response MUST focus 100% on the active strategic category: "${profile.categoryName}".
+   - Core Focus: ${profile.objectiveFocus}
+   - Business Context: ${eco.name} (${eco.businessType})
+   - Allowed Units & Ranges: ${eco.allowedFinancialUnits}
+   - STRICT PROHIBITION: ${eco.forbiddenMetrics || "Do not mix unrelated domain concepts."}
+   - NEVER mention auto repair, service bays, hoists, mechanics, or DVI unless the business is explicitly an auto shop.
 
-RESPONSE FORMAT:
+2. VOICE & TONE:
+   - Speak directly TO the owner like a trusted senior partner sitting across the table.
+   - Ground everything in real operational math (daily revenue vs. expenses).
+   - Cut generic corporate boilerplate. Be sharp, dense, and actionable.
 
-### 1. Executive Diagnosis & Direct Advice
-(2 direct paragraphs addressing the owner's exact situation and explaining the solution.)
+STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 
->> ★ Key Turnaround Move: [1 clear, uncompromised sentence with the single highest-impact action the owner should take first.]
+### 1. ${profile.categoryName} — Strategic Diagnosis
+(2 dense, analytical paragraphs directly addressing the business's situation under this exact topic lens.)
 
-### 2. The Real Numbers (Daily Cash Flow & Unit Economics)
-• Metric 1: Value — Plain-English explanation of the math and profit impact.
+>> ★ Key Turnaround Move: [1 clear, uncompromised sentence stating the single highest-impact tactical action the owner should execute first.]
+
+### 2. Verified Operational Telemetry (${profile.categoryName})
+(Provide 5 distinct metrics tailored specifically to ${profile.categoryName} with explicit math formulas:
+• Metric 1: Value — Plain-English explanation of the calculation and bottom-line impact.
 • Metric 2: Value — Plain-English explanation.
 • Metric 3: Value — Plain-English explanation.
 • Metric 4: Value — Plain-English explanation.
 • Metric 5: Value — Plain-English explanation.
+)
 
-### 3. Step-by-Step Execution Plan
-1. Days 1–30 (Immediate Fix): [Action & assigned Role Owner]
-2. Days 31–60 (System Upgrade): [Action & assigned Role Owner]
-3. Days 61–90 (Profit Lock): [Action & assigned Role Owner]
+### 3. Frontline Execution Roadmap
+1. Phase 1 (Days 1–30 | Immediate Fix): [Tactical action & assigned Role Owner]
+2. Phase 2 (Days 31–60 | Process Optimization): [Tactical action & assigned Role Owner]
+3. Phase 3 (Days 61–90 | Margin Defense): [Tactical action & assigned Role Owner]
 
 ### 4. Direct Bottom-Line Takeaway
-(1 direct, encouraging concluding sentence.)`;
+(1 direct, encouraging concluding sentence from you as their advisor.)`;
 
-    const userPrompt = `Client Business: ${eco.name} (${eco.businessType})
-Owner's Question & Goal: "${userMessage}"
+    const userPrompt = `Client: ${eco.name} (${eco.businessType})
+Category Focus: ${profile.categoryName}
+Owner's Prompt: "${userMessage}"
 
-Give me your direct strategic advisory memo based on this situation:`;
+Generate your high-density strategic advisory memo tailored strictly to this category and business:`;
 
-    // Multi-Model Cascade: Primary Gemini 3.8 Flash with automatic fallback to Gemini 3.5 / 2.5
+    // Multi-Model Cascade: Primary Gemini 3.8 Flash with automatic fallback
     const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
     let content = null;
     let lastError = null;
@@ -110,7 +123,7 @@ Give me your direct strategic advisory memo based on this situation:`;
           const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
           if (textPart) {
             content = textPart;
-            break; // Success!
+            break;
           }
         } else {
           lastError = `Model ${model} returned ${response.status}`;
