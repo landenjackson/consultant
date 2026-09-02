@@ -1907,8 +1907,8 @@
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <span>Cmd + K</span>
                 </button>
-                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleStrategyDiff()">
-                    <span>⚖️ Compare</span>
+                <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="shareTeamHuddle()">
+                    <span>📲 Share Huddle</span>
                 </button>
                 <button class="action-btn" style="padding:3px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" onclick="toggleFocusMode()">
                     <span>⛶ Focus</span>
@@ -2134,8 +2134,25 @@
                 <div class="telemetry-pane">
                     <div class="telemetry-feed" id="chatArea">
                         
-                        <!-- Upgrade 1: Interactive Strategy Comparison Diff Canvas -->
-                        <div class="strategy-diff-box" id="strategyDiffCanvas">
+                        <!-- Quick Tools Pill Strip (Collapsible Diagnostics Bar) -->
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #1a1e26;">
+                            <span style="font-size:11px; font-weight:800; color:#71717a; text-transform:uppercase; letter-spacing:0.04em; align-self:center; margin-right:4px;">Diagnostic Suite:</span>
+                            <button type="button" class="action-btn" id="btnToggleDiff" onclick="toggleDiagnosticTool('diff')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
+                                <span>⚖️ Strategy Diff</span>
+                            </button>
+                            <button type="button" class="action-btn" id="btnToggleLeakage" onclick="toggleDiagnosticTool('leakage')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
+                                <span>🔍 Profit Leakage Scanner</span>
+                            </button>
+                            <button type="button" class="action-btn" id="btnToggleSliders" onclick="toggleDiagnosticTool('sliders')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
+                                <span>🎛️ Cash Flow Sliders</span>
+                            </button>
+                            <button type="button" class="action-btn" onclick="openDispatchModal()" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px; color:#4ade80;">
+                                <span>⏰ Morning Dispatch</span>
+                            </button>
+                        </div>
+
+                        <!-- Upgrade 1: Interactive Strategy Comparison Diff Canvas (Collapsed by default) -->
+                        <div class="strategy-diff-box" id="strategyDiffCanvas" style="display:none;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span style="font-size:13px; font-weight:800; color:#ffffff; text-transform:uppercase;">⚖️ Strategy Comparison & Margin Diff</span>
@@ -2174,8 +2191,8 @@
                             </div>
                         </div>
 
-                        <!-- Upgrade 1: Profit Leakage & Opportunity Diagnostic Scanner -->
-                        <div class="leakage-scanner-box" id="leakageScannerBox">
+                        <!-- Upgrade 1: Profit Leakage & Opportunity Diagnostic Scanner (Collapsed by default) -->
+                        <div class="leakage-scanner-box" id="leakageScannerBox" style="display:none;">
                             <div class="leakage-header">
                                 <span class="leakage-title">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -2264,8 +2281,8 @@
                             </div>
                         </div>
 
-                        <!-- Interactive Scenario Calculator Slider Box (Feature 1) -->
-                        <div class="scenario-slider-box" id="scenarioSimulator">
+                        <!-- Interactive Scenario Calculator Slider Box (Feature 1 - Collapsed by default) -->
+                        <div class="scenario-slider-box" id="scenarioSimulator" style="display:none;">
                             <div class="slider-header">
                                 <span class="slider-title">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -2431,11 +2448,47 @@
         let isStreaming = false;
         let currentTaskType = 'trade_analysis';
 
-        // Next-Gen Upgrade 1: Strategy Diff Canvas Toggle
-        function toggleStrategyDiff() {
+        // Next-Gen Feature: Diagnostic Suite Controller (Collapsible Quick-Tools Bar)
+        function toggleDiagnosticTool(tool) {
             const diffBox = document.getElementById('strategyDiffCanvas');
-            if (diffBox) {
-                diffBox.style.display = diffBox.style.display === 'none' ? 'block' : 'none';
+            const leakageBox = document.getElementById('leakageScannerBox');
+            const slidersBox = document.getElementById('scenarioSimulator');
+
+            if (tool === 'diff') {
+                const isHidden = diffBox.style.display === 'none';
+                diffBox.style.display = isHidden ? 'block' : 'none';
+                document.getElementById('btnToggleDiff').classList.toggle('active', isHidden);
+            } else if (tool === 'leakage') {
+                const isHidden = leakageBox.style.display === 'none';
+                leakageBox.style.display = isHidden ? 'block' : 'none';
+                document.getElementById('btnToggleLeakage').classList.toggle('active', isHidden);
+            } else if (tool === 'sliders') {
+                const isHidden = slidersBox.style.display === 'none';
+                slidersBox.style.display = isHidden ? 'block' : 'none';
+                document.getElementById('btnToggleSliders').classList.toggle('active', isHidden);
+            }
+        }
+
+        // Next-Gen Feature 2: 1-Tap Executive SMS / WhatsApp Team Huddle Share
+        function shareTeamHuddle() {
+            const lastAssistantCard = document.querySelector('.message-row.assistant:last-child .message-card');
+            let huddleText = "🚀 Morning Executive Priorities — Consultant Studio:\n";
+
+            if (lastAssistantCard) {
+                const title = document.getElementById('currentWorkspaceDisplay')?.textContent || "Strategic Operation";
+                const actionPlan = lastAssistantCard.innerText;
+                huddleText = `📊 ${title} Strategic Priorities:\n` + actionPlan.substring(0, 320) + "...\n\n— Generated via Consultant Studio";
+            } else {
+                huddleText = "📊 Ma's Diner Morning Priorities:\n1. 7-9am Counter Line speed under 8.5 min\n2. 28% food cost defense / zero discount\n3. Pre-shift huddle at 6:15am.\n\n— Consultant Studio";
+            }
+
+            // Open native SMS url scheme
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.location.href = `sms:?&body=${encodeURIComponent(huddleText)}`;
+            } else {
+                navigator.clipboard.writeText(huddleText);
+                alert("✓ Team Huddle Priorities copied to clipboard! Paste into iMessage, WhatsApp, or Slack.");
             }
         }
 
