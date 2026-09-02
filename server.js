@@ -32,7 +32,6 @@ const createEmailTransporter = async () => {
     });
   }
   
-  // Default to Ethereal test account if no credentials supplied
   const testAccount = await nodemailer.createTestAccount();
   return nodemailer.createTransport({
     host: 'smtp.ethereal.email',
@@ -88,28 +87,42 @@ Owner's Question & Goal: "${userMessage}"
 
 Give me your direct strategic advisory memo based on this situation:`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    // Multi-Model Cascade: Primary Gemini 3.8 Flash with automatic fallback to Gemini 3.5 / 2.5
+    const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+    let content = null;
+    let lastError = null;
 
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }
-        ],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-      })
-    });
+    for (const model of candidateModels) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      try {
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+            generationConfig: { temperature: 0.65, maxOutputTokens: 1200 }
+          })
+        });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: `Google AI Studio API (${response.status}): ${errText}` });
+        if (response.ok) {
+          const data = await response.json();
+          const candidate = data.candidates?.[0];
+          const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
+          if (textPart) {
+            content = textPart;
+            break; // Success!
+          }
+        } else {
+          lastError = `Model ${model} returned ${response.status}`;
+        }
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    const data = await response.json();
-    const candidate = data.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
-    const content = textPart || "Strategic memo generated.";
+    if (!content) {
+      return res.status(503).json({ error: `AI inference temporarily unavailable: ${lastError}` });
+    }
 
     return res.json({
       choices: [
