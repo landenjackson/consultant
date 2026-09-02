@@ -100,41 +100,35 @@ Owner's Prompt: "${userMessage}"
 
 Generate your high-density strategic advisory memo tailored strictly to this category and business:`;
 
-    // Fast Multi-Model Cascade: Primary official Gemini 3.5 Flash (Instant Sub-Second Response) with 3.8 support
-    const candidateModels = ['gemini-3.5-flash', 'gemini-3.8-flash'];
-    let content = null;
-    let lastError = null;
-
-    for (const model of candidateModels) {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      try {
-        const response = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-            generationConfig: { temperature: 0.65, maxOutputTokens: 1200 }
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const candidate = data.candidates?.[0];
-          const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
-          if (textPart) {
-            content = textPart;
-            break;
+    // Direct Google Generative AI REST Call (Thinking budget = 0 for instant sub-second response)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+        generationConfig: {
+          temperature: 0.65,
+          maxOutputTokens: 1500,
+          thinkingConfig: {
+            thinkingBudget: 0
           }
-        } else {
-          lastError = `Model ${model} returned ${response.status}`;
         }
-      } catch (err) {
-        lastError = err.message;
-      }
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(response.status).json({ error: `Google API (${response.status}): ${errText}` });
     }
 
-    if (!content) {
-      return res.status(503).json({ error: `AI inference temporarily unavailable: ${lastError}` });
+    const data = await response.json();
+    const candidate = data.candidates?.[0];
+    const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
+    
+    if (!textPart) {
+      return res.status(500).json({ error: "No response text generated." });
     }
 
     return res.json({
@@ -142,7 +136,7 @@ Generate your high-density strategic advisory memo tailored strictly to this cat
         {
           message: {
             role: "assistant",
-            content: content
+            content: textPart
           }
         }
       ]
