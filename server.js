@@ -100,8 +100,8 @@ Owner's Prompt: "${userMessage}"
 
 Generate your high-density strategic advisory memo tailored strictly to this category and business:`;
 
-    // Multi-Model Cascade: Primary Gemini 3.8 Flash with automatic fallback
-    const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+    // Fast Multi-Model Cascade: Prefer Gemini 2.5 Flash for instant sub-second response, with 3.8/3.5 support
+    const candidateModels = ['gemini-2.5-flash', 'gemini-3.8-flash', 'gemini-3.5-flash'];
     let content = null;
     let lastError = null;
 
