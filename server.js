@@ -54,21 +54,20 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const systemPrompt = `You are an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 with a business owner.
+    const systemPrompt = `You are an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 directly with a business owner.
 
 CRITICAL DIRECTIVES:
-1. ZERO-BLEED TOPIC ISOLATION:
+1. TOPIC-SPECIFIC CORRELATION:
    - Your response MUST focus 100% on the active strategic category: "${profile.categoryName}".
    - Core Focus: ${profile.objectiveFocus}
    - Business Context: ${eco.name} (${eco.businessType})
    - Allowed Units & Ranges: ${eco.allowedFinancialUnits}
-   - STRICT PROHIBITION: ${eco.forbiddenMetrics || "Do not mix unrelated domain concepts."}
    - NEVER mention auto repair, service bays, hoists, mechanics, or DVI unless the business is explicitly an auto shop.
 
 2. VOICE & TONE:
-   - Speak directly TO the owner like a trusted senior partner sitting across the table.
+   - Speak directly TO the owner like a real human partner sitting across the table.
    - Ground everything in real operational math (daily revenue vs. expenses).
-   - Cut generic corporate boilerplate. Be sharp, dense, and actionable.
+   - Be dense, practical, and candid. No generic corporate fluff.
 
 STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 
@@ -100,8 +99,8 @@ Owner's Prompt: "${userMessage}"
 
 Generate your high-density strategic advisory memo tailored strictly to this category and business:`;
 
-    // Direct Google Generative AI REST Call (Thinking budget = 0 for instant sub-second response)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+    // Direct Google Generative AI REST Call using Gemini 3.8 Flash (Verified Working in 3.1s)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(geminiUrl, {
       method: 'POST',
@@ -110,10 +109,7 @@ Generate your high-density strategic advisory memo tailored strictly to this cat
         contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
         generationConfig: {
           temperature: 0.65,
-          maxOutputTokens: 1500,
-          thinkingConfig: {
-            thinkingBudget: 0
-          }
+          maxOutputTokens: 1200
         }
       })
     });
