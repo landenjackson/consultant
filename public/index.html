@@ -1869,6 +1869,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 <span>Encrypted Vault (<span id="vaultCount">0</span>)</span>
             </div>
+            <div class="nav-item" onclick="switchView('portfolio')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Executive Portfolio</span>
+            </div>
             <div class="nav-item" onclick="window.location.href='/standards.html'">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <span>Our Standards</span>
@@ -2368,6 +2372,59 @@
                     </div>
                 </div>
                 <div class="grid-container" id="vaultGrid"></div>
+            </div>
+        </section>
+
+        <!-- Executive Portfolio Section (Embedded for Google AI Studio) -->
+        <section id="portfolio-section" class="view-section">
+            <div class="studio-view" style="max-width:100%; padding:20px 24px;">
+                <div class="studio-header" style="margin-bottom:20px;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <h1 style="font-size: 20px; font-weight: 800;">Executive Strategy & Analytics Portfolio</h1>
+                            <span class="tag-pill" style="background:rgba(34,197,94,0.15); color:#4ade80;">LANDØ</span>
+                        </div>
+                        <p style="color: #71717a; font-size: 13px; margin-top:3px;">Landen Jackson • Strategic Marketing & Quantitative Operations • FSU 2026</p>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <a href="/Landen_Jackson_Resume_Updated.docx" class="action-btn" download style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                            <span>📥 Download Resume (.docx)</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="diff-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+                    <div class="diff-card strategy-a">
+                        <div class="diff-badge a">Academic & Statistical Research</div>
+                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">FSU SPSS Consumer Trust Study</div>
+                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Co-authored empirical research at Florida State University using Qualtrics datasets and SPSS multivariate regression to isolate consumer AI trust boundaries.</p>
+                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>4.2x Trust Multiplier:</strong> Human-in-the-loop validation gate.</div>
+                        <div style="font-size:12px; color:#4ade80;">• <strong>p &lt; .001:</strong> Statistical significance against un-gated AI.</div>
+                    </div>
+
+                    <div class="diff-card strategy-a">
+                        <div class="diff-badge a">Hospitality & Trade Area Strategy</div>
+                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">Ma's Diner Brand Repositioning</div>
+                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Replaced margin-diluting discount couponing with high-value analog connection campaigns ("No WiFi, Only HiFi") and morning line synchronization.</p>
+                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>+20%–30%:</strong> Weekday foot-traffic expansion.</div>
+                        <div style="font-size:12px; color:#4ade80;">• <strong>100% Margin Defense:</strong> Zero unearned promotional discounting.</div>
+                    </div>
+
+                    <div class="diff-card strategy-a">
+                        <div class="diff-badge a">Cloud Architecture & Edge Intelligence</div>
+                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">Consultant Studio Production Platform</div>
+                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Architected and deployed a multi-industry executive operations suite with 10 domain economic P&L models, interactive scenario sliders, and browser-native Office export.</p>
+                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>Sub-second REST:</strong> Direct Gemini 3.6 Flash inference.</div>
+                        <div style="font-size:12px; color:#4ade80;">• <strong>AES-GCM 256-Bit:</strong> Client-side cryptographic vault.</div>
+                    </div>
+
+                    <div class="diff-card strategy-a">
+                        <div class="diff-badge a">Foundational Governance</div>
+                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">Eagle Scout Leadership</div>
+                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Earned the rank of Eagle Scout (BSA, 2018). Built an operational philosophy of disciplined execution, risk mitigation, and team stewardship.</p>
+                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>The Operator's Creed:</strong> AI builds skeletons; human judgment provides integrity.</div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -2934,8 +2991,12 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`${viewId}-section`).classList.add('active');
             if (viewId === 'vault') renderVault();
-            const activeIdx = viewId === 'chat' ? 0 : 1;
-            document.querySelectorAll('.nav-item')[activeIdx]?.classList.add('active');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            if (viewId === 'chat') navItems[0]?.classList.add('active');
+            else if (viewId === 'vault') navItems[2]?.classList.add('active');
+            else if (viewId === 'portfolio') navItems[3]?.classList.add('active');
+
             closeSidebar();
         }
 
