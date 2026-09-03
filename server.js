@@ -20,10 +20,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Apify Client Initialization (Zero-Friction Fallback)
 const apifyClient = process.env.APIFY_API_KEY ? new ApifyClient({ token: process.env.APIFY_API_KEY }) : null;
 
-// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -49,13 +47,11 @@ const createEmailTransporter = async () => {
   });
 };
 
-// Apify Live Market & Trade Area Recon Endpoint
 app.post('/api/apify-recon', async (req, res) => {
   try {
     const { query, location = "Tallahassee, FL", actor = "compass/crawler-google-places" } = req.body;
 
     if (!apifyClient) {
-      // High-density realistic trade area simulation if API key is not yet set
       return res.json({
         live: false,
         source: "Empirical Spatial Cache",
@@ -71,7 +67,6 @@ app.post('/api/apify-recon', async (req, res) => {
       });
     }
 
-    // Call live Apify Actor
     const run = await apifyClient.actor(actor).call({
       searchStringsArray: [query || `${location} restaurants businesses`],
       maxCrawledPlacesPerSearch: 10,
@@ -102,52 +97,46 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const systemPrompt = `You are an elite Senior Strategic Operations Partner, Quantitative Analyst, and Chief of Staff speaking 1-on-1 directly with a business owner.
-Powered by Gemini 3.8 Flash & Apify Market Intelligence.
+    const systemPrompt = `You are an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 directly with a business owner.
 
-CRITICAL DIRECTIVES:
-1. TOPIC-SPECIFIC CORRELATION:
-   - Your response MUST focus 100% on the active strategic category: "${profile.categoryName}".
-   - Core Focus: ${profile.objectiveFocus}
-   - Business Context: ${eco.name} (${eco.businessType})
-   - Allowed Units & Ranges: ${eco.allowedFinancialUnits}
-   - NEVER mention auto repair, service bays, hoists, mechanics, or DVI unless the business is explicitly an auto shop.
-
-2. VOICE & TONE:
-   - Speak directly TO the owner like a real human partner sitting across the table.
-   - Ground everything in real operational math (daily revenue vs. expenses).
-   - Be dense, practical, and candid. No generic corporate fluff.
+CRITICAL DIRECTIVE ON QUESTION DIFFERENTIATION & SPECIFICITY:
+- Look at the EXACT question, scenario, or numbers the user submitted: "${userMessage}".
+- DO NOT output a generic canned template or repeat identical stock numbers.
+- Answer the EXACT problem asked. If they ask about catering, talk about catering orders and margins. If they ask about staffing, talk about shift labor and hourly wages. If they ask about prices, talk about item-level elasticity and check sizes.
+- Every single metric and action step MUST be custom-calculated and tailored specifically to what the user asked in this prompt.
+- Active Business: ${eco.name} (${eco.businessType})
+- Strategic Lens: ${profile.categoryName}
 
 STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 
-### 1. ${profile.categoryName} — Strategic Diagnosis
-(2 dense, analytical paragraphs directly addressing the business's situation under this exact topic lens.)
+### 1. Strategic Diagnosis: "${userMessage.substring(0, 80)}"
+(2 dense paragraphs analyzing the exact challenge or question asked by the owner.)
 
->> ★ Key Turnaround Move: [1 clear, uncompromised sentence stating the single highest-impact tactical action the owner should execute first.]
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical move directly solving the user's specific question.]
 
-### 2. Verified Operational Telemetry (${profile.categoryName})
-(Provide 5 distinct metrics tailored specifically to ${profile.categoryName} with explicit math formulas:
-• Metric 1: Value — Plain-English explanation of the calculation and bottom-line impact.
+### 2. Tailored Operational Telemetry & Math
+(5 distinct metrics directly calculating the math for the user's specific inquiry with explicit formulas:
+• Metric 1: Value — Plain-English explanation of the calculation and bottom-line profit impact.
 • Metric 2: Value — Plain-English explanation.
 • Metric 3: Value — Plain-English explanation.
 • Metric 4: Value — Plain-English explanation.
 • Metric 5: Value — Plain-English explanation.
 )
-• What-If Annual Cash Flow Recovery: [Calculated Value, e.g. +$24,680.00/yr] — Plain-English explanation of raw take-home cash gain.
+• What-If Annual Cash Flow Recovery: [Calculated Value, e.g. +$XX,XXX/yr] — Plain-English explanation.
 
-### 3. Frontline Execution Roadmap
-1. Phase 1 (Days 1–30 | Immediate Fix): [Tactical action & assigned Role Owner]
-2. Phase 2 (Days 31–60 | Process Optimization): [Tactical action & assigned Role Owner]
-3. Phase 3 (Days 61–90 | Margin Defense): [Tactical action & assigned Role Owner]
+### 3. Tactical Action Plan (Direct Solution)
+1. Priority 1 (Immediate Fix for This Problem): [Tactical action & assigned Role Owner]
+2. Priority 2 (Process & Operational Upgrade): [Tactical action & assigned Role Owner]
+3. Priority 3 (Long-Term Retention & Margin Lock): [Tactical action & assigned Role Owner]
 
 ### 4. Direct Bottom-Line Takeaway
-(1 direct, encouraging concluding sentence from you as their advisor.)`;
+(1 direct, encouraging concluding sentence answering the owner's core question.)`;
 
-    const userPrompt = `Client: ${eco.name} (${eco.businessType})
+    const userPrompt = `Client Business: ${eco.name} (${eco.businessType})
 Category Focus: ${profile.categoryName}
-Owner's Prompt: "${userMessage}"
+Specific Owner Question: "${userMessage}"
 
-Generate your high-density strategic advisory memo tailored strictly to this category and business:`;
+Provide your tailored strategic advisory memo solving this exact situation:`;
 
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
     
@@ -157,8 +146,8 @@ Generate your high-density strategic advisory memo tailored strictly to this cat
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
         generationConfig: {
-          temperature: 0.65,
-          maxOutputTokens: 1200
+          temperature: 0.85,
+          maxOutputTokens: 1400
         }
       })
     });
