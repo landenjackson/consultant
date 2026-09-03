@@ -109,7 +109,7 @@ Consultant Studio is built on three immutable operational principles:
 2. **The Human-in-the-Loop Quality Moat:** Technology constructs the data skeleton; human operators hold the judgment, ethics, and strategic decision gate.
 3. **Absolute Data Sovereignty:** Isolated private execution pipelines with zero public LLM training exposure.
 
-Read the full essay: [The Illusion of Autopilot: Why Strategic Orchestration Wins](https://consultant-app.com/orchestration-creed.html)
+Read the full essay: [The Illusion of Autopilot: Why Strategic Orchestration Wins](https://consultant-studio.ai.studio/#creed-section)
 
 ---
 
