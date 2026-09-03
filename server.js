@@ -138,31 +138,44 @@ Specific Owner Question: "${userMessage}"
 
 Provide your tailored strategic advisory memo solving this exact situation:`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-    
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-        generationConfig: {
-          temperature: 0.85,
-          maxOutputTokens: 1400
-        }
-      })
-    });
+    // Multi-Model Cascade: Try Gemini 3.8 Flash, failover to 3.5 if busy
+    const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash'];
+    let content = null;
+    let lastError = null;
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: `Google API (${response.status}): ${errText}` });
+    for (const model of candidateModels) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      try {
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+            generationConfig: {
+              temperature: 0.85,
+              maxOutputTokens: 1400
+            }
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const candidate = data.candidates?.[0];
+          const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
+          if (textPart) {
+            content = textPart;
+            break;
+          }
+        } else {
+          lastError = `Model ${model} returned ${response.status}`;
+        }
+      } catch (e) {
+        lastError = e.message;
+      }
     }
 
-    const data = await response.json();
-    const candidate = data.candidates?.[0];
-    const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
-    
-    if (!textPart) {
-      return res.status(500).json({ error: "No response text generated." });
+    if (!content) {
+      return res.status(503).json({ error: `AI inference temporarily unavailable: ${lastError}` });
     }
 
     return res.json({
@@ -170,7 +183,7 @@ Provide your tailored strategic advisory memo solving this exact situation:`;
         {
           message: {
             role: "assistant",
-            content: textPart
+            content: content
           }
         }
       ]
