@@ -1933,6 +1933,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 <span>Executive Portfolio</span>
             </div>
+            <div class="nav-item" onclick="switchView('creed')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Operator's Creed</span>
+            </div>
             <div class="nav-item" onclick="window.location.href='/standards.html'">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <span>Our Standards</span>
@@ -2449,6 +2453,36 @@
                     </div>
                 </div>
                 <div class="grid-container" id="vaultGrid"></div>
+            </div>
+        </section>
+
+        <!-- Operator's Creed Section (Embedded directly in Studio) -->
+        <section id="creed-section" class="view-section">
+            <div class="studio-view" style="max-width:860px; margin:0 auto; padding:24px 20px;">
+                <div style="margin-bottom:24px; border-bottom:1px solid #1c2028; padding-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:11px; font-weight:800; color:#4ade80; text-transform:uppercase; letter-spacing:0.05em; background:rgba(34,197,94,0.12); padding:3px 8px; border-radius:4px; border:1px solid rgba(34,197,94,0.3);">Philosophical Standard</span>
+                    </div>
+                    <h1 style="font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.02em; margin-bottom:8px;">The Illusion of Autopilot: Why Strategic Orchestration Wins</h1>
+                    <p style="color:#94a3b8; font-size:14px; line-height:1.6;">By Landen Jackson • The Foundational Doctrine of Consultant Studio</p>
+                </div>
+
+                <div class="diff-card strategy-a" style="margin-bottom:20px; font-size:14px; line-height:1.7; color:#cbd5e1;">
+                    <div class="diff-badge a" style="margin-bottom:8px;">1. The Core Differentiator</div>
+                    <p style="margin-bottom:12px;">The tech industry is currently obsessed with "autonomous autopilot"—the naive promise that business owners can push one button and completely replace human strategy, critical thinking, and discernment with a generic LLM wrapper.</p>
+                    <p>Autopilot creates generic, derivative, and hallucinated drivel. It replaces real domain accounting with plausibility. In contrast, <strong>Orchestration</strong> treats artificial intelligence as a force-multiplier: technology constructs the computational skeleton in milliseconds, while the experienced human operator provides the soul, integrity, and final decision gate.</p>
+                </div>
+
+                <div class="diff-card strategy-a" style="margin-bottom:20px; font-size:14px; line-height:1.7; color:#cbd5e1;">
+                    <div class="diff-badge a" style="margin-bottom:8px;">2. The 3 Immutable Rules of the Creed</div>
+                    <p style="margin-bottom:8px;"><strong>Rule 1: Zero Guesswork Math.</strong> We never guess numbers. If a diner has 180 covers a day at $16.50 average check, the gross revenue is $2,970/day. We balance direct prime costs to the penny.</p>
+                    <p style="margin-bottom:8px;"><strong>Rule 2: The Empirical Trust Standard (p &lt; .001).</strong> Grounded in our Florida State University study, consumers exhibit a 4.2x higher willingness to act when a verified human operator signs off on the strategy.</p>
+                    <p><strong>Rule 3: No Guru Just Shippin.</strong> We reject theoretical slide-deck consulting for live operational code, real P&L reconciliation, and measurable bottom-line cash flow.</p>
+                </div>
+
+                <div style="text-align:center; padding:16px 0;">
+                    <button class="btn-trial" onclick="switchView('chat')">← Return to Operations Board</button>
+                </div>
             </div>
         </section>
 
@@ -3220,6 +3254,7 @@
             if (viewId === 'chat') navItems[0]?.classList.add('active');
             else if (viewId === 'vault') navItems[2]?.classList.add('active');
             else if (viewId === 'portfolio') navItems[3]?.classList.add('active');
+            else if (viewId === 'creed') navItems[4]?.classList.add('active');
 
             closeSidebar();
         }
