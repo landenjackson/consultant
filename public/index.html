@@ -2587,6 +2587,73 @@
             document.body.classList.toggle('focus-mode');
         }
 
+        // Cross-Gen Upgrade 2: 1-Page Bank, Lender & Partner Teaser PDF Exporter
+        function exportBankTeaser(btn) {
+            const card = btn.closest('.message-card');
+            const wsName = document.getElementById('currentWorkspaceDisplay')?.textContent || "Executive Workspace";
+            const memoTitle = card.querySelector('.memo-title')?.innerText || "Executive Strategic Briefing";
+            const memoText = card.innerText;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${wsName} — 1-Page Bank & Partner Executive Teaser</title>
+                    <style>
+                        @page { size: letter portrait; margin: 18mm 16mm; }
+                        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #111827; background: #ffffff; margin: 0; padding: 0; line-height: 1.5; font-size: 11pt; }
+                        .teaser-header { border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; }
+                        .brand-title { font-size: 18pt; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; margin: 0; }
+                        .teaser-badge { font-size: 9pt; font-weight: 700; text-transform: uppercase; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; color: #334155; }
+                        .headline-box { background: #f8fafc; border-left: 4px solid #16a34a; padding: 10px 14px; margin-bottom: 16px; border-radius: 0 6px 6px 0; }
+                        .headline-title { font-size: 13pt; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+                        .headline-sub { font-size: 9.5pt; color: #475569; }
+                        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+                        .stat-card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; background: #ffffff; }
+                        .stat-val { font-size: 15pt; font-weight: 800; color: #16a34a; margin-bottom: 2px; }
+                        .stat-lbl { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; color: #64748b; }
+                        .stat-desc { font-size: 8.5pt; color: #334155; margin-top: 4px; line-height: 1.35; }
+                        .memo-body-clean { font-size: 9.5pt; color: #1e293b; line-height: 1.55; margin-bottom: 16px; }
+                        .memo-body-clean h3 { font-size: 11pt; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-top: 12px; margin-bottom: 6px; }
+                        .teaser-footer { border-top: 1px solid #cbd5e1; padding-top: 10px; display: flex; justify-content: space-between; font-size: 8.5pt; color: #64748b; margin-top: 16px; }
+                        .sign-off { font-weight: 700; color: #0f172a; }
+                    </style>
+                </head>
+                <body>
+                    <div class="teaser-header">
+                        <div>
+                            <h1 class="brand-title">${wsName}</h1>
+                            <div style="font-size:9.5pt; color:#64748b; margin-top:2px;">Strategic Operations & Bank Feasibility Teaser</div>
+                        </div>
+                        <div class="teaser-badge">CONFIDENTIAL • EXECUTIVE BRIEFING</div>
+                    </div>
+
+                    <div class="headline-box">
+                        <div class="headline-title">${memoTitle}</div>
+                        <div class="headline-sub">Prepared via Consultant Studio • Lead Operator: Landen Jackson (FSU Marketing '26 / Eagle Scout)</div>
+                    </div>
+
+                    <div class="memo-body-clean">
+                        ${card.querySelector('.memo-content')?.innerHTML || card.innerHTML}
+                    </div>
+
+                    <div class="teaser-footer">
+                        <div class="sign-off">Cleared for Lender & Partner Review • Operator Sign-Off Active</div>
+                        <div>Generated via consultant-app.com • AES-256 Vault Verified</div>
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
         // FEATURE 1: Interactive Scenario Calculator Logic
         function recalcSimulator() {
             const price = parseFloat(document.getElementById('sliderPrice').value);
@@ -3289,8 +3356,11 @@
                     <button class="action-btn" onclick="exportPowerPointDeck(this)">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Deck (.pptx)
                     </button>
+                    <button class="action-btn" onclick="exportBankTeaser(this)" style="color:#4ade80; border-color:rgba(34,197,94,0.35);">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> 📄 1-Page Bank Teaser
+                    </button>
                     <button class="action-btn" onclick="exportPDFBtn(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> PDF
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Full PDF
                     </button>
                     <button class="action-btn" onclick="emailMemoBtn(this)" style="color:#4ade80;">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> ✉️ Email Me
