@@ -1,0 +1,142 @@
+        /* Upgrade 1 & 2: Profit Leakage Scanner & SVG Waterfall Styling */
+        .leakage-scanner-box {
+            background: #0d1015;
+            border: 1px solid #232a35;
+            border-left: 3.5px solid #ef4444;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .leakage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .leakage-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .leakage-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .leakage-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .leakage-input-label {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .leakage-input {
+            background: #090a0c;
+            border: 1px solid #1e232c;
+            color: #ffffff;
+            padding: 7px 10px;
+            border-radius: 5px;
+            font-size: 12.5px;
+            font-weight: 700;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .leakage-input:focus {
+            border-color: #22c55e;
+        }
+
+        /* SVG Waterfall Breakdown Chart */
+        .waterfall-container {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .waterfall-bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .waterfall-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .waterfall-label {
+            width: 140px;
+            font-weight: 600;
+            color: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .waterfall-track {
+            flex: 1;
+            height: 20px;
+            background: #14181f;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .waterfall-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .waterfall-fill.gross { background: #3b82f6; }
+        .waterfall-fill.cogs { background: #ef4444; }
+        .waterfall-fill.labor { background: #f59e0b; }
+        .waterfall-fill.margin { background: #22c55e; }
+
+        .leakage-alert-card {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .leakage-alert-text {
+            font-size: 12px;
+            color: #fca5a5;
+        }
+
+        .leakage-recoverable-val {
+            font-size: 15px;
+            font-weight: 800;
+            color: #4ade80;
+            letter-spacing: -0.02em;
+        }

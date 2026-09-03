@@ -1,0 +1,113 @@
+        /* 3 Next-Gen Features: Citations Drawer, Sensitivity Heatmap, Focus Mode */
+        
+        /* Feature 1: Citation Drawer */
+        .citation-drawer {
+            position: fixed;
+            top: 0; right: -420px; bottom: 0;
+            width: 400px;
+            background: #0d1015;
+            border-left: 1px solid #232a35;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
+            z-index: 2500;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .citation-drawer.open { right: 0; }
+
+        .citation-drawer-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #1e242f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .citation-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .citation-item {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-left: 3px solid #22c55e;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .citation-title { font-weight: 700; font-size: 12.5px; color: #ffffff; margin-bottom: 4px; }
+        .citation-source { font-size: 11px; color: #4ade80; margin-bottom: 6px; display: block; text-decoration: none; word-break: break-all; }
+        .citation-quote { font-size: 11.5px; color: #94a3b8; line-height: 1.45; font-style: italic; background: rgba(255,255,255,0.02); padding: 6px 8px; border-radius: 4px; }
+
+        /* Feature 2: Sensitivity Heatmap Matrix */
+        .sensitivity-matrix-box {
+            background: #0d1015;
+            border: 1px solid #1f2530;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .sensitivity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .sensitivity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .sensitivity-card {
+            background: #090a0c;
+            border: 1px solid #1c222c;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sensitivity-card.worst { border-top: 3px solid #ef4444; }
+        .sensitivity-card.base { border-top: 3px solid #3b82f6; }
+        .sensitivity-card.optimal { border-top: 3px solid #22c55e; }
+
+        .sc-badge { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .sc-badge.worst { color: #f87171; }
+        .sc-badge.base { color: #60a5fa; }
+        .sc-badge.optimal { color: #4ade80; }
+
+        .sc-val { font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+        .sc-desc { font-size: 11px; color: #94a3b8; line-height: 1.35; margin-top: 2px; }
+
+        /* Feature 3: Widescreen Glassmorphic Focus Mode */
+        body.focus-mode .sidebar {
+            width: 60px !important;
+        }
+        body.focus-mode .sidebar .brand-name span,
+        body.focus-mode .sidebar .tag-pill,
+        body.focus-mode .sidebar .controls-block,
+        body.focus-mode .sidebar .nav-item span,
+        body.focus-mode .sidebar .partner-card {
+            display: none !important;
+        }
+        body.focus-mode .top-bar {
+            left: 60px !important;
+        }
+        body.focus-mode .launcher-pane {
+            display: none !important;
+        }
+        body.focus-mode .telemetry-feed {
+            max-width: 1200px !important;
+        }
