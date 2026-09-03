@@ -4,8 +4,8 @@
 > *AI builds the computational skeleton; human operators hold the judgment, ethics, and strategic decision gate.*
 
 [![Live App](https://img.shields.io/badge/Google_AI_Studio-Live_App-22C55E?style=for-the-badge&logo=google)](https://consultant-studio.ai.studio/)
-[![Cloudflare Edge](https://img.shields.io/badge/Cloudflare_Pages-Edge_Deployed-F38020?style=for-the-badge&logo=cloudflare)](https://consultant-app.com)
-[![Model](https://img.shields.io/badge/Engine-Google_Gemini_3.7_Flash-4285F4?style=for-the-badge&logo=google)](https://aistudio.google.com/)
+[![Cloudflare Edge](https://img.shields.io/badge/Cloudflare_Pages-Edge_Deployed-F38020?style=for-the-badge&logo=cloudflare)](https://consultant-studio.ai.studio)
+[![Model](https://img.shields.io/badge/Engine-Google_Gemini_3.8_Flash-4285F4?style=for-the-badge&logo=google)](https://aistudio.google.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 ---
@@ -38,19 +38,17 @@ Unlike conversational consumer AI chatbots that produce generic text, Consultant
 ```
 [ Client Browser / PWA ]
           │
-          ├──> Google AI Studio App (https://consultant-studio.ai.studio/)
-          │
-          └──> Cloudflare Edge Worker (consultant-app.com)
+          └──> Google AI Studio App (https://consultant-studio.ai.studio/)
                      │
                      ▼
           [ Encrypted Cloudflare Tunnel ]
                      │
                      ▼
           [ Node.js / Express Gateway (PM2) ]
-                ├──> Tavily AI (Real-time 2026 Web Reconnaissance)
-                ├──> Google Generative AI (Gemini 3.7 Flash API)
-                ├──> Google Workspace Sync (Docs, Sheets, Drive)
-                └──> Stripe Checkout (Starter, Pro, Executive)
+                ├──> Apify & Tavily AI (Real-time Market Reconnaissance)
+                ├──> Google Generative AI (Gemini 3.8 Flash API)
+                ├──> Universal Office Engine (Word, Excel .xlsx, PPT .pptx, PDF)
+                └──> Stripe Billing (Starter, Pro, Executive)
 ```
 
 * **Frontend:** Plus Jakarta Sans & Inter typography, Linear-grade Obsidian dark styling (`#090A0C`), Luminous Emerald detailing (`#22C55E`), responsive mobile drawer, and offline telemetry vault.
@@ -119,6 +117,6 @@ Read the full essay: [The Illusion of Autopilot: Why Strategic Orchestration Win
 
 **Landen Jackson (LANDØ)**  
 *FSU Marketing Graduate | Eagle Scout | Google AI Certified Professional*  
-* [LinkedIn](https://www.linkedin.com/in/landen-jackson/) • [Live App](https://consultant-studio.ai.studio/) • [Website](https://consultant-app.com)
+* [LinkedIn](https://www.linkedin.com/in/landen-jackson/) • [Live App](https://consultant-studio.ai.studio/) • [Portfolio](https://consultant-studio.ai.studio/#portfolio-section)
 
 *"No guru, just shippin'."* ⚓️
