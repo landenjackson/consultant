@@ -1765,6 +1765,66 @@
         </div>
     </div>
 
+    <!-- Create Business Workspace Modal -->
+    <div class="modal-overlay" id="createWorkspaceModal">
+        <div class="modal-content" style="max-width:520px;">
+            <span class="close-modal" onclick="closeCreateWorkspaceModal()">&times;</span>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span style="font-size:18px;">🏛️</span>
+                <div>
+                    <h3 style="color:#ffffff; font-size:16px; font-weight:800; margin:0;">Configure New Business Workspace</h3>
+                    <span style="font-size:11px; color:#4ade80; font-weight:700;">CUSTOM ECONOMIC BOUNDARY ONBOARDING</span>
+                </div>
+            </div>
+            <p style="color:#94a3b8; font-size:12.5px; line-height:1.5; margin-bottom:16px;">
+                Lock in domain economics, daily transaction baselines, and cost targets so generated memos correlate 100% with your actual operation.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Business Name</label>
+                    <input type="text" id="newWsName" placeholder="e.g. Apex Performance Dental or Midtown Auto" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:13px;">
+                </div>
+
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Industry & Operating Domain</label>
+                    <select id="newWsDomain" class="custom-select" style="background:#090a0c; width:100%;">
+                        <option value="mas_diner">Hospitality / Restaurant / Diner (Covers & Prime Costs)</option>
+                        <option value="healthcare_clinic">Medical, Dental & Specialty Clinic (Patient Show-Rates & RVU)</option>
+                        <option value="fitness_wellness">Fitness Studio & Gym (Monthly Dues & Churn Defense)</option>
+                        <option value="engineering_firm">Engineering, RFP & Professional Services (Labor Multipliers)</option>
+                        <option value="bannerman">Commercial Real Estate & Retail Center (NNN Leases & Dwell Time)</option>
+                        <option value="cleaver_brooks">Industrial Thermal & Manufacturing (Contract Capex & Retention)</option>
+                        <option value="default">B2B SaaS, Agency & Digital Subscriptions (CAC, LTV & Payback)</option>
+                    </select>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Avg Ticket / Dues / Rate</label>
+                        <input type="text" id="newWsTicket" placeholder="e.g. $185.00 / visit" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Daily Volume / Capacity</label>
+                        <input type="text" id="newWsVolume" placeholder="e.g. 24 visits / day" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Core Margin & Strategic Goal</label>
+                    <input type="text" id="newWsGoal" placeholder="e.g. Reduce patient no-shows under 4% and defend zero discounts" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
+                </div>
+            </div>
+
+            <div style="margin-top:18px; display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" class="action-btn" onclick="closeCreateWorkspaceModal()">Cancel</button>
+                <button type="button" class="btn-launch-intake" onclick="saveNewWorkspaceModal()" style="margin:0; padding:8px 16px;">
+                    <span>Create & Activate Workspace ⚡</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pricing Modal -->
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
@@ -2890,8 +2950,25 @@
         }
 
         function createWorkspace() {
-            const name = prompt("Enter new client/project workspace name:");
-            if (!name) return;
+            document.getElementById('createWorkspaceModal').style.display = 'flex';
+            document.getElementById('newWsName').focus();
+        }
+
+        function closeCreateWorkspaceModal() {
+            document.getElementById('createWorkspaceModal').style.display = 'none';
+        }
+
+        function saveNewWorkspaceModal() {
+            const name = document.getElementById('newWsName').value.trim();
+            if (!name) {
+                alert("Please enter a business name.");
+                return;
+            }
+            const domain = document.getElementById('newWsDomain').value;
+            const ticket = document.getElementById('newWsTicket').value.trim() || "$16.50";
+            const volume = document.getElementById('newWsVolume').value.trim() || "150 units/day";
+            const goal = document.getElementById('newWsGoal').value.trim() || "Defend gross margin & capture local trade";
+
             const select = document.getElementById('clientWorkspace');
             const opt = document.createElement('option');
             const key = 'ws_' + Date.now();
@@ -2900,12 +2977,18 @@
             select.appendChild(opt);
             select.value = key;
 
-            // Save to persistent localStorage
+            // Save to persistent localStorage with full economic parameters
             const customWs = JSON.parse(localStorage.getItem('consultant_custom_workspaces') || '[]');
-            customWs.push({ key, name });
+            customWs.push({ key, name, domain, ticket, volume, goal });
             localStorage.setItem('consultant_custom_workspaces', JSON.stringify(customWs));
 
+            // Auto-fill directive builder with the new business profile
+            autofillDirective(name, goal, `Target Ticket: ${ticket} | Baseline: ${volume}`, `Audit ${name} operational throughput, prime costs, and turnaround catalysts.`);
+
+            closeCreateWorkspaceModal();
             onWorkspaceChange();
+
+            alert(`✓ Workspace "${name}" created and configured with custom ${domain} economics!`);
         }
 
         function autofillDirective(target, goal, constraint, prompt) {
