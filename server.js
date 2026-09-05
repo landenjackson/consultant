@@ -47,6 +47,56 @@ const createEmailTransporter = async () => {
   });
 };
 
+// Multi-Channel Webhook Dispatch Endpoint (Discord, Slack, Webhooks)
+app.post('/api/dispatch-webhook', async (req, res) => {
+  try {
+    const { platform = 'discord', webhookUrl, workspace = "Ma's Diner", title = "Morning Executive Strategic Briefing", memoContent } = req.body;
+
+    if (!webhookUrl || !webhookUrl.startsWith('http')) {
+      return res.status(400).json({ error: "A valid HTTP(S) webhook URL is required." });
+    }
+
+    let payload = {};
+
+    if (platform === 'discord') {
+      payload = {
+        username: "Consultant Studio",
+        avatar_url: "https://consultant-studio.ai.studio/favicon.svg",
+        embeds: [{
+          title: `📊 ${workspace}: ${title}`,
+          description: (memoContent || "Strategic brief ready.").substring(0, 2000),
+          color: 0x22c55e,
+          footer: { text: "Delivered via Consultant Studio Multi-Channel Cron • Landen Jackson (Lead Operator)" },
+          timestamp: new Date().toISOString()
+        }]
+      };
+    } else if (platform === 'slack') {
+      payload = {
+        text: `*📊 ${workspace} — ${title}*\n\n${memoContent}\n\n_Delivered autonomously via Consultant Studio Engine_`
+      };
+    } else {
+      payload = { workspace, title, memoContent, timestamp: new Date().toISOString() };
+    }
+
+    const resp = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      return res.status(resp.status).json({ error: `Webhook post failed: ${err}` });
+    }
+
+    return res.json({ success: true, platform, status: "Delivered" });
+
+  } catch (err) {
+    console.error('Webhook dispatch error:', err);
+    res.status(500).json({ error: err.message || "Failed to dispatch webhook." });
+  }
+});
+
 app.post('/api/apify-recon', async (req, res) => {
   try {
     const { query, location = "Tallahassee, FL", actor = "compass/crawler-google-places" } = req.body;
@@ -138,7 +188,6 @@ Specific Owner Question: "${userMessage}"
 
 Provide your tailored strategic advisory memo solving this exact situation:`;
 
-    // Multi-Model Cascade: Try Gemini 3.8 Flash, failover to 3.5 if busy
     const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash'];
     let content = null;
     let lastError = null;

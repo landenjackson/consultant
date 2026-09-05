@@ -1708,8 +1708,15 @@
                 </div>
 
                 <div class="intake-field">
-                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Destination (Email / Webhook / Telegram)</label>
-                    <input type="text" id="dispatchTarget" placeholder="e.g. founder@company.com or Telegram Handle" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
+                    <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Delivery Platform Channel</label>
+                    <select id="dispatchPlatform" class="custom-select" style="background:#090a0c; margin-bottom:8px;" onchange="updateDispatchPlaceholder()">
+                        <option value="telegram" selected>✈️ Telegram (Channel / DM)</option>
+                        <option value="discord">💬 Discord (Webhook URL)</option>
+                        <option value="slack">💼 Slack (Incoming Webhook)</option>
+                        <option value="email">✉️ Executive Email</option>
+                        <option value="sms">📱 SMS / WhatsApp (Twilio)</option>
+                    </select>
+                    <input type="text" id="dispatchTarget" placeholder="Enter Telegram Chat ID (e.g. 5393795759)" style="width:100%; background:#090a0c; border:1px solid #1e232c; color:#fff; padding:8px 10px; border-radius:5px; font-size:12.5px;">
                 </div>
 
                 <div style="background:#090a0c; border:1px solid #1e232c; border-left:3px solid #22c55e; border-radius:6px; padding:10px 12px; font-size:11.5px; color:#94a3b8;">
@@ -2923,16 +2930,27 @@
             document.getElementById('dispatchModal').style.display = 'none';
         }
 
+        function updateDispatchPlaceholder() {
+            const platform = document.getElementById('dispatchPlatform').value;
+            const input = document.getElementById('dispatchTarget');
+            if (platform === 'telegram') input.placeholder = "Enter Telegram Chat ID (e.g. 5393795759)";
+            else if (platform === 'discord') input.placeholder = "Paste Discord Webhook URL (https://discord.com/api/webhooks/...)";
+            else if (platform === 'slack') input.placeholder = "Paste Slack Incoming Webhook URL (https://hooks.slack.com/...)";
+            else if (platform === 'email') input.placeholder = "Enter Email Address (e.g. founder@company.com)";
+            else if (platform === 'sms') input.placeholder = "Enter Phone Number for WhatsApp / SMS (+1XXXXXXXXXX)";
+        }
+
         function saveDispatchSchedule() {
             const ws = document.getElementById('dispatchWorkspace').value;
             const time = document.getElementById('dispatchTime').value;
             const cadence = document.getElementById('dispatchCadence').value;
-            const target = document.getElementById('dispatchTarget').value.trim() || 'Active Telegram/Email';
+            const platform = document.getElementById('dispatchPlatform').value;
+            const target = document.getElementById('dispatchTarget').value.trim() || 'Default Channel';
 
-            localStorage.setItem('consultant_dispatch_config', JSON.stringify({ ws, time, cadence, target, active: true }));
+            localStorage.setItem('consultant_dispatch_config', JSON.stringify({ ws, time, cadence, platform, target, active: true }));
             closeDispatchModal();
 
-            alert(`⏰ Daily Dispatch Activated!\n• Workspace: ${ws}\n• Delivery: ${time} (${cadence})\n• Destination: ${target}\n\nYour strategic briefings will be delivered autonomously.`);
+            alert(`⏰ Multi-Channel Dispatch Armed!\n• Platform: ${platform.toUpperCase()}\n• Workspace: ${ws}\n• Delivery: ${time} (${cadence})\n• Destination: ${target}\n\nYour strategic feasibility briefs will deliver automatically.`);
         }
 
         // Global Command Palette (Cmd + K) Controller
