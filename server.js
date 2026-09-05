@@ -21,13 +21,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Stripe Client Initialization
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-
-// Apify Client Initialization
 const apifyClient = process.env.APIFY_API_KEY ? new ApifyClient({ token: process.env.APIFY_API_KEY }) : null;
 
-// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -53,24 +49,17 @@ const createEmailTransporter = async () => {
   });
 };
 
-// Stripe Create Checkout Session Endpoint (SaaS Subscriptions with 30-Day Trial)
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { tier = 'starter', priceId } = req.body;
-    
-    if (!stripe) {
-      return res.status(500).json({ error: "Stripe is not configured on the server." });
-    }
+    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
 
     const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
-
-    // Pricing matrix configuration
     const tierConfig = {
       starter: { name: 'Consultant Studio — Starter Plan', amount: 1599, desc: 'Independent operators & small diners' },
       pro: { name: 'Consultant Studio — Pro Strategy', amount: 3999, desc: 'Growing multi-unit operators & clinics' },
       executive: { name: 'Consultant Studio — Executive Suite', amount: 7999, desc: 'Commercial developers, industrial & agencies' }
     };
-
     const selected = tierConfig[tier] || tierConfig.starter;
 
     const session = await stripe.checkout.sessions.create({
@@ -91,32 +80,24 @@ app.post('/create-checkout-session', async (req, res) => {
         }
       ],
       mode: 'subscription',
-      subscription_data: {
-        trial_period_days: 30
-      },
+      subscription_data: { trial_period_days: 30 },
       success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
       cancel_url: `${domain}/?status=cancelled`
     });
 
     return res.json({ url: session.url, sessionId: session.id });
-
   } catch (err) {
     console.error('Stripe session error:', err);
-    return res.status(500).json({ error: err.message || "Failed to create Stripe checkout session." });
+    return res.status(500).json({ error: err.message || "Failed to create checkout session." });
   }
 });
 
-// Multi-Channel Webhook Dispatch Endpoint (Discord, Slack, Webhooks)
 app.post('/api/dispatch-webhook', async (req, res) => {
   try {
     const { platform = 'discord', webhookUrl, workspace = "Ma's Diner", title = "Morning Executive Strategic Briefing", memoContent } = req.body;
-
-    if (!webhookUrl || !webhookUrl.startsWith('http')) {
-      return res.status(400).json({ error: "A valid HTTP(S) webhook URL is required." });
-    }
+    if (!webhookUrl || !webhookUrl.startsWith('http')) return res.status(400).json({ error: "Valid webhook URL required." });
 
     let payload = {};
-
     if (platform === 'discord') {
       payload = {
         username: "Consultant Studio",
@@ -125,14 +106,12 @@ app.post('/api/dispatch-webhook', async (req, res) => {
           title: `📊 ${workspace}: ${title}`,
           description: (memoContent || "Strategic brief ready.").substring(0, 2000),
           color: 0x22c55e,
-          footer: { text: "Delivered via Consultant Studio Multi-Channel Cron • Landen Jackson (Lead Operator)" },
+          footer: { text: "Delivered via Consultant Studio Engine" },
           timestamp: new Date().toISOString()
         }]
       };
     } else if (platform === 'slack') {
-      payload = {
-        text: `*📊 ${workspace} — ${title}*\n\n${memoContent}\n\n_Delivered autonomously via Consultant Studio Engine_`
-      };
+      payload = { text: `*📊 ${workspace} — ${title}*\n\n${memoContent}\n\n_Delivered via Consultant Studio_` };
     } else {
       payload = { workspace, title, memoContent, timestamp: new Date().toISOString() };
     }
@@ -143,60 +122,47 @@ app.post('/api/dispatch-webhook', async (req, res) => {
       body: JSON.stringify(payload)
     });
 
-    if (!resp.ok) {
-      const err = await resp.text();
-      return res.status(resp.status).json({ error: `Webhook post failed: ${err}` });
-    }
-
+    if (!resp.ok) return res.status(resp.status).json({ error: "Webhook post failed" });
     return res.json({ success: true, platform, status: "Delivered" });
-
   } catch (err) {
-    console.error('Webhook dispatch error:', err);
-    res.status(500).json({ error: err.message || "Failed to dispatch webhook." });
+    console.error('Webhook error:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 app.post('/api/apify-recon', async (req, res) => {
   try {
     const { query, location = "Tallahassee, FL", actor = "compass/crawler-google-places" } = req.body;
-
     if (!apifyClient) {
       return res.json({
         live: false,
         source: "Empirical Spatial Cache",
         data: {
-          location: location,
-          searchQuery: query || "Local Competitors & Foot-Traffic Catchment",
+          location,
+          searchQuery: query || "Local Catchment",
           competitorCount: 14,
           averageRating: 4.6,
           footfallIndex: "High Density (8.4/10)",
-          peakHours: "7:15 AM - 9:30 AM & 12:00 PM - 1:45 PM",
-          estimatedWalkshedCapture: "6.8% (5-min pedestrian perimeter)"
+          peakHours: "7:15 AM - 9:30 AM",
+          estimatedWalkshedCapture: "6.8%"
         }
       });
     }
 
     const run = await apifyClient.actor(actor).call({
-      searchStringsArray: [query || `${location} restaurants businesses`],
+      searchStringsArray: [query || `${location} businesses`],
       maxCrawledPlacesPerSearch: 10,
       language: "en"
     });
-
     const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems({ limit: 10 });
-
-    return res.json({
-      live: true,
-      source: "Apify Live Cloud Actor",
-      datasetId: run.defaultDatasetId,
-      items: items
-    });
-
+    return res.json({ live: true, source: "Apify Live Cloud Actor", datasetId: run.defaultDatasetId, items });
   } catch (err) {
-    console.error('Apify recon error:', err);
-    res.status(500).json({ error: err.message || "Apify reconnaissance failed." });
+    console.error('Apify error:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
+// ULTRA-FAST STREAMLINED CHAT ENDPOINT (<10-15s Latency Cap)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
@@ -206,48 +172,38 @@ app.post('/api/chat', async (req, res) => {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const systemPrompt = `You are an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 directly with a business owner.
+    const promptText = `You are Consultant Studio, an elite Senior Strategic Operations Partner and Chief of Staff.
+Client: ${eco.name} (${eco.businessType})
+Domain Focus: ${profile.categoryName}
+Owner Question: "${userMessage}"
 
-CRITICAL DIRECTIVE ON QUESTION DIFFERENTIATION & SPECIFICITY:
-- Look at the EXACT question, scenario, or numbers the user submitted: "${userMessage}".
-- DO NOT output a generic canned template or repeat identical stock numbers.
-- Answer the EXACT problem asked. If they ask about catering, talk about catering orders and margins. If they ask about staffing, talk about shift labor and hourly wages. If they ask about prices, talk about item-level elasticity and check sizes.
-- Every single metric and action step MUST be custom-calculated and tailored specifically to what the user asked in this prompt.
-- Active Business: ${eco.name} (${eco.businessType})
-- Strategic Lens: ${profile.categoryName}
+DIRECTIVE:
+Deliver a high-density, candid 4-part boardroom memo solving this exact inquiry in under 600 words. Reconcile daily top-line revenue vs direct prime costs (food/parts, labor, lease). No generic filler.
 
-STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
+FORMAT:
+### 1. Strategic Diagnosis: "${userMessage.substring(0, 70)}"
+(2 dense, analytical paragraphs analyzing the exact bottleneck and operational fix.)
 
-### 1. Strategic Diagnosis: "${userMessage.substring(0, 80)}"
-(2 dense paragraphs analyzing the exact challenge or question asked by the owner.)
-
->> ★ Key Turnaround Move: [1 single, high-leverage tactical move directly solving the user's specific question.]
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical action to protect profit without discounting.]
 
 ### 2. Tailored Operational Telemetry & Math
-(5 distinct metrics directly calculating the math for the user's specific inquiry with explicit formulas:
-• Metric 1: Value — Plain-English explanation of the calculation and bottom-line profit impact.
+• Metric 1: Value — Plain-English explanation.
 • Metric 2: Value — Plain-English explanation.
 • Metric 3: Value — Plain-English explanation.
 • Metric 4: Value — Plain-English explanation.
 • Metric 5: Value — Plain-English explanation.
-)
-• What-If Annual Cash Flow Recovery: [Calculated Value, e.g. +$XX,XXX/yr] — Plain-English explanation.
+• What-If Annual Cash Flow Recovery: +$XX,XXX/yr — Plain-English explanation.
 
-### 3. Tactical Action Plan (Direct Solution)
-1. Priority 1 (Immediate Fix for This Problem): [Tactical action & assigned Role Owner]
-2. Priority 2 (Process & Operational Upgrade): [Tactical action & assigned Role Owner]
-3. Priority 3 (Long-Term Retention & Margin Lock): [Tactical action & assigned Role Owner]
+### 3. Tactical Action Plan (Today's Priorities)
+1. Priority 1 (Immediate Fix): [Action & assigned Role Owner]
+2. Priority 2 (Process & Labor Optimization): [Action & assigned Role Owner]
+3. Priority 3 (Zero-Discount Customer Retention): [Action & assigned Role Owner]
 
 ### 4. Direct Bottom-Line Takeaway
-(1 direct, encouraging concluding sentence answering the owner's core question.)`;
+(1 direct, encouraging concluding sentence.)`;
 
-    const userPrompt = `Client Business: ${eco.name} (${eco.businessType})
-Category Focus: ${profile.categoryName}
-Specific Owner Question: "${userMessage}"
-
-Provide your tailored strategic advisory memo solving this exact situation:`;
-
-    const candidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash'];
+    // Latency-Optimized Multi-Model Cascade: Primary gemini-3.5-flash with tuned 900 token budget
+    const candidateModels = ['gemini-3.5-flash', 'gemini-3.8-flash'];
     let content = null;
     let lastError = null;
 
@@ -258,10 +214,10 @@ Provide your tailored strategic advisory memo solving this exact situation:`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+            contents: [{ role: "user", parts: [{ text: promptText }] }],
             generationConfig: {
-              temperature: 0.85,
-              maxOutputTokens: 1400
+              temperature: 0.7,
+              maxOutputTokens: 900
             }
           })
         });
@@ -283,22 +239,15 @@ Provide your tailored strategic advisory memo solving this exact situation:`;
     }
 
     if (!content) {
-      return res.status(503).json({ error: `AI inference temporarily unavailable: ${lastError}` });
+      return res.status(503).json({ error: `Inference error: ${lastError}` });
     }
 
     return res.json({
-      choices: [
-        {
-          message: {
-            role: "assistant",
-            content: content
-          }
-        }
-      ]
+      choices: [{ message: { role: "assistant", content } }]
     });
 
   } catch (err) {
-    console.error('Chat endpoint error:', err);
+    console.error('Chat error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });
@@ -307,67 +256,32 @@ Provide your tailored strategic advisory memo solving this exact situation:`;
 app.post('/api/dispatch-email', async (req, res) => {
   try {
     const { to, workspace = "Ma's Diner", title = "Morning Executive Strategic Briefing", memoContent } = req.body;
-
-    if (!to || !to.includes('@')) {
-      return res.status(400).json({ error: "A valid recipient email address is required." });
-    }
+    if (!to || !to.includes('@')) return res.status(400).json({ error: "Valid email required." });
 
     const transporter = await createEmailTransporter();
-
     const htmlBody = `
     <!DOCTYPE html>
     <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090A0C; color: #E2E8F0; padding: 24px; margin: 0; }
-        .email-container { max-width: 600px; margin: 0 auto; background: #0F1216; border: 1px solid #1C2028; border-radius: 10px; overflow: hidden; }
-        .email-header { background: #161A22; border-bottom: 1px solid #1C2028; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
-        .logo-text { font-size: 15px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.01em; }
-        .jade-badge { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.35); color: #4ADE80; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
-        .email-body { padding: 24px; font-size: 14px; line-height: 1.6; color: #CBD5E1; }
-        .memo-title { font-size: 18px; font-weight: 800; color: #FFFFFF; margin-top: 0; margin-bottom: 16px; border-bottom: 1px solid #1C2028; padding-bottom: 12px; }
-        .email-footer { background: #0C0E12; border-top: 1px solid #1C2028; padding: 16px 24px; font-size: 11.5px; color: #64748B; text-align: center; }
-      </style>
-    </head>
-    <body>
-      <div class="email-container">
-        <div class="email-header">
-          <div class="logo-text">✦ CONSULTANT STUDIO</div>
-          <div class="jade-badge">Executive Dispatch • ${workspace}</div>
-        </div>
-        <div class="email-body">
-          <h2 class="memo-title">${title}</h2>
-          <div style="white-space: pre-wrap; font-family: inherit;">${memoContent || "No memo content provided."}</div>
-        </div>
-        <div class="email-footer">
-          Delivered autonomously via Consultant Studio Orchestrated Engine • <a href="https://consultant-studio.ai.studio" style="color:#4ADE80; text-decoration:none;">Launch Dashboard</a>
-        </div>
+    <body style="font-family:sans-serif; background:#090A0C; color:#E2E8F0; padding:24px;">
+      <div style="max-width:600px; margin:0 auto; background:#0F1216; border:1px solid #1C2028; border-radius:8px; padding:20px;">
+        <h2 style="color:#FFF; margin-top:0;">📊 ${workspace}: ${title}</h2>
+        <div style="white-space:pre-wrap; line-height:1.6; color:#CBD5E1;">${memoContent}</div>
       </div>
     </body>
-    </html>
-    `;
+    </html>`;
 
     const info = await transporter.sendMail({
       from: `"Consultant Studio" <${process.env.SMTP_FROM || 'briefings@consultant-app.com'}>`,
-      to: to,
+      to,
       subject: `📊 ${workspace}: ${title}`,
       text: memoContent,
       html: htmlBody
     });
 
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-
-    return res.json({
-      success: true,
-      messageId: info.messageId,
-      recipient: to,
-      previewUrl: previewUrl || null
-    });
-
+    return res.json({ success: true, messageId: info.messageId });
   } catch (err) {
-    console.error('Email dispatch error:', err);
-    return res.status(500).json({ error: err.message || "Failed to dispatch email." });
+    console.error('Email error:', err);
+    return res.status(500).json({ error: err.message });
   }
 });
 
