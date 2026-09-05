@@ -202,39 +202,45 @@ FORMAT:
 ### 4. Direct Bottom-Line Takeaway
 (1 direct, encouraging concluding sentence.)`;
 
-    // Latency-Optimized Multi-Model Cascade: Primary gemini-3.5-flash with tuned 900 token budget
-    const candidateModels = ['gemini-3.5-flash', 'gemini-3.8-flash'];
+    // Fast Direct Cloudflare / Google Inference Fast Lane (Sub-10s Response Target)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     let content = null;
-    let lastError = null;
 
-    for (const model of candidateModels) {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      try {
-        const response = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: promptText }] }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 900
-            }
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const candidate = data.candidates?.[0];
-          const textPart = candidate?.content?.parts?.find(p => p.text)?.text;
-          if (textPart) {
-            content = textPart;
-            break;
+    try {
+      const response = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 750
           }
-        } else {
-          lastError = `Model ${model} returned ${response.status}`;
-        }
-      } catch (e) {
-        lastError = e.message;
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        content = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
+      }
+    } catch (e) {
+      console.error("Lite model failover:", e);
+    }
+
+    // Fallback to 3.5 if lite is busy
+    if (!content) {
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+      const response = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 750 }
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        content = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
       }
     }
 
