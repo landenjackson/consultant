@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import Stripe from 'stripe';
 import { ApifyClient } from 'apify-client';
 import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
 import { TASK_PROFILES } from './src/taskProfiles.js';
@@ -20,8 +21,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Stripe Client Initialization
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
+// Apify Client Initialization
 const apifyClient = process.env.APIFY_API_KEY ? new ApifyClient({ token: process.env.APIFY_API_KEY }) : null;
 
+// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -46,6 +52,59 @@ const createEmailTransporter = async () => {
     }
   });
 };
+
+// Stripe Create Checkout Session Endpoint (SaaS Subscriptions with 30-Day Trial)
+app.post('/create-checkout-session', async (req, res) => {
+  try {
+    const { tier = 'starter', priceId } = req.body;
+    
+    if (!stripe) {
+      return res.status(500).json({ error: "Stripe is not configured on the server." });
+    }
+
+    const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
+
+    // Pricing matrix configuration
+    const tierConfig = {
+      starter: { name: 'Consultant Studio — Starter Plan', amount: 1599, desc: 'Independent operators & small diners' },
+      pro: { name: 'Consultant Studio — Pro Strategy', amount: 3999, desc: 'Growing multi-unit operators & clinics' },
+      executive: { name: 'Consultant Studio — Executive Suite', amount: 7999, desc: 'Commercial developers, industrial & agencies' }
+    };
+
+    const selected = tierConfig[tier] || tierConfig.starter;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        priceId ? { price: priceId, quantity: 1 } : {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: selected.name,
+              description: selected.desc,
+              images: ['https://consultant-studio.ai.studio/icon.svg']
+            },
+            unit_amount: selected.amount,
+            recurring: { interval: 'month' }
+          },
+          quantity: 1
+        }
+      ],
+      mode: 'subscription',
+      subscription_data: {
+        trial_period_days: 30
+      },
+      success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+      cancel_url: `${domain}/?status=cancelled`
+    });
+
+    return res.json({ url: session.url, sessionId: session.id });
+
+  } catch (err) {
+    console.error('Stripe session error:', err);
+    return res.status(500).json({ error: err.message || "Failed to create Stripe checkout session." });
+  }
+});
 
 // Multi-Channel Webhook Dispatch Endpoint (Discord, Slack, Webhooks)
 app.post('/api/dispatch-webhook', async (req, res) => {
