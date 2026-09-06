@@ -54,49 +54,82 @@ const createEmailTransporter = async () => {
 // STRIPE ACCOUNTS V2 CONNECT & EMBEDDED PAYMENTS BLUEPRINT IMPLEMENTATION
 // ============================================================================
 
-// 1. Create and Onboard Connected Account (v2/core/accounts with v1 standard fallback)
+// 1. Create and Onboard Connected Account (Official Accounts v2 Direct Raw Request)
 app.post('/api/stripe/create-connected-account', async (req, res) => {
   try {
-    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
     const { email, displayName = "Test Operator", country = "US" } = req.body;
     const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
+    const apiKey = process.env.STRIPE_SECRET_KEY;
 
-    let accountId = null;
-    let onboardingUrl = null;
+    if (!apiKey) return res.status(500).json({ error: "Stripe API Key is not configured." });
 
-    try {
-      // Standard Connect Account Creation
-      const account = await stripe.accounts.create({
-        type: 'standard',
-        country: country,
-        email: email || "operator@consultant-studio.ai.studio",
-        business_profile: {
-          name: displayName
+    // 1. Call POST /v2/core/accounts
+    const createResp = await fetch('https://api.stripe.com/v2/core/accounts', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        display_name: displayName,
+        contact_email: email || "operator@consultant-studio.ai.studio",
+        configuration: {
+          merchant: {
+            simulate_accept_tos_obo: true
+          }
+        },
+        include: ['configuration.merchant', 'configuration.recipient', 'identity', 'defaults', 'configuration.customer'],
+        identity: {
+          country: country,
+          business_details: {
+            phone: "0000000000"
+          }
+        },
+        dashboard: 'full',
+        defaults: {
+          responsibilities: {
+            losses_collector: 'stripe',
+            fees_collector: 'stripe'
+          }
         }
-      });
-      accountId = account.id;
+      })
+    });
 
-      const accountLink = await stripe.accountLinks.create({
-        account: account.id,
-        refresh_url: `${domain}/?connect=refresh`,
-        return_url: `${domain}/?connect=return`,
-        type: 'account_onboarding'
-      });
-      onboardingUrl = accountLink.url;
-
-    } catch (connectErr) {
-      console.error("Standard connect error, falling back to direct account link:", connectErr.message);
-      return res.status(400).json({ error: connectErr.message });
+    const accountData = await createResp.json();
+    if (!createResp.ok) {
+      return res.status(createResp.status).json({ error: accountData.error?.message || "Failed to create Accounts v2" });
     }
+
+    const accountId = accountData.id;
+
+    // 2. Call POST /v2/core/account_links
+    const linkResp = await fetch('https://api.stripe.com/v2/core/account_links', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        account: accountId,
+        use_case: {
+          type: 'account_onboarding',
+          account_onboarding: {
+            configurations: ['merchant', 'customer']
+          }
+        }
+      })
+    });
+
+    const linkData = await linkResp.json();
 
     return res.json({
       success: true,
       accountId: accountId,
-      onboardingUrl: onboardingUrl
+      onboardingUrl: linkData.url || `https://connect.stripe.com/setup/s/${accountId}`
     });
 
   } catch (err) {
-    console.error('Stripe connected account creation error:', err);
+    console.error('Stripe v2 raw request error:', err);
     return res.status(500).json({ error: err.message || "Failed to create connected account." });
   }
 });
