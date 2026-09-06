@@ -21,11 +21,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize Stripe Client without hardcoded version
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const apifyClient = process.env.APIFY_API_KEY ? new ApifyClient({ token: process.env.APIFY_API_KEY }) : null;
 
-// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -50,207 +48,6 @@ const createEmailTransporter = async () => {
   });
 };
 
-// ============================================================================
-// STRIPE ACCOUNTS V2 CONNECT & EMBEDDED PAYMENTS BLUEPRINT IMPLEMENTATION
-// ============================================================================
-
-// 1. Create and Onboard Connected Account (Official Accounts v2 Direct Raw Request)
-app.post('/api/stripe/create-connected-account', async (req, res) => {
-  try {
-    const { email, displayName = "Test Operator", country = "US" } = req.body;
-    const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
-    const apiKey = process.env.STRIPE_SECRET_KEY;
-
-    if (!apiKey) return res.status(500).json({ error: "Stripe API Key is not configured." });
-
-    // 1. Call POST /v2/core/accounts with exact merchant/customer config
-    const createResp = await fetch('https://api.stripe.com/v2/core/accounts', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Stripe-Version': '2025-01-27.acacia; core_accounts_beta=v2'
-      },
-      body: JSON.stringify({
-        display_name: displayName,
-        contact_email: email || "operator@consultant-studio.ai.studio",
-        identity: {
-          country: country
-        }
-      })
-    });
-
-    const accountData = await createResp.json();
-    if (!createResp.ok) {
-      return res.status(createResp.status).json({ error: accountData.error?.message || "Failed to create Accounts v2" });
-    }
-
-    const accountId = accountData.id;
-
-    // 2. Call POST /v2/core/account_links with required v2 API Version Header
-    const linkResp = await fetch('https://api.stripe.com/v2/core/account_links', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Stripe-Version': '2025-01-27.acacia; core_accounts_beta=v2'
-      },
-      body: JSON.stringify({
-        account: accountId,
-        use_case: {
-          type: 'account_onboarding',
-          account_onboarding: {
-            configurations: ['merchant', 'customer']
-          }
-        }
-      })
-    });
-
-    const linkData = await linkResp.json();
-
-    return res.json({
-      success: true,
-      accountId: accountId,
-      onboardingUrl: linkData.url || `https://connect.stripe.com/setup/s/${accountId}`
-    });
-
-  } catch (err) {
-    console.error('Stripe v2 raw request error:', err);
-    return res.status(500).json({ error: err.message || "Failed to create connected account." });
-  }
-});
-
-// 2. Accept Embedded Direct Payments & Application Fee Transfer
-app.post('/api/stripe/create-connected-checkout', async (req, res) => {
-  try {
-    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
-    const { connectedAccountId, productName = "Strategy Consultation Package", amount = 100000, fee = 123 } = req.body;
-
-    if (!connectedAccountId) {
-      return res.status(400).json({ error: "connectedAccountId is required." });
-    }
-
-    const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      automatic_tax: { enabled: true },
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          tax_behavior: 'exclusive',
-          product_data: {
-            name: productName,
-            tax_code: 'txcd_10000000'
-          },
-          unit_amount: amount
-        },
-        quantity: 1
-      }],
-      mode: 'payment',
-      payment_intent_data: {
-        application_fee_amount: fee
-      },
-      success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&payment=success`,
-      cancel_url: `${domain}/?payment=cancelled`
-    }, {
-      stripeAccount: connectedAccountId
-    });
-
-    return res.json({ url: session.url, sessionId: session.id });
-
-  } catch (err) {
-    console.error('Stripe connected checkout error:', err);
-    return res.status(500).json({ error: err.message || "Failed to create connected checkout." });
-  }
-});
-
-// 3. Charge Subscriptions from Connected Account Balance via SetupIntent
-app.post('/api/stripe/create-account-subscription', async (req, res) => {
-  try {
-    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
-    const { connectedAccountId, planName = "Platform Subscription", interval = "month", amount = 1000 } = req.body;
-
-    if (!connectedAccountId) {
-      return res.status(400).json({ error: "connectedAccountId is required." });
-    }
-
-    // A. Create or ensure Product with default price
-    const product = await stripe.products.create({
-      name: planName,
-      default_price_data: {
-        currency: 'usd',
-        recurring: { interval: interval },
-        unit_amount: amount
-      }
-    });
-
-    // B. Create SetupIntent with stripe_balance payment method
-    const setupIntent = await stripe.setupIntents.create({
-      payment_method_types: ['stripe_balance'],
-      confirm: true,
-      customer_account: connectedAccountId,
-      usage: 'off_session',
-      payment_method_data: {
-        type: 'stripe_balance'
-      }
-    });
-
-    // C. Charge Subscription against account balance
-    const subscription = await stripe.subscriptions.create({
-      customer_account: connectedAccountId,
-      default_payment_method: setupIntent.payment_method,
-      items: [{
-        price: product.default_price,
-        quantity: 1
-      }],
-      payment_settings: {
-        payment_method_types: ['stripe_balance']
-      }
-    });
-
-    return res.json({
-      success: true,
-      subscriptionId: subscription.id,
-      status: subscription.status,
-      productId: product.id
-    });
-
-  } catch (err) {
-    console.error('Stripe account subscription error:', err);
-    return res.status(500).json({ error: err.message || "Failed to create account subscription." });
-  }
-});
-
-// 1. Update Tax Settings with Head Office Address (Tallahassee, FL)
-app.post('/api/stripe/configure-tax', async (req, res) => {
-  try {
-    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
-
-    const taxSettings = await stripe.tax.settings.update({
-      head_office: {
-        address: {
-          line1: "100 S Monroe St",
-          city: "Tallahassee",
-          state: "FL",
-          postal_code: "32301",
-          country: "US"
-        }
-      },
-      defaults: {
-        tax_code: "txcd_10000000",
-        tax_behavior: "exclusive"
-      }
-    });
-
-    return res.json({ success: true, taxSettings });
-  } catch (err) {
-    console.error('Stripe Tax config error:', err);
-    return res.status(500).json({ error: err.message || "Failed to configure tax settings." });
-  }
-});
-
-// 2. Standard Platform Subscription Checkout Session (with Automatic Tax fallback)
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { tier = 'starter', priceId } = req.body;
@@ -264,58 +61,31 @@ app.post('/create-checkout-session', async (req, res) => {
     };
     const selected = tierConfig[tier] || tierConfig.starter;
 
-    let session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        automatic_tax: { enabled: true },
-        line_items: [
-          priceId ? { price: priceId, quantity: 1 } : {
-            price_data: {
-              currency: 'usd',
-              tax_behavior: 'exclusive',
-              product_data: {
-                name: selected.name,
-                description: selected.desc,
-                tax_code: 'txcd_10000000',
-                images: ['https://consultant-studio.ai.studio/icon.svg']
-              },
-              unit_amount: selected.amount,
-              recurring: { interval: 'month' }
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      automatic_tax: { enabled: true },
+      line_items: [
+        priceId ? { price: priceId, quantity: 1 } : {
+          price_data: {
+            currency: 'usd',
+            tax_behavior: 'exclusive',
+            product_data: {
+              name: selected.name,
+              description: selected.desc,
+              tax_code: 'txcd_10000000',
+              images: ['https://consultant-studio.ai.studio/icon.svg']
             },
-            quantity: 1
-          }
-        ],
-        mode: 'subscription',
-        subscription_data: { trial_period_days: 30 },
-        success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
-        cancel_url: `${domain}/?status=cancelled`
-      });
-    } catch (taxErr) {
-      console.warn("Stripe Tax not yet activated on dashboard, creating standard checkout session:", taxErr.message);
-      session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [
-          priceId ? { price: priceId, quantity: 1 } : {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: selected.name,
-                description: selected.desc,
-                images: ['https://consultant-studio.ai.studio/icon.svg']
-              },
-              unit_amount: selected.amount,
-              recurring: { interval: 'month' }
-            },
-            quantity: 1
-          }
-        ],
-        mode: 'subscription',
-        subscription_data: { trial_period_days: 30 },
-        success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
-        cancel_url: `${domain}/?status=cancelled`
-      });
-    }
+            unit_amount: selected.amount,
+            recurring: { interval: 'month' }
+          },
+          quantity: 1
+        }
+      ],
+      mode: 'subscription',
+      subscription_data: { trial_period_days: 30 },
+      success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+      cancel_url: `${domain}/?status=cancelled`
+    });
 
     return res.json({ url: session.url, sessionId: session.id });
   } catch (err) {
@@ -324,7 +94,6 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// Multi-Channel Webhook Dispatch Endpoint (Discord, Slack, Webhooks)
 app.post('/api/dispatch-webhook', async (req, res) => {
   try {
     const { platform = 'discord', webhookUrl, workspace = "Ma's Diner", title = "Morning Executive Strategic Briefing", memoContent } = req.body;
@@ -395,7 +164,7 @@ app.post('/api/apify-recon', async (req, res) => {
   }
 });
 
-// ZERO-GUESSWORK EMPIRICAL CHAT ENDPOINT (INSTANT SUB-SECOND RESPONSE)
+// DYNAMIC 100% TOPIC-CORRELATED CHAT ENDPOINT (GEMINI 3.8 / 3.5 FLASH)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
@@ -403,64 +172,103 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
     const profile = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
 
-    let covers = 180;
-    let avgCheck = 16.50;
-    let foodCostPct = 28.0;
-    let laborCostPct = 30.0;
-    let rentOverhead = 720.00;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    if (workspace === 'healthcare_clinic') {
-      covers = 24;
-      avgCheck = 185.00;
-      foodCostPct = 12.0;
-      laborCostPct = 34.0;
-      rentOverhead = 1450.00;
-    } else if (workspace === 'fitness_wellness') {
-      covers = 220;
-      avgCheck = 169.00 / 30;
-      foodCostPct = 8.0;
-      laborCostPct = 42.0;
-      rentOverhead = 950.00;
-    } else if (workspace === 'cleaver_brooks') {
-      covers = 2;
-      avgCheck = 350000.00 / 30;
-      foodCostPct = 42.0;
-      laborCostPct = 24.0;
-      rentOverhead = 2400.00;
-    }
+    const promptText = `You are Consultant Studio, an elite Senior Strategic Operations Partner and Chief of Staff speaking 1-on-1 directly with a business owner.
 
-    const dailyGross = covers * avgCheck;
-    const primeCostTotal = dailyGross * ((foodCostPct + laborCostPct) / 100);
-    const dailyNet = dailyGross - primeCostTotal;
-    const unitMargin = dailyNet / covers;
-    const breakevenUnits = Math.ceil(rentOverhead / Math.max(unitMargin, 1));
-    const annualRecovery = Math.round(unitMargin * 18 * 300);
+CRITICAL DIRECTIVE ON STRICT TOPIC & QUESTION DIFFERENTIATION:
+1. FOCUS 100% ON THE SPECIFIC INQUIRY & ACTIVE CATEGORY:
+   - Active Business: ${eco.name} (${eco.businessType})
+   - Strategic Focus: ${profile.categoryName} (${profile.objectiveFocus})
+   - User's Exact Prompt: "${userMessage}"
+   - Allowed Units & Ranges: ${eco.allowedFinancialUnits} (${JSON.stringify(eco.realisticRanges)})
+   - STRICT PROHIBITION: ${eco.forbiddenMetrics || "Do not mix unrelated domain concepts."}
 
-    const generatedMemo = `### 1. ${profile.categoryName} — Strategic Diagnosis: "${userMessage.substring(0, 60)}"
+2. DO NOT OUTPUT CANNED TEMPLATES OR REPEAT GENERIC NUMBERS:
+   - Answer the EXACT question asked. If they ask about catering, calculate bulk orders and kitchen prep margins. If they ask about staff raises, calculate hourly labor ceilings and table turns. If they ask about prices, calculate item-level price elasticity.
+   - Every single metric, formula, and action item MUST be custom-calculated for this exact scenario.
 
-Operating ${eco.name} without synchronous station staging forces ticket pass speed past 9.5 minutes during peak volume, triggering a 42% walk-away balk rate at the counter. When you protect full-price gross contribution and decouple grab-and-go beverage add-ons from short-order preparation lines, net profitability expands immediately without discounting.
+FORMAT YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 
->> ★ Key Turnaround Move: Decouple beverage and signature add-on grab-and-go ordering from short-order tickets to cut average line wait to 6.5 minutes.
+### 1. ${profile.categoryName} — Strategic Diagnosis: "${userMessage.substring(0, 60)}"
+(2 dense, analytical paragraphs analyzing the exact problem or inquiry submitted by the owner. Explain why it is happening and how to solve it.)
 
-### 2. Verified Financial Telemetry & Daily P&L Math
-• Daily Gross Sales: $${dailyGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/day — Formula: ${covers} active units/day × $${avgCheck.toFixed(2)} average encounter ticket.
-• Direct Prime & Operating Costs: $${primeCostTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/day — Formula: ${foodCostPct.toFixed(1)}% Direct Supplies ($${(dailyGross * (foodCostPct/100)).toFixed(2)}) + ${laborCostPct.toFixed(1)}% Direct Labor ($${(dailyGross * (laborCostPct/100)).toFixed(2)}).
-• Daily Net Operating Margin: +$${dailyNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/day — Formula: $${dailyGross.toFixed(2)} Gross Sales - $${primeCostTotal.toFixed(2)} Prime Costs (${(100 - foodCostPct - laborCostPct).toFixed(1)}% Contribution).
-• Unit Margin Contribution: +$${unitMargin.toFixed(2)} / unit — Formula: Net operating cash generated per completed customer transaction.
-• Daily Breakeven Volume: ${breakevenUnits} units/day — Formula: Fixed daily labor and lease overhead ($${rentOverhead.toFixed(2)}/day) ÷ $${unitMargin.toFixed(2)} unit margin.
-• What-If Annual Cash Flow Recovery: +$${annualRecovery.toLocaleString()}/yr — Plain-English: Recovering 18 walk-away balked customers daily adds $${(unitMargin * 18).toFixed(2)}/day in pure net profit.
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical action directly answering the user's specific prompt.]
+
+### 2. Verified Financial Telemetry & Daily P&L Math (${profile.categoryName})
+(5 custom metrics directly calculating the math for the user's specific inquiry with explicit line-item formulas:
+• Metric 1: Value — Plain-English explanation of the calculation and profit impact.
+• Metric 2: Value — Plain-English explanation.
+• Metric 3: Value — Plain-English explanation.
+• Metric 4: Value — Plain-English explanation.
+• Metric 5: Value — Plain-English explanation.
+)
+• What-If Annual Cash Flow Recovery: +$XX,XXX/yr — Plain-English explanation of the raw annual take-home gain.
 
 ### 3. Frontline Operational Action Plan (Today's Priorities)
-1. Priority 1 (Line-Speed Optimization): Pre-stage high-velocity prep stations at 6:30 AM to hold turnaround strictly under 8.5 minutes (Owner: General Manager).
-2. Priority 2 (Beverage Attach): Train counter staff on signature coffee and bakery add-on attach to lift tickets by +$1.85 (Owner: Floor Lead).
-3. Priority 3 (Zero-Discount Defense): Eliminate all promotional couponing; enforce full-price heritage hospitality (Owner: Shift Lead).
+1. Priority 1 (Immediate Margin Defense): [Specific tactical action & assigned Role Owner]
+2. Priority 2 (Process & Labor Optimization): [Specific operational upgrade & assigned Role Owner]
+3. Priority 3 (Zero-Discount Customer Retention): [Long-term community retention move & assigned Role Owner]
 
 ### 4. Direct Bottom-Line Takeaway & Operator Gate
-Protecting your peak throughput recovers your highest-margin volume without surrendering a penny in unearned discounts.
+(1 direct, encouraging closing sentence answering the owner's core question.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
+    let content = null;
+
+    // Fast-Lane API Call to Google Generative AI with dynamic temperature
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+    try {
+      const response = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          generationConfig: {
+            temperature: 0.85,
+            maxOutputTokens: 900
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        content = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
+      }
+    } catch (e) {
+      console.error("Gemini 3.5 call error:", e);
+    }
+
+    // Fallback to Gemini 3.8 Flash if 3.5 is busy
+    if (!content) {
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+      try {
+        const response = await fetch(fallbackUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: promptText }] }],
+            generationConfig: {
+              temperature: 0.85,
+              maxOutputTokens: 900
+            }
+          })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          content = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
+        }
+      } catch (err) {
+        console.error("Gemini 3.8 fallback error:", err);
+      }
+    }
+
+    if (!content) {
+      return res.status(503).json({ error: "AI inference engine temporarily busy. Please retry in a few seconds." });
+    }
+
     return res.json({
-      choices: [{ message: { role: "assistant", content: generatedMemo } }]
+      choices: [{ message: { role: "assistant", content } }]
     });
 
   } catch (err) {
