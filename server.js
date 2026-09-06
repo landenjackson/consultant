@@ -63,12 +63,13 @@ app.post('/api/stripe/create-connected-account', async (req, res) => {
 
     if (!apiKey) return res.status(500).json({ error: "Stripe API Key is not configured." });
 
-    // 1. Call POST /v2/core/accounts
+    // 1. Call POST /v2/core/accounts with required v2 API Version Header
     const createResp = await fetch('https://api.stripe.com/v2/core/accounts', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Stripe-Version': '2025-01-27.acacia; core_accounts_beta=v2'
       },
       body: JSON.stringify({
         display_name: displayName,
@@ -102,12 +103,13 @@ app.post('/api/stripe/create-connected-account', async (req, res) => {
 
     const accountId = accountData.id;
 
-    // 2. Call POST /v2/core/account_links
+    // 2. Call POST /v2/core/account_links with required v2 API Version Header
     const linkResp = await fetch('https://api.stripe.com/v2/core/account_links', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Stripe-Version': '2025-01-27.acacia; core_accounts_beta=v2'
       },
       body: JSON.stringify({
         account: accountId,
