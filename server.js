@@ -273,23 +273,39 @@ Format your answer strictly as:
 (1 sharp closing sentence.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 800
-          }
-        })
-      });
+      // High-Availability Multi-Model Fast-Lane Cascade
+      const modelsToTry = [
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro-latest',
+        'gemini-3.6-flash'
+      ];
 
-      if (geminiRes.ok) {
-        const data = await geminiRes.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          return res.json({ response: text });
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`Sending live request to model: ${modelName}...`);
+          const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.85,
+                maxOutputTokens: 800
+              }
+            })
+          });
+
+          console.log(`${modelName} Status:`, geminiRes.status);
+          if (geminiRes.ok) {
+            const data = await geminiRes.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              return res.json({ response: text });
+            }
+          }
+        } catch (mErr) {
+          console.error(`Model ${modelName} error:`, mErr.message);
         }
       }
     }
