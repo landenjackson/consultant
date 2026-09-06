@@ -216,8 +216,8 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
 
     let content = null;
 
-    // Fast-Lane API Call to Google Generative AI with dynamic temperature
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+    // Fast-Lane API Call to Google Generative AI with low token cap (<500 tokens) for instant response
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     try {
       const response = await fetch(geminiUrl, {
         method: 'POST',
@@ -225,8 +225,8 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: promptText }] }],
           generationConfig: {
-            temperature: 0.85,
-            maxOutputTokens: 900
+            temperature: 0.8,
+            maxOutputTokens: 550
           }
         })
       });
@@ -236,7 +236,7 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
         content = data.candidates?.[0]?.content?.parts?.find(p => p.text)?.text;
       }
     } catch (e) {
-      console.error("Gemini 3.5 call error:", e);
+      console.error("Gemini lite call error:", e);
     }
 
     // Fallback to Gemini 3.8 Flash if 3.5 is busy
