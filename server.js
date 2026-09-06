@@ -21,9 +21,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Initialize Stripe Client without hardcoded version
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const apifyClient = process.env.APIFY_API_KEY ? new ApifyClient({ token: process.env.APIFY_API_KEY }) : null;
 
+// Configure Email Transporter
 const createEmailTransporter = async () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -48,6 +50,165 @@ const createEmailTransporter = async () => {
   });
 };
 
+// ============================================================================
+// STRIPE ACCOUNTS V2 CONNECT & EMBEDDED PAYMENTS BLUEPRINT IMPLEMENTATION
+// ============================================================================
+
+// 1. Create and Onboard Connected Account (v2/core/accounts)
+app.post('/api/stripe/create-connected-account', async (req, res) => {
+  try {
+    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
+    const { email, displayName = "Test Operator", country = "US", phone = "0000000000" } = req.body;
+
+    // Accounts v2 Core Creation
+    const account = await stripe.v2.core.accounts.create({
+      display_name: displayName,
+      contact_email: email || "operator@consultant-studio.ai.studio",
+      configuration: {
+        merchant: {
+          simulate_accept_tos_obo: true
+        }
+      },
+      include: ['configuration.merchant', 'configuration.recipient', 'identity', 'defaults', 'configuration.customer'],
+      identity: {
+        country: country,
+        business_details: {
+          phone: phone
+        }
+      },
+      dashboard: 'full',
+      defaults: {
+        responsibilities: {
+          losses_collector: 'stripe',
+          fees_collector: 'stripe'
+        }
+      }
+    });
+
+    // Generate KYC Account Onboarding Link
+    const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
+    const accountLink = await stripe.v2.core.accountLinks.create({
+      account: account.id,
+      use_case: {
+        type: 'account_onboarding',
+        account_onboarding: {
+          configurations: ['merchant', 'customer']
+        }
+      }
+    });
+
+    return res.json({
+      success: true,
+      accountId: account.id,
+      onboardingUrl: accountLink.url
+    });
+
+  } catch (err) {
+    console.error('Stripe connected account creation error:', err);
+    return res.status(500).json({ error: err.message || "Failed to create connected account." });
+  }
+});
+
+// 2. Accept Embedded Direct Payments & Application Fee Transfer
+app.post('/api/stripe/create-connected-checkout', async (req, res) => {
+  try {
+    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
+    const { connectedAccountId, productName = "Strategy Consultation Package", amount = 100000, fee = 123 } = req.body;
+
+    if (!connectedAccountId) {
+      return res.status(400).json({ error: "connectedAccountId is required." });
+    }
+
+    const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: productName
+          },
+          unit_amount: amount
+        },
+        quantity: 1
+      }],
+      mode: 'payment',
+      payment_intent_data: {
+        application_fee_amount: fee
+      },
+      success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+      cancel_url: `${domain}/?payment=cancelled`
+    }, {
+      stripeAccount: connectedAccountId
+    });
+
+    return res.json({ url: session.url, sessionId: session.id });
+
+  } catch (err) {
+    console.error('Stripe connected checkout error:', err);
+    return res.status(500).json({ error: err.message || "Failed to create connected checkout." });
+  }
+});
+
+// 3. Charge Subscriptions from Connected Account Balance via SetupIntent
+app.post('/api/stripe/create-account-subscription', async (req, res) => {
+  try {
+    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
+    const { connectedAccountId, planName = "Platform Subscription", interval = "month", amount = 1000 } = req.body;
+
+    if (!connectedAccountId) {
+      return res.status(400).json({ error: "connectedAccountId is required." });
+    }
+
+    // A. Create or ensure Product with default price
+    const product = await stripe.products.create({
+      name: planName,
+      default_price_data: {
+        currency: 'usd',
+        recurring: { interval: interval },
+        unit_amount: amount
+      }
+    });
+
+    // B. Create SetupIntent with stripe_balance payment method
+    const setupIntent = await stripe.setupIntents.create({
+      payment_method_types: ['stripe_balance'],
+      confirm: true,
+      customer_account: connectedAccountId,
+      usage: 'off_session',
+      payment_method_data: {
+        type: 'stripe_balance'
+      }
+    });
+
+    // C. Charge Subscription against account balance
+    const subscription = await stripe.subscriptions.create({
+      customer_account: connectedAccountId,
+      default_payment_method: setupIntent.payment_method,
+      items: [{
+        price: product.default_price,
+        quantity: 1
+      }],
+      payment_settings: {
+        payment_method_types: ['stripe_balance']
+      }
+    });
+
+    return res.json({
+      success: true,
+      subscriptionId: subscription.id,
+      status: subscription.status,
+      productId: product.id
+    });
+
+  } catch (err) {
+    console.error('Stripe account subscription error:', err);
+    return res.status(500).json({ error: err.message || "Failed to create account subscription." });
+  }
+});
+
+// 4. Standard Platform Subscription Checkout Session (Starter / Pro / Executive)
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { tier = 'starter', priceId } = req.body;
@@ -91,6 +252,7 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
+// Multi-Channel Webhook Dispatch Endpoint (Discord, Slack, Webhooks)
 app.post('/api/dispatch-webhook', async (req, res) => {
   try {
     const { platform = 'discord', webhookUrl, workspace = "Ma's Diner", title = "Morning Executive Strategic Briefing", memoContent } = req.body;
@@ -169,7 +331,6 @@ app.post('/api/chat', async (req, res) => {
     const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
     const profile = TASK_PROFILES[taskType] || TASK_PROFILES.trade_analysis;
 
-    // Fast-path deterministic calculation based on domain model
     let covers = 180;
     let avgCheck = 16.50;
     let foodCostPct = 28.0;
@@ -179,20 +340,20 @@ app.post('/api/chat', async (req, res) => {
     if (workspace === 'healthcare_clinic') {
       covers = 24;
       avgCheck = 185.00;
-      foodCostPct = 12.0; // Clinical supplies
-      laborCostPct = 34.0; // RN/Admin staff
+      foodCostPct = 12.0;
+      laborCostPct = 34.0;
       rentOverhead = 1450.00;
     } else if (workspace === 'fitness_wellness') {
-      covers = 220; // members
-      avgCheck = 169.00 / 30; // daily dues per member
-      foodCostPct = 8.0; // supplements/gear
-      laborCostPct = 42.0; // trainer split
+      covers = 220;
+      avgCheck = 169.00 / 30;
+      foodCostPct = 8.0;
+      laborCostPct = 42.0;
       rentOverhead = 950.00;
     } else if (workspace === 'cleaver_brooks') {
-      covers = 2; // industrial projects
+      covers = 2;
       avgCheck = 350000.00 / 30;
-      foodCostPct = 42.0; // raw steel/parts
-      laborCostPct = 24.0; // union boilermakers
+      foodCostPct = 42.0;
+      laborCostPct = 24.0;
       rentOverhead = 2400.00;
     }
 
