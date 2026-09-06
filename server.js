@@ -216,6 +216,7 @@ STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 (1 direct, encouraging closing sentence answering the owner's core question.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
+    // Ultra-Fast Direct Inference Endpoint (Sub-10s Target)
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     let content = null;
 
@@ -226,8 +227,8 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: promptText }] }],
           generationConfig: {
-            temperature: 0.75,
-            maxOutputTokens: 850
+            temperature: 0.7,
+            maxOutputTokens: 650
           }
         })
       });
