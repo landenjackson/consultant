@@ -426,22 +426,23 @@
             overflow: hidden;
         }
 
-        /* LEFT PANE: Mission & Protocol Launcher */
+        /* SINGLE STREAMLINED INPUT DOCK & UNIFIED CANVAS */
         .launcher-pane {
-            width: 320px;
-            background: #0b0d10;
-            border-right: 1px solid #1a1e24;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 14px;
-            flex-shrink: 0;
-            gap: 12px;
+            display: none !important;
         }
 
-        /* RIGHT PANE: Strategic Telemetry & Boardroom Canvas */
+        .split-workspace-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding-top: 48px;
+            overflow: hidden;
+        }
+
         .telemetry-pane {
             flex: 1;
+            width: 100%;
+            max-width: 100%;
             background: #090a0c;
             display: flex;
             flex-direction: column;
@@ -2045,8 +2046,8 @@
         <section id="chat-section" class="view-section active">
             <div class="split-workspace-container">
                 
-                <!-- LEFT PANE: Mission & Strategic Protocol Launcher -->
-                <div class="launcher-pane">
+                <!-- UNIFIED FULL-WIDTH STRATEGIC CANVAS -->
+                <div class="telemetry-pane">
                     
                     <div class="command-banner">
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -2475,21 +2476,24 @@
 
                     </div>
 
-                    <!-- Fixed Docked Input Bar inside Canvas with OCR Camera Upload & Voice Mic -->
+                    <!-- Single Universal Executive Input Dock (Fixed at Bottom) -->
                     <div class="input-dock">
+                        <!-- Quick 1-Tap Strategic Scenario Chips -->
+                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; width:100%; justify-content:center;">
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🥞 Audit morning rush covers & 28% food cost prime')">🥞 Diner 7–9am Rush</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🩺 Reduce patient no-shows under 4% with SMS confirmation')">🩺 Clinic No-Shows</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏢 Defend $34/sqft NNN base lease rates with dwell time data')">🏢 Bannerman Leases</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏭 Cleaver-Brooks boiler capex and 32% parts attach')">🏭 Cleaver-Brooks RFP</button>
+                        </div>
                         <div class="input-box">
-                            <!-- Hidden File Input for Instant POS/P&L Photo Upload -->
                             <input type="file" id="posReceiptUpload" accept="image/*,.pdf,.csv" style="display:none;" onchange="handleReceiptUpload(event)">
                             <button class="icon-btn" title="📷 Snap / Upload P&L or POS Register Tape" onclick="document.getElementById('posReceiptUpload').click()" style="color:#4ade80;">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                             </button>
-                            <button class="icon-btn" title="Run Audit Template" onclick="insertAuditTemplate()">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            </button>
                             <button class="mic-btn" id="voiceMicBtn" title="Speak your directive (Speech-to-Text)" onclick="toggleVoiceRecording()">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                             </button>
-                            <input type="text" id="userInput" placeholder="Ask a question, speak your directive, or snap a photo of your P&L..." onkeydown="handleKey(event)">
+                            <input type="text" id="userInput" placeholder="Ask a question, speak your directive, or upload a photo of your P&L..." onkeydown="handleKey(event)">
                             <button class="send-btn-docked" id="sendBtn" onclick="sendMessage()">
                                 <span>Execute</span>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -2631,7 +2635,11 @@
         let isStreaming = false;
         let currentTaskType = 'trade_analysis';
 
-        // Next-Gen Feature: Diagnostic Suite Controller (Collapsible Quick-Tools Bar)
+        function quickScenario(text) {
+            const input = document.getElementById('userInput');
+            input.value = text;
+            sendMessage();
+        }
         function toggleDiagnosticTool(tool) {
             const diffBox = document.getElementById('strategyDiffCanvas');
             const leakageBox = document.getElementById('leakageScannerBox');
