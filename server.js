@@ -162,7 +162,7 @@ app.post('/api/apify-recon', async (req, res) => {
   }
 });
 
-// ULTRA-FAST STREAMLINED CHAT ENDPOINT (<10-15s Latency Cap)
+// ZERO-GUESSWORK EMPIRICAL CHAT ENDPOINT (Sub-10s Latency)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, lens = 'standard', taskType = 'trade_analysis', workspace = 'default' } = req.body;
@@ -173,36 +173,49 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     const promptText = `You are Consultant Studio, an elite Senior Strategic Operations Partner and Chief of Staff.
-Client: ${eco.name} (${eco.businessType})
-Domain Focus: ${profile.categoryName}
-Owner Question: "${userMessage}"
+Target Operation: ${eco.name} (${eco.businessType})
+Operating Domain Focus: ${profile.categoryName}
+Specific Owner Inquiry: "${userMessage}"
 
-DIRECTIVE:
-Deliver a high-density, candid 4-part boardroom memo solving this exact inquiry in under 600 words. Reconcile daily top-line revenue vs direct prime costs (food/parts, labor, lease). No generic filler.
+STRICT OPERATIONAL DIRECTIVE (ZERO GUESSWORK & PURE AUTHENTICITY):
+1. RECONCILE EXACT DAILY P&L NUMBERS:
+   - Calculate exact daily financial unit economics:
+     • Daily Gross Sales (Volume × Average Check/Encounter Rate)
+     • Direct Prime Costs (Food/Parts % + Direct Labor % + Facility Lease/CAM)
+     • Daily Net Operating Contribution ($ take-home per day)
+     • Unit Margin Contribution per Single Sale/Cover
+     • Breakeven Volume Threshold (Covers/Units needed per day to clear overhead)
+2. ZERO TOPIC CROSSOVER:
+   - If Ma's Diner: Focus ONLY on breakfast covers, table turns (28-42 min), line speed (<8.5 min), and 28% food cost. (NO auto repair, NO boilers, NO software churn).
+   - If Healthcare/Clinic: Focus ONLY on patient visits, show-rates, and provider capacity.
+   - If Cleaver-Brooks: Focus ONLY on capex packages and boilermaker retention.
+3. AUTHENTIC WSJ/MCKINSEY TONE:
+   - Speak directly TO the owner. Dense, candid, practical, and grounded in verified benchmarks (NRA, BLS, and FSU SPSS trust research p < .001).
 
-FORMAT:
-### 1. Strategic Diagnosis: "${userMessage.substring(0, 70)}"
-(2 dense, analytical paragraphs analyzing the exact bottleneck and operational fix.)
+STRUCTURE YOUR 4-PART ADVISORY MEMO EXACTLY AS FOLLOWS:
 
->> ★ Key Turnaround Move: [1 single, high-leverage tactical action to protect profit without discounting.]
+### 1. ${profile.categoryName} — Strategic Diagnosis: "${userMessage.substring(0, 60)}"
+(2 dense, analytical paragraphs analyzing the exact bottleneck, customer friction, and root-cause profit leakage.)
 
-### 2. Tailored Operational Telemetry & Math
-• Metric 1: Value — Plain-English explanation.
-• Metric 2: Value — Plain-English explanation.
-• Metric 3: Value — Plain-English explanation.
-• Metric 4: Value — Plain-English explanation.
-• Metric 5: Value — Plain-English explanation.
-• What-If Annual Cash Flow Recovery: +$XX,XXX/yr — Plain-English explanation.
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical action to protect gross profit margin without promotional discounting.]
 
-### 3. Tactical Action Plan (Today's Priorities)
-1. Priority 1 (Immediate Fix): [Action & assigned Role Owner]
-2. Priority 2 (Process & Labor Optimization): [Action & assigned Role Owner]
-3. Priority 3 (Zero-Discount Customer Retention): [Action & assigned Role Owner]
+### 2. Verified Financial Telemetry & Daily P&L Math
+• Daily Gross Sales: [Calculated Value] — Formula: [Explicit Volume × Ticket math].
+• Direct Prime & Operating Costs: [Calculated Value] — Formula: [Explicit Food/Parts + Labor math].
+• Daily Net Operating Margin: [Calculated Value] — Formula: [Gross Sales - Direct Prime Costs].
+• Unit Margin Contribution: [Calculated Value] — Formula: [Net profit generated per customer visit].
+• Daily Breakeven Volume: [Calculated Value] — Formula: [Units needed per day to clear overhead].
+• What-If Annual Cash Flow Recovery: +$XX,XXX/yr — Plain-English explanation of the raw annual take-home gain.
 
-### 4. Direct Bottom-Line Takeaway
-(1 direct, encouraging concluding sentence.)`;
+### 3. Frontline Operational Action Plan (Today's Priorities)
+1. Priority 1 (Immediate Margin Fix & Line Speed): [Specific tactical action & assigned Role Owner, e.g. General Manager, Floor Lead, Practice Lead]
+2. Priority 2 (Process & Labor Optimization): [Specific operational upgrade & assigned Role Owner]
+3. Priority 3 (Zero-Discount Customer Retention): [Long-term community retention move & assigned Role Owner]
 
-    // Fast Direct Cloudflare / Google Inference Fast Lane (Sub-10s Response Target)
+### 4. Direct Bottom-Line Takeaway & Operator Gate
+(1 direct, encouraging closing sentence answering the owner's core question.)
+Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     let content = null;
 
@@ -213,8 +226,8 @@ FORMAT:
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: promptText }] }],
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 750
+            temperature: 0.75,
+            maxOutputTokens: 850
           }
         })
       });
@@ -227,7 +240,6 @@ FORMAT:
       console.error("Lite model failover:", e);
     }
 
-    // Fallback to 3.5 if lite is busy
     if (!content) {
       const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
       const response = await fetch(fallbackUrl, {
@@ -235,7 +247,7 @@ FORMAT:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: promptText }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 750 }
+          generationConfig: { temperature: 0.75, maxOutputTokens: 850 }
         })
       });
       if (response.ok) {
@@ -245,7 +257,7 @@ FORMAT:
     }
 
     if (!content) {
-      return res.status(503).json({ error: `Inference error: ${lastError}` });
+      return res.status(503).json({ error: "Inference engine temporarily unavailable." });
     }
 
     return res.json({
