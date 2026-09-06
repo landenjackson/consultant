@@ -74,6 +74,9 @@ app.post('/api/stripe/create-connected-account', async (req, res) => {
       body: JSON.stringify({
         display_name: displayName,
         contact_email: email || "operator@consultant-studio.ai.studio",
+        configuration: {
+          merchant: {}
+        },
         include: ['configuration.merchant', 'configuration.recipient', 'identity', 'defaults', 'configuration.customer'],
         identity: {
           country: country,
