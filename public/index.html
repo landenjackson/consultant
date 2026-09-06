@@ -3681,6 +3681,17 @@
             setTimeout(() => { window.print(); }, 400);
         };
     </script>
+    <!-- Cache-Buster & Immediate Service Worker Invalidation -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let r of registrations) r.unregister();
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        }
+    </script>
 </body>
 </html>
             `;
@@ -3751,6 +3762,17 @@
             </td>
         </tr>
     </table>
+    <!-- Cache-Buster & Immediate Service Worker Invalidation -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let r of registrations) r.unregister();
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        }
+    </script>
 </body>
 </html>`;
 
@@ -3807,6 +3829,17 @@
             ${text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}
         </div>
     </div>
+    <!-- Cache-Buster & Immediate Service Worker Invalidation -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let r of registrations) r.unregister();
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        }
+    </script>
 </body>
 </html>`;
 
@@ -4033,6 +4066,17 @@ Standard: Boardroom-Ready / Google Drive Sync
         checkFirstTimeUser();
         recalcSimulator();
         recalcLeakageScanner();
+    </script>
+    <!-- Cache-Buster & Immediate Service Worker Invalidation -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let r of registrations) r.unregister();
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+        }
     </script>
 </body>
 </html>
