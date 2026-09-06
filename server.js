@@ -290,7 +290,7 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
                 temperature: 0.85,
-                maxOutputTokens: 800
+                maxOutputTokens: 1600
               }
             })
           });
@@ -298,8 +298,9 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
           console.log(`${modelName} Status:`, geminiRes.status);
           if (geminiRes.ok) {
             const data = await geminiRes.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
+            const candidate = data.candidates?.[0];
+            const text = candidate?.content?.parts?.map(p => p.text).filter(Boolean).join('');
+            if (text && text.trim().length > 0) {
               return res.json({ response: text });
             }
           }
