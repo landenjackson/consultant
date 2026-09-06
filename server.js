@@ -271,6 +271,27 @@ app.post('/api/chat', async (req, res) => {
         `Clean First-Pass Claims Rate: 97.4% — Formula: Verified clean insurance submissions without denial drag.`,
         `What-If Annual Cash Flow Recovery: +$${annualRecovery.toLocaleString()}/yr — Plain-English: Recovering 3 no-show appointments weekly adds $${annualRecovery.toLocaleString()} in pure annual collections.`
       ];
+    } else if (workspace === 'cleaver_brooks' || eco.name.includes("Cleaver") || eco.businessType.includes("Industrial") || cleanQuestion.toLowerCase().includes("cleaver") || cleanQuestion.toLowerCase().includes("boiler")) {
+      // Industrial Thermal & Boiler Engineering Model
+      const packageCapex = 425000.00;
+      const annualPackages = 14;
+      grossRev = (annualPackages * packageCapex) / 365;
+      primeCost = grossRev * 0.62; // 38% gross margin floor (raw steel, ASME fab, boilermaker labor)
+      netContribution = grossRev - primeCost;
+      unitMargin = packageCapex * 0.38;
+      annualRecovery = Math.round(unitMargin * 2);
+
+      diagnosisText = `Cleaver-Brooks occupies dominant industrial market share in packaged boiler systems, but profitability is governed by long RFP sales cycles (120–240 days) and skilled boilermaker labor retention. Margin expansion is achieved not by competing on initial equipment discounts, but by attaching high-margin 10-year predictive maintenance and OEM aftermarket parts agreements.`;
+      turnaroundMove = `Bundle all capital equipment bids with mandatory Tier-1 OEM parts attach to lock in a 32.0% recurring aftermarket gross margin.`;
+
+      metrics = [
+        `Average Boiler Package Value: $${packageCapex.toLocaleString('en-US', { minimumFractionDigits: 2 })} — Formula: Packaged firetube/watertube industrial system capex.`,
+        `Direct Industrial Prime Costs: $${(packageCapex * 0.62).toLocaleString('en-US', { minimumFractionDigits: 2 })} — Formula: 38.0% Steel/Parts ($${(packageCapex*0.38).toFixed(2)}) + 24.0% Certified ASME Labor ($${(packageCapex*0.24).toFixed(2)}).`,
+        `Gross Margin Realization: 38.0% ($${unitMargin.toLocaleString('en-US', { minimumFractionDigits: 2 })}) — Formula: Equipment gross profit before field commissioning.`,
+        `Aftermarket Parts & Service Attach: 32.0% Margin — Formula: Ongoing recurring OEM burner & controls maintenance.`,
+        `Skilled Boilermaker Retention Rate: 91.5% — Formula: Certified welding & fabrication workforce stability.`,
+        `What-If Annual Cash Flow Recovery: +$${annualRecovery.toLocaleString()}/yr — Plain-English: Securing 2 additional retrofits via shortened RFP cycles adds $${annualRecovery.toLocaleString()} in net profit.`
+      ];
     } else {
       // Default / General SaaS & Agency Model
       const accounts = 120;
