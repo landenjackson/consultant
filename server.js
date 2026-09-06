@@ -222,7 +222,35 @@ app.post('/api/stripe/create-account-subscription', async (req, res) => {
   }
 });
 
-// 4. Standard Platform Subscription Checkout Session (Starter / Pro / Executive)
+// 1. Update Tax Settings with Head Office Address (Tallahassee, FL)
+app.post('/api/stripe/configure-tax', async (req, res) => {
+  try {
+    if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
+
+    const taxSettings = await stripe.tax.settings.update({
+      head_office: {
+        address: {
+          line1: "100 S Monroe St",
+          city: "Tallahassee",
+          state: "FL",
+          postal_code: "32301",
+          country: "US"
+        }
+      },
+      defaults: {
+        tax_code: "txcd_10000000",
+        tax_behavior: "exclusive"
+      }
+    });
+
+    return res.json({ success: true, taxSettings });
+  } catch (err) {
+    console.error('Stripe Tax config error:', err);
+    return res.status(500).json({ error: err.message || "Failed to configure tax settings." });
+  }
+});
+
+// 2. Standard Platform Subscription Checkout Session (with Automatic Tax fallback)
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { tier = 'starter', priceId } = req.body;
@@ -236,31 +264,58 @@ app.post('/create-checkout-session', async (req, res) => {
     };
     const selected = tierConfig[tier] || tierConfig.starter;
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      automatic_tax: { enabled: true },
-      line_items: [
-        priceId ? { price: priceId, quantity: 1 } : {
-          price_data: {
-            currency: 'usd',
-            tax_behavior: 'exclusive',
-            product_data: {
-              name: selected.name,
-              description: selected.desc,
-              tax_code: 'txcd_10000000', // General software as a service (SaaS)
-              images: ['https://consultant-studio.ai.studio/icon.svg']
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        automatic_tax: { enabled: true },
+        line_items: [
+          priceId ? { price: priceId, quantity: 1 } : {
+            price_data: {
+              currency: 'usd',
+              tax_behavior: 'exclusive',
+              product_data: {
+                name: selected.name,
+                description: selected.desc,
+                tax_code: 'txcd_10000000',
+                images: ['https://consultant-studio.ai.studio/icon.svg']
+              },
+              unit_amount: selected.amount,
+              recurring: { interval: 'month' }
             },
-            unit_amount: selected.amount,
-            recurring: { interval: 'month' }
-          },
-          quantity: 1
-        }
-      ],
-      mode: 'subscription',
-      subscription_data: { trial_period_days: 30 },
-      success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
-      cancel_url: `${domain}/?status=cancelled`
-    });
+            quantity: 1
+          }
+        ],
+        mode: 'subscription',
+        subscription_data: { trial_period_days: 30 },
+        success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+        cancel_url: `${domain}/?status=cancelled`
+      });
+    } catch (taxErr) {
+      console.warn("Stripe Tax not yet activated on dashboard, creating standard checkout session:", taxErr.message);
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          priceId ? { price: priceId, quantity: 1 } : {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: selected.name,
+                description: selected.desc,
+                images: ['https://consultant-studio.ai.studio/icon.svg']
+              },
+              unit_amount: selected.amount,
+              recurring: { interval: 'month' }
+            },
+            quantity: 1
+          }
+        ],
+        mode: 'subscription',
+        subscription_data: { trial_period_days: 30 },
+        success_url: `${domain}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+        cancel_url: `${domain}/?status=cancelled`
+      });
+    }
 
     return res.json({ url: session.url, sessionId: session.id });
   } catch (err) {
