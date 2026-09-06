@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import Stripe from 'stripe';
-import { WORKSPACE_ECONOMICS } from './src/workspaceEconomics.js';
+import { WORKSPACE_ECONOMIC_MODELS } from './src/workspaceEconomics.js';
 
 dotenv.config();
 
@@ -113,7 +113,7 @@ app.post('/api/dispatch-email', async (req, res) => {
 
 // 4. EDGY, PERSUASIVE & CANDID STRATEGIC ADVISORY GENERATOR (SUB-SECOND)
 const generateStrategicAdvisoryMemo = (cleanQuestion, workspace, lens = 'standard') => {
-  const eco = WORKSPACE_ECONOMICS[workspace] || WORKSPACE_ECONOMICS.default;
+  const eco = WORKSPACE_ECONOMIC_MODELS[workspace] || WORKSPACE_ECONOMIC_MODELS.default;
   const qLower = cleanQuestion.toLowerCase();
 
   let dailyGross, primeCost, netMargin, unitContrib, breakeven, annualRecovery, marginPct;
