@@ -134,11 +134,14 @@ app.post('/api/stripe/create-connected-checkout', async (req, res) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      automatic_tax: { enabled: true },
       line_items: [{
         price_data: {
           currency: 'usd',
+          tax_behavior: 'exclusive',
           product_data: {
-            name: productName
+            name: productName,
+            tax_code: 'txcd_10000000'
           },
           unit_amount: amount
         },
@@ -235,13 +238,16 @@ app.post('/create-checkout-session', async (req, res) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      automatic_tax: { enabled: true },
       line_items: [
         priceId ? { price: priceId, quantity: 1 } : {
           price_data: {
             currency: 'usd',
+            tax_behavior: 'exclusive',
             product_data: {
               name: selected.name,
               description: selected.desc,
+              tax_code: 'txcd_10000000', // General software as a service (SaaS)
               images: ['https://consultant-studio.ai.studio/icon.svg']
             },
             unit_amount: selected.amount,
