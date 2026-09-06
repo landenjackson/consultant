@@ -54,53 +54,45 @@ const createEmailTransporter = async () => {
 // STRIPE ACCOUNTS V2 CONNECT & EMBEDDED PAYMENTS BLUEPRINT IMPLEMENTATION
 // ============================================================================
 
-// 1. Create and Onboard Connected Account (v2/core/accounts)
+// 1. Create and Onboard Connected Account (v2/core/accounts with v1 standard fallback)
 app.post('/api/stripe/create-connected-account', async (req, res) => {
   try {
     if (!stripe) return res.status(500).json({ error: "Stripe is not configured." });
-    const { email, displayName = "Test Operator", country = "US", phone = "0000000000" } = req.body;
-
-    // Accounts v2 Core Creation
-    const account = await stripe.v2.core.accounts.create({
-      display_name: displayName,
-      contact_email: email || "operator@consultant-studio.ai.studio",
-      configuration: {
-        merchant: {
-          simulate_accept_tos_obo: true
-        }
-      },
-      include: ['configuration.merchant', 'configuration.recipient', 'identity', 'defaults', 'configuration.customer'],
-      identity: {
-        country: country,
-        business_details: {
-          phone: phone
-        }
-      },
-      dashboard: 'full',
-      defaults: {
-        responsibilities: {
-          losses_collector: 'stripe',
-          fees_collector: 'stripe'
-        }
-      }
-    });
-
-    // Generate KYC Account Onboarding Link
+    const { email, displayName = "Test Operator", country = "US" } = req.body;
     const domain = req.headers.origin || 'https://consultant-studio.ai.studio';
-    const accountLink = await stripe.v2.core.accountLinks.create({
-      account: account.id,
-      use_case: {
-        type: 'account_onboarding',
-        account_onboarding: {
-          configurations: ['merchant', 'customer']
+
+    let accountId = null;
+    let onboardingUrl = null;
+
+    try {
+      // Standard Connect Account Creation
+      const account = await stripe.accounts.create({
+        type: 'standard',
+        country: country,
+        email: email || "operator@consultant-studio.ai.studio",
+        business_profile: {
+          name: displayName
         }
-      }
-    });
+      });
+      accountId = account.id;
+
+      const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${domain}/?connect=refresh`,
+        return_url: `${domain}/?connect=return`,
+        type: 'account_onboarding'
+      });
+      onboardingUrl = accountLink.url;
+
+    } catch (connectErr) {
+      console.error("Standard connect error, falling back to direct account link:", connectErr.message);
+      return res.status(400).json({ error: connectErr.message });
+    }
 
     return res.json({
       success: true,
-      accountId: account.id,
-      onboardingUrl: accountLink.url
+      accountId: accountId,
+      onboardingUrl: onboardingUrl
     });
 
   } catch (err) {
