@@ -319,10 +319,10 @@ ${diagnosisText}
 ### 2. Verified Financial Telemetry & Daily P&L Math (${eco.name})
 ${metrics.map(m => `• ${m}`).join('\n')}
 
-### 3. Frontline Operational Action Plan (Today's Priorities)
-1. Priority 1 (Immediate Margin Defense): Execute pre-shift alignment and station staging by 6:30 AM (Owner: General Manager / Practice Lead).
-2. Priority 2 (Process & Labor Fix): Eliminate unearned promotional discounting; enforce value-based full price (Owner: Floor Lead / Shift Lead).
-3. Priority 3 (Zero-Discount Customer Lock): Build permanent customer retention loops through signature quality and speed (Owner: Lead Strategist).
+### 3. Strategic Execution Directives (Key Operator Moves)
+• Strategic Priority: Execute pre-shift alignment and high-velocity station prep by 6:30 AM (Owner: General Manager / Practice Lead).
+• Margin Defense: Eliminate all unearned promotional discounting; defend full-price value (Owner: Floor Lead / Shift Lead).
+• Customer Retention Loop: Build lasting guest loyalty through signature quality and speed (Owner: Lead Strategist).
 
 ### 4. Direct Bottom-Line Takeaway & Operator Gate
 Protecting your operational unit economics puts cash directly into your bank account without sacrificing customer trust.
