@@ -273,12 +273,11 @@ Format your answer strictly as:
 (1 sharp closing sentence.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
-      // High-Availability Multi-Model Fast-Lane Cascade
+      // High-Availability Multi-Model Fast-Lane Cascade (Verified HTTP 200 Endpoints)
       const modelsToTry = [
-        'gemini-1.5-flash-latest',
-        'gemini-1.5-flash',
-        'gemini-1.5-pro-latest',
-        'gemini-3.6-flash'
+        'gemini-3.5-flash',
+        'gemini-3.7-flash',
+        'gemini-3.5-flash-lite'
       ];
 
       for (const modelName of modelsToTry) {
