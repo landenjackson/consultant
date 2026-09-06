@@ -1611,13 +1611,13 @@
                 </div>
 
                 <div class="cmd-section-heading">Workspace Routing</div>
-                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('mas_diner'))">
-                    <div class="cmd-item-left"><span>🥞</span><span>Ma's Diner</span></div>
-                    <span class="cmd-shortcut-badge">W1</span>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('hospitality'))">
+                    <div class="cmd-item-left"><span>🥞</span><span>Hospitality & Restaurant</span></div>
+                    <span style="color:#64748b; font-size:11px;">Covers & Prime Cost</span>
                 </div>
-                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('cleaver_brooks'))">
-                    <div class="cmd-item-left"><span>🏭</span><span>Cleaver-Brooks</span></div>
-                    <span class="cmd-shortcut-badge">W2</span>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('industrial'))">
+                    <div class="cmd-item-left"><span>🏭</span><span>Industrial & Manufacturing</span></div>
+                    <span style="color:#64748b; font-size:11px;">RFP Capex & Labor</span>
                 </div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('bannerman'))">
                     <div class="cmd-item-left"><span>📍</span><span>Bannerman Crossings</span></div>
@@ -1690,8 +1690,8 @@
                     <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Target Workspace</label>
                     <select id="dispatchWorkspace" class="custom-select" style="background:#090a0c;">
                         <option value="default">General Workspace</option>
-                        <option value="mas_diner">Ma's Diner (Hospitality)</option>
-                        <option value="cleaver_brooks">Cleaver-Brooks (Industrial)</option>
+                        <option value="hospitality">Hospitality & Food Service</option>
+                        <option value="industrial">Industrial & Engineering</option>
                         <option value="bannerman">Bannerman Crossings (Commercial Real Estate)</option>
                     </select>
                 </div>
@@ -1841,12 +1841,12 @@
                 <div>
                     <label style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; margin-bottom:4px; display:block;">Industry & Operating Domain</label>
                     <select id="newWsDomain" class="custom-select" style="background:#090a0c; width:100%;">
-                        <option value="mas_diner">Hospitality / Restaurant / Diner (Covers & Prime Costs)</option>
+                        <option value="hospitality">Hospitality & Food Service (Covers & Prime Costs)</option>
                         <option value="healthcare_clinic">Medical, Dental & Specialty Clinic (Patient Show-Rates & RVU)</option>
                         <option value="fitness_wellness">Fitness Studio & Gym (Monthly Dues & Churn Defense)</option>
                         <option value="engineering_firm">Engineering, RFP & Professional Services (Labor Multipliers)</option>
-                        <option value="bannerman">Commercial Real Estate & Retail Center (NNN Leases & Dwell Time)</option>
-                        <option value="cleaver_brooks">Industrial Thermal & Manufacturing (Contract Capex & Retention)</option>
+                        <option value="commercial_real_estate">Commercial Real Estate & Retail Center (NNN Leases & Dwell Time)</option>
+                        <option value="industrial_manufacturing">Industrial & Manufacturing (Contract Capex & Retention)</option>
                         <option value="default">B2B SaaS, Agency & Digital Subscriptions (CAC, LTV & Payback)</option>
                     </select>
                 </div>
@@ -1950,10 +1950,11 @@
                     <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ Add</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
-                    <option value="default">General Workspace</option>
-                    <option value="mas_diner">Ma's Diner</option>
-                    <option value="cleaver_brooks">Cleaver-Brooks</option>
-                    <option value="bannerman">Bannerman Crossings</option>
+                    <option value="default">General Business Workspace</option>
+                    <option value="hospitality">Hospitality & Food Service</option>
+                    <option value="healthcare_clinic">Medical & Clinic Practice</option>
+                    <option value="industrial_manufacturing">Industrial & Manufacturing</option>
+                    <option value="commercial_real_estate">Commercial Real Estate</option>
                 </select>
             </div>
 
@@ -2480,10 +2481,10 @@
                     <div class="input-dock">
                         <!-- Quick 1-Tap Strategic Scenario Chips -->
                         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; width:100%; justify-content:center;">
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🥞 Audit morning rush covers & 28% food cost prime')">🥞 Diner 7–9am Rush</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🩺 Reduce patient no-shows under 4% with SMS confirmation')">🩺 Clinic No-Shows</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏢 Defend $34/sqft NNN base lease rates with dwell time data')">🏢 Bannerman Leases</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏭 Cleaver-Brooks boiler capex and 32% parts attach')">🏭 Cleaver-Brooks RFP</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🥞 Restaurant morning covers and 28% food cost defense')">🥞 Restaurant Rush</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🩺 Clinic patient show-rates and 97% clean claims')">🩺 Clinic Care</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏢 Commercial retail lease and footfall capture')">🏢 Retail NNN</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏭 Industrial manufacturing capex and parts attach')">🏭 Industrial Capex</button>
                         </div>
                         <div class="input-box">
                             <input type="file" id="posReceiptUpload" accept="image/*,.pdf,.csv" style="display:none;" onchange="handleReceiptUpload(event)">
@@ -2670,7 +2671,7 @@
                 const actionPlan = lastAssistantCard.innerText;
                 huddleText = `📊 ${title} Strategic Priorities:\n` + actionPlan.substring(0, 320) + "...\n\n— Generated via Consultant Studio";
             } else {
-                huddleText = "📊 Ma's Diner Morning Priorities:\n1. 7-9am Counter Line speed under 8.5 min\n2. 28% food cost defense / zero discount\n3. Pre-shift huddle at 6:15am.\n\n— Consultant Studio";
+                huddleText = `📊 ${ws.name} Morning Directives:\n1. Peak station line speed under 8.5 min\n2. Margin defense & zero unauthorized discounts\n3. Pre-shift team huddle execution.\n\n— Consultant Studio`;
             }
 
             // Open native SMS url scheme
