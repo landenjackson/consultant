@@ -63,7 +63,7 @@ app.post('/api/stripe/create-connected-account', async (req, res) => {
 
     if (!apiKey) return res.status(500).json({ error: "Stripe API Key is not configured." });
 
-    // 1. Call POST /v2/core/accounts with required v2 API Version Header
+    // 1. Call POST /v2/core/accounts with supported Accounts v2 payload
     const createResp = await fetch('https://api.stripe.com/v2/core/accounts', {
       method: 'POST',
       headers: {
@@ -74,15 +74,8 @@ app.post('/api/stripe/create-connected-account', async (req, res) => {
       body: JSON.stringify({
         display_name: displayName,
         contact_email: email || "operator@consultant-studio.ai.studio",
-        configuration: {
-          merchant: {}
-        },
-        include: ['configuration.merchant', 'configuration.recipient', 'identity', 'defaults', 'configuration.customer'],
         identity: {
-          country: country,
-          business_details: {
-            phone: "0000000000"
-          }
+          country: country
         },
         dashboard: 'full',
         defaults: {
