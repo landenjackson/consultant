@@ -1642,18 +1642,10 @@
                     <span class="cmd-shortcut-badge">11</span>
                 </div>
 
-                <div class="cmd-section-heading">Workspace Routing</div>
-                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('hospitality'))">
-                    <div class="cmd-item-left"><span>🥞</span><span>Hospitality & Restaurant</span></div>
-                    <span style="color:#64748b; font-size:11px;">Covers & Prime Cost</span>
-                </div>
-                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('industrial'))">
-                    <div class="cmd-item-left"><span>🏭</span><span>Industrial & Manufacturing</span></div>
-                    <span style="color:#64748b; font-size:11px;">RFP Capex & Labor</span>
-                </div>
-                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('bannerman'))">
-                    <div class="cmd-item-left"><span>📍</span><span>Bannerman Crossings</span></div>
-                    <span class="cmd-shortcut-badge">W3</span>
+                <div class="cmd-section-heading">Workspace Mode</div>
+                <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('default'))">
+                    <div class="cmd-item-left"><span>🏢</span><span>General Business / Custom Mission</span></div>
+                    <span style="color:#4ade80; font-size:11px;">Universal</span>
                 </div>
                 <div class="cmd-item" onclick="execCmd(() => switchWorkspaceCmd('default'))">
                     <div class="cmd-item-left"><span>📁</span><span>General Workspace</span></div>
@@ -1982,11 +1974,8 @@
                     <span style="cursor:pointer; color:#4ade80;" onclick="createWorkspace()">+ Add</span>
                 </div>
                 <select id="clientWorkspace" class="custom-select" onchange="onWorkspaceChange()">
-                    <option value="default">General Business Workspace</option>
-                    <option value="hospitality">Hospitality & Food Service</option>
-                    <option value="healthcare_clinic">Medical & Clinic Practice</option>
-                    <option value="industrial_manufacturing">Industrial & Manufacturing</option>
-                    <option value="commercial_real_estate">Commercial Real Estate</option>
+                    <option value="default">General Business Workspace (Custom / Universal)</option>
+                    <option value="custom">Custom Enterprise Mission</option>
                 </select>
             </div>
 
@@ -2495,12 +2484,12 @@
 
                     <!-- Single Universal Executive Input Dock (Fixed at Bottom) -->
                     <div class="input-dock">
-                        <!-- Quick 1-Tap Strategic Scenario Chips -->
+                        <!-- Quick Universal Strategic Inquiry Chips -->
                         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; width:100%; justify-content:center;">
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🥞 Restaurant morning covers and 28% food cost defense')">🥞 Restaurant Rush</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🩺 Clinic patient show-rates and 97% clean claims')">🩺 Clinic Care</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏢 Commercial retail lease and footfall capture')">🏢 Retail NNN</button>
-                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('🏭 Industrial manufacturing capex and parts attach')">🏭 Industrial Capex</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('Audit my daily revenue vs labor and operating costs')">📊 Daily P&L Audit</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('How do I eliminate unearned discounting and protect profit margin?')">🛡️ Margin Defense</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('Identify frontline bottlenecks causing customer drop-off')">⚡ Frontline Bottlenecks</button>
+                            <button type="button" class="action-btn" style="padding:3px 9px; font-size:11px;" onclick="quickScenario('Structure high-ticket proposal to win contracts without price cuts')">💼 Proposal Strategy</button>
                         </div>
                         <div class="input-box">
                             <input type="file" id="posReceiptUpload" accept="image/*,.pdf,.csv" style="display:none;" onchange="handleReceiptUpload(event)">
