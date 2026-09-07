@@ -273,19 +273,23 @@ Format your answer strictly as:
 (1 sharp closing sentence.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
-      // High-Availability Multi-Model Fast-Lane Cascade (Verified HTTP 200 Endpoints)
+      // High-Availability Multi-Model Fast-Lane Cascade (Prioritize 100% Uptime Models)
       const modelsToTry = [
+        'gemini-3.5-flash-lite',
+        'gemini-3.1-flash-lite',
         'gemini-3.5-flash',
-        'gemini-3.7-flash',
-        'gemini-3.5-flash-lite'
+        'gemini-3.7-flash'
       ];
 
       for (const modelName of modelsToTry) {
         try {
           console.log(`Sending live request to model: ${modelName}...`);
-          const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+          const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'x-goog-api-key': apiKey,
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
