@@ -235,7 +235,7 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
 `;
 };
 
-// 5. LIVE GEMINI 3.8 FLASH INFERENCE ENGINE (100% UNIQUE DYNAMIC RESPONSES)
+// 5. LIVE GEMINI 3.5 FLASH-LITE INFERENCE ENGINE (100% UNIQUE DYNAMIC RESPONSES)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, workspace = 'default' } = req.body;
