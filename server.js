@@ -303,8 +303,8 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
-                temperature: 0.95,
-                maxOutputTokens: 900
+                temperature: 0.85,
+                maxOutputTokens: 2048
               }
             })
           });
