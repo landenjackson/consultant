@@ -26,16 +26,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51Pt2t7PQmvE
 
 // 1. HIGH-AVAILABILITY MULTI-MODEL FAST-LANE WITH AUTOMATIC ZERO-FAIL RECOVERY
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Ultra-Fast Zero-Latency Cascade (Sub-3s Execution)
+  // Pinned Primary: Gemini 3.7 Flash for deep reasoning, empirical evidence & persuasive tone
   const models = [
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite',
+    'gemini-3.7-flash',
     'gemini-3.5-flash',
-    'gemini-3.7-flash'
+    'gemini-3.5-flash-lite'
   ];
 
   for (const modelName of models) {
     try {
+      console.log(`[Inference] Querying ${modelName}...`);
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
         method: 'POST',
         headers: {
@@ -46,11 +46,12 @@ const queryGeminiWithFallback = async (prompt, apiKey) => {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.85,
-            maxOutputTokens: 1200
+            maxOutputTokens: 2048
           }
         })
       });
 
+      console.log(`[Inference] ${modelName} returned status: ${res.status}`);
       if (res.ok) {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
@@ -58,10 +59,11 @@ const queryGeminiWithFallback = async (prompt, apiKey) => {
           return text;
         }
       } else {
-        console.warn(`Model ${modelName} returned status ${res.status}`);
+        const errBody = await res.text();
+        console.warn(`[Inference Warning] ${modelName} (${res.status}): ${errBody.substring(0, 150)}`);
       }
     } catch (err) {
-      console.warn(`Model ${modelName} call failed:`, err.message);
+      console.warn(`[Inference Error] ${modelName} failed:`, err.message);
     }
   }
 
