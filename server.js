@@ -276,9 +276,7 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
       // High-Availability Multi-Model Fast-Lane Cascade (Prioritize 100% Uptime Models)
       const modelsToTry = [
         'gemini-3.5-flash-lite',
-        'gemini-3.1-flash-lite',
-        'gemini-3.5-flash',
-        'gemini-3.7-flash'
+        'gemini-3.1-flash-lite'
       ];
 
       for (const modelName of modelsToTry) {
