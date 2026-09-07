@@ -335,14 +335,54 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
 `;
 };
 
-// 5. INSTANT CHAT ENDPOINT WITH ZERO-WAIT DETERMINISTIC FAST-LANE (< 100ms)
+// 5. LIVE GENERATIVE REASONING ENGINE WITH HARNESS ENFORCEMENT
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, workspace = 'default', documentText = '' } = req.body;
     const userMessage = messages && messages.length > 0 ? messages[messages.length - 1].content : '';
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Fast-path: Return instant workspace-correlated memo in < 50ms if external API is slow or offline
+    if (apiKey) {
+      const prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner sitting across the desk from a business owner.
+DO NOT use generic AI filler, polite throat-clearing, or academic textbook jargon.
+BANNED PHRASES: "In today's fast-paced environment", "Operational telemetry reveals", "Maximizing throughput is the primary lever", "It is important to consider".
+
+ANALYZE THIS SPECIFIC INQUIRY WITH CANDID EXECUTIVE VOICE & BALANCED P&L MATH:
+User Inquiry: "${userMessage}"
+Operating Domain: "${workspace}"
+${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
+
+Deliver a 4-part boardroom strategy memo formatted strictly as:
+
+### 1. Operational Reality: "${userMessage}"
+(Write 2 punchy, unvarnished paragraphs diagnosing the exact operational truth, root causes of friction, and specific numbers for this question.)
+
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical action to fix this exact problem without discounting.]
+
+### 2. Verified Financial Telemetry & Daily P&L Math
+• Daily Gross Sales: $X,XXX.XX/day — Formula: [State specific transaction math]
+• Direct Prime Costs: $X,XXX.XX/day — Formula: [COGS $ + Direct Labor $]
+• Daily Net Operating Take-Home: +$X,XXX.XX/day — Formula: [Gross - Prime (XX.X% margin)]
+• Unit Cash Contribution: +$X.XX / unit — Formula: [Net margin per transaction]
+• Daily Breakeven Volume: XX units/day — Formula: [Fixed daily baseline overhead ÷ Unit contribution]
+• What-If Annual Cash Machine: +$XX,XXX.XX/yr — Plain-English: [Cash unlocked by fixing this specific bottleneck]
+
+### 3. Strategic Execution Directives (Key Operator Moves)
+• Frontline Velocity: [Direct operational speed mandate with functional lead]
+• Zero Discount Policy: [Strict pricing defense rule with functional lead]
+• Workflow Synchronization: [Advance staging protocol with functional lead]
+
+### 4. Direct Bottom-Line Takeaway & Operator Gate
+(1 sharp closing sentence.)
+Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+
+      const liveResponse = await queryGeminiWithFallback(prompt, apiKey);
+      if (liveResponse) {
+        const verifiedMemo = verifyAndEnforceHarnessPolicy(liveResponse, userMessage, workspace);
+        return res.json({ response: verifiedMemo });
+      }
+    }
+
     const memo = generateWorkspaceCorrelatedMemo(userMessage, workspace);
     const enforcedMemo = verifyAndEnforceHarnessPolicy(memo, userMessage, workspace);
     return res.json({ response: enforcedMemo });
