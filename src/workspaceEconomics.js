@@ -1,7 +1,65 @@
 // Comprehensive Industry Economic Models for Consultant Studio
 export const WORKSPACE_ECONOMIC_MODELS = {
+  hospitality: {
+    name: "Hospitality & Restaurant Hub",
+    businessType: "Food Service, Cafe & Restaurant Operations",
+    allowedFinancialUnits: "Dollars ($), Minutes (min), Percentages (%), Covers (guests), Table Turns",
+    realisticRanges: {
+      averageTicket: "$14.00 – $22.50 per guest",
+      foodCostPrime: "26.0% – 30.0% of gross revenue",
+      laborCostFloor: "28.0% – 32.0% of gross revenue",
+      primeCostTotal: "54.0% – 62.0% (Food + Labor combined)",
+      tableTurnTime: "28 – 35 minutes per table",
+      ticketSpeed: "6.0 – 8.5 minutes from order to pass"
+    }
+  },
+
+  industrial_manufacturing: {
+    name: "Industrial & Manufacturing Hub",
+    businessType: "Industrial Engineering, Capex & Manufacturing",
+    allowedFinancialUnits: "Dollars ($), Packaged Capex, Aftermarket Attach %, ASME Labor %",
+    realisticRanges: {
+      packageCapex: "$250,000 – $650,000",
+      grossMargin: "34.0% – 42.0%",
+      aftermarketAttach: "28.0% – 36.0%"
+    }
+  },
+
+  healthcare_clinic: {
+    name: "Medical & Clinical Practice Hub",
+    businessType: "Outpatient Healthcare, Dental & Specialty Clinics",
+    allowedFinancialUnits: "Encounters, Reimbursement Rate ($), Clean Claims %, Show-Rates %",
+    realisticRanges: {
+      averageEncounter: "$165.00 – $240.00",
+      cleanClaims: "95.0% – 99.0%",
+      providerUtilization: "85.0% – 94.0%"
+    }
+  },
+
+  commercial_real_estate: {
+    name: "Commercial Real Estate Hub",
+    businessType: "Retail Center, NNN Leases & Asset Management",
+    allowedFinancialUnits: "Sq Ft, NNN Base Rate ($/sqft), CAM Recovery ($), Dwell Times",
+    realisticRanges: {
+      baseRate: "$28.00 – $42.00 / sqft",
+      camRecovery: "$4.50 – $7.00 / sqft",
+      centerOccupancy: "92.0% – 98.0%"
+    }
+  },
+
+  default: {
+    name: "B2B SaaS & General Business Hub",
+    businessType: "Software Subscriptions, Digital Agency & Consultancies",
+    allowedFinancialUnits: "MRR ($), ARR ($), CAC ($), LTV:CAC Multiplier, Logo Churn %",
+    realisticRanges: {
+      arpu: "$15.99 – $79.99 / mo",
+      cac: "$45.00 – $110.00",
+      ltvCac: "3.5x – 6.0x",
+      churnCeiling: "< 2.0% / mo"
+    }
+  },
   mas_diner: {
-    name: "Ma's Diner",
+    name: "Hospitality & Restaurant Hub",
     businessType: "Independent Heritage Diner / Restaurant",
     allowedFinancialUnits: "Dollars ($), Minutes (min), Percentages (%), Covers (guests), Table Turns",
     realisticRanges: {
