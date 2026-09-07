@@ -284,10 +284,11 @@ Deliver a compact, high-density 4-part boardroom memo in under 350 words:
 (1 sharp closing sentence.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
-      // High-Availability Multi-Model Fast-Lane Cascade (Prioritize 100% Uptime Models)
+      // High-Availability Multi-Model Fast-Lane Cascade (Primary: Gemini 3.7 Flash)
       const modelsToTry = [
-        'gemini-3.5-flash-lite',
-        'gemini-3.1-flash-lite'
+        'gemini-3.7-flash',
+        'gemini-3.5-flash',
+        'gemini-3.5-flash-lite'
       ];
 
       for (const modelName of modelsToTry) {
