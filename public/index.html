@@ -1569,7 +1569,30 @@
             .mobile-menu-btn { display: block; }
             .split-workspace-container { padding-top: 46px; }
             .quick-task-grid { grid-template-columns: 1fr; }
-            .pricing-grid { grid-template-columns: 1fr; gap: 8px; }
+            .modal-content {
+                width: 92% !important;
+                max-width: 92% !important;
+                padding: 18px 16px !important;
+                margin: auto;
+            }
+            .pricing-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .pricing-card {
+                padding: 14px !important;
+            }
+            .pricing-header {
+                font-size: 16px !important;
+            }
+            .pricing-price {
+                font-size: 20px !important;
+                margin: 4px 0 !important;
+            }
+            .plan-features {
+                margin: 8px 0 !important;
+                font-size: 11px !important;
+            }
         }
     </style>
 </head>
@@ -3143,6 +3166,13 @@
                 const titleEl = welcomeCard.querySelector('.friendly-section-header');
                 if (titleEl) titleEl.textContent = `Welcome, ${name} // ${company}`;
             }
+
+            // Clean 3-Stage Step Flow: Step 1 (Login) -> Step 2 (30-Day Free Trial Selection) -> Step 3 (Consultant Studio)
+            setTimeout(() => {
+                if (!localStorage.getItem('consultant_subscribed')) {
+                    openPricing();
+                }
+            }, 300);
         }
 
         // Live Stripe Subscription Management & Session Handling
