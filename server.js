@@ -26,11 +26,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51Pt2t7PQmvE
 
 // 1. HIGH-AVAILABILITY MULTI-MODEL FAST-LANE WITH AUTOMATIC ZERO-FAIL RECOVERY
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Pinned Primary: Gemini 3.7 Flash for deep reasoning, empirical evidence & persuasive tone
+  // Pinned Primary: Gemini 3.1 Flash-Lite for maximum speed, zero 503 errors, and sub-2s execution
   const models = [
-    'gemini-3.7-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-3.5-flash-lite',
     'gemini-3.5-flash',
-    'gemini-3.5-flash-lite'
+    'gemini-3.7-flash'
   ];
 
   for (const modelName of models) {
