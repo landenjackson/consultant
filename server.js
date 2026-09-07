@@ -24,7 +24,48 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51Pt2t7PQmvE
   apiVersion: '2023-10-16'
 });
 
-// 1. STRIPE CHECKOUT ENDPOINT WITH AUTOMATIC TAX SUPPORT
+// 1. HIGH-AVAILABILITY MULTI-MODEL FAST-LANE WITH AUTOMATIC ZERO-FAIL RECOVERY
+const queryGeminiWithFallback = async (prompt, apiKey) => {
+  const models = [
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite'
+  ];
+
+  for (const modelName of models) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.85,
+            maxOutputTokens: 2200
+          }
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+        if (text && text.trim().length > 0) {
+          return text;
+        }
+      } else {
+        console.warn(`Model ${modelName} returned status ${res.status}`);
+      }
+    } catch (err) {
+      console.warn(`Model ${modelName} call failed:`, err.message);
+    }
+  }
+
+  return null;
+};
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
@@ -243,27 +284,27 @@ Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Oper
 `;
 };
 
-// 5. LIVE GEMINI 3.5 FLASH-LITE INFERENCE ENGINE (100% UNIQUE DYNAMIC RESPONSES)
+// 5. LIVE HIGH-REASONING CHAT ENDPOINT
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, workspace = 'default' } = req.body;
+    const { messages, workspace = 'default', documentText = '' } = req.body;
     const userMessage = messages && messages.length > 0 ? messages[messages.length - 1].content : '';
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (apiKey) {
-      const prompt = `You are Consultant Studio, a candid, ruthless Senior Chief Operating Officer and Strategic Partner sitting across the table from a business owner.
-DO NOT use polite filler, robotic throat-clearing, or academic textbook jargon.
+      const prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner sitting across the desk from a business owner.
+DO NOT use generic AI filler, polite throat-clearing, or academic textbook jargon.
 BANNED PHRASES: "In today's fast-paced environment", "Operational telemetry reveals", "Maximizing throughput is the primary lever", "It is important to consider".
-Humanize everything: speak with conviction, raw operational truth, and financial urgency.
-Answer this specific question with 100% tailored, fresh, unvarnished operational analysis:
 
-User Question: "${userMessage}"
-Workspace: "${workspace}"
+ANALYZE THIS SPECIFIC SITUATION WITH CANDID EXECUTIVE VOICE & BALANCED P&L MATH:
+User Inquiry: "${userMessage}"
+Operating Domain: "${workspace}"
+${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
 
-Deliver a compact, high-density 4-part boardroom memo in under 350 words:
+Deliver a 4-part boardroom strategy memo formatted strictly as:
 
 ### 1. Operational Reality: "${userMessage}"
-(Write 2 punchy, candid paragraphs directly answering the specific user question. Diagnose the exact root-cause operational bottleneck, customer friction, and why traditional methods fail for THIS specific topic.)
+(Write 2 punchy, unvarnished paragraphs diagnosing the exact operational truth, root causes of friction, and specific numbers for this question.)
 
 >> ★ Key Turnaround Move: [1 single, high-leverage tactical action to fix this exact problem without discounting.]
 
@@ -272,54 +313,21 @@ Deliver a compact, high-density 4-part boardroom memo in under 350 words:
 • Direct Prime Costs: $X,XXX.XX/day — Formula: [COGS $ + Direct Labor $]
 • Daily Net Operating Take-Home: +$X,XXX.XX/day — Formula: [Gross - Prime (XX.X% margin)]
 • Unit Cash Contribution: +$X.XX / unit — Formula: [Net margin per transaction]
-• Daily Breakeven Volume: XX units/day — Formula: [Fixed overhead ÷ Unit contribution]
+• Daily Breakeven Volume: XX units/day — Formula: [Fixed daily overhead ÷ Unit contribution]
 • What-If Annual Cash Machine: +$XX,XXX.XX/yr — Plain-English: [Cash unlocked by fixing this specific bottleneck]
 
 ### 3. Strategic Execution Directives (Key Operator Moves)
-• Frontline Velocity: [Direct operational speed mandate with owner]
-• Zero Discount Policy: [Strict pricing defense rule with owner]
-• Workflow Synchronization: [Advance staging protocol with owner]
+• Frontline Velocity: [Direct operational speed mandate with functional lead]
+• Zero Discount Policy: [Strict pricing defense rule with functional lead]
+• Workflow Synchronization: [Advance staging protocol with functional lead]
 
 ### 4. Direct Bottom-Line Takeaway & Operator Gate
 (1 sharp closing sentence.)
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 
-      // High-Availability Multi-Model Fast-Lane Cascade (Primary: Gemini 3.7 Flash)
-      const modelsToTry = [
-        'gemini-3.7-flash',
-        'gemini-3.5-flash',
-        'gemini-3.5-flash-lite'
-      ];
-
-      for (const modelName of modelsToTry) {
-        try {
-          console.log(`Sending live request to model: ${modelName}...`);
-          const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
-            method: 'POST',
-            headers: {
-              'x-goog-api-key': apiKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                temperature: 0.85,
-                maxOutputTokens: 2048
-              }
-            })
-          });
-
-          console.log(`${modelName} Status:`, geminiRes.status);
-          if (geminiRes.ok) {
-            const data = await geminiRes.json();
-            const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-            if (text.trim().length > 0) {
-              return res.json({ response: text });
-            }
-          }
-        } catch (mErr) {
-          console.error(`Model ${modelName} error:`, mErr.message);
-        }
+      const liveResponse = await queryGeminiWithFallback(prompt, apiKey);
+      if (liveResponse) {
+        return res.json({ response: liveResponse });
       }
     }
 

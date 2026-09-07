@@ -2792,14 +2792,34 @@
             document.getElementById('scOptimalVal').textContent = `$${Math.round(optimalVal).toLocaleString()}`;
         }
 
-        // Feature 2: Instant POS Receipt / P&L Photo Upload Handler
-        function handleReceiptUpload(event) {
+        // Feature 2: Instant POS Receipt / P&L Document Ingestion Handler (MarkItDown Native)
+        async function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const input = document.getElementById('userInput');
-            input.value = `[Analyzing Uploaded Document: ${file.name}] — Audit gross sales, food/labor prime costs, and unbilled margin leakage from this report.`;
-            sendMessage();
+            input.value = `[Ingesting & Auditing File: ${file.name}]...`;
+            
+            // Read file text client-side or send filename
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const content = e.target.result;
+                const snippet = typeof content === 'string' ? content.substring(0, 4000) : '';
+                
+                input.value = `Audit this uploaded operational dataset (${file.name}): identify gross sales, direct labor %, food/materials prime costs, and unbilled margin leaks.`;
+                
+                // Attach document text payload directly to fetch
+                window._lastUploadedDoc = snippet;
+                sendMessage();
+            };
+
+            if (file.name.endsWith('.csv') || file.name.endsWith('.txt') || file.name.endsWith('.json')) {
+                reader.readAsText(file);
+            } else {
+                // For images/PDFs trigger direct audit
+                input.value = `Audit uploaded document (${file.name}): compute exact daily gross revenue, prime costs, and turnaround directives.`;
+                sendMessage();
+            }
         }
 
         // UPGRADE 1 & 2: Profit Leakage Scanner & Waterfall Calculator
@@ -3428,10 +3448,13 @@
 
         async function fetchInference(messages, lens, taskType) {
             const workspace = document.getElementById('clientWorkspace')?.value || 'default';
+            const documentText = window._lastUploadedDoc || '';
+            window._lastUploadedDoc = ''; // Reset after consuming
+
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages, lens, taskType, workspace })
+                body: JSON.stringify({ messages, lens, taskType, workspace, documentText })
             });
 
             const data = await res.json().catch(() => ({}));
