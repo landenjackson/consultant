@@ -426,7 +426,33 @@
             overflow: hidden;
         }
 
-        /* SINGLE STREAMLINED INPUT DOCK & UNIFIED CANVAS */
+        /* FULL SCREEN DRAG & DROP OVERLAY */
+        #dropOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 10, 12, 0.92);
+            border: 2px dashed #22c55e;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+        #dropOverlay.active {
+            display: flex;
+            pointer-events: auto;
+        }
+        .drop-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
         .launcher-pane {
             display: none !important;
         }
@@ -1548,6 +1574,12 @@
     </style>
 </head>
 <body>
+    <!-- Full Screen Drag and Drop Zone -->
+    <div id="dropOverlay">
+        <div class="drop-icon">📁</div>
+        <div style="font-size:20px; font-weight:800; color:#ffffff; margin-bottom:6px;">Drop POS / P&L Document to Audit</div>
+        <div style="font-size:13px; color:#94a3b8;">Supports Clover CSV, Toast exports, QuickBooks P&L sheets, and Lease PDFs</div>
+    </div>
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
     <!-- Linear / Superhuman Global Command Palette (Cmd + K) -->
@@ -3418,10 +3450,72 @@
             }
         }
 
-        // Beta Telemetry Parser
+        // Global Drag and Drop Event Listeners
+        window.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            const overlay = document.getElementById('dropOverlay');
+            if (overlay) overlay.classList.add('active');
+        });
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const overlay = document.getElementById('dropOverlay');
+            if (overlay) overlay.classList.add('active');
+        });
+        window.addEventListener('dragleave', (e) => {
+            if (e.relatedTarget === null) {
+                const overlay = document.getElementById('dropOverlay');
+                if (overlay) overlay.classList.remove('active');
+            }
+        });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const overlay = document.getElementById('dropOverlay');
+            if (overlay) overlay.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleReceiptUpload({ target: { files: files } });
+            }
+        });
+
+        // Function to dynamically sync scenario sliders with generated memo numbers
+        function syncSlidersFromMemo(text) {
+            try {
+                const grossMatch = text.match(/Daily Gross Sales:\s*\$([0-9,]+(\.[0-9]{2})?)/i);
+                if (grossMatch) {
+                    const gross = parseFloat(grossMatch[1].replace(/,/g, ''));
+                    if (gross > 0) {
+                        const monthlyGross = gross * 30;
+                        const el1 = document.getElementById('simGrossRev');
+                        const el2 = document.getElementById('scBaseVal');
+                        if (el1) el1.textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
+                        if (el2) el2.textContent = `$${Math.round(monthlyGross).toLocaleString()}`;
+                    }
+                }
+                const primeMatch = text.match(/Direct Prime Costs:\s*\$([0-9,]+(\.[0-9]{2})?)/i);
+                if (primeMatch) {
+                    const prime = parseFloat(primeMatch[1].replace(/,/g, ''));
+                    if (prime > 0) {
+                        const monthlyPrime = prime * 30;
+                        const el = document.getElementById('simPrimeCost');
+                        if (el) el.textContent = `$${Math.round(monthlyPrime).toLocaleString()}`;
+                    }
+                }
+                const annualMatch = text.match(/What-If Annual Cash Machine:\s*\+\$([0-9,]+(\.[0-9]{2})?)/i);
+                if (annualMatch) {
+                    const annual = parseFloat(annualMatch[1].replace(/,/g, ''));
+                    if (annual > 0) {
+                        const el = document.getElementById('simNetProfit');
+                        if (el) el.textContent = `+$${Math.round(annual).toLocaleString()}/yr`;
+                    }
+                }
+            } catch (err) {
+                console.warn('Slider sync error:', err);
+            }
+        }
+
+        // Initialize Charts and Load Defaults
         function formatTelemetryOutput(text) {
             return text
-                .replace(/^###\s+(.+)$/gm, '<div class="friendly-section-header">$1</div>')
                 .replace(/^(\>\>|💡)\s*(.+)$/gm, '<div class="turnaround-catalyst"><span class="turnaround-icon">★</span><div>$2</div></div>')
                 .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#ffffff; font-weight:700;">$1</strong>')
                 .replace(/^[\*\•\-]\s+([^:\n\r]+):\s*([^\—\-\n\r]+)[\—\-]\s*(.+)$/gm, function(match, title, val, desc) {
@@ -3508,6 +3602,7 @@
                 memoBodyDiv.contentEditable = 'true';
                 memoBodyDiv.spellcheck = false;
                 memoBodyDiv.innerHTML = formatTelemetryOutput(fullResponse);
+                syncSlidersFromMemo(fullResponse);
 
                 card.innerHTML = editBadge;
                 card.appendChild(memoBodyDiv);
