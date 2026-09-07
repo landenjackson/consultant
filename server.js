@@ -167,23 +167,21 @@ app.post('/api/dispatch-email', async (req, res) => {
 // 4. HIGH-VELOCITY DETERMINISTIC WORKSPACE ENGINE (SUB-50ms ZERO-WAIT EXECUTION)
 const generateWorkspaceCorrelatedMemo = (cleanQuestion, workspace) => {
   let domainKey = workspace;
-  if (!WORKSPACE_ECONOMIC_MODELS[domainKey]) {
-    const qLower = cleanQuestion.toLowerCase();
-    if (qLower.includes('diner') || qLower.includes('restaurant') || qLower.includes('breakfast') || qLower.includes('food') || qLower.includes('prep') || qLower.includes('staffing')) {
-      domainKey = 'hospitality';
-    } else if (qLower.includes('boiler') || qLower.includes('industrial') || qLower.includes('manufacturing') || qLower.includes('rfp') || qLower.includes('capex')) {
-      domainKey = 'industrial_manufacturing';
-    } else if (qLower.includes('patient') || qLower.includes('clinic') || qLower.includes('dental') || qLower.includes('medical') || qLower.includes('doctor')) {
-      domainKey = 'healthcare_clinic';
-    } else if (qLower.includes('lease') || qLower.includes('nnn') || qLower.includes('tenant') || qLower.includes('retail') || qLower.includes('real estate')) {
-      domainKey = 'commercial_real_estate';
-    } else {
-      domainKey = 'default';
-    }
+  const qLower = cleanQuestion.toLowerCase();
+  
+  if (workspace === 'hospitality' || qLower.includes('diner') || qLower.includes('restaurant') || qLower.includes('breakfast') || qLower.includes('food') || qLower.includes('prep') || qLower.includes('staffing')) {
+    domainKey = 'hospitality';
+  } else if (workspace === 'industrial' || workspace === 'industrial_manufacturing' || qLower.includes('boiler') || qLower.includes('industrial') || qLower.includes('manufacturing') || qLower.includes('rfp') || qLower.includes('capex')) {
+    domainKey = 'industrial_manufacturing';
+  } else if (workspace === 'healthcare' || workspace === 'healthcare_clinic' || qLower.includes('patient') || qLower.includes('clinic') || qLower.includes('dental') || qLower.includes('medical') || qLower.includes('doctor')) {
+    domainKey = 'healthcare_clinic';
+  } else if (workspace === 'real_estate' || workspace === 'commercial_real_estate' || qLower.includes('lease') || qLower.includes('nnn') || qLower.includes('tenant') || qLower.includes('retail') || qLower.includes('real estate')) {
+    domainKey = 'commercial_real_estate';
+  } else {
+    domainKey = 'default';
   }
 
   const eco = WORKSPACE_ECONOMIC_MODELS[domainKey] || WORKSPACE_ECONOMIC_MODELS.default;
-  const qLower = cleanQuestion.toLowerCase();
   const wsName = eco.name;
 
   let dailyGross, primeCost, netMargin, unitContrib, breakeven, annualRecovery, marginPct;
