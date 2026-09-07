@@ -3610,7 +3610,10 @@
                 const fullResponse = await fetchInference(conversationHistory, lens, currentTaskType);
                 
                 card.innerHTML = '';
-                const editBadge = `<div class="edit-badge-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Interactive Editor Active (Click text to edit)</div>`;
+                const editBadge = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #1a1e24; padding-bottom:6px;">
+                    <span style="font-size:10px; color:#4ade80; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;">✦ VERIFIED STRATEGIC EXECUTIVE MEMO</span>
+                    <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')" style="padding:2px 8px; font-size:10px;">📋 Copy Metrics</button>
+                </div>`;
                 
                 const memoBodyDiv = document.createElement('div');
                 memoBodyDiv.className = 'memo-editable-body';
@@ -3625,29 +3628,23 @@
                 const actions = document.createElement('div');
                 actions.className = 'memo-actions';
                 actions.innerHTML = `
-                    <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Save Encrypted
-                    </button>
-                    <button class="action-btn" onclick="copyMetricsCSV('${escapeHtml(fullResponse)}')">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> CSV
-                    </button>
-                    <button class="action-btn" onclick="exportDocBtn(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Word
+                    <button class="action-btn" onclick="exportBankTeaser(this)" style="color:#4ade80; border-color:rgba(34,197,94,0.35); font-weight:700;">
+                        📄 1-Page Bank Teaser
                     </button>
                     <button class="action-btn" onclick="exportExcelXLSX(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Excel (.xlsx)
+                        📑 Excel (.xlsx)
                     </button>
                     <button class="action-btn" onclick="exportPowerPointDeck(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Deck (.pptx)
+                        📊 Deck (.pptx)
                     </button>
-                    <button class="action-btn" onclick="exportBankTeaser(this)" style="color:#4ade80; border-color:rgba(34,197,94,0.35);">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> 📄 1-Page Bank Teaser
+                    <button class="action-btn" onclick="exportDocBtn(this)">
+                        📝 Word (.doc)
                     </button>
-                    <button class="action-btn" onclick="exportPDFBtn(this)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Full PDF
+                    <button class="action-btn" onclick="openDispatchModal()">
+                        ⏰ Dispatch
                     </button>
-                    <button class="action-btn" onclick="emailMemoBtn(this)" style="color:#4ade80;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> ✉️ Email Me
+                    <button class="action-btn" onclick="saveToVault(${conversationHistory.length})">
+                        🔒 Save Vault
                     </button>
                 `;
                 card.appendChild(actions);
