@@ -55,12 +55,11 @@ const verifyAndEnforceHarnessPolicy = (rawMemo, userInquiry, workspaceName) => {
   return verified;
 };
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Pinned Primary: Gemini 3.5 Flash for deep reasoning, authentic operator tone, and stable execution
+  // Pinned Primary: Gemini 3.8 Flash for maximum speed, sharpness, and rapid execution
   const models = [
+    'gemini-3.8-flash',
     'gemini-3.5-flash',
-    'gemini-3.7-flash',
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite'
+    'gemini-3.5-flash-lite'
   ];
 
   for (const modelName of models) {
