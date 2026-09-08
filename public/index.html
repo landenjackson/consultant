@@ -2694,6 +2694,18 @@
         let isStreaming = false;
         let currentTaskType = 'custom_strategic_memo';
 
+        // AUTOMATIC CACHE & CONVERSATION SESSION PURGE
+        (function purgeOldSessions() {
+            try {
+                // Clear any stored stale chat arrays or legacy session state
+                localStorage.removeItem('consultant_chat_history');
+                localStorage.removeItem('consultant_last_memo');
+                localStorage.removeItem('consultant_cached_response');
+                sessionStorage.clear();
+                console.log('✓ Stale chat sessions purged. Initialized fresh runtime.');
+            } catch(e) {}
+        })();
+
         function quickScenario(text) {
             const input = document.getElementById('userInput');
             input.value = text;
