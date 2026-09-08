@@ -55,11 +55,11 @@ const verifyAndEnforceHarnessPolicy = (rawMemo, userInquiry, workspaceName) => {
   return verified;
 };
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Pinned Primary: Gemini 3.8 Flash for maximum speed, sharpness, and rapid execution
+  // Pinned Primary: Gemini 3.5 Flash-Lite & 3.1 Flash-Lite for instant sub-3s execution with zero 503 errors
   const models = [
-    'gemini-3.8-flash',
-    'gemini-3.5-flash',
-    'gemini-3.5-flash-lite'
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-3.5-flash'
   ];
 
   for (const modelName of models) {
@@ -342,12 +342,44 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (apiKey) {
-      const prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner sitting across the desk from a business owner.
+      // Dynamic Intent Detection: Marketing/Flyers vs. Financial/P&L
+      const qLower = userMessage.toLowerCase();
+      const isMarketingIntent = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis/i.test(qLower);
+
+      let prompt = '';
+      if (isMarketingIntent) {
+        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner sitting across the desk from a business owner.
+DO NOT talk about generic balance sheets, EBITDA, or industrial factory costs.
+DO NOT use robotic filler ("In today's fast-paced environment", "Operational telemetry reveals", "Maximizing throughput").
+The user is asking a MARKETING / GROWTH / COMMUNITY OUTREACH question: "${userMessage}".
+
+Deliver a high-converting, tactical marketing memo formatted strictly as:
+
+### 1. Strategic Campaign Angle: "${userMessage}"
+(Write 2 punchy, candid paragraphs explaining the psychological hook, why generic discounting fails, and how to capture local neighborhood demand.)
+
+>> ★ Core Campaign Move: [The #1 single most effective local distribution or event hook to acquire customers without discounts.]
+
+### 2. Ready-to-Print Campaign Asset
+• Headline & Hook: [Punchy, high-converting copy for the flyer or post]
+• The Welcome Experience: [High-perceived-value welcome offer with ZERO cash discounting]
+• Distribution Plan: [Specific doors, local businesses, or physical drop-off mechanics]
+• Retention Loop: [How to turn first-time visitors into high-frequency recurring customers]
+
+### 3. Customer Acquisition & Foot-Traffic Math
+• Target Circulation: [e.g., 500 local residential doors or targeted prospects]
+• Expected Capture Rate: [e.g., 5% conversion = 25 new recurring accounts/visits]
+• Projected Monthly Revenue Lift: [Realistic net margin added vs. printing/distribution cost]
+
+### 4. Direct Operator Directive
+(1 sharp, unvarnished closing sentence giving clear deployment orders.)
+
+Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+      } else {
+        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner sitting across the desk from a business owner.
 DO NOT use generic AI filler, polite throat-clearing, or academic textbook jargon.
 BANNED PHRASES: "In today's fast-paced environment", "Operational telemetry reveals", "Maximizing throughput is the primary lever", "It is important to consider".
-
-ANALYZE THIS SPECIFIC INQUIRY WITH CANDID EXECUTIVE VOICE & BALANCED P&L MATH:
-User Inquiry: "${userMessage}"
+The user is asking an OPERATIONS / P&L / FINANCIAL question: "${userMessage}".
 Operating Domain: "${workspace}"
 ${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
 
@@ -373,7 +405,9 @@ Deliver a 4-part boardroom strategy memo formatted strictly as:
 
 ### 4. Direct Bottom-Line Takeaway & Operator Gate
 (1 sharp closing sentence.)
+
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+      }
 
       const liveResponse = await queryGeminiWithFallback(prompt, apiKey);
       if (liveResponse) {
