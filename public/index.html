@@ -1642,17 +1642,17 @@
             </div>
 
             <div class="cmd-results-list" id="cmdResultsList">
-                <div class="cmd-section-heading">Strategic Protocols</div>
+                <div class="cmd-section-heading">Strategic Actions</div>
                 <div class="cmd-item" onclick="execCmd(triggerAutoAudit)">
-                    <div class="cmd-item-left"><span>⚡</span><span style="color:#4ade80; font-weight:700;">Run Orchestrated Live Audit</span></div>
+                    <div class="cmd-item-left"><span>⚡</span><span style="color:#4ade80; font-weight:700;">Run Strategic Audit</span></div>
                     <span class="cmd-shortcut-badge">RUN</span>
                 </div>
-                <div class="cmd-item" onclick="execCmd(() => quickTask('trade_analysis'))">
-                    <div class="cmd-item-left"><span>📍</span><span>Retail & Trade Area Geometry</span></div>
+                <div class="cmd-item" onclick="execCmd(() => quickScenario('Audit my daily revenue vs direct operating expenses'))">
+                    <div class="cmd-item-left"><span>📊</span><span>Financial & P&L Telemetry</span></div>
                     <span class="cmd-shortcut-badge">01</span>
                 </div>
-                <div class="cmd-item" onclick="execCmd(() => quickTask('medical'))">
-                    <div class="cmd-item-left"><span>🩺</span><span>Healthcare & Clinic Operations</span></div>
+                <div class="cmd-item" onclick="execCmd(() => quickScenario('Structure a local neighborhood outreach campaign to acquire new customers without discounting'))">
+                    <div class="cmd-item-left"><span>🎯</span><span>Customer Acquisition & Marketing</span></div>
                     <span class="cmd-shortcut-badge">02</span>
                 </div>
                 <div class="cmd-item" onclick="execCmd(() => quickTask('psychology'))">
@@ -2124,17 +2124,8 @@
             <!-- UNIFIED FULL-WIDTH STRATEGIC CANVAS -->
             <div class="telemetry-pane">
                 <div class="telemetry-feed" id="chatArea">
-                    <!-- Quick Strategic Protocol Selector (Removed Hardcoded Category Locks) -->
+                    <!-- Strategic Protocols Grid (Completely Cleaned & Generalized) -->
                     <div style="display:none;" id="quickTaskGridContainer">
-                            <!-- 01: Retail / Hospitality -->
-                            <div class="quick-task-card" onclick="quickTask('trade_analysis')">
-                                <div class="quick-task-card-header">
-                                    <span class="task-index">01 // Retail</span>
-                                    <svg class="task-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                                </div>
-                                <div class="quick-task-title">Trade Area & Foot-Traffic</div>
-                                <div class="quick-task-desc">Catchments & retail density</div>
-                            </div>
 
                             <!-- 02: Healthcare & Medicine -->
                             <div class="quick-task-card" onclick="quickTask('medical')">
@@ -2639,10 +2630,10 @@
                     </div>
 
                     <div class="diff-card strategy-a">
-                        <div class="diff-badge a">Hospitality & Trade Area Strategy</div>
-                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">Hospitality Brand Repositioning</div>
-                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Replaced margin-diluting discount couponing with high-value analog connection campaigns ("No WiFi, Only HiFi") and morning line synchronization.</p>
-                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>+20%–30%:</strong> Weekday foot-traffic expansion.</div>
+                        <div class="diff-badge a">Strategic Operations & Growth</div>
+                        <div style="font-size:15px; font-weight:800; color:#ffffff; margin:4px 0;">Customer Acquisition & Brand Repositioning</div>
+                        <p style="font-size:12.5px; color:#94a3b8; line-height:1.5;">Replaced margin-diluting discount couponing with high-value community connection campaigns and peak operational line synchronization.</p>
+                        <div style="margin-top:8px; font-size:12px; color:#4ade80;">• <strong>+20%–30%:</strong> Customer volume expansion.</div>
                         <div style="font-size:12px; color:#4ade80;">• <strong>100% Margin Defense:</strong> Zero unearned promotional discounting.</div>
                     </div>
 
