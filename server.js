@@ -55,7 +55,7 @@ const verifyAndEnforceHarnessPolicy = (rawMemo, userInquiry, workspaceName) => {
   return verified;
 };
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Pinned Primary: Gemini 3.8 Flash for Full App Reasoning & Dynamic Math
+  // Ultra-Low Latency Fast-Lane Pipeline (Target: Sub-1s execution)
   const models = [
     'gemini-3.8-flash',
     'gemini-3.5-flash',
@@ -64,7 +64,6 @@ const queryGeminiWithFallback = async (prompt, apiKey) => {
 
   for (const modelName of models) {
     try {
-      console.log(`[Inference] Querying ${modelName}...`);
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
         method: 'POST',
         headers: {
@@ -74,13 +73,13 @@ const queryGeminiWithFallback = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.85,
-            maxOutputTokens: 2048
+            temperature: 0.7,
+            maxOutputTokens: 650, // Calibrated token ceiling for ultra-fast <1s generation
+            topP: 0.9
           }
         })
       });
 
-      console.log(`[Inference] ${modelName} returned status: ${res.status}`);
       if (res.ok) {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
@@ -89,7 +88,7 @@ const queryGeminiWithFallback = async (prompt, apiKey) => {
         }
       } else {
         const errBody = await res.text();
-        console.warn(`[Inference Warning] ${modelName} (${res.status}): ${errBody.substring(0, 150)}`);
+        console.warn(`[Inference Warning] ${modelName} (${res.status}): ${errBody.substring(0, 100)}`);
       }
     } catch (err) {
       console.warn(`[Inference Error] ${modelName} failed:`, err.message);
