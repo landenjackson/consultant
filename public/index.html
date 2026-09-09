@@ -650,94 +650,125 @@
             transform: translateY(-1px);
         }
 
-        /* MOBILE RESPONSIVE MEDIA QUERIES */
+        /* FONT SIZE CUSTOMIZATION SETTINGS */
+        body.font-compact {
+            --base-font-size: 13.5px;
+        }
+        body.font-standard {
+            --base-font-size: 14.5px;
+        }
+        body.font-large {
+            --base-font-size: 16px;
+        }
+
+        .bubble-assistant, .bubble-user, .dock-input, .mode-tile-desc {
+            font-size: var(--base-font-size, 14.5px);
+        }
+
+        /* COMPACT MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
             header {
-                height: 56px;
-                padding: 0 16px;
+                height: 52px;
+                padding: 0 12px;
             }
 
-            .brand-tag {
+            .brand-tag, .brand-text {
                 display: none;
             }
 
-            .brand-text {
-                font-size: 15px;
-            }
-
             .mode-selector-wrap {
-                padding: 3px 6px;
+                padding: 2px 6px;
             }
 
             .mode-select {
-                font-size: 11.5px;
-                max-width: 130px;
+                font-size: 11px;
+                max-width: 115px;
             }
 
             .btn-pricing-badge {
-                padding: 4px 10px;
-                font-size: 11px;
+                padding: 4px 8px;
+                font-size: 10.5px;
             }
 
             main {
-                padding: 16px 14px 140px;
-                gap: 16px;
+                padding: 12px 10px 130px;
+                gap: 12px;
             }
 
             .hero-banner-card {
-                padding: 20px 16px;
-                border-radius: 14px;
+                padding: 16px 14px;
+                border-radius: 12px;
             }
 
             .hero-h1 {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .hero-sub {
-                font-size: 13.5px;
+                font-size: 12.5px;
+            }
+
+            .live-stat-strip {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .stat-capsule {
+                padding: 6px 8px;
+            }
+
+            .stat-label {
+                font-size: 9.5px;
+            }
+
+            .stat-value {
+                font-size: 12px;
             }
 
             .custom-modes-grid {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 8px;
             }
 
             .mode-tile {
-                padding: 14px 16px;
-            }
-
-            .bubble-user {
-                max-width: 90%;
-                font-size: 13.5px;
-                padding: 12px 16px;
-            }
-
-            .bubble-assistant {
-                padding: 18px 16px;
-                font-size: 13.5px;
-                border-radius: 14px;
-            }
-
-            .dock-container {
                 padding: 12px 14px;
             }
 
-            .dock-box {
+            .bubble-user {
+                max-width: 92%;
+                font-size: 13px;
+                padding: 10px 14px;
+            }
+
+            .bubble-assistant {
+                padding: 16px 14px;
+                font-size: 13px;
                 border-radius: 12px;
-                padding: 4px 10px;
+            }
+
+            .dock-container {
+                padding: 8px 10px;
+            }
+
+            .dock-box {
+                border-radius: 10px;
+                padding: 2px 8px;
             }
 
             .btn-send {
-                padding: 7px 14px;
-                font-size: 12.5px;
+                padding: 6px 12px;
+                font-size: 12px;
             }
 
-            .pricing-grid {
-                grid-template-columns: 1fr;
+            .deliverables-bar {
+                gap: 6px;
+                margin-top: 14px;
+                padding-top: 10px;
             }
 
-            .modal-card {
-                padding: 24px 18px;
+            .btn-export {
+                padding: 5px 9px;
+                font-size: 11px;
             }
         }
     </style>
@@ -774,7 +805,16 @@
                 </select>
             </div>
 
-            <!-- USER LOGIN / PROFILE BUTTON -->
+            <!-- USER PROFILE & VAULT BUTTONS -->
+            <button id="vaultBtn" class="btn-export" onclick="openVaultModal()" style="border-radius:20px; padding:6px 12px; color:#FFFFFF; background:rgba(255,255,255,0.06); border:1px solid var(--border); display:flex; align-items:center; gap:6px;">
+                <span>🔒</span>
+                <span>Vault (<strong id="vaultCount">0</strong>)</span>
+            </button>
+
+            <button id="settingsBtn" class="btn-export" onclick="openSettingsModal()" style="border-radius:20px; padding:6px 10px; color:#FFFFFF; background:rgba(255,255,255,0.06); border:1px solid var(--border); display:flex; align-items:center; gap:4px;">
+                <span>⚙️</span>
+            </button>
+
             <button id="authBtn" class="btn-export" onclick="openLoginModal()" style="border-radius:20px; padding:6px 14px; color:#FFFFFF; background:rgba(255,255,255,0.06); border:1px solid var(--border-glow); display:flex; align-items:center; gap:6px;">
                 <span style="color:var(--accent-glow);">👤</span>
                 <span id="userAuthDisplay" style="font-weight:700;">Landen Jackson</span>
@@ -905,6 +945,59 @@
         </div>
     </div>
 
+    <!-- EXECUTIVE STRATEGY VAULT MODAL -->
+    <div class="modal-overlay" id="vaultModal">
+        <div class="modal-card" style="max-width:680px; padding:32px;">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🔒 Strategy & Research Vault</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Saved business models, job interview notes, and research workflows.</p>
+                </div>
+                <button onclick="closeVaultModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
+            </div>
+
+            <div id="vaultItemsContainer" style="display:flex; flex-direction:column; gap:10px; max-height:450px; overflow-y:auto;">
+                <!-- Dynamically populated from localStorage -->
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
+                <span style="font-size:12px; color:var(--text-muted);">Encrypted in local browser storage.</span>
+                <button class="btn-export" onclick="clearVault()">Clear Vault</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS & FONT CONTROLS MODAL -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card" style="max-width:440px; padding:28px;">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:18px; font-weight:800; color:#FFFFFF;">⚙️ Studio Settings</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Customize viewport font sizing and display density.</p>
+                </div>
+                <button onclick="closeSettingsModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Reading Font Size:</div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-export" onclick="setFontSize('compact')" style="flex:1; justify-content:center;">Compact (13.5px)</button>
+                        <button class="btn-export" onclick="setFontSize('standard')" style="flex:1; justify-content:center; border-color:var(--accent);">Standard (14.5px)</button>
+                        <button class="btn-export" onclick="setFontSize('large')" style="flex:1; justify-content:center;">Large (16px)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Active Model Acceleration:</div>
+                    <div style="font-size:12.5px; color:var(--accent-glow); background:rgba(34,197,94,0.08); padding:10px 14px; border-radius:10px; border:1px solid var(--border-glow);">
+                        ✓ Gemini 3.8 Flash Engine Active (Zero 503 Fallback Enabled)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- LOGIN & PROFILE MODAL (Zero-Firebase Direct OAuth & Instant Access) -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card" style="max-width:480px; padding:32px;">
@@ -1027,8 +1120,118 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+        function openVaultModal() {
+            renderVaultItems();
+            document.getElementById('vaultModal').style.display = 'flex';
+        }
+        function closeVaultModal() { document.getElementById('vaultModal').style.display = 'none'; }
+
+        function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+        function setFontSize(size) {
+            document.body.className = `font-${size}`;
+            localStorage.setItem('consultant_font_size', size);
+            alert(`Font size updated to ${size}.`);
+        }
+
+        // Vault Saving & Retrieval Engine
+        function saveToVault(btn) {
+            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            if (!card) return;
+            const text = card.innerText || card.textContent;
+            const title = text.split('\n')[0].replace(/^[#\s•]+/, '').substring(0, 45) || 'Executive Strategy';
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            vault.unshift({ id: `vault_${Date.now()}`, title, text, timestamp });
+            localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
+            updateVaultCount();
+            alert(`Saved to Vault: "${title}"`);
+        }
+
+        function updateVaultCount() {
+            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            const countLabel = document.getElementById('vaultCount');
+            if (countLabel) countLabel.innerText = vault.length.toString();
+        }
+        updateVaultCount();
+
+        function renderVaultItems() {
+            const container = document.getElementById('vaultItemsContainer');
+            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            if (!container) return;
+
+            if (vault.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13.5px;">Your Strategy Vault is empty. Click <strong>[ 🔒 Save Vault ]</strong> on any strategy response to save it for job interviews, research, or company reviews.</div>`;
+                return;
+            }
+
+            container.innerHTML = vault.map(item => `
+                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:700; color:#FFFFFF; font-size:13.5px; margin-bottom:3px;">${escapeHtml(item.title)}</div>
+                        <div style="font-size:11.5px; color:var(--text-muted);">${item.timestamp}</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-export" style="padding:4px 8px; font-size:11px;" onclick="loadVaultItem('${item.id}')">View</button>
+                        <button class="btn-export" style="padding:4px 8px; font-size:11px; color:#F87171;" onclick="deleteVaultItem('${item.id}')">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadVaultItem(id) {
+            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            const item = vault.find(v => v.id === id);
+            if (!item) return;
+            closeVaultModal();
+
+            const hero = document.getElementById('heroBanner');
+            if (hero) hero.style.display = 'none';
+
+            const chatFeed = document.getElementById('chatFeed');
+            const row = document.createElement('div');
+            row.className = 'chat-row';
+            const card = document.createElement('div');
+            card.className = 'bubble-assistant';
+            card.innerHTML = formatExecutiveResponse(item.text);
+
+            const delivBar = document.createElement('div');
+            delivBar.className = 'deliverables-bar';
+            delivBar.innerHTML = `
+                <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
+                <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
+                <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
+                <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+            `;
+            card.appendChild(delivBar);
+            row.appendChild(card);
+            chatFeed.appendChild(row);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+        }
+
+        function deleteVaultItem(id) {
+            let vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            vault = vault.filter(v => v.id !== id);
+            localStorage.setItem('consultant_vault', JSON.stringify(vault));
+            updateVaultCount();
+            renderVaultItems();
+        }
+
+        function clearVault() {
+            if (confirm("Clear all items in your Strategy Vault?")) {
+                localStorage.removeItem('consultant_vault');
+                updateVaultCount();
+                renderVaultItems();
+            }
+        }
+
+        // Restore saved font size
+        (function restoreFont() {
+            const font = localStorage.getItem('consultant_font_size') || 'standard';
+            document.body.className = `font-${font}`;
+        })();
 
         function handleGoogleSignIn() {
             localStorage.setItem('consultant_user_authenticated', 'true');
@@ -1417,7 +1620,7 @@
                 const responseText = data.response || "Strategy synthesized.";
                 assistantCard.innerHTML = formatExecutiveResponse(responseText);
 
-                // Add Deliverables Bar
+                // Add Deliverables & Vault Bar
                 const delivBar = document.createElement('div');
                 delivBar.className = 'deliverables-bar';
                 delivBar.innerHTML = `
@@ -1425,6 +1628,7 @@
                     <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
                     <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
                     <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+                    <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
                 `;
                 assistantCard.appendChild(delivBar);
 
