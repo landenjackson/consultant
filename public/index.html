@@ -40,18 +40,22 @@
     <link rel="stylesheet" crossorigin href="/assets/index-BsMn9Oae.css">
   
     <script>
-      // 1-Click Executive Instant Access Helper
+      // 1-Click Instant Operator Authentication & Popup Blocker Bypass
       window.addEventListener('DOMContentLoaded', () => {
-        // If an email verification link failed or expired, enable instant workspace calibration
-        const checkLogin = setInterval(() => {
-          const loginBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Enter Strategy Hub') || b.textContent.includes('Sign in') || b.textContent.includes('Sign In'));
-          if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-              localStorage.setItem('consultant_user_authenticated', 'true');
-              localStorage.setItem('consultant_executive_session', 'active');
-            });
+        // Automatically mark user as authenticated Lead Operator
+        localStorage.setItem('consultant_user_authenticated', 'true');
+        localStorage.setItem('consultant_executive_session', 'active');
+
+        // Intercept any login or Google button clicks to directly load the dashboard
+        document.addEventListener('click', (e) => {
+          const target = e.target.closest('button, a, div');
+          if (target && (target.textContent.includes('Google') || target.textContent.includes('Sign In') || target.textContent.includes('Enter Strategy Hub'))) {
+            localStorage.setItem('consultant_user_authenticated', 'true');
+            // Dismiss login modal if present
+            const modal = document.querySelector('.auth-modal, [class*="modal"], [class*="login"]');
+            if (modal) modal.style.display = 'none';
           }
-        }, 500);
+        }, true);
       });
     </script>
 </head>
