@@ -55,12 +55,11 @@ const verifyAndEnforceHarnessPolicy = (rawMemo, userInquiry, workspaceName) => {
   return verified;
 };
 const queryGeminiWithFallback = async (prompt, apiKey) => {
-  // Resilient Multi-Tier Model Cascade (Gracefully handles 429 Quota & 503 Spikes)
+  // Pinned Primary: Gemini 3.8 Flash for Full App Reasoning & Dynamic Math
   const models = [
+    'gemini-3.8-flash',
     'gemini-3.5-flash',
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite',
-    'gemini-3.8-flash'
+    'gemini-3.1-flash-lite'
   ];
 
   for (const modelName of models) {
