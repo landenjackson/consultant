@@ -68,7 +68,6 @@ const queryGemini = async (prompt, apiKey) => {
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
-    // Dynamically detect host to guarantee return redirect works on Cloudflare Tunnels
     const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://trackbacks-niagara-keyboard-katrina.trycloudflare.com');
 
     const session = await stripe.checkout.sessions.create({
@@ -78,8 +77,7 @@ app.post('/create-checkout-session', async (req, res) => {
           currency: 'usd',
           product_data: {
             name: `Consultant Studio — ${tier}`,
-            description: 'Executive Operations & Strategic Intelligence Suite (30-Day Free Trial)',
-            tax_code: 'txcd_10000000'
+            description: 'Executive Operations & Strategic Intelligence Suite (30-Day Free Trial)'
           },
           unit_amount: amount,
           recurring: { interval: 'month' }
@@ -90,7 +88,6 @@ app.post('/create-checkout-session', async (req, res) => {
       subscription_data: {
         trial_period_days: 30
       },
-      automatic_tax: { enabled: true },
       success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
       cancel_url: `${origin}/?canceled=true`
     });
