@@ -23,47 +23,41 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 });
 
 // ULTRA-FAST RESILIENT GEMINI 3.8 FLASH ENGINE
-// RESILIENT MULTI-TIER REASONING CASCADE (100% LIVE INFERENCE, ZERO 503/429 DROPS)
 const queryGemini = async (prompt, apiKey) => {
-  // Pinned Primary: Gemini 3.5 Flash (100% Active, 0% 503, Sub-2s Latency)
-  const models = ['gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-3.8-flash'];
+  // Ultra-Fast Direct REST Endpoint on gemini-3.5-flash
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-  for (const model of models) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.75,
-            maxOutputTokens: 1200,
-            topP: 0.95
-          }
-        })
-      });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-        if (text && text.trim().length > 0) {
-          console.log(`[Inference Success] Generated live via ${model}`);
-          return text;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 1500,
+          topP: 0.95
         }
-      } else {
-        const errText = await res.text();
-        console.warn(`[Inference Failover] ${model} (${res.status}): ${errText.substring(0, 80)}... Moving to next lane.`);
+      })
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+      if (text && text.trim().length > 0) {
+        return text;
       }
-    } catch (err) {
-      console.warn(`[Inference Exception] ${model}:`, err.message);
+    } else {
+      const err = await res.text();
+      console.warn('[Gemini 3.5 Warning]', res.status, err.substring(0, 100));
     }
+  } catch (err) {
+    console.warn('[Gemini 3.5 Error]', err.message);
   }
   return null;
 };
