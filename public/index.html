@@ -663,13 +663,19 @@
         }
 
         function formatMarkdown(text) {
-            return text
+            let html = text
                 .replace(/### (.*?)\n/g, '<h3>$1</h3>')
                 .replace(/## (.*?)\n/g, '<h2>$1</h2>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/• (.*?)\n/g, '<li>$1</li>')
                 .replace(/>> ★ (.*?)\n/g, '<div class="catalyst-box">★ $1</div>')
-                .replace(/\n\n/g, '<br><br>');
+                .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
+                .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
+
+            // Format unordered bullet points cleanly
+            html = html.replace(/• (.*?)(?=(\n• |\n\n|\n<h|$))/g, '<li style="margin-bottom:6px; margin-left:16px;">$1</li>');
+            html = html.replace(/(<li[\s\S]*?<\/li>)/g, '<ul style="margin: 10px 0;">$1</ul>');
+            html = html.replace(/\n\n/g, '<p style="margin-bottom:12px;"></p>');
+            return html;
         }
 
         async function sendMessage() {
