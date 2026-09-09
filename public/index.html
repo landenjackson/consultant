@@ -1371,28 +1371,34 @@
 
         // Clean executive response formatting (Fluid business dialogue instead of rigid 1-4 step boilerplate)
         function formatExecutiveResponse(text) {
+            if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
+
             let clean = text
-                .replace(/### 1\.\s*Operational Reality:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead">$1</div>')
-                .replace(/### 1\.\s*Strategic Campaign Angle:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead">$1</div>')
-                .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title">$1</div>')
-                .replace(/>> ★\s*([^\n]+)/g, '<div class="exec-catalyst">★ <strong>Key Turnaround Catalyst:</strong> $1</div>')
-                .replace(/★ Key Turnaround Move:\s*([^\n]+)/g, '<div class="exec-catalyst">★ <strong>Key Turnaround Move:</strong> $1</div>')
+                .replace(/### 1\.\s*Operational Reality:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
+                .replace(/### 1\.\s*Strategic Campaign Angle:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
+                .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15px; font-family:\'Plus Jakarta Sans\';">$1</div>')
+                .replace(/###\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15px; font-family:\'Plus Jakarta Sans\';">$1</div>')
+                .replace(/##\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:18px 0 10px; font-size:16px; font-family:\'Plus Jakarta Sans\';">$1</div>')
+                .replace(/>> ★\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:12px 14px; border-radius:10px; margin:12px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF;">$1</div></div>')
+                .replace(/★ Key Turnaround Move:\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:12px 14px; border-radius:10px; margin:12px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF;">$1</div></div>')
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
                 .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
 
-            // Convert bullets to clean metrics list
-            clean = clean.replace(/• (.*?)(?=(\n• |\n\n|\n<div|$))/g, '<li>$1</li>');
-            clean = clean.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="exec-metrics-list">$1</ul>');
+            // Convert bullet lines
+            clean = clean.replace(/^[•\*\-]\s*(.*?)$/gm, '<li style="margin-bottom:6px;">$1</li>');
+            clean = clean.replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="exec-metrics-list" style="margin:10px 0 14px 18px; padding:0;">$1</ul>');
 
             // Format bold metrics
-            clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#FFF;">$1</strong>');
             
-            // Paragraph line breaks
-            clean = clean.replace(/\n\n/g, '<p style="margin-bottom:12px;"></p>');
-
-            // Clean signoff line
-            clean = clean.replace(/Status:\s*Cleared for Production Execution\s*•\s*([^\n<]+)/gi, 
-                '<div class="exec-footer"><span>Status: <strong class="exec-signoff">Cleared for Production Execution</strong></span><span>Operator: $1</span></div>');
+            // Format paragraphs
+            const paragraphs = clean.split(/\n\n+/);
+            clean = paragraphs.map(p => {
+                p = p.trim();
+                if (!p) return '';
+                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li')) return p;
+                return `<p style="margin-bottom:12px; line-height:1.65; color:var(--text-secondary);">${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
 
             return clean;
         }
