@@ -838,6 +838,15 @@
 
     <!-- FIXED BOTTOM INPUT DOCK -->
     <div class="dock-container">
+        <!-- ATTACHED FILE PREVIEW CHIP -->
+        <div id="fileAttachmentPreview" style="display:none; max-width:940px; margin:0 auto 8px auto; align-items:center; gap:8px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:8px; font-size:12px; color:var(--accent-glow);">
+                <span>📎</span>
+                <span id="attachedFileName" style="font-weight:600;">document.csv</span>
+                <span onclick="removeAttachedFile()" style="cursor:pointer; margin-left:4px; font-weight:bold; color:var(--text-muted);">✕</span>
+            </div>
+        </div>
+
         <div class="dock-box">
             <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(event)">
             <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach CSV, P&L, or Document">
@@ -1035,15 +1044,31 @@
             }
         }
 
+        let attachedFileNameStr = "";
+
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
+            attachedFileNameStr = file.name;
             const reader = new FileReader();
             reader.onload = (event) => {
                 uploadedDocText = event.target.result;
-                alert(`Document attached: ${file.name}`);
+                const preview = document.getElementById('fileAttachmentPreview');
+                const nameLabel = document.getElementById('attachedFileName');
+                if (preview && nameLabel) {
+                    nameLabel.innerText = file.name;
+                    preview.style.display = 'flex';
+                }
             };
             reader.readAsText(file);
+        }
+
+        function removeAttachedFile() {
+            uploadedDocText = "";
+            attachedFileNameStr = "";
+            document.getElementById('fileInput').value = "";
+            const preview = document.getElementById('fileAttachmentPreview');
+            if (preview) preview.style.display = 'none';
         }
 
         function sendQuick(text) {
@@ -1079,6 +1104,12 @@
             return clean;
         }
 
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
         async function sendMessage() {
             if (isGenerating) return;
             const input = document.getElementById('userInput');
@@ -1100,8 +1131,11 @@
             // User Message
             const userRow = document.createElement('div');
             userRow.className = 'chat-row';
-            userRow.innerHTML = `<div class="bubble-user">${text}</div>`;
+            const fileBadge = attachedFileNameStr ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached:</span> <strong>${escapeHtml(attachedFileNameStr)}</strong></div>` : '';
+            userRow.innerHTML = `<div class="bubble-user">${fileBadge}${escapeHtml(text)}</div>`;
             chatFeed.appendChild(userRow);
+
+            removeAttachedFile(); // Clear file chip after sending
 
             messages.push({ role: 'user', content: text });
 
