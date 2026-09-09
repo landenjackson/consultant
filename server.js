@@ -22,27 +22,24 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST RESILIENT GEMINI 3.8 FLASH ENGINE
-// ULTRA-FAST DIRECT GEMINI 3.8 FLASH ENGINE
+// ULTRA-FAST RESILIENT GEMINI ENGINE
 const queryGemini = async (prompt, apiKey) => {
   const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 1000,
+            temperature: 0.82,
+            maxOutputTokens: 1100,
             topP: 0.95
           }
         })
@@ -53,18 +50,17 @@ const queryGemini = async (prompt, apiKey) => {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         if (text && text.trim().length > 0) {
-          console.log(`[Inference Success] Model: ${model}`);
           return text;
         }
       }
     } catch (err) {
-      // Pass
+      // Pass to next lane
     }
   }
   return null;
 };
 
-// 1. CLEAN DYNAMIC STRIPE CHECKOUT ENDPOINT (TIED TO LIVE CLOUDFLARE EDGE HOST)
+// 1. DYNAMIC STRIPE CHECKOUT SESSIONS
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
@@ -92,10 +88,8 @@ app.post('/create-checkout-session', async (req, res) => {
       cancel_url: `${origin}/?canceled=true`
     });
 
-    console.log(`[Stripe Checkout Created] URL: ${session.url}`);
     res.json({ id: session.id, url: session.url });
   } catch (error) {
-    console.error('[Stripe Checkout Error]', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -128,107 +122,111 @@ const generateDynamicMathMemo = (cleanQuestion) => {
   const breakeven = Math.max(1, Math.ceil((dailyGross * 0.25) / parseFloat(unitContrib)));
   const annualRecovery = Math.round(netMargin * 0.22 * 260);
 
-  return `### 1. Operational Reality: "${cleanQuestion}"
-Analyzing your frontline workflow reveals that unbilled labor drag and operational friction are directly eroding gross margins. When operations absorb stealth vendor price hikes or staging bottlenecks without adjusting baseline pricing, daily profit leaks directly out of the owner's ledger before reaching the bottom line.
+  return `Look at your numbers directly: at $${dailyGross.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} in daily gross revenue, carrying a ${(primePct * 100).toFixed(0)}% prime cost drag means you are letting $${primeCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} slip out of the business every single day before you touch a dime of owner profit.
 
-Stop attempting to solve margin leaks through volume expansion or promotional discounts. The immediate turnaround is eliminating labor downtime, enforcing a strict zero-discount policy, and standardizing your ticket pricing structure.
+When frontline scheduling overlaps, technicians sit unbilled between jobs, or vendor invoice creep goes unpassed, your take-home cash drops to $${netMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day. You do not solve this by scrambling for more volume or discounting prices—you fix it by locking down your price floor and stopping staging leaks at the source.
 
->> ★ Key Turnaround Move: Enforce a strict ${(primePct * 100).toFixed(0)}% prime cost ceiling and stage all materials 30 minutes prior to first shift dispatch to reclaim leaked margin.
+>> ★ Key Turnaround Move: Enforce a strict ${(primePct * 100).toFixed(0)}% prime cost ceiling and mandate 30-minute advance staging prior to active operations to recover leaked margin immediately.
 
-### 2. Verified Financial Telemetry & Daily P&L Math
-• Daily Gross Sales: $${dailyGross.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day — Formula: [${units} completed encounters/day × $${extractedTicket.toFixed(2)} average ticket]
-• Direct Prime Costs: $${primeCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day — Formula: [Direct materials/COGS + Frontline labor (${(primePct * 100).toFixed(1)}% drag)]
-• Daily Net Operating Take-Home: +$${netMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day — Formula: [Gross Sales - Prime Costs (${marginPct}% margin)]
-• Unit Cash Contribution: +$${unitContrib} / encounter — Formula: [Net operating profit produced per transaction]
-• Daily Breakeven Volume: ${breakeven} units/day — Formula: [Fixed daily baseline overhead ÷ Unit cash contribution]
-• What-If Annual Cash Machine: +$${annualRecovery.toLocaleString('en-US')}/yr — Plain-English: [Cash unlocked by eliminating frontline line bottlenecks]
+### Executive P&L Telemetry & Real Unit Math
+• Daily Gross Sales: $${dailyGross.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [Audited across ${units} encounters at $${extractedTicket.toFixed(2)} average ticket]
+• Direct Prime Expenses: $${primeCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [Materials + frontline labor drag at ${(primePct * 100).toFixed(1)}%]
+• Daily Net Operating Margin: +$${netMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [${marginPct}% real contribution margin]
+• Unit Cash Contribution: +$${unitContrib} / encounter [Raw profit generated per completed transaction]
+• Daily Breakeven Volume: ${breakeven} units/day [Overhead coverage baseline threshold]
+• What-If Annual Cash Machine: +$${annualRecovery.toLocaleString('en-US')}/yr [Tangible cash reclaimed by tightening frontline execution]
 
-### 3. Strategic Execution Directives (Key Operator Moves)
-• Frontline Velocity: Standardize shift staging 30 minutes prior to active operations (Owner: Shift Lead).
-• Zero Discount Policy: Prohibit generic price concessions; defend 100% full-price realization (Owner: General Manager).
-• Workflow Synchronization: Track job-level gross margins before marking tickets complete (Owner: Billing Desk).
-
-### 4. Direct Bottom-Line Takeaway & Operator Gate
-Execute these three directives before tomorrow's first shift to defend pricing power and stop frontline cash leakage immediately.
+### Strategic Execution Mandates
+• Frontline Velocity: Standardize station staging 30 minutes prior to shift dispatch (Owner: Shift Lead).
+• Price Defense Policy: Prohibit unapproved discounts; defend 100% full-price realization (Owner: General Manager).
+• Workflow Synchronization: Audit job-level gross margins before marking tickets complete (Owner: Billing Desk).
 
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
 };
 
-// 3. UNIFIED HIGH-VELOCITY STRATEGIC CHAT ENDPOINT
+// 3. UNIFIED HIGH-VELOCITY STRATEGIC CHAT ENDPOINT (AUTHENTIC EXECUTIVE ADVISOR PERSONA)
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages = [], workspace = 'default', documentText = '' } = req.body;
+    const { messages = [], workspace = 'general', documentText = '' } = req.body;
     const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (apiKey && userMessage) {
       const qLower = userMessage.toLowerCase();
-      const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door/i.test(qLower);
+      const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
       const isConversational = messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
 
       let prompt = '';
       if (isConversational) {
-        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner.
-Follow up directly and conversationally on: "${userMessage}".
-Reply in 2 to 3 sharp paragraphs as a trusted peer with skin in the game.
-Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+        prompt = `You are Consultant Studio, an unvarnished Senior Chief Operating Officer and Strategic Growth Partner sitting directly across the desk from a business owner.
+The user is following up conversationally with: "${userMessage}".
+
+RULES FOR THIS RESPONSE:
+- DO NOT speak like a chatbot, assistant, or textbook.
+- Speak with visceral executive conviction, commercial candor, and charismatic authority.
+- Reply in 2 to 3 sharp, compelling paragraphs addressing their exact question.
+- Reference numbers, real-world team friction, customer psychology, and cash trade-offs.
+- DO NOT use rigid numbered step headers (Step 1, Step 2, etc.).
+- End with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       } else if (isMarketing) {
-        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner.
-The user is asking a marketing / customer acquisition question: "${userMessage}".
-Deliver a high-converting, non-discounting campaign memo strictly formatted as:
+        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner advising a business owner.
+Operating Domain: "${workspace}"
+The user wants a high-impact customer acquisition / marketing campaign: "${userMessage}".
+${documentText ? `Attached Data / Context:\n"""\n${documentText}\n"""\n` : ''}
 
-### 1. Strategic Campaign Angle: "${userMessage}"
-(2 punchy paragraphs diagnosing why discount couponing fails and how to command immediate attention in the local trade area.)
+Deliver an unvarnished, charismatic growth strategy. DO NOT use generic "Step 1, Step 2" headers.
+Structure your reply strictly using these executive sections:
 
->> ★ Core Campaign Move: [The #1 single most effective local distribution or event hook to acquire customers without discounts.]
+(Paragraph 1 & 2: Open with raw commercial truth on why generic discounting destroys pricing power, and explain the exact psychological hook to command affluent local demand without price concessions.)
 
-### 2. Ready-to-Print Campaign Asset
-• Headline & Hook: [High-converting copy for the flyer or post]
-• The Welcome Experience: [High-perceived-value welcome offer with ZERO cash discounting]
-• Distribution Plan: [Specific doors, local businesses, or physical drop-off mechanics]
-• Retention Loop: [How to turn first-time visitors into high-frequency recurring accounts]
+>> ★ Key Turnaround Move: [1 single, high-leverage marketing move to capture customer gravitation without discounting.]
 
-### 3. Customer Acquisition & Foot-Traffic Math
+### Campaign Architecture & Ready-to-Print Copy
+• Headline & Hook: [High-converting, curiosity-driven headline copy]
+• The VIP Welcome Experience: [High-perceived-value onboarding offer with ZERO cash discounts]
+• Distribution Logistics: [Exact doors, B2B partner drop-offs, or physical neighborhood mechanics]
+• Retention & Lifetime Value Loop: [Mechanism to convert first-time acquisition into high-frequency recurring accounts]
+
+### Acquisition Economics & Foot-Traffic Math
 • Target Circulation: [e.g., 500 local residential doors or targeted prospects]
 • Expected Capture Rate: [e.g., 5% conversion = 25 new recurring accounts/visits]
-• Projected Monthly Revenue Lift: [Realistic net margin added vs. campaign cost]
+• Projected Monthly Lift: [Estimated gross profit generated vs. campaign cost]
 
-### 4. Direct Operator Directive
-(1 sharp closing sentence giving clear deployment orders.)
+### Strategic Deployment Directives
+• Velocity Mandate: [Field execution timeline with functional owner]
+• Brand Protection: [Strict covenant forbidding price matching or discounting]
+• Asset Staging: [Material staging and team coordination protocol]
 
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       } else {
-        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner.
-The user is asking a financial / operational / P&L question: "${userMessage}".
-${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
+        prompt = `You are Consultant Studio, an unvarnished Senior Chief Operating Officer and Strategic Partner advising a business owner.
+Operating Domain: "${workspace}"
+The user is asking an operational, P&L audit, or margin bottleneck question: "${userMessage}".
+${documentText ? `Uploaded Data:\n"""\n${documentText}\n"""\n` : ''}
 
-Deliver an unvarnished 4-part boardroom strategy memo with penny-balanced daily unit math:
+Deliver an unvarnished boardroom advisory memo with penny-balanced unit math. DO NOT use generic "Step 1, Step 2" headers.
+Structure your reply strictly using these executive sections:
 
-### 1. Operational Reality: "${userMessage}"
-(2 punchy paragraphs diagnosing the exact operational truth, root causes of friction, and specific numbers for this question.)
+(Paragraph 1 & 2: Open immediately with the core operational truth—diagnose where frontline labor is unbilled, vendor costs are creeping, or capacity is choking take-home cash.)
 
->> ★ Key Turnaround Move: [1 single, high-leverage tactical action to fix this exact problem without discounting.]
+>> ★ Key Turnaround Move: [1 single, high-leverage tactical action to protect gross margins without promotional discounts.]
 
-### 2. Verified Financial Telemetry & Daily P&L Math
-• Daily Gross Sales: $X,XXX.XX/day — Formula: [State specific transaction math]
-• Direct Prime Costs: $X,XXX.XX/day — Formula: [COGS $ + Direct Labor $]
-• Daily Net Operating Take-Home: +$X,XXX.XX/day — Formula: [Gross - Prime (XX.X% margin)]
-• Unit Cash Contribution: +$X.XX / unit — Formula: [Net margin per transaction]
-• Daily Breakeven Volume: XX units/day — Formula: [Fixed daily baseline overhead ÷ Unit contribution]
-• What-If Annual Cash Machine: +$XX,XXX.XX/yr — Plain-English: [Cash unlocked by fixing this specific bottleneck]
+### Executive P&L Telemetry & Real Unit Math
+• Daily Gross Sales: $X,XXX.XX/day [Audited customer volume × average realized ticket]
+• Direct Prime Expenses: $X,XXX.XX/day [Materials/COGS + Direct frontline labor drag]
+• Daily Net Operating Margin: +$X,XXX.XX/day [Gross Sales - Prime Expenses (XX.X% margin)]
+• Unit Cash Contribution: +$X.XX / encounter [Net profit produced per transaction]
+• Daily Breakeven Volume: XX units/day [Overhead coverage baseline threshold]
+• What-If Annual Cash Machine: +$XX,XXX.XX/yr [Annual cash unlocked by eliminating this bottleneck]
 
-### 3. Strategic Execution Directives (Key Operator Moves)
+### Strategic Execution Mandates
 • Frontline Velocity: [Direct operational speed mandate with functional lead]
-• Zero Discount Policy: [Strict pricing defense rule with functional lead]
-• Workflow Synchronization: [Advance staging protocol with functional lead]
-
-### 4. Direct Bottom-Line Takeaway & Operator Gate
-(1 sharp closing sentence.)
+• Zero Discount Policy: [Strict pricing defense rule to protect full-price integrity with functional lead]
+• Workflow Synchronization: [Advance staging protocol to eliminate line choke points with functional lead]
 
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       }
 
-      console.log(`[Executing Prompt for ${isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Finance'}]`);
       const liveResponse = await queryGemini(prompt, apiKey);
       if (liveResponse) {
         return res.json({ response: liveResponse });
