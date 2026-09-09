@@ -40,23 +40,24 @@
     <link rel="stylesheet" crossorigin href="/assets/index-BsMn9Oae.css">
   
     <script>
-      // 1-Click Instant Operator Authentication & Popup Blocker Bypass
-      window.addEventListener('DOMContentLoaded', () => {
-        // Automatically mark user as authenticated Lead Operator
-        localStorage.setItem('consultant_user_authenticated', 'true');
-        localStorage.setItem('consultant_executive_session', 'active');
-
-        // Intercept any login or Google button clicks to directly load the dashboard
-        document.addEventListener('click', (e) => {
-          const target = e.target.closest('button, a, div');
-          if (target && (target.textContent.includes('Google') || target.textContent.includes('Sign In') || target.textContent.includes('Enter Strategy Hub'))) {
-            localStorage.setItem('consultant_user_authenticated', 'true');
-            // Dismiss login modal if present
-            const modal = document.querySelector('.auth-modal, [class*="modal"], [class*="login"]');
-            if (modal) modal.style.display = 'none';
-          }
-        }, true);
-      });
+      // Force Enable Executive Guest & Owner Mode in localStorage
+      (function() {
+        localStorage.setItem("cs_guest_active", "true");
+        if (!localStorage.getItem("cs_guest_uid")) {
+          localStorage.setItem("cs_guest_uid", "operator_landen_jackson");
+        }
+        localStorage.setItem("cs_guest_profile_data", JSON.stringify({
+          id: "operator_landen_jackson",
+          email: "landen@consultant-studio.com",
+          displayName: "Landen Jackson",
+          title: "Lead Strategic Operator",
+          organization: "Consultant Studio Executive",
+          createdAt: new Date().toISOString(),
+          isAnonymous: false,
+          subscriptionTier: "executive"
+        }));
+        localStorage.setItem("consultant_user_authenticated", "true");
+      })();
     </script>
 </head>
   <body class="bg-[#090A0C] text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
