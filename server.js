@@ -24,12 +24,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 
 // ULTRA-FAST RESILIENT GEMINI 3.8 FLASH ENGINE
 const queryGemini = async (prompt, apiKey) => {
-  const models = ['gemini-3.8-flash'];
+  const models = ['gemini-3.8-flash', 'gemini-3.5-flash'];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      const timeoutId = setTimeout(() => controller.abort(), 6500);
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',
@@ -41,9 +41,9 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 750,
-            topP: 0.9
+            temperature: 0.8,
+            maxOutputTokens: 1024,
+            topP: 0.95
           }
         })
       });
@@ -55,9 +55,12 @@ const queryGemini = async (prompt, apiKey) => {
         if (text && text.trim().length > 0) {
           return text;
         }
+      } else {
+        const errText = await res.text();
+        console.warn(`[Gemini Warning] ${model} returned ${res.status}: ${errText.substring(0, 100)}`);
       }
     } catch (err) {
-      // Pass
+      console.warn(`[Gemini Error] ${model}:`, err.message);
     }
   }
   return null;
