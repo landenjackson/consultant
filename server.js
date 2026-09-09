@@ -96,22 +96,52 @@ app.post('/create-checkout-session', async (req, res) => {
 
 // 2. DYNAMIC REAL-TIME NUMBER EXTRACTION & MATH ENGINE
 const generateDynamicMathMemo = (cleanQuestion) => {
+  const qLower = cleanQuestion.toLowerCase();
+  const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
+
+  if (isMarketing) {
+    return `Discount coupons attract bargain hunters who leave the moment someone else is 5% cheaper. In your local trade area, customers aren't hesitating because of price—they hesitate because they haven't experienced a seamless, high-trust entry point into your business.
+
+To capture high-intent recurring accounts, we deploy the **Neighborhood Priority Key**. Instead of eroding your gross margin with discounts, we wrap an elevated welcome upgrade around your full standard ticket, establishing immediate relationship loyalty from day one.
+
+>> ★ Key Turnaround Move: Deploy a physical "Neighborhood Priority Pass" door-hanger granting an exclusive complimentary onboarding upgrade while holding 100% full-price ticket integrity.
+
+### Campaign Architecture & Ready-to-Print Copy
+• Headline & Hook: "A Formal Neighborhood Welcome from Your Local Specialists Down the Street."
+• The VIP Welcome Experience: Receive our full Signature Priority Onboarding (a $45 value) on your first scheduled visit with zero cash discounting.
+• Distribution Logistics: Direct hand-delivery to 500 targeted residential doors within your primary 2-mile radius on Tuesday and Thursday mornings.
+• Retention & Lifetime Value Loop: Secure next month's recurring booking directly during the initial encounter to lock in long-term frequency.
+
+### Acquisition Economics & Foot-Traffic Math
+• Target Circulation: 500 premium residential door-hangers directly distributed.
+• Expected Capture Rate: 6.0% conversion rate = 30 new recurring monthly accounts.
+• Projected Monthly Revenue Lift: +$5,550.00/mo ($66,600.00/yr) in net margin added against ~$280 in total print and distribution labor.
+
+### Strategic Deployment Directives
+• Velocity Mandate: Complete door-to-door distribution within 48 hours of asset printing (Owner: Field Marketing Lead).
+• Price Defense Policy: Prohibit coupon discounting; ring up standard full-price ticket on all activations (Owner: Front-of-House Lead).
+• Asset Staging: Inspect 100% of printed door-hangers for heavy 16pt cardstock quality before dispatch (Owner: General Manager).
+
+Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+  }
+
+  // Real-time Number Extraction for Finance
   const revenueMatch = cleanQuestion.match(/\$?\b([0-9,]+(?:\.[0-9]+)?)\s*(?:k|m|million|thousand|\/day|\/yr|\/year|\s*revenue|\s*gross|\s*sales)?\b/i);
   const ticketMatch = cleanQuestion.match(/(?:ticket|average|avg|price|rate|fee)\s*(?:of|is|at|:)?\s*\$?([0-9,]+(?:\.[0-9]+)?)/i);
   const marginMatch = cleanQuestion.match(/([0-9]+(?:\.[0-9]+)?)\s*%\s*(?:prime|cost|margin|drag|labor|cogs)/i);
 
-  let extractedGross = 5000;
+  let extractedGross = 16000;
   if (revenueMatch) {
     let raw = revenueMatch[1].replace(/,/g, '');
     let val = parseFloat(raw);
     if (/m|million/i.test(revenueMatch[0])) val = (val * 1000000) / 300;
-    else if (/k|thousand/i.test(revenueMatch[0])) val = (val * 1000) / 300;
+    else if (/k|thousand/i.test(revenueMatch[0])) val = (val * 1000);
     else if (/\/yr|\/year/i.test(revenueMatch[0])) val = val / 300;
     if (val > 100) extractedGross = val;
   }
 
-  let extractedTicket = ticketMatch ? parseFloat(ticketMatch[1].replace(/,/g, '')) : (extractedGross > 10000 ? 450 : 35);
-  let primePct = marginMatch ? parseFloat(marginMatch[1]) / 100 : 0.58;
+  let extractedTicket = ticketMatch ? parseFloat(ticketMatch[1].replace(/,/g, '')) : (extractedGross > 10000 ? 320 : 45);
+  let primePct = marginMatch ? parseFloat(marginMatch[1]) / 100 : 0.62;
 
   const dailyGross = extractedGross;
   const primeCost = dailyGross * primePct;
