@@ -166,121 +166,120 @@
             gap: 24px;
         }
 
-        /* UPLIFTING HERO HUB */
+        /* UPLIFTING HERO BANNER & MISSION TILES */
         #heroBanner {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             animation: fadeIn 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .hero-banner-card {
-            background: linear-gradient(135deg, rgba(19, 24, 36, 0.95) 0%, rgba(14, 18, 26, 0.8) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: radial-gradient(120% 120% at 50% 0%, #151C28 0%, #0E131C 100%);
+            border: 1px solid rgba(34, 197, 94, 0.25);
             border-radius: 18px;
-            padding: 28px;
+            padding: 24px 28px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
         }
 
         .hero-banner-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 1.5px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
         }
 
-        .hero-top-row {
+        /* LIVE TELEMETRY CASH FLOW STAT STRIP */
+        .live-stat-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-capsule {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
+            flex-direction: column;
+            gap: 3px;
         }
 
-        .status-tag {
-            background: rgba(34, 197, 94, 0.12);
-            color: var(--accent-glow);
-            border: 1px solid var(--border-glow);
-            font-size: 11.5px;
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
             font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 12px;
-            letter-spacing: 0.04em;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .hero-h1 {
+        .stat-value {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 24px;
+            font-size: 15px;
             font-weight: 800;
-            letter-spacing: -0.02em;
             color: #FFFFFF;
-            line-height: 1.3;
-            margin-bottom: 8px;
         }
 
-        .hero-sub {
-            color: var(--text-secondary);
-            font-size: 14.5px;
-            line-height: 1.6;
+        .stat-value.green {
+            color: var(--accent-glow);
         }
 
-        /* CUSTOM INDUSTRY / GOAL CARDS */
+        /* 4 HIGH-IMPACT EXECUTIVE WORKSPACE MODES */
         .custom-modes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
         }
 
         .mode-tile {
-            background: var(--bg-card);
+            background: #111622;
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 18px 20px;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mode-tile:hover {
             border-color: var(--accent);
-            background: var(--bg-card-hover);
+            background: #161D2B;
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(34, 197, 94, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(34, 197, 94, 0.12);
         }
 
         .mode-tile-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #FFFFFF;
         }
 
         .mode-tile-desc {
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.5;
             flex: 1;
         }
 
         .mode-tile-cta {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--accent-glow);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         /* STREAMLINED BUSINESS CHAT FEED */
@@ -793,49 +792,89 @@
         <!-- UPLIFTING HERO BANNER -->
         <div id="heroBanner">
             <div class="hero-banner-card">
-                <div class="hero-top-row">
-                    <span class="status-tag">Executive Strategy Advisory</span>
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.8 Flash • Sub-2s</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="status-tag">Executive Strategy Advisory</span>
+                        <span style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Live Telemetry Active</span>
+                    </div>
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.8 Flash • Sub-2s Speed</span>
                 </div>
-                <h1 class="hero-h1">Real-Time Commercial Intelligence & Profit Defense</h1>
-                <p class="hero-sub">
-                    Direct executive counsel with real skin in the game. Select a custom business mode or drop your numbers below to diagnose profit leaks, build high-converting campaigns, and scale margins without promotional discounting.
+                <h1 style="font-family:'Plus Jakarta Sans'; font-size:23px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
+                    Real-Time Commercial Intelligence & Profit Defense
+                </h1>
+                <p style="color:var(--text-secondary); font-size:14px; line-height:1.6;">
+                    Sitting directly across the desk with real skin in the game. Audit cash leakage, draft company reports, design compensation & job structures, or launch high-converting non-discount campaigns.
                 </p>
+
+                <!-- LIVE REAL-TIME TELEMETRY CAPLETS -->
+                <div class="live-stat-strip">
+                    <div class="stat-capsule">
+                        <span class="stat-label">Model Engine</span>
+                        <span class="stat-value green">Gemini 3.8 Flash</span>
+                    </div>
+                    <div class="stat-capsule">
+                        <span class="stat-label">Response Velocity</span>
+                        <span class="stat-value">Sub-2.0s REST</span>
+                    </div>
+                    <div class="stat-capsule">
+                        <span class="stat-label">Active Standard</span>
+                        <span class="stat-value">Human-in-the-Loop</span>
+                    </div>
+                    <div class="stat-capsule">
+                        <span class="stat-label">Security & Privacy</span>
+                        <span class="stat-value green">Zero-Knowledge Vault</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- 3 CUSTOM MODES (CONSUMER JOB-SPECIFIC TILES) -->
+            <!-- 4 PRACTICAL REAL-WORLD MISSION CARDS -->
             <div class="custom-modes-grid">
-                <div class="mode-tile" onclick="sendQuick('Audit our commercial operations: $28,000/day revenue with 59% prime cost drag. Reconcile our daily cash and find where we are bleeding.')">
+                <!-- MISSION 1: COMPANY REPORT & BOARD BRIEFING -->
+                <div class="mode-tile" onclick="sendQuick('I have to finish a company strategy report for our quarterly review. Help me draft the executive summary, operational bottleneck diagnosis, and 90-day turnaround milestones.')">
                     <div class="mode-tile-header">
-                        <span>📊</span>
-                        <span>Financial Audit & Margin Defense</span>
+                        <span style="font-size:16px;">📑</span>
+                        <span>Company Report & Board Briefing</span>
+                    </div>
+                    <div class="mode-tile-desc">
+                        Drafts executive summaries, operational risk sections, and actionable 90-day strategic milestones for leadership reviews.
+                    </div>
+                    <div class="mode-tile-cta">Draft Company Report →</div>
+                </div>
+
+                <!-- MISSION 2: JOB DESCRIPTION & TEAM RESTRUCTURE -->
+                <div class="mode-tile" onclick="sendQuick('We need to restructure our frontline operations team. Write high-accountability job descriptions and incentive compensation structures for a Lead Field Supervisor and Shift Dispatcher.')">
+                    <div class="mode-tile-header">
+                        <span style="font-size:16px;">👥</span>
+                        <span>Job Descriptions & Org Structure</span>
+                    </div>
+                    <div class="mode-tile-desc">
+                        Structures high-performance job descriptions, KPI scorecards, and margin-aligned incentive compensation frameworks.
+                    </div>
+                    <div class="mode-tile-cta">Model Org Structure →</div>
+                </div>
+
+                <!-- MISSION 3: FINANCIAL & P&L LEAKAGE AUDIT -->
+                <div class="mode-tile" onclick="sendQuick('Audit our commercial operations: $28,000/day revenue with 59% prime cost drag. Reconcile our daily cash, identify labor leakage, and calculate breakeven volume.')">
+                    <div class="mode-tile-header">
+                        <span style="font-size:16px;">📊</span>
+                        <span>Daily Cash Flow & P&L Defense</span>
                     </div>
                     <div class="mode-tile-desc">
                         Reconciles audited daily gross sales, direct labor drag, and prime costs to calculate exact take-home cash and breakeven volume.
                     </div>
-                    <div class="mode-tile-cta">Launch P&L Audit →</div>
+                    <div class="mode-tile-cta">Run Cash Flow Audit →</div>
                 </div>
 
-                <div class="mode-tile" onclick="sendQuick('We want to capture 40 new recurring monthly accounts in our local trade area without discounts. Build the door-hanger hook and distribution logistics.')">
+                <!-- MISSION 4: CUSTOMER ACQUISITION & PRINT CAMPAIGNS -->
+                <div class="mode-tile" onclick="sendQuick('We want to capture 40 new recurring monthly accounts in our local trade area without discounting. Build the door-hanger hook and distribution logistics.')">
                     <div class="mode-tile-header">
-                        <span>🚀</span>
-                        <span>Customer Acquisition & Campaigns</span>
+                        <span style="font-size:16px;">🚀</span>
+                        <span>High-Value Customer Acquisition</span>
                     </div>
                     <div class="mode-tile-desc">
                         Generates print-ready door-hangers, high-converting hooks, VIP welcome keys, and non-discount retention architecture.
                     </div>
                     <div class="mode-tile-cta">Build Acquisition Plan →</div>
-                </div>
-
-                <div class="mode-tile" onclick="sendQuick('We are launching a premium tier at 2.5x our standard offering. Structure the 3-tier pricing architecture and announcement email.')">
-                    <div class="mode-tile-header">
-                        <span>🛡️</span>
-                        <span>2.5x Price Anchor & Decoy Model</span>
-                    </div>
-                    <div class="mode-tile-desc">
-                        Establishes an aspirational price ceiling to drive consumer volume into upgraded middle tiers and lift average order value.
-                    </div>
-                    <div class="mode-tile-cta">Anchor Premium Pricing →</div>
                 </div>
             </div>
         </div>

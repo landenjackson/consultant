@@ -194,11 +194,38 @@ app.post('/api/chat', async (req, res) => {
 
     if (apiKey && userMessage) {
       const qLower = userMessage.toLowerCase();
+      const isReportOrJob = /report|executive summary|quarterly review|job description|org structure|team restructure|kpi scorecard|incentive compensation|staffing role/i.test(qLower);
       const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
       const isConversational = messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
 
       let prompt = '';
-      if (isConversational) {
+      if (isReportOrJob) {
+        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Advisor.
+Operating Domain: "${workspace}"
+Executive Task: "${userMessage}"
+${documentText ? `Attached Background Document / Report Data:\n"""\n${documentText}\n"""\n` : ''}
+
+VOICE & TONE SPECIFICATION:
+- Deliver an authoritative, polished corporate strategy report or executive organizational framework.
+- Speak with visceral clarity, high-accountability leadership tone, and zero generic filler.
+- DO NOT use generic "Step 1, Step 2, Step 3" headers.
+
+Structure your deliverable strictly as:
+
+(Executive Briefing: Open with a compelling 2-paragraph strategic analysis diagnosing the organizational priority, core commercial bottleneck, and immediate corporate outcome.)
+
+>> ★ Key Turnaround Move: [The single most critical operational or structural action that leadership must execute immediately.]
+
+### Executive Framework & Deliverable
+[Deliver the complete working artifact: either a full boardroom-grade Executive Report with clear section headers, or thorough Job Descriptions with explicit core responsibilities, measurable KPI scorecards, and margin-aligned incentive compensation structures.]
+
+### Organizational Directives & Ownership
+• Accountability Mandate: [Leadership expectation and operational timeline with functional owner]
+• Quality & Margin Standard: [Uncompromising benchmark to prevent organizational drift]
+• Review Rhythm: [Governance rhythm to ensure flawless execution]
+
+Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+      } else if (isConversational) {
         prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner in an active boardroom conversation.
 The business operator is asking: "${userMessage}".
 Industry Domain: "${workspace}"
