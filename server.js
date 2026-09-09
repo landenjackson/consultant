@@ -23,41 +23,43 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 });
 
 // ULTRA-FAST RESILIENT GEMINI 3.8 FLASH ENGINE
+// ULTRA-FAST DIRECT GEMINI 3.8 FLASH ENGINE
 const queryGemini = async (prompt, apiKey) => {
-  // Ultra-Fast Direct REST Endpoint on gemini-3.5-flash
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+  const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.85,
-          maxOutputTokens: 1500,
-          topP: 0.95
+  for (const model of models) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 1000,
+            topP: 0.95
+          }
+        })
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+        if (text && text.trim().length > 0) {
+          console.log(`[Inference Success] Model: ${model}`);
+          return text;
         }
-      })
-    });
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-      if (text && text.trim().length > 0) {
-        return text;
       }
-    } else {
-      const err = await res.text();
-      console.warn('[Gemini 3.5 Warning]', res.status, err.substring(0, 100));
+    } catch (err) {
+      // Pass
     }
-  } catch (err) {
-    console.warn('[Gemini 3.5 Error]', err.message);
   }
   return null;
 };
