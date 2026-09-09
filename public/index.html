@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS (Excel) & docx/PDF preview libraries -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg-base: #080A0D;
@@ -1407,7 +1410,40 @@
             sendMessage();
         }
 
-        // Clean executive response formatting (Fluid business dialogue instead of rigid 1-4 step boilerplate)
+        // EXECUTIVE INLINE STREAMING ANIMATION WITH EMERALD TELEMETRY PULSE
+        async function streamAssistantResponse(container, fullText, onComplete) {
+            const formatted = formatExecutiveResponse(fullText);
+            
+            // Render container skeleton
+            container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor"></span>`;
+            const contentBox = container.querySelector('.stream-content');
+            const cursor = container.querySelector('.typing-cursor');
+
+            const words = fullText.split(' ');
+            let currentText = '';
+            let i = 0;
+
+            const step = () => {
+                // Stream 3-4 words per tick for high-velocity natural typing
+                const chunk = words.slice(i, i + 4).join(' ');
+                i += 4;
+                currentText += (currentText ? ' ' : '') + chunk;
+                
+                contentBox.innerHTML = formatExecutiveResponse(currentText);
+                const feed = document.getElementById('chatFeed');
+                if (feed) feed.scrollTop = feed.scrollHeight;
+
+                if (i < words.length) {
+                    requestAnimationFrame(() => setTimeout(step, 20));
+                } else {
+                    if (cursor) cursor.remove();
+                    contentBox.innerHTML = formatted;
+                    if (onComplete) onComplete();
+                }
+            };
+
+            step();
+        }
         function formatExecutiveResponse(text) {
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
@@ -1470,6 +1506,7 @@
             }
         }
 
+        // 1-CLICK INSTANT EXPORTER WITH REAL OPEN-IN-TAB & UNIVERSAL DOWNLOAD
         function exportBankTeaser(btn) {
             const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "Executive Strategy Briefing";
@@ -1480,20 +1517,21 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>1-Page Bank & Investor Teaser</title>
+    <title>1-Page Bank & Investor Teaser (${mode.toUpperCase()})</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #0F172A; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #0F172A; max-width: 800px; margin: 0 auto; line-height: 1.6; background: #FFFFFF; }
         .header { border-bottom: 3px solid #16A34A; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .title { font-size: 24px; font-weight: 800; color: #0F172A; margin: 0; }
-        .sub { font-size: 13px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .title { font-size: 22px; font-weight: 800; color: #0F172A; margin: 0; }
+        .sub { font-size: 12px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .content { font-size: 14px; color: #334155; }
         .footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 12px; color: #94A3B8; display: flex; justify-content: space-between; }
+        @media print { body { padding: 0; } }
     </style>
 </head>
 <body>
     <div class="header">
         <div>
-            <div class="sub">Executive Bank & Underwriting Teaser</div>
+            <div class="sub">Executive Underwriting & Strategy Brief</div>
             <h1 class="title">CONSULTANT STUDIO // ${mode.toUpperCase()}</h1>
         </div>
         <div style="text-align: right; font-size: 12px; color: #64748B;">
@@ -1505,75 +1543,68 @@
         ${text.replace(/\n\n/g, '<p></p>').replace(/•/g, '<br>• ')}
     </div>
     <div class="footer">
-        <span>Operator Sign-Off: Landen Jackson (Lead Strategic Operator)</span>
+        <span>Lead Operator: Landen Jackson (Lead Strategic Operator)</span>
         <span>Confidential & Proprietary</span>
     </div>
 </body>
 </html>`;
 
-            const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-            triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(teaserHtml);
+                win.document.close();
+            } else {
+                const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
+                triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
+            }
         }
 
         function exportExcelXLSX(btn) {
             const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "";
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-            const regex = /•\s+([^:\n\r]+):\s*([^\—\-\n\r\[]+)(?:[\—\-\[]\s*([^\]\n\r]+))?/g;
-            let match;
-            let rowsHtml = '';
-            
-            while ((match = regex.exec(text)) !== null) {
-                rowsHtml += `
-                <tr>
-                    <td style="font-weight:bold; border:1px solid #cbd5e1; padding:8px;">${match[1].trim()}</td>
-                    <td style="font-weight:bold; color:#15803d; border:1px solid #cbd5e1; padding:8px;">${match[2].trim()}</td>
-                    <td style="border:1px solid #cbd5e1; padding:8px;">${(match[3] || 'Target Standard').trim()}</td>
-                </tr>`;
+            try {
+                if (window.XLSX) {
+                    const lines = text.split('\n').filter(l => l.trim().length > 0);
+                    const data = [
+                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL MODEL", mode.toUpperCase(), timestamp],
+                        ["Lead Operator: Landen Jackson", "Status: Cleared for Execution", ""],
+                        [],
+                        ["Section / Item", "Detail / Directive", "Value / Assessment"]
+                    ];
+
+                    lines.forEach((line, idx) => {
+                        if (line.includes(':')) {
+                            const parts = line.split(':');
+                            data.push([parts[0].replace(/^[•\*\-\s]+/, ''), parts.slice(1).join(':').trim(), "Target Standard"]);
+                        } else {
+                            data.push([`Point ${idx + 1}`, line.replace(/^[•\*\-\s]+/, ''), "Active"]);
+                        }
+                    });
+
+                    const ws = XLSX.utils.aoa_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Executive Strategy");
+                    XLSX.writeFile(wb, `${mode}_Financial_Model_${Date.now()}.xlsx`);
+                    return;
+                }
+            } catch(err) {
+                console.warn("SheetJS XLSX export fallback:", err);
             }
 
-            if (!rowsHtml) {
-                rowsHtml = `
-                <tr>
-                    <td style="font-weight:bold; border:1px solid #cbd5e1; padding:8px;">Operational Strategy</td>
-                    <td style="font-weight:bold; color:#15803d; border:1px solid #cbd5e1; padding:8px;">Verified</td>
-                    <td style="border:1px solid #cbd5e1; padding:8px;">Executive unit model generated successfully.</td>
-                </tr>`;
-            }
-
-            const excelTemplate = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${mode} Financials</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
-</head>
-<body style="font-family: Calibri, sans-serif;">
-    <table style="border-collapse:collapse; width:100%;">
-        <tr style="background:#0f172a; color:#ffffff;">
-            <th colspan="3" style="font-size:16px; font-weight:bold; padding:14px; text-align:left;">
-                CONSULTANT STUDIO // FINANCIAL & OPERATIONAL MODEL (${mode.toUpperCase()})
-            </th>
-        </tr>
-        <tr style="background:#f1f5f9;">
-            <td colspan="3" style="padding:8px; font-size:11px; color:#475569;">
-                Status: Verified Production Model | Generated: ${timestamp} | Lead Strategic Operator: Landen Jackson
-            </td>
-        </tr>
-        <tr><td colspan="3" style="height:10px;"></td></tr>
-        <tr style="background:#22c55e; color:#ffffff; font-weight:bold;">
-            <th style="border:1px solid #15803d; padding:10px; text-align:left; width:240px;">Metric / Directive</th>
-            <th style="border:1px solid #15803d; padding:10px; text-align:left; width:160px;">Value / Formula</th>
-            <th style="border:1px solid #15803d; padding:10px; text-align:left;">Operational Detail</th>
-        </tr>
-        ${rowsHtml}
-    </table>
-</body>
-</html>`;
-
-            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
-            triggerFileDownload(blob, `${mode}_Financial_Model_${Date.now()}.xls`);
+            // CSV Fallback if SheetJS is loading
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Metric,Detail,Status\n" + 
+                text.split('\n').map(l => `"${l.replace(/"/g, '""')}",,"Cleared"`).join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${mode}_Model_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function exportWordDoc(btn) {
@@ -1582,21 +1613,22 @@
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-            const docHtml = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+            const docHtml = `<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title>Executive Strategy Memorandum</title>
     <style>
-        body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; line-height: 1.5; color: #1e293b; padding: 40px; }
-        h1 { color: #0f172a; font-size: 18pt; border-bottom: 2pt solid #22c55e; padding-bottom: 6pt; }
-        .meta { font-size: 9pt; color: #64748b; margin-bottom: 20pt; }
-        .body-text { margin-top: 15pt; }
+        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1E293B; padding: 40px; }
+        h1 { color: #0F172A; font-size: 18pt; border-bottom: 2px solid #22C55E; padding-bottom: 6px; }
+        .meta { font-size: 9.5pt; color: #64748B; margin-bottom: 20px; }
+        .body-text { margin-top: 15px; }
     </style>
 </head>
 <body>
     <h1>CONSULTANT STUDIO: EXECUTIVE MEMORANDUM</h1>
     <div class="meta">
-        <strong>Domain:</strong> ${mode.toUpperCase()} | <strong>Date:</strong> ${timestamp} | <strong>Lead Operator:</strong> Landen Jackson
+        <strong>Domain:</strong> ${mode.toUpperCase()} &nbsp;|&nbsp; <strong>Date:</strong> ${timestamp} &nbsp;|&nbsp; <strong>Lead Operator:</strong> Landen Jackson
     </div>
     <div class="body-text">
         ${text.replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')}
@@ -1604,8 +1636,14 @@
 </body>
 </html>`;
 
-            const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
-            triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(docHtml);
+                win.document.close();
+            } else {
+                const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
+                triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
+            }
         }
 
         function exportPowerPointDeck(btn) {
@@ -1614,16 +1652,17 @@
             const mode = document.getElementById('customModeSelect')?.value || "Executive";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-            const pptHtml = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:p="urn:schemas-microsoft-com:office:powerpoint" xmlns="http://www.w3.org/TR/REC-html40">
+            const pptHtml = `<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+    <meta charset="utf-8">
+    <title>Executive Presentation Deck</title>
     <style>
-        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background:#090a0c; color:#ffffff; padding:30px; }
-        .slide-card { background:#0f1216; border:2px solid #1c2028; border-left:6px solid #22c55e; border-radius:10px; padding:30px; margin-bottom:30px; }
-        .slide-title { font-size:24px; font-weight:bold; color:#ffffff; margin-bottom:12px; }
-        .slide-kicker { font-size:12px; color:#4ade80; text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:6px; }
-        .slide-body { font-size:14px; color:#cbd5e1; line-height:1.6; }
+        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background:#090A0C; color:#FFFFFF; padding:30px; }
+        .slide-card { background:#0F1216; border:2px solid #1C2028; border-left:6px solid #22C55E; border-radius:10px; padding:30px; margin-bottom:30px; }
+        .slide-title { font-size:24px; font-weight:bold; color:#FFFFFF; margin-bottom:12px; }
+        .slide-kicker { font-size:12px; color:#4ADE80; text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:6px; }
+        .slide-body { font-size:14px; color:#CBD5E1; line-height:1.6; }
     </style>
 </head>
 <body>
@@ -1646,8 +1685,14 @@
 </body>
 </html>`;
 
-            const blob = new Blob([pptHtml], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
-            triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.ppt`);
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(pptHtml);
+                win.document.close();
+            } else {
+                const blob = new Blob([pptHtml], { type: 'text/html;charset=utf-8' });
+                triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.html`);
+            }
         }
 
         async function sendMessage() {
@@ -1714,26 +1759,26 @@
                 const data = await res.json();
                 const responseText = data.response || "Strategy synthesized.";
 
-                // Instant rendering of completed executive memo
-                assistantCard.innerHTML = formatExecutiveResponse(responseText);
+                // Stream response with smooth word-by-word animation and glowing green cursor
+                streamAssistantResponse(assistantCard, responseText, () => {
+                    // Add Deliverables & Vault Bar
+                    const delivBar = document.createElement('div');
+                    delivBar.className = 'deliverables-bar';
+                    delivBar.innerHTML = `
+                        <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
+                        <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
+                        <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
+                        <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+                        <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
+                    `;
+                    assistantCard.appendChild(delivBar);
+                    chatFeed.scrollTop = chatFeed.scrollHeight;
 
-                // Add Deliverables & Vault Bar
-                const delivBar = document.createElement('div');
-                delivBar.className = 'deliverables-bar';
-                delivBar.innerHTML = `
-                    <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
-                    <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
-                    <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
-                    <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
-                    <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
-                `;
-                assistantCard.appendChild(delivBar);
-                chatFeed.scrollTop = chatFeed.scrollHeight;
-
-                // Increment memo count
-                const current = getMemoCount();
-                localStorage.setItem('consultant_memo_count', (current + 1).toString());
-                updateQuotaDisplay();
+                    // Increment memo count
+                    const current = getMemoCount();
+                    localStorage.setItem('consultant_memo_count', (current + 1).toString());
+                    updateQuotaDisplay();
+                });
 
                 messages.push({ role: 'assistant', content: responseText });
 
