@@ -25,12 +25,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 // ULTRA-FAST RESILIENT GEMINI RUNTIME (SUB-2S EXECUTION, ZERO 503s)
 const queryGemini = async (prompt, apiKey) => {
   // Ultra-fast model cascade with tight timeouts to prevent hanging loops
-  const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
+  const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash'];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s per model ceiling
+      const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s per model ceiling
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',
@@ -42,8 +42,8 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.75,
-            maxOutputTokens: 750,
+            temperature: 0.7,
+            maxOutputTokens: 600,
             topP: 0.9
           }
         })
