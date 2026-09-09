@@ -653,6 +653,24 @@
             transform: translateY(-1px);
         }
 
+        /* LIVE STREAMING TYPEWRITER CURSOR & GLOW */
+        .typing-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 15px;
+            background: var(--accent-glow);
+            margin-left: 4px;
+            vertical-align: middle;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent);
+            animation: cursorBlink 0.75s infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
         /* FONT SIZE CUSTOMIZATION SETTINGS */
         body.font-compact {
             --base-font-size: 13.5px;
@@ -1673,26 +1691,50 @@
 
                 const data = await res.json();
                 const responseText = data.response || "Strategy synthesized.";
-                assistantCard.innerHTML = formatExecutiveResponse(responseText);
 
-                // Add Deliverables & Vault Bar
-                const delivBar = document.createElement('div');
-                delivBar.className = 'deliverables-bar';
-                delivBar.innerHTML = `
-                    <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
-                    <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
-                    <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
-                    <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
-                    <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
-                `;
-                assistantCard.appendChild(delivBar);
+                // Human-like typewriter streaming animation
+                let displayedLength = 0;
+                const totalLength = responseText.length;
+                const chunkSize = Math.max(3, Math.floor(totalLength / 60)); // Fast fluid pacing
+                
+                assistantCard.innerHTML = `<span id="typewriterBody"></span><span class="typing-cursor"></span>`;
+                const typeBody = assistantCard.querySelector('#typewriterBody');
+                const cursor = assistantCard.querySelector('.typing-cursor');
+
+                const typeInterval = setInterval(() => {
+                    displayedLength += chunkSize;
+                    if (displayedLength >= totalLength) {
+                        clearInterval(typeInterval);
+                        assistantCard.innerHTML = formatExecutiveResponse(responseText);
+
+                        // Add Deliverables & Vault Bar
+                        const delivBar = document.createElement('div');
+                        delivBar.className = 'deliverables-bar';
+                        delivBar.innerHTML = `
+                            <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
+                            <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
+                            <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
+                            <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+                            <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
+                        `;
+                        assistantCard.appendChild(delivBar);
+                        chatFeed.scrollTop = chatFeed.scrollHeight;
+
+                        // Increment memo count
+                        const current = getMemoCount();
+                        localStorage.setItem('consultant_memo_count', (current + 1).toString());
+                        updateQuotaDisplay();
+                        isGenerating = false;
+                        document.getElementById('sendBtn').disabled = false;
+                        return;
+                    }
+
+                    const partialText = responseText.substring(0, displayedLength);
+                    typeBody.innerHTML = formatExecutiveResponse(partialText);
+                    chatFeed.scrollTop = chatFeed.scrollHeight;
+                }, 16);
 
                 messages.push({ role: 'assistant', content: responseText });
-
-                // Increment count
-                const currentCount = getMemoCount() + 1;
-                localStorage.setItem('consultant_memo_count', currentCount.toString());
-                updateQuotaDisplay();
 
             } catch (err) {
                 assistantCard.innerHTML = `<span style="color:#F87171;">Engine Error: ${err.message}</span>`;
