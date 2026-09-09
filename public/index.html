@@ -8,9 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- SheetJS (Excel) & docx/PDF preview libraries -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Robust SheetJS library with CDN fallbacks -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg-base: #080A0D;
@@ -1566,45 +1565,76 @@
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
             try {
-                if (window.XLSX) {
-                    const lines = text.split('\n').filter(l => l.trim().length > 0);
-                    const data = [
-                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL MODEL", mode.toUpperCase(), timestamp],
-                        ["Lead Operator: Landen Jackson", "Status: Cleared for Execution", ""],
+                // Ensure XLSX is available
+                if (typeof XLSX !== 'undefined') {
+                    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    const aoa = [
+                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
+                        ["Lead Strategic Operator", "Landen Jackson", "Status: Cleared for Execution"],
                         [],
-                        ["Section / Item", "Detail / Directive", "Value / Assessment"]
+                        ["Line Item / Category", "Strategic Directive / Metric", "Assessment / Target Standard"]
                     ];
 
                     lines.forEach((line, idx) => {
-                        if (line.includes(':')) {
-                            const parts = line.split(':');
-                            data.push([parts[0].replace(/^[•\*\-\s]+/, ''), parts.slice(1).join(':').trim(), "Target Standard"]);
+                        // Clean out markdown noise
+                        const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
+                        if (!cleanLine) return;
+
+                        if (cleanLine.includes(':')) {
+                            const [key, ...vals] = cleanLine.split(':');
+                            aoa.push([key.trim(), vals.join(':').trim(), "Target Benchmark"]);
                         } else {
-                            data.push([`Point ${idx + 1}`, line.replace(/^[•\*\-\s]+/, ''), "Active"]);
+                            aoa.push([`Point ${idx + 1}`, cleanLine, "Operational Directive"]);
                         }
                     });
 
-                    const ws = XLSX.utils.aoa_to_sheet(data);
+                    const ws = XLSX.utils.aoa_to_sheet(aoa);
+                    
+                    // Column widths for clean readability in Excel
+                    ws['!cols'] = [
+                        { wch: 30 },
+                        { wch: 55 },
+                        { wch: 25 }
+                    ];
+
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Executive Strategy");
+                    XLSX.utils.book_append_sheet(wb, ws, "Financial Strategy");
+
+                    // Direct binary write & download
                     XLSX.writeFile(wb, `${mode}_Financial_Model_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
-                console.warn("SheetJS XLSX export fallback:", err);
+                console.error("SheetJS Export Error:", err);
             }
 
-            // CSV Fallback if SheetJS is loading
-            const csvContent = "data:text/csv;charset=utf-8," + 
-                "Metric,Detail,Status\n" + 
-                text.split('\n').map(l => `"${l.replace(/"/g, '""')}",,"Cleared"`).join('\n');
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `${mode}_Model_${Date.now()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Universal CSV Fallback if SheetJS library is delayed
+            try {
+                const rows = [
+                    ["Category / Item", "Operational Directive", "Target Standard"]
+                ];
+                text.split('\n').forEach((l, idx) => {
+                    const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
+                    if (!cl) return;
+                    if (cl.includes(':')) {
+                        const [k, ...v] = cl.split(':');
+                        rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
+                    } else {
+                        rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
+                    }
+                });
+
+                const csvStr = "data:text/csv;charset=utf-8," + rows.map(r => r.join(",")).join("\n");
+                const encodedUri = encodeURI(csvStr);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `${mode}_Model_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (fallbackErr) {
+                alert("Could not generate spreadsheet: " + fallbackErr.message);
+            }
         }
 
         function exportWordDoc(btn) {
