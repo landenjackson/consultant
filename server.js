@@ -57,28 +57,33 @@ const verifyAndEnforceHarnessPolicy = (rawMemo, userInquiry, workspaceName) => {
 const queryGeminiWithFallback = async (prompt, apiKey) => {
   // Ultra-Low Latency Fast-Lane Pipeline (Target: Sub-1s execution)
   const models = [
-    'gemini-3.8-flash',
     'gemini-3.5-flash',
+    'gemini-3.8-flash',
     'gemini-3.1-flash-lite'
   ];
 
   for (const modelName of models) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500); // 4.5s hard timeout per model
+
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
         method: 'POST',
         headers: {
           'x-goog-api-key': apiKey,
           'Content-Type': 'application/json'
         },
+        signal: controller.signal,
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 650, // Calibrated token ceiling for ultra-fast <1s generation
+            maxOutputTokens: 600,
             topP: 0.9
           }
         })
       });
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
