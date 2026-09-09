@@ -520,12 +520,28 @@
     <main id="chatFeed">
         <!-- INTRO HERO -->
         <div id="heroBanner">
-            <div class="hero-title">
-                <span>Executive Strategy & Unit Economics Engine</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="hero-title">
+                    <span>Executive Strategic Advocate & Chief of Staff</span>
+                </div>
+                <span style="font-size:11px; background:rgba(34,197,94,0.1); color:var(--accent-bright); border:1px solid rgba(34,197,94,0.25); padding:3px 8px; border-radius:12px; font-weight:700;">LIVE TELEMETRY</span>
             </div>
             <p class="hero-desc">
-                High-density boardroom clarity powered by Gemini 3.8 Flash. Enter a business scenario, audit live P&L numbers, or generate non-discount local marketing campaigns.
+                Unvarnished operational clarity and zero-discount revenue expansion. How I can respond to your situation:
             </p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin: 4px 0 12px 0;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:12px; border-radius:8px;">
+                    <div style="color:#FFF; font-weight:700; font-size:13px; margin-bottom:4px;">📊 Mode A: Financial & P&L Defense</div>
+                    <div style="color:var(--text-secondary); font-size:12px; line-height:1.5;">Reconciles daily gross sales, direct labor drag, and uncaptured prime margins to the penny.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:12px; border-radius:8px;">
+                    <div style="color:var(--accent-bright); font-weight:700; font-size:13px; margin-bottom:4px;">🚀 Mode B: Acquisition & Campaigns</div>
+                    <div style="color:var(--text-secondary); font-size:12px; line-height:1.5;">Builds ready-to-print local door-hangers, VIP welcome keys, and non-discount retention loops.</div>
+                </div>
+            </div>
+
+            <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">Launch Instant Strategy Directive:</div>
             <div class="quick-chips">
                 <div class="chip" onclick="sendQuick('Audit our commercial HVAC operation: $18,000/day revenue, 58% prime cost drag.')">
                     📊 HVAC P&L Audit
@@ -632,6 +648,12 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
+        const STRIPE_LINKS = {
+            starter: 'https://buy.stripe.com/test_8wM4gB444333', // Starter $15.99 / mo
+            pro: 'https://buy.stripe.com/test_5kA5kF555444',     // Pro $39.99 / mo
+            executive: 'https://buy.stripe.com/test_6oE6oJ666555' // Executive $79.99 / mo
+        };
+
         async function checkout(planId, amount, tier) {
             try {
                 const res = await fetch('/create-checkout-session', {
@@ -640,9 +662,17 @@
                     body: JSON.stringify({ planId, amount, tier })
                 });
                 const data = await res.json();
-                if (data.url) window.location.href = data.url;
+                if (data.url) {
+                    window.location.href = data.url;
+                } else if (STRIPE_LINKS[planId]) {
+                    window.location.href = STRIPE_LINKS[planId];
+                }
             } catch (err) {
-                alert("Checkout error: " + err.message);
+                if (STRIPE_LINKS[planId]) {
+                    window.location.href = STRIPE_LINKS[planId];
+                } else {
+                    alert("Opening checkout for " + tier);
+                }
             }
         }
 
