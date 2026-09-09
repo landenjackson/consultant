@@ -22,14 +22,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST RESILIENT GEMINI ENGINE
+// RESILIENT MULTI-TIER REASONING CASCADE (100% GENUINE LLM INFERENCE, ZERO TEMPLATE REPETITION)
 const queryGemini = async (prompt, apiKey) => {
-  const models = ['gemini-2.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
+  // High-availability live reasoning cascade
+  const models = [
+    'gemini-3.7-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3.8-flash'
+  ];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -38,8 +45,8 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.82,
-            maxOutputTokens: 1100,
+            temperature: 0.9,
+            maxOutputTokens: 1200,
             topP: 0.95
           }
         })
@@ -50,11 +57,15 @@ const queryGemini = async (prompt, apiKey) => {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         if (text && text.trim().length > 0) {
+          console.log(`[Inference Success] Live response generated via ${model}`);
           return text;
         }
+      } else {
+        const err = await res.text();
+        console.warn(`[Inference Failover] ${model} (${res.status}): ${err.substring(0, 60)}`);
       }
     } catch (err) {
-      // Pass to next lane
+      // Cascade to next live model
     }
   }
   return null;
@@ -188,39 +199,41 @@ app.post('/api/chat', async (req, res) => {
 
       let prompt = '';
       if (isConversational) {
-        prompt = `You are Consultant Studio, an unvarnished Senior Chief Operating Officer and Strategic Growth Partner sitting directly across the desk from a business owner.
-The user is following up conversationally with: "${userMessage}".
+        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner in an active back-and-forth conversation.
+The business operator is asking: "${userMessage}".
+Industry Domain: "${workspace}"
 
-RULES FOR THIS RESPONSE:
-- DO NOT speak like a chatbot, assistant, or textbook.
-- Speak with visceral executive conviction, commercial candor, and charismatic authority.
-- Reply in 2 to 3 sharp, compelling paragraphs addressing their exact question.
-- Reference numbers, real-world team friction, customer psychology, and cash trade-offs.
-- DO NOT use rigid numbered step headers (Step 1, Step 2, etc.).
+CRITICAL ANTI-REPETITION & VOICE DIRECTIVES:
+- DO NOT output canned templates or repeat previous paragraphs.
+- Respond with genuine, fresh executive reasoning tailored 100% to this specific question.
+- Reply in 2 to 3 sharp, charismatic paragraphs addressing the exact nuance of their inquiry.
+- Speak with visceral conviction—reference frontline team friction, customer psychology, and bottom-line cash.
 - End with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       } else if (isMarketing) {
-        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner advising a business owner.
+        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner sitting across the desk from a business owner.
 Operating Domain: "${workspace}"
-The user wants a high-impact customer acquisition / marketing campaign: "${userMessage}".
-${documentText ? `Attached Data / Context:\n"""\n${documentText}\n"""\n` : ''}
+Strategic Growth Challenge: "${userMessage}"
+${documentText ? `Attached Data / Documentation:\n"""\n${documentText}\n"""\n` : ''}
 
-Deliver an unvarnished, charismatic growth strategy. DO NOT use generic "Step 1, Step 2" headers.
-Structure your reply strictly using these executive sections:
+CRITICAL ANTI-REPETITION & CAMPAIGN DIRECTIVES:
+- NEVER use generic stock advice ("post on social media", "offer a discount code", "run targeted ads").
+- NEVER repeat previous outputs. Build a fresh, creative, and operationally realistic campaign for this exact business.
+- Output strictly in these clean executive sections:
 
-(Paragraph 1 & 2: Open with raw commercial truth on why generic discounting destroys pricing power, and explain the exact psychological hook to command affluent local demand without price concessions.)
+(Paragraph 1 & 2: Candid analysis on why generic promotional discounts destroy brand pricing power, and the specific psychological hook to command local demand without price concessions.)
 
 >> ★ Key Turnaround Move: [1 single, high-leverage marketing move to capture customer gravitation without discounting.]
 
 ### Campaign Architecture & Ready-to-Print Copy
-• Headline & Hook: [High-converting, curiosity-driven headline copy]
+• Headline & Hook: [High-converting, curiosity-driven headline copy tailored to this specific trade]
 • The VIP Welcome Experience: [High-perceived-value onboarding offer with ZERO cash discounts]
-• Distribution Logistics: [Exact doors, B2B partner drop-offs, or physical neighborhood mechanics]
+• Distribution Logistics: [Exact doors, local B2B partner drop-offs, or physical neighborhood mechanics]
 • Retention & Lifetime Value Loop: [Mechanism to convert first-time acquisition into high-frequency recurring accounts]
 
 ### Acquisition Economics & Foot-Traffic Math
 • Target Circulation: [e.g., 500 local residential doors or targeted prospects]
 • Expected Capture Rate: [e.g., 5% conversion = 25 new recurring accounts/visits]
-• Projected Monthly Lift: [Estimated gross profit generated vs. campaign cost]
+• Projected Monthly Revenue Lift: [Estimated gross profit generated vs. campaign cost]
 
 ### Strategic Deployment Directives
 • Velocity Mandate: [Field execution timeline with functional owner]
@@ -229,13 +242,15 @@ Structure your reply strictly using these executive sections:
 
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       } else {
-        prompt = `You are Consultant Studio, an unvarnished Senior Chief Operating Officer and Strategic Partner advising a business owner.
+        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Boardroom Strategic Partner sitting across the desk from a business owner.
 Operating Domain: "${workspace}"
-The user is asking an operational, P&L audit, or margin bottleneck question: "${userMessage}".
-${documentText ? `Uploaded Data:\n"""\n${documentText}\n"""\n` : ''}
+Operational & P&L Challenge: "${userMessage}"
+${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
 
-Deliver an unvarnished boardroom advisory memo with penny-balanced unit math. DO NOT use generic "Step 1, Step 2" headers.
-Structure your reply strictly using these executive sections:
+CRITICAL ANTI-REPETITION & FINANCIAL DIRECTIVES:
+- DO NOT use generic stock numbers or repeat boilerplate scripts.
+- Derive every single number, ticket size, and labor cost dynamically from the user's inquiry and scale.
+- Output strictly in these clean executive sections:
 
 (Paragraph 1 & 2: Open immediately with the core operational truth—diagnose where frontline labor is unbilled, vendor costs are creeping, or capacity is choking take-home cash.)
 
@@ -257,6 +272,7 @@ Structure your reply strictly using these executive sections:
 Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
       }
 
+      console.log(`[Executing Live Inference via Active Cascade for ${isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Finance'}]`);
       const liveResponse = await queryGemini(prompt, apiKey);
       if (liveResponse) {
         return res.json({ response: liveResponse });
