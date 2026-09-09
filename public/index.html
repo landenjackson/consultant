@@ -1159,17 +1159,23 @@
         }
 
         function updateQuotaDisplay() {
-            const count = getMemoCount();
-            const left = Math.max(0, 15 - count);
-            const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true' || location.search.includes('subscribed=true');
-            if (location.search.includes('subscribed=true')) {
-                localStorage.setItem('consultant_subscribed', 'true');
-            }
-            const quotaText = document.getElementById('quotaText');
-            if (isSubscribed) {
-                quotaText.innerText = "Executive Active";
-            } else {
-                quotaText.innerText = `${left} Free Memos Left`;
+            try {
+                const count = getMemoCount();
+                const left = Math.max(0, 15 - count);
+                const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true' || location.search.includes('subscribed=true');
+                if (location.search.includes('subscribed=true')) {
+                    localStorage.setItem('consultant_subscribed', 'true');
+                }
+                const quotaText = document.getElementById('quotaText');
+                if (quotaText) {
+                    if (isSubscribed) {
+                        quotaText.innerText = "Executive Active";
+                    } else {
+                        quotaText.innerText = `${left} Free Memos Left`;
+                    }
+                }
+            } catch(e) {
+                console.error("Quota display error:", e);
             }
         }
         updateQuotaDisplay();
@@ -1647,7 +1653,7 @@
         async function sendMessage() {
             if (isGenerating) return;
             const input = document.getElementById('userInput');
-            const text = input.value.trim();
+            const text = input ? input.value.trim() : '';
             if (!text) return;
 
             const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true';
@@ -1685,7 +1691,8 @@
             chatFeed.scrollTop = chatFeed.scrollHeight;
 
             isGenerating = true;
-            document.getElementById('sendBtn').disabled = true;
+            const sendBtn = document.getElementById('sendBtn');
+            if (sendBtn) sendBtn.disabled = true;
 
             try {
                 const selectedMode = document.getElementById('customModeSelect')?.value || 'general';
@@ -1700,10 +1707,14 @@
                 });
                 uploadedDocText = "";
 
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: Strategic engine unavailable`);
+                }
+
                 const data = await res.json();
                 const responseText = data.response || "Strategy synthesized.";
 
-                // Instant rendering of completed executive memo (100% reliable across mobile & desktop)
+                // Instant rendering of completed executive memo
                 assistantCard.innerHTML = formatExecutiveResponse(responseText);
 
                 // Add Deliverables & Vault Bar
@@ -1727,10 +1738,11 @@
                 messages.push({ role: 'assistant', content: responseText });
 
             } catch (err) {
-                assistantCard.innerHTML = `<span style="color:#F87171;">Engine Error: ${err.message}</span>`;
+                console.error("Chat Execution Error:", err);
+                assistantCard.innerHTML = `<span style="color:#F87171;">Engine Notice: ${err.message}. Please retry in 1 moment.</span>`;
             } finally {
                 isGenerating = false;
-                document.getElementById('sendBtn').disabled = false;
+                if (sendBtn) sendBtn.disabled = false;
                 chatFeed.scrollTop = chatFeed.scrollHeight;
             }
         }
