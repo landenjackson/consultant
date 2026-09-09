@@ -342,12 +342,23 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (apiKey) {
-      // Dynamic Intent Detection: Marketing/Flyers vs. Financial/P&L
       const qLower = userMessage.toLowerCase();
       const isMarketingIntent = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis/i.test(qLower);
+      const isConversational = messages && messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown/i.test(qLower);
 
       let prompt = '';
-      if (isMarketingIntent) {
+      if (isConversational) {
+        // Mode C: Natural Executive Dialogue (Direct Peer-to-Peer Conversation)
+        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner in an active back-and-forth conversation.
+The previous turns produced a strategic/financial memo. The user is now following up conversationally with: "${userMessage}".
+
+RULES FOR THIS CONVERSATIONAL TURN:
+- DO NOT force a 4-part memo, headers, bullet lists, or boardroom deliverables bars here.
+- Reply naturally in 2 to 4 sharp, direct, charismatic paragraphs as a trusted peer and executive partner.
+- Reference the numbers, marketing angles, or operational decisions previously discussed.
+- Answer their direct question immediately without boilerplate, throat-clearing, or robotic pleasantries.
+- Conclude naturally with an unvarnished operator recommendation.`;
+      } else if (isMarketingIntent) {
         prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner sitting across the desk from a business owner.
 DO NOT talk about generic balance sheets, EBITDA, or industrial factory costs.
 DO NOT use robotic filler ("In today's fast-paced environment", "Operational telemetry reveals", "Maximizing throughput").
