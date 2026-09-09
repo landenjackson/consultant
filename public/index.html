@@ -648,14 +648,11 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        const STRIPE_LINKS = {
-            starter: 'https://buy.stripe.com/test_8wM4gB444333', // Starter $15.99 / mo
-            pro: 'https://buy.stripe.com/test_5kA5kF555444',     // Pro $39.99 / mo
-            executive: 'https://buy.stripe.com/test_6oE6oJ666555' // Executive $79.99 / mo
-        };
-
         async function checkout(planId, amount, tier) {
             try {
+                const btn = event?.target;
+                if (btn) btn.innerText = "Connecting Stripe...";
+                
                 const res = await fetch('/create-checkout-session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -664,15 +661,13 @@
                 const data = await res.json();
                 if (data.url) {
                     window.location.href = data.url;
-                } else if (STRIPE_LINKS[planId]) {
-                    window.location.href = STRIPE_LINKS[planId];
+                } else {
+                    throw new Error(data.error || "Unable to generate Stripe session");
                 }
             } catch (err) {
-                if (STRIPE_LINKS[planId]) {
-                    window.location.href = STRIPE_LINKS[planId];
-                } else {
-                    alert("Opening checkout for " + tier);
-                }
+                alert("Stripe Checkout Error: " + err.message);
+                const btn = event?.target;
+                if (btn) btn.innerText = "Start 30-Day Trial";
             }
         }
 

@@ -64,11 +64,12 @@ const queryGemini = async (prompt, apiKey) => {
   return null;
 };
 
-// 1. CLEAN STRIPE CHECKOUT ENDPOINT
+// 1. CLEAN DYNAMIC STRIPE CHECKOUT ENDPOINT (TIED TO LIVE CLOUDFLARE EDGE HOST)
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
-    const origin = req.headers.origin || 'https://consultant-app.com';
+    // Dynamically detect host to guarantee return redirect works on Cloudflare Tunnels
+    const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://trackbacks-niagara-keyboard-katrina.trycloudflare.com');
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -90,12 +91,14 @@ app.post('/create-checkout-session', async (req, res) => {
         trial_period_days: 30
       },
       automatic_tax: { enabled: true },
-      success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}`,
+      success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
       cancel_url: `${origin}/?canceled=true`
     });
 
+    console.log(`[Stripe Checkout Created] URL: ${session.url}`);
     res.json({ id: session.id, url: session.url });
   } catch (error) {
+    console.error('[Stripe Checkout Error]', error.message);
     res.status(500).json({ error: error.message });
   }
 });
