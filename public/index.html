@@ -31,18 +31,22 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        html, body {
+            height: 100%;
+            min-height: 100%;
             background-color: #080A0D;
             color: var(--text-primary);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            height: 100dvh;
+            letter-spacing: -0.01em;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
             overflow: hidden;
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.05) 0%, transparent 60%),
                 linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%);
-            letter-spacing: -0.01em;
         }
 
         /* HEADER */
@@ -160,13 +164,15 @@
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 28px 20px 150px;
+            padding: 20px 20px 140px;
             max-width: 940px;
             width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         /* UPLIFTING HERO BANNER & MISSION TILES */
@@ -689,11 +695,16 @@
         /* COMPACT MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
             header {
-                height: 52px;
-                padding: 0 12px;
+                height: 56px;
+                padding: 0 16px;
             }
 
-            .brand-tag, .brand-text {
+            .brand-text {
+                display: inline-block !important;
+                font-size: 16px !important;
+            }
+
+            .brand-tag {
                 display: none;
             }
 
