@@ -2126,29 +2126,22 @@
             <div class="split-workspace-container">
                 
             <!-- UNIFIED FULL-WIDTH STRATEGIC CANVAS -->
-            <div class="telemetry-pane">
+            <div class="telemetry-pane" style="width: 100%;">
                 <div class="telemetry-feed" id="chatArea">
 
-                <!-- RIGHT PANE: Strategic Telemetry & Boardroom Canvas -->
-                <div class="telemetry-pane">
-                    <div class="telemetry-feed" id="chatArea">
-                        
-                        <!-- Quick Tools Pill Strip (Collapsible Diagnostics Bar) -->
-                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #1a1e26;">
-                            <span style="font-size:11px; font-weight:800; color:#71717a; text-transform:uppercase; letter-spacing:0.04em; align-self:center; margin-right:4px;">Diagnostic Suite:</span>
-                            <button type="button" class="action-btn" id="btnToggleDiff" onclick="toggleDiagnosticTool('diff')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
-                                <span>⚖️ Strategy Diff</span>
-                            </button>
-                            <button type="button" class="action-btn" id="btnToggleLeakage" onclick="toggleDiagnosticTool('leakage')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
-                                <span>🔍 Profit Leakage Scanner</span>
-                            </button>
-                            <button type="button" class="action-btn" id="btnToggleSliders" onclick="toggleDiagnosticTool('sliders')" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px;">
-                                <span>🎛️ Cash Flow Sliders</span>
-                            </button>
-                            <button type="button" class="action-btn" onclick="openDispatchModal()" style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px; color:#4ade80;">
-                                <span>⏰ Morning Dispatch</span>
-                            </button>
-                        </div>
+                    <!-- Quick Diagnostic Suite Strip (Sleek Micro-Pills) -->
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); align-items:center;">
+                        <span style="font-size:11px; font-weight:800; color:#71717a; text-transform:uppercase; letter-spacing:0.05em; margin-right:4px;">Diagnostic Tools:</span>
+                        <button type="button" class="action-btn" id="btnToggleDiff" onclick="toggleDiagnosticTool('diff')" style="font-size:11.5px; padding:4px 10px; border-radius:6px;">
+                            <span>⚖️ Strategy Diff</span>
+                        </button>
+                        <button type="button" class="action-btn" id="btnToggleLeakage" onclick="toggleDiagnosticTool('leakage')" style="font-size:11.5px; padding:4px 10px; border-radius:6px;">
+                            <span>🔍 Profit Leakage Scanner</span>
+                        </button>
+                        <button type="button" class="action-btn" id="btnToggleSliders" onclick="toggleDiagnosticTool('sliders')" style="font-size:11.5px; padding:4px 10px; border-radius:6px;">
+                            <span>🎛️ Cash Flow Sliders</span>
+                        </button>
+                    </div>
 
                         <!-- Upgrade 1: Interactive Strategy Comparison Diff Canvas (Collapsed by default) -->
                         <div class="strategy-diff-box" id="strategyDiffCanvas" style="display:none;">
