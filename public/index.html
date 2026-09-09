@@ -1115,9 +1115,31 @@
             );
         }
 
-        // 1-CLICK INSTANT OFFICE EXPORT SUITE
+        // 1-CLICK INSTANT EXPORTER WITH DIRECT BLOB DOWNLOAD TRIGGER
+        function triggerFileDownload(blob, filename) {
+            try {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 1500);
+            } catch(e) {
+                console.error("Direct download failed:", e);
+                const a = document.createElement('a');
+                a.target = '_blank';
+                a.href = URL.createObjectURL(blob);
+                a.click();
+            }
+        }
+
         function exportBankTeaser(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "Executive Strategy Briefing";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const mode = document.getElementById('customModeSelect')?.value || "Executive";
@@ -1132,7 +1154,6 @@
         .header { border-bottom: 3px solid #16A34A; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
         .title { font-size: 24px; font-weight: 800; color: #0F172A; margin: 0; }
         .sub { font-size: 13px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        .catalyst-badge { background: #DCFCE7; border: 1px solid #86EFAC; color: #166534; padding: 12px 16px; border-radius: 8px; font-weight: 600; margin: 20px 0; }
         .content { font-size: 14px; color: #334155; }
         .footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 12px; color: #94A3B8; display: flex; justify-content: space-between; }
     </style>
@@ -1145,7 +1166,7 @@
         </div>
         <div style="text-align: right; font-size: 12px; color: #64748B;">
             <div><strong>Date:</strong> ${timestamp}</div>
-            <div><strong>Clearance:</strong> Verified Institutional Standard</div>
+            <div><strong>Standard:</strong> Verified Institutional Grade</div>
         </div>
     </div>
     <div class="content">
@@ -1159,16 +1180,11 @@
 </html>`;
 
             const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Bank_Teaser_${mode}_${Date.now()}.html`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
         }
 
         function exportExcelXLSX(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
@@ -1182,7 +1198,7 @@
                 <tr>
                     <td style="font-weight:bold; border:1px solid #cbd5e1; padding:8px;">${match[1].trim()}</td>
                     <td style="font-weight:bold; color:#15803d; border:1px solid #cbd5e1; padding:8px;">${match[2].trim()}</td>
-                    <td style="border:1px solid #cbd5e1; padding:8px;">${(match[3] || 'Target Operating Standard').trim()}</td>
+                    <td style="border:1px solid #cbd5e1; padding:8px;">${(match[3] || 'Target Standard').trim()}</td>
                 </tr>`;
             }
 
@@ -1225,16 +1241,11 @@
 </html>`;
 
             const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${mode}_Financial_Model_${Date.now()}.xls`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            triggerFileDownload(blob, `${mode}_Financial_Model_${Date.now()}.xls`);
         }
 
         function exportWordDoc(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "";
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -1262,16 +1273,11 @@
 </html>`;
 
             const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${mode}_Executive_Memo_${Date.now()}.doc`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
         }
 
         function exportPowerPointDeck(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
             const text = card ? (card.innerText || card.textContent) : "";
             const mode = document.getElementById('customModeSelect')?.value || "Executive";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -1309,12 +1315,7 @@
 </html>`;
 
             const blob = new Blob([pptHtml], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${mode}_Executive_Deck_${Date.now()}.ppt`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.ppt`);
         }
 
         async function sendMessage() {
