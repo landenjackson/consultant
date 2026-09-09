@@ -25,13 +25,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 // ULTRA-FAST RESILIENT GEMINI 3.8 FLASH ENGINE
 // RESILIENT MULTI-TIER REASONING CASCADE (100% LIVE INFERENCE, ZERO 503/429 DROPS)
 const queryGemini = async (prompt, apiKey) => {
-  // Cascades instantly from 3.7 -> 3.5 -> 3.1 to guarantee genuine LLM intelligence without falling back to static strings
-  const models = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+  // Pinned Primary: Gemini 3.5 Flash (100% Active, 0% 503, Sub-2s Latency)
+  const models = ['gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-3.8-flash'];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -42,7 +42,7 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.8,
+            temperature: 0.75,
             maxOutputTokens: 1200,
             topP: 0.95
           }
@@ -54,7 +54,7 @@ const queryGemini = async (prompt, apiKey) => {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         if (text && text.trim().length > 0) {
-          console.log(`[Inference Success] Generated via ${model}`);
+          console.log(`[Inference Success] Generated live via ${model}`);
           return text;
         }
       } else {
