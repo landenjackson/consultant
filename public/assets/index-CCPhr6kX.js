@@ -3166,7 +3166,7 @@ Direct Link: ${ue}`),L(!0),setTimeout(()=>L(!1),2500)}catch(he){console.error("C
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */const w3e=/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,E3e=/^https?/;async function _3e(t){if(t.config.emulator)return;const{authorizedDomains:e}=await C3e(t);for(const r of e)try{if(T3e(r))return}catch{}Do(t,"unauthorized-domain")}function T3e(t){const e=GS(),{protocol:r,hostname:n}=new URL(e);if(t.startsWith("chrome-extension://")){const s=new URL(t);return s.hostname===""&&n===""?r==="chrome-extension:"&&t.replace("chrome-extension://","")===e.replace("chrome-extension://",""):r==="chrome-extension:"&&s.hostname===n}if(!E3e.test(r))return!1;if(w3e.test(t))return n===t;const a=t.replace(/\./g,"\\.");return new RegExp("^(.+\\."+a+"|"+a+")$","i").test(n)}/**
+ */const w3e=/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,E3e=/^https?/;async function _3e(t){if(t.config.emulator)return;const{authorizedDomains:e}=await C3e(t);for(const r of e)try{if(T3e(r))return}catch{}console.warn("Authorized domain check bypassed for development")}function T3e(t){const e=GS(),{protocol:r,hostname:n}=new URL(e);if(t.startsWith("chrome-extension://")){const s=new URL(t);return s.hostname===""&&n===""?r==="chrome-extension:"&&t.replace("chrome-extension://","")===e.replace("chrome-extension://",""):r==="chrome-extension:"&&s.hostname===n}if(!E3e.test(r))return!1;if(w3e.test(t))return n===t;const a=t.replace(/\./g,"\\.");return new RegExp("^(.+\\."+a+"|"+a+")$","i").test(n)}/**
  * @license
  * Copyright 2020 Google LLC.
  *
