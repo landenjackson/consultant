@@ -679,7 +679,87 @@
             50% { opacity: 0; }
         }
 
-        /* FONT SIZE CUSTOMIZATION SETTINGS */
+        /* INSTITUTIONAL EXECUTIVE TABLES & METRIC MATRICES */
+        .exec-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #090C12;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .exec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            min-width: 500px;
+        }
+
+        .exec-table th {
+            background: #111724;
+            color: var(--accent-glow);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border);
+            font-size: 11.5px;
+        }
+
+        .exec-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .exec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .exec-table tr:hover td {
+            background: rgba(34, 197, 94, 0.03);
+        }
+
+        .exec-table td.metric-val {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .exec-table td.metric-delta {
+            color: var(--accent-glow);
+            font-weight: 700;
+        }
+
+        /* VOCABULARY & FORMULA HIGHLIGHT CHIPS */
+        .formula-card {
+            background: rgba(34, 197, 94, 0.05);
+            border: 1px solid var(--border-glow);
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .formula-math {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: 0.02em;
+            margin-bottom: 4px;
+        }
+
+        .formula-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+        }
         body.font-compact {
             --base-font-size: 13.5px;
         }
@@ -1457,6 +1537,18 @@
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
                 .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
 
+            // Markdown Table Parser -> Institutional HTML Table
+            clean = clean.replace(/(\|[^\n]+\|\r?\n)((?:\|:?[-]+:?)+\|\r?\n)((?:\|[^\n]+\|\r?\n?)+)/g, (match, headerRow, separatorRow, bodyRows) => {
+                const parseRow = (row) => row.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1);
+                const headers = parseRow(headerRow);
+                const rows = bodyRows.trim().split('\n').map(parseRow);
+
+                const thHtml = headers.map(h => `<th>${h}</th>`).join('');
+                const trHtml = rows.map(r => `<tr>${r.map((td, idx) => `<td class="${idx === 1 ? 'metric-val' : (idx === 2 ? 'metric-delta' : '')}">${td}</td>`).join('')}</tr>`).join('');
+
+                return `<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
+            });
+
             // Convert bullet lines
             clean = clean.replace(/^[•\*\-]\s*(.*?)$/gm, '<li style="margin-bottom:6px;">$1</li>');
             clean = clean.replace(/(<li[\s\S]*?<\/li>)/g, '<ul class="exec-metrics-list" style="margin:10px 0 14px 18px; padding:0;">$1</ul>');
@@ -1469,7 +1561,7 @@
             clean = paragraphs.map(p => {
                 p = p.trim();
                 if (!p) return '';
-                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li')) return p;
+                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li') || p.startsWith('<table')) return p;
                 return `<p style="margin-bottom:12px; line-height:1.65; color:var(--text-secondary);">${p.replace(/\n/g, '<br>')}</p>`;
             }).join('');
 
