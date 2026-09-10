@@ -679,61 +679,82 @@
             50% { opacity: 0; }
         }
 
-        /* INSTITUTIONAL EXECUTIVE TABLES & METRIC MATRICES */
+        /* ELEGANT EXECUTIVE WORD-LIKE REPORT TABLE */
         .exec-table-wrap {
             width: 100%;
             overflow-x: auto;
-            margin: 16px 0;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: #090C12;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0D1117;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
         }
 
         .exec-table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13.5px;
             text-align: left;
-            min-width: 500px;
+            min-width: 540px;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        .exec-table thead tr {
+            background: #161D2B;
         }
 
         .exec-table th {
-            background: #111724;
-            color: var(--accent-glow);
+            color: #FFFFFF;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
+            font-weight: 700;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 12px 16px;
-            border-bottom: 2px solid var(--border);
-            font-size: 11.5px;
+            letter-spacing: 0.04em;
+            padding: 14px 18px;
+            border-bottom: 2px solid rgba(34, 197, 94, 0.35);
         }
 
         .exec-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-primary);
-            line-height: 1.5;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #CBD5E1;
+            line-height: 1.6;
+            vertical-align: top;
         }
 
-        .exec-table tr:last-child td {
+        .exec-table tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .exec-table tr:hover td {
-            background: rgba(34, 197, 94, 0.03);
+        .exec-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.015);
         }
 
-        .exec-table td.metric-val {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
+        .exec-table tbody tr:hover td {
+            background: rgba(34, 197, 94, 0.04);
             color: #FFFFFF;
         }
 
-        .exec-table td.metric-delta {
-            color: var(--accent-glow);
+        .exec-table td.metric-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 700;
+            color: #FFFFFF;
+            width: 28%;
+        }
+
+        .exec-table td.metric-target {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            color: var(--accent-glow);
+            width: 22%;
+            white-space: nowrap;
+        }
+
+        .exec-table td.metric-desc {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            width: 50%;
         }
 
         /* VOCABULARY & FORMULA HIGHLIGHT CHIPS */
@@ -1544,14 +1565,21 @@
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
                 .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
 
-            // Markdown Table Parser -> Institutional HTML Table
+            // Markdown Table Parser -> Human-Grade Executive Word-Like Table
             clean = clean.replace(/(\|[^\n]+\|\r?\n)((?:\|:?[-]+:?)+\|\r?\n)((?:\|[^\n]+\|\r?\n?)+)/g, (match, headerRow, separatorRow, bodyRows) => {
                 const parseRow = (row) => row.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1);
                 const headers = parseRow(headerRow);
                 const rows = bodyRows.trim().split('\n').map(parseRow);
 
-                const thHtml = headers.map(h => `<th>${h}</th>`).join('');
-                const trHtml = rows.map(r => `<tr>${r.map((td, idx) => `<td class="${idx === 1 ? 'metric-val' : (idx === 2 ? 'metric-delta' : '')}">${td}</td>`).join('')}</tr>`).join('');
+                const thHtml = headers.map((h, i) => `<th style="${i === 1 ? 'color:var(--accent-glow);' : ''}">${h}</th>`).join('');
+                const trHtml = rows.map(r => `
+                    <tr>
+                        ${r.map((td, idx) => {
+                            const cls = idx === 0 ? 'metric-name' : (idx === 1 ? 'metric-target' : 'metric-desc');
+                            return `<td class="${cls}">${td}</td>`;
+                        }).join('')}
+                    </tr>
+                `).join('');
 
                 return `<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
             });
