@@ -22,62 +22,65 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-VELOCITY 1.5S PARALLEL REASONING RACE (FASTEST RESPONSE WINS)
+// HIGH-VELOCITY PARALLEL INFERENCE RACE
 const queryGemini = async (prompt, apiKey) => {
-  // We race Google's two fastest production models in parallel
-  // The first model to return valid tokens within 4-5s immediately resolves the request
-  const fastModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
+  const querySingle = (model) => {
+    return new Promise(async (resolve) => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+          resolve(null);
+        }, 6500);
 
-  const querySingle = async (model) => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6500);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.6,
+              maxOutputTokens: 1200,
+              topP: 0.9
+            }
+          })
+        });
+        clearTimeout(timeoutId);
 
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.6,
-            maxOutputTokens: 1200,
-            topP: 0.9
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+          if (text && text.trim().length > 0) {
+            resolve({ model, text });
+            return;
           }
-        })
-      });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-        if (text && text.trim().length > 0) {
-          return { model, text };
         }
+      } catch (err) {
+        // Continue to resolve null
       }
-    } catch (err) {
-      // Return null on failure
-    }
-    return null;
+      resolve(null);
+    });
   };
 
-  try {
-    // Run both in parallel; whichever finishes first wins
-    const results = await Promise.all(fastModels.map(m => querySingle(m)));
-    const winner = results.find(r => r && r.text);
-    if (winner) {
-      console.log(`[Parallel Race Winner] Delivered via ${winner.model}`);
-      return winner.text;
-    }
-  } catch (err) {
-    console.warn("[Parallel Race Failed]:", err.message);
+  // Launch both 3.6-flash and 3.5-flash-lite simultaneously; whichever returns first wins
+  const p1 = querySingle('gemini-3.6-flash');
+  const p2 = querySingle('gemini-3.5-flash-lite');
+
+  const winner = await Promise.race([
+    p1.then(res => res ? res : new Promise(() => {})),
+    p2.then(res => res ? res : new Promise(() => {}))
+  ]).catch(() => null);
+
+  if (winner && winner.text) {
+    console.log(`[Race Winner] Delivered via ${winner.model}`);
+    return winner.text;
   }
 
-  // Serial fallback if both parallel races timed out
-  try {
-    const fallbackRes = await querySingle('gemini-flash-lite-latest');
-    if (fallbackRes) return fallbackRes.text;
-  } catch(e) {}
+  // Backup if race didn't resolve in time
+  const backup = await Promise.all([p1, p2]);
+  const fallback = backup.find(b => b && b.text);
+  if (fallback) return fallback.text;
 
   return null;
 };
