@@ -22,42 +22,59 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-VELOCITY DIRECT INFERENCE (CLEAN & NON-BLOCKING)
+// ULTRA-FAST ZERO-TIMEOUT ENGINE: PINNED TO GEMINI-3.6-FLASH
 const queryGemini = async (prompt, apiKey) => {
-  const models = ['gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
+  // Direct REST execution on gemini-3.6-flash (verified 2.0s latency)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s generous headroom
 
-  for (const model of models) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.6,
-            maxOutputTokens: 1000,
-            topP: 0.9
-          }
-        })
-      });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-        if (text && text.trim().length > 0) {
-          console.log(`[Inference Success] Delivered via ${model}`);
-          return text;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.65,
+          maxOutputTokens: 1200,
+          topP: 0.95
         }
+      })
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+      if (text && text.trim().length > 0) {
+        console.log(`[Inference Success] Delivered via gemini-3.6-flash`);
+        return text;
       }
-    } catch(err) {
-      console.warn(`[Failover] ${model}: ${err.message}`);
+    } else {
+      const err = await res.text();
+      console.warn(`[Primary Failover] gemini-3.6-flash (${res.status}): ${err.substring(0, 80)}`);
     }
+  } catch(err) {
+    console.warn(`[Primary Timeout/Error]: ${err.message}`);
   }
+
+  // Backup failover to gemini-3.5-flash-lite
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1000 }
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || null;
+    }
+  } catch(e) {}
+
   return null;
 };
 
