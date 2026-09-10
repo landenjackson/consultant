@@ -1378,6 +1378,14 @@
     </div>
 
     <script>
+        // DYNAMIC OPERATOR MEMORY RETRIEVAL (STORES STRATEGIC CONSTRAINTS & RESUME/P&L CONTEXT)
+        function getOperatorMemoryContext() {
+            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            if (vault.length === 0) return '';
+            const summaries = vault.slice(0, 3).map(v => `- [Prior Saved Focus: ${v.title}]: ${v.text.slice(0, 200)}...`);
+            return `\nRETAINED OPERATOR WORKSPACE MEMORY & PRIOR DISCUSSIONS:\n${summaries.join('\n')}\n`;
+        }
+
         // UNIFIED MESSAGES REPOSITORY FOR MULTI-TURN THREAD CONTINUATION
         const messages = [];
         let isGenerating = false;
@@ -2166,13 +2174,15 @@
 
             try {
                 const selectedMode = document.getElementById('customModeSelect')?.value || 'general';
+                const memoryContext = getOperatorMemoryContext();
+
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages,
                         workspace: selectedMode,
-                        documentText: uploadedDocText
+                        documentText: (uploadedDocText ? uploadedDocText : '') + (memoryContext ? `\n${memoryContext}` : '')
                     })
                 });
                 uploadedDocText = "";
