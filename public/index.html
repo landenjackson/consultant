@@ -8,8 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Robust SheetJS library with CDN fallbacks -->
+    <!-- Robust Document Ingestion & Export Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
     <style>
         :root {
             --bg-base: #080A0D;
@@ -1309,6 +1316,7 @@
     </div>
 
     <script>
+        // UNIFIED MESSAGES REPOSITORY FOR MULTI-TURN THREAD CONTINUATION
         const messages = [];
         let isGenerating = false;
         let uploadedDocText = "";
@@ -1590,21 +1598,66 @@
 
         let attachedFileNameStr = "";
 
-        function handleFileUpload(e) {
+        async function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
             attachedFileNameStr = file.name;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                uploadedDocText = event.target.result;
-                const preview = document.getElementById('fileAttachmentPreview');
-                const nameLabel = document.getElementById('attachedFileName');
-                if (preview && nameLabel) {
-                    nameLabel.innerText = file.name;
-                    preview.style.display = 'flex';
+
+            const preview = document.getElementById('fileAttachmentPreview');
+            const nameLabel = document.getElementById('attachedFileName');
+            if (preview && nameLabel) {
+                nameLabel.innerText = `${file.name} (reading...)`;
+                preview.style.display = 'flex';
+            }
+
+            try {
+                const ext = file.name.split('.').pop().toLowerCase();
+
+                if (ext === 'docx') {
+                    // Extract full text from Word .docx
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    uploadedDocText = result.value;
+                } else if (ext === 'pdf') {
+                    // Extract text from PDF documents
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let fullPdfText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullPdfText += `\n--- Page ${i} ---\n` + pageText;
+                    }
+                    uploadedDocText = fullPdfText;
+                } else if (ext === 'xlsx' || ext === 'xls') {
+                    // Extract text from Excel spreadsheets
+                    const arrayBuffer = await file.arrayBuffer();
+                    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+                    let fullSheetText = "";
+                    wb.SheetNames.forEach(sheetName => {
+                        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
+                        fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
+                    });
+                    uploadedDocText = fullSheetText;
+                } else {
+                    // Standard CSV, TXT, MD, JSON
+                    uploadedDocText = await file.text();
                 }
-            };
-            reader.readAsText(file);
+
+                if (nameLabel) {
+                    nameLabel.innerText = `${file.name} (ready)`;
+                }
+            } catch (err) {
+                console.error("Document Parsing Error:", err);
+                // Fallback to raw text
+                try {
+                    uploadedDocText = await file.text();
+                } catch(e) {
+                    uploadedDocText = `[File attached: ${file.name}]`;
+                }
+                if (nameLabel) nameLabel.innerText = file.name;
+            }
         }
 
         function removeAttachedFile() {
