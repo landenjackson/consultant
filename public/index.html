@@ -1148,37 +1148,49 @@
                 border-radius: 12px;
             }
 
-            /* Mobile-Optimized Ultra-Compact Table */
+            /* Mobile-Optimized Zero-Scroll Responsive Table Grid */
             .exec-table-wrap {
-                margin: 10px 0;
+                margin: 8px 0;
                 border-radius: 6px;
+                overflow-x: hidden; /* No side-scrolling required */
+                width: 100%;
             }
 
             .exec-table {
-                font-size: 11px;
-                line-height: 1.35;
-                min-width: 100%;
+                width: 100% !important;
+                min-width: 0 !important;
+                table-layout: fixed; /* Lock columns to container width */
+                font-size: 10.5px;
+                line-height: 1.3;
+                word-wrap: break-word;
+                word-break: break-word;
             }
 
             .exec-table th {
-                font-size: 10px;
-                padding: 6px 8px;
+                font-size: 9.5px;
+                padding: 5px 6px;
+                white-space: normal;
             }
 
             .exec-table td {
-                padding: 6px 8px;
+                padding: 5px 6px;
+                white-space: normal;
             }
 
             .exec-table td.metric-name {
-                font-size: 11px;
+                font-size: 10.5px;
+                width: 32%;
             }
 
             .exec-table td.metric-target {
-                font-size: 11px;
+                font-size: 10.5px;
+                width: 25%;
+                white-space: normal;
             }
 
             .exec-table td.metric-desc {
-                font-size: 10.5px;
+                font-size: 10px;
+                width: 43%;
             }
 
             .dock-container {
