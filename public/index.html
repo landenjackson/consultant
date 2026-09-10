@@ -1528,6 +1528,12 @@
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
             let clean = text
+                // Scrub any leftover raw LaTeX math code
+                .replace(/\$\$[\s\S]*?\$\$/g, '')
+                .replace(/\$([^\$\n]+)\$/g, '$1')
+                .replace(/\\text\{([^}]+)\}/g, '$1')
+                .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
+                .replace(/\\left\(|\\right\)/g, '')
                 .replace(/### 1\.\s*Operational Reality:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
                 .replace(/### 1\.\s*Strategic Campaign Angle:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
                 .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15px; font-family:\'Plus Jakarta Sans\';">$1</div>')
