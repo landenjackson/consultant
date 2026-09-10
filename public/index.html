@@ -1476,18 +1476,30 @@
             return parseInt(localStorage.getItem('consultant_memo_count') || '0', 10);
         }
 
+        function isCreatorOrSubscribed() {
+            // Permanent free access bypass for Landen Jackson (Creator / Lead Strategic Advisor)
+            const isCreator = location.search.includes('creator=true') || 
+                              location.hostname === 'localhost' || 
+                              localStorage.getItem('consultant_creator') === 'true' ||
+                              localStorage.getItem('consultant_subscribed') === 'true' ||
+                              location.search.includes('subscribed=true');
+            
+            if (location.search.includes('creator=true') || location.hostname === 'localhost') {
+                localStorage.setItem('consultant_creator', 'true');
+                localStorage.setItem('consultant_subscribed', 'true');
+            }
+            return isCreator;
+        }
+
         function updateQuotaDisplay() {
             try {
                 const count = getMemoCount();
                 const left = Math.max(0, 15 - count);
-                const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true' || location.search.includes('subscribed=true');
-                if (location.search.includes('subscribed=true')) {
-                    localStorage.setItem('consultant_subscribed', 'true');
-                }
+                const isAuthorized = isCreatorOrSubscribed();
                 const quotaText = document.getElementById('quotaText');
                 if (quotaText) {
-                    if (isSubscribed) {
-                        quotaText.innerText = "Executive Active";
+                    if (isAuthorized) {
+                        quotaText.innerText = "Creator Access • Unlimited";
                     } else {
                         quotaText.innerText = `${left} Free Memos Left`;
                     }
@@ -2201,8 +2213,8 @@
             const text = input ? input.value.trim() : '';
             if (!text) return;
 
-            const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true';
-            if (!isSubscribed && getMemoCount() >= 15) {
+            const isAuthorized = isCreatorOrSubscribed();
+            if (!isAuthorized && getMemoCount() >= 15) {
                 openPricing();
                 return;
             }
