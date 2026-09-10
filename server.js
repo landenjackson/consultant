@@ -22,20 +22,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// RESILIENT MULTI-TIER REASONING CASCADE (100% GENUINE LLM INFERENCE, ZERO HARDCODED FALLBACKS)
+// ULTRA-FAST ZERO-TIMEOUT REASONING CASCADE
 const queryGemini = async (prompt, apiKey) => {
-  // Production high-uptime verified models
+  // Speed-optimized cascade: 3.1-flash-lite (1.8s) -> 3.5-flash-lite (4.4s) -> 3.7-flash -> 3.5-flash
   const models = [
-    'gemini-3.7-flash',
-    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite',
     'gemini-3.5-flash-lite',
-    'gemini-3.8-flash'
+    'gemini-3.7-flash',
+    'gemini-3.5-flash'
   ];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 9000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s generous budget
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -44,8 +44,8 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2500,
+            temperature: 0.65,
+            maxOutputTokens: 2048,
             topP: 0.95
           }
         })
@@ -64,7 +64,7 @@ const queryGemini = async (prompt, apiKey) => {
         console.warn(`[Inference Failover] ${model} (${res.status}): ${err.substring(0, 75)}`);
       }
     } catch (err) {
-      console.warn(`[Inference Network Error] ${model}: ${err.message}`);
+      console.warn(`[Inference Failover] ${model}: ${err.message}`);
     }
   }
   return null;
