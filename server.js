@@ -104,127 +104,50 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// 2. DYNAMIC REAL-TIME NUMBER EXTRACTION & MATH ENGINE
-const generateDynamicMathMemo = (cleanQuestion) => {
-  const qLower = cleanQuestion.toLowerCase();
-  const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
-
-  if (isMarketing) {
-    return `Discount coupons attract bargain hunters who leave the moment someone else is 5% cheaper. In your local trade area, customers aren't hesitating because of price—they hesitate because they haven't experienced a seamless, high-trust entry point into your business.
-
-To capture high-intent recurring accounts, we deploy the **Neighborhood Priority Key**. Instead of eroding your gross margin with discounts, we wrap an elevated welcome upgrade around your full standard ticket, establishing immediate relationship loyalty from day one.
-
->> ★ Key Turnaround Move: Deploy a physical "Neighborhood Priority Pass" door-hanger granting an exclusive complimentary onboarding upgrade while holding 100% full-price ticket integrity.
-
-### Campaign Architecture & Ready-to-Print Copy
-• Headline & Hook: "A Formal Neighborhood Welcome from Your Local Specialists Down the Street."
-• The VIP Welcome Experience: Receive our full Signature Priority Onboarding (a $45 value) on your first scheduled visit with zero cash discounting.
-• Distribution Logistics: Direct hand-delivery to 500 targeted residential doors within your primary 2-mile radius on Tuesday and Thursday mornings.
-• Retention & Lifetime Value Loop: Secure next month's recurring booking directly during the initial encounter to lock in long-term frequency.
-
-### Acquisition Economics & Foot-Traffic Math
-• Target Circulation: 500 premium residential door-hangers directly distributed.
-• Expected Capture Rate: 6.0% conversion rate = 30 new recurring monthly accounts.
-• Projected Monthly Revenue Lift: +$5,550.00/mo ($66,600.00/yr) in net margin added against ~$280 in total print and distribution labor.
-
-### Strategic Deployment Directives
-• Velocity Mandate: Complete door-to-door distribution within 48 hours of asset printing (Owner: Field Marketing Lead).
-• Price Defense Policy: Prohibit coupon discounting; ring up standard full-price ticket on all activations (Owner: Front-of-House Lead).
-• Asset Staging: Inspect 100% of printed door-hangers for heavy 16pt cardstock quality before dispatch (Owner: General Manager).
-
-Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-  }
-
-  // Real-time Number Extraction for Finance
-  const revenueMatch = cleanQuestion.match(/\$?\b([0-9,]+(?:\.[0-9]+)?)\s*(?:k|m|million|thousand|\/day|\/yr|\/year|\s*revenue|\s*gross|\s*sales)?\b/i);
-  const ticketMatch = cleanQuestion.match(/(?:ticket|average|avg|price|rate|fee)\s*(?:of|is|at|:)?\s*\$?([0-9,]+(?:\.[0-9]+)?)/i);
-  const marginMatch = cleanQuestion.match(/([0-9]+(?:\.[0-9]+)?)\s*%\s*(?:prime|cost|margin|drag|labor|cogs)/i);
-
-  let extractedGross = 16000;
-  if (revenueMatch) {
-    let raw = revenueMatch[1].replace(/,/g, '');
-    let val = parseFloat(raw);
-    if (/m|million/i.test(revenueMatch[0])) val = (val * 1000000) / 300;
-    else if (/k|thousand/i.test(revenueMatch[0])) val = (val * 1000);
-    else if (/\/yr|\/year/i.test(revenueMatch[0])) val = val / 300;
-    if (val > 100) extractedGross = val;
-  }
-
-  let extractedTicket = ticketMatch ? parseFloat(ticketMatch[1].replace(/,/g, '')) : (extractedGross > 10000 ? 320 : 45);
-  let primePct = marginMatch ? parseFloat(marginMatch[1]) / 100 : 0.62;
-
-  const dailyGross = extractedGross;
-  const primeCost = dailyGross * primePct;
-  const netMargin = dailyGross - primeCost;
-  const marginPct = ((netMargin / dailyGross) * 100).toFixed(1);
-  const units = Math.max(1, Math.round(dailyGross / extractedTicket));
-  const unitContrib = (netMargin / units).toFixed(2);
-  const breakeven = Math.max(1, Math.ceil((dailyGross * 0.25) / parseFloat(unitContrib)));
-  const annualRecovery = Math.round(netMargin * 0.22 * 260);
-
-  return `Look at your numbers directly: at $${dailyGross.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} in daily gross revenue, carrying a ${(primePct * 100).toFixed(0)}% prime cost drag means you are letting $${primeCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} slip out of the business every single day before you touch a dime of owner profit.
-
-When frontline scheduling overlaps, technicians sit unbilled between jobs, or vendor invoice creep goes unpassed, your take-home cash drops to $${netMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day. You do not solve this by scrambling for more volume or discounting prices—you fix it by locking down your price floor and stopping staging leaks at the source.
-
->> ★ Key Turnaround Move: Enforce a strict ${(primePct * 100).toFixed(0)}% prime cost ceiling and mandate 30-minute advance staging prior to active operations to recover leaked margin immediately.
-
-### Executive P&L Telemetry & Real Unit Math
-• Daily Gross Sales: $${dailyGross.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [Audited across ${units} encounters at $${extractedTicket.toFixed(2)} average ticket]
-• Direct Prime Expenses: $${primeCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [Materials + frontline labor drag at ${(primePct * 100).toFixed(1)}%]
-• Daily Net Operating Margin: +$${netMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/day [${marginPct}% real contribution margin]
-• Unit Cash Contribution: +$${unitContrib} / encounter [Raw profit generated per completed transaction]
-• Daily Breakeven Volume: ${breakeven} units/day [Overhead coverage baseline threshold]
-• What-If Annual Cash Machine: +$${annualRecovery.toLocaleString('en-US')}/yr [Tangible cash reclaimed by tightening frontline execution]
-
-### Strategic Execution Mandates
-• Frontline Velocity: Standardize station staging 30 minutes prior to shift dispatch (Owner: Shift Lead).
-• Price Defense Policy: Prohibit unapproved discounts; defend 100% full-price realization (Owner: General Manager).
-• Workflow Synchronization: Audit job-level gross margins before marking tickets complete (Owner: Billing Desk).
-
-Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-};
-
-// 3. UNIFIED HIGH-VELOCITY STRATEGIC CHAT ENDPOINT (AUTHENTIC HIGH-CONVICTION COO PERSONA)
+// 2. UNIFIED STRATEGIC CHAT ENDPOINT (100% GENUINE REAL-TIME REASONING)
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages = [], workspace = 'general', documentText = '' } = req.body;
     const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
     const apiKey = process.env.GEMINI_API_KEY;
 
-    if (apiKey && userMessage) {
-      const qLower = userMessage.toLowerCase();
-      const isReportOrJob = /report|executive summary|quarterly review|job description|org structure|team restructure|kpi|interview|hiring|resume|résumé|career|onboarding/i.test(qLower);
-      const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
-      const isConversational = messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
+    if (!userMessage) {
+      return res.status(400).json({ error: "Empty prompt provided." });
+    }
 
-      let prompt = '';
-      if (isReportOrJob) {
-        prompt = `You are Consultant Studio, an elite Executive Career Strategist, Chief Operating Officer, and Leadership Advisor.
+    const qLower = userMessage.toLowerCase();
+    const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone/i.test(qLower);
+    const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
+    const isConversational = messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
+
+    let systemPrompt = '';
+
+    if (isCareerOrResume) {
+      systemPrompt = `You are Consultant Studio, an elite Executive Career Strategist, Chief Operating Officer, and Leadership Advisor.
 Operating Domain: "${workspace}"
 User's Inquiry / Document: "${userMessage}"
 ${documentText ? `Attached Resume / Background Data:\n"""\n${documentText}\n"""\n` : ''}
 
 CRITICAL EXECUTION INSTRUCTIONS:
-- Directly answer the user's specific question regarding resumes, job interviews, career transitions, or organizational execution.
-- If evaluating or rewriting a resume or interview talking point, focus on:
-  1. Operational baseline (the initial challenge or situation).
-  2. The strategic lever pulled (process optimization, tool integration, team coordination).
-  3. Quantifiable commercial outcome (time saved, revenue unlocked, trust metrics, error reduction).
-- Present key metrics, STAR talking points, or scorecards in a clean Markdown Table.
-- Highlight the single highest-leverage career/interview catalyst with: >> ★ Key Turnaround Move: [Action]
+- Directly analyze and answer the user's specific questions on resumes, interview preparation, career transitions, and role scorecards.
+- Ground advice in commercial value creation (baseline -> strategic lever pulled -> quantifiable business/trust outcome).
+- Present key metrics or STAR talking points in a clean, compact Markdown Table:
+| Career Milestone / Target | Strategic Action / Lever | Quantifiable Outcome |
+| :--- | :--- | :--- |
+- Highlight the single highest-leverage career turnaround move with: >> ★ Key Turnaround Move: [Action]
 - Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-      } else if (isConversational) {
-        prompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner in an active boardroom conversation.
+    } else if (isConversational) {
+      systemPrompt = `You are Consultant Studio, an elite Senior Chief Operating Officer and Strategic Partner in an active boardroom conversation.
 The business operator is asking: "${userMessage}".
 Industry Domain: "${workspace}"
 
 EXECUTIVE DENSITY & CLARITY DIRECTIVES:
-- Directly and specifically address whatever topic the user asks (career, operations, tools, strategy, or daily execution).
+- Directly address whatever topic the user asks (career, operations, tools, strategy, or daily execution).
 - Deliver high-density, concise executive answers in 2 to 3 punchy paragraphs.
 - Zero robotic fluff, zero vague generalizations.
 - Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-      } else if (isMarketing) {
-        prompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner advising a business owner.
+    } else if (isMarketing) {
+      systemPrompt = `You are Consultant Studio, an elite Chief Marketing Officer and Growth Partner advising a business owner.
 Operating Domain: "${workspace}"
 Strategic Growth Directive: "${userMessage}"
 ${documentText ? `Attached Data / Documentation:\n"""\n${documentText}\n"""\n` : ''}
@@ -236,8 +159,8 @@ EXECUTIVE DENSITY & CLARITY DIRECTIVES:
 | :--- | :--- | :--- |
 - State the exact hook with: >> ★ Key Turnaround Move: [Action]
 - Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-      } else {
-        prompt = `You are Consultant Studio, a Senior Chief Operating Officer and Forensic Turnaround Partner.
+    } else {
+      systemPrompt = `You are Consultant Studio, a Senior Chief Operating Officer and Forensic Turnaround Partner.
 Operating Domain: "${workspace}"
 Operational & P&L Directive: "${userMessage}"
 ${documentText ? `Uploaded POS/P&L Data:\n"""\n${documentText}\n"""\n` : ''}
@@ -250,36 +173,16 @@ EXECUTIVE DENSITY & CLARITY DIRECTIVES:
 - Explain the breakeven equation and prime cost targets in direct business language.
 - State the highest-leverage turnaround catalyst with: >> ★ Key Turnaround Move: [Action]
 - Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
-      }
-
-      console.log(`[Executing Live Inference via Active Cascade for ${isReportOrJob ? 'Report/Resume/Career' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Finance'}]`);
-      const liveResponse = await queryGemini(prompt, apiKey);
-      if (liveResponse) {
-        return res.json({ response: liveResponse });
-      }
     }
 
-    // Dynamic Intelligent Fallback (Context-Aware)
-    if (/resume|résumé|interview|career|hiring|job/i.test(userMessage)) {
-      return res.json({
-        response: `An executive-tier career narrative is judged on a single operational metric: tangible value creation.
+    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'}]`);
+    const liveResponse = await queryGemini(systemPrompt, apiKey);
 
-To evaluate your resume bullets and interview prep, strip away passive duties and audit every line for commercial leverage. Structure your talking tracks around the operational baseline, the strategic lever you pulled, and the quantifiable outcome.
-
-| Career Milestone | Strategic Action / Lever | Measurable Outcome |
-| :--- | :--- | :--- |
-| Core Project Leadership | End-to-end scoping and execution | 100% on-time milestone delivery |
-| Operational Research | Statistical modeling & consumer trust | Validated trust boundaries (p < .001) |
-| Process Optimization | Standardized workflow & asset staging | Reduced turnaround cycle time |
-
->> ★ Key Turnaround Move: Reframe your interview talking points from "what I managed" to "the measurable return and trust built through disciplined execution."
-
-Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`
-      });
+    if (liveResponse) {
+      return res.json({ response: liveResponse });
     }
 
-    const fallbackMemo = generateDynamicMathMemo(userMessage || 'Operational Audit');
-    return res.json({ response: fallbackMemo });
+    return res.status(503).json({ error: "Reasoning engine temporarily saturated. Please retry in 1 moment." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
