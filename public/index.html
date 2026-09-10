@@ -1939,6 +1939,57 @@
             sendMessage();
         }
 
+        // Render all pending charts inside a container
+        function initializePendingCharts(container) {
+            if (typeof Chart === 'undefined') return;
+            const charts = container.querySelectorAll('.exec-chart-canvas-wrap canvas[data-chart-labels]');
+            charts.forEach(canvas => {
+                if (canvas.dataset.initialized === 'true') return;
+                try {
+                    const labels = JSON.parse(canvas.dataset.chartLabels || '[]');
+                    const values = JSON.parse(canvas.dataset.chartValues || '[]');
+                    const labelName = canvas.dataset.chartName || 'Target Value';
+
+                    if (labels.length > 0 && values.length > 0) {
+                        new Chart(canvas, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: labelName,
+                                    data: values,
+                                    backgroundColor: 'rgba(34, 197, 94, 0.45)',
+                                    borderColor: '#22C55E',
+                                    borderWidth: 1.5,
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: { display: false },
+                                        ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
+                                    },
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.05)' },
+                                        ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
+                                    }
+                                }
+                            }
+                        });
+                        canvas.dataset.initialized = 'true';
+                    }
+                } catch(e) {
+                    console.warn("Chart initialization error:", e);
+                }
+            });
+        }
+
         /* SMOOTH & FLUID CHAT STREAMING WITH GLOWING CURSOR */
         async function streamAssistantResponse(container, fullText, onComplete) {
             const formatted = formatExecutiveResponse(fullText);
@@ -1967,6 +2018,7 @@
                 } else {
                     if (cursor) cursor.remove();
                     contentBox.innerHTML = formatted;
+                    initializePendingCharts(contentBox);
                     const feed = document.getElementById('chatFeed');
                     if (feed) feed.scrollTop = feed.scrollHeight;
                     if (onComplete) onComplete();
@@ -2068,17 +2120,22 @@
                 
                 rows.forEach(r => {
                     if (r.length >= 2) {
-                        const label = r[0].replace(/[^\w\s\-\/]/g, '').slice(0, 18);
-                        const numMatch = r[1].match(/(\d+(?:\.\d+)?)/);
-                        if (numMatch && label) {
-                            chartLabels.push(label);
+                        const cleanLabel = r[0].replace(/<[^>]*>/g, '').replace(/[\*\_]/g, '').trim();
+                        const cleanVal = r[1].replace(/<[^>]*>/g, '').replace(/[\*\_]/g, '').trim();
+                        const numMatch = cleanVal.match(/([\+\-]?\d+(?:\.\d+)?)/);
+                        if (numMatch && cleanLabel) {
+                            chartLabels.push(cleanLabel.slice(0, 20));
                             chartValues.push(parseFloat(numMatch[1]));
                         }
                     }
                 });
 
-                if (chartValues.length >= 2 && typeof Chart !== 'undefined') {
+                if (chartValues.length >= 2) {
                     const chartId = 'pivotChart_' + Math.random().toString(36).substr(2, 9);
+                    const safeLabels = escapeHtml(JSON.stringify(chartLabels));
+                    const safeValues = escapeHtml(JSON.stringify(chartValues));
+                    const safeName = escapeHtml(headers[1] || 'Target Benchmark');
+
                     chartHtml = `
                         <div class="exec-chart-card">
                             <div class="exec-chart-header">
@@ -2086,51 +2143,13 @@
                                 <span class="exec-chart-tag">Excel Analytics</span>
                             </div>
                             <div class="exec-chart-canvas-wrap">
-                                <canvas id="${chartId}"></canvas>
+                                <canvas id="${chartId}" data-chart-labels="${safeLabels}" data-chart-values="${safeValues}" data-chart-name="${safeName}"></canvas>
                             </div>
                         </div>
                     `;
-
-                    // Render Chart.js asynchronously
-                    setTimeout(() => {
-                        const ctx = document.getElementById(chartId);
-                        if (ctx) {
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: chartLabels,
-                                    datasets: [{
-                                        label: headers[1] || 'Target Value',
-                                        data: chartValues,
-                                        backgroundColor: 'rgba(34, 197, 94, 0.45)',
-                                        borderColor: '#22C55E',
-                                        borderWidth: 1.5,
-                                        borderRadius: 6
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: { display: false }
-                                    },
-                                    scales: {
-                                        x: {
-                                            grid: { display: false },
-                                            ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
-                                        },
-                                        y: {
-                                            grid: { color: 'rgba(255,255,255,0.05)' },
-                                            ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }, 100);
                 }
             } catch(e) {
-                console.warn("Pivot Chart Generation Error:", e);
+                console.warn("Pivot Chart Extraction Error:", e);
             }
 
             return `${chartHtml}<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
