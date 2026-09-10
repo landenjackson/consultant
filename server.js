@@ -75,7 +75,7 @@ const queryGemini = async (prompt, apiKey) => {
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
-    const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://trackbacks-niagara-keyboard-katrina.trycloudflare.com');
+    const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://www.consultant-studio.app');
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
