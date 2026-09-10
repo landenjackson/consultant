@@ -22,66 +22,42 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-VELOCITY PARALLEL INFERENCE RACE
+// HIGH-VELOCITY DIRECT INFERENCE (CLEAN & NON-BLOCKING)
 const queryGemini = async (prompt, apiKey) => {
-  const querySingle = (model) => {
-    return new Promise(async (resolve) => {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-          resolve(null);
-        }, 6500);
+  const models = ['gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.6,
-              maxOutputTokens: 1200,
-              topP: 0.9
-            }
-          })
-        });
-        clearTimeout(timeoutId);
+  for (const model of models) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
-          if (text && text.trim().length > 0) {
-            resolve({ model, text });
-            return;
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.6,
+            maxOutputTokens: 1000,
+            topP: 0.9
           }
+        })
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+        if (text && text.trim().length > 0) {
+          console.log(`[Inference Success] Delivered via ${model}`);
+          return text;
         }
-      } catch (err) {
-        // Continue to resolve null
       }
-      resolve(null);
-    });
-  };
-
-  // Launch both 3.6-flash and 3.5-flash-lite simultaneously; whichever returns first wins
-  const p1 = querySingle('gemini-3.6-flash');
-  const p2 = querySingle('gemini-3.5-flash-lite');
-
-  const winner = await Promise.race([
-    p1.then(res => res ? res : new Promise(() => {})),
-    p2.then(res => res ? res : new Promise(() => {}))
-  ]).catch(() => null);
-
-  if (winner && winner.text) {
-    console.log(`[Race Winner] Delivered via ${winner.model}`);
-    return winner.text;
+    } catch(err) {
+      console.warn(`[Failover] ${model}: ${err.message}`);
+    }
   }
-
-  // Backup if race didn't resolve in time
-  const backup = await Promise.all([p1, p2]);
-  const fallback = backup.find(b => b && b.text);
-  if (fallback) return fallback.text;
-
   return null;
 };
 
