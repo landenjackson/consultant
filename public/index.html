@@ -1565,24 +1565,8 @@
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
                 .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
 
-            // Markdown Table Parser -> Human-Grade Executive Word-Like Table
-            clean = clean.replace(/(\|[^\n]+\|\r?\n)((?:\|:?[-]+:?)+\|\r?\n)((?:\|[^\n]+\|\r?\n?)+)/g, (match, headerRow, separatorRow, bodyRows) => {
-                const parseRow = (row) => row.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1);
-                const headers = parseRow(headerRow);
-                const rows = bodyRows.trim().split('\n').map(parseRow);
-
-                const thHtml = headers.map((h, i) => `<th style="${i === 1 ? 'color:var(--accent-glow);' : ''}">${h}</th>`).join('');
-                const trHtml = rows.map(r => `
-                    <tr>
-                        ${r.map((td, idx) => {
-                            const cls = idx === 0 ? 'metric-name' : (idx === 1 ? 'metric-target' : 'metric-desc');
-                            return `<td class="${cls}">${td}</td>`;
-                        }).join('')}
-                    </tr>
-                `).join('');
-
-                return `<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
-            });
+            // Robust multi-column table parser
+            clean = parseAllTables(clean);
 
             // Convert bullet lines
             clean = clean.replace(/^[•\*\-]\s*(.*?)$/gm, '<li style="margin-bottom:6px;">$1</li>');
@@ -1601,6 +1585,52 @@
             }).join('');
 
             return clean;
+        }
+
+        // Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
+        function parseAllTables(text) {
+            const lines = text.split('\n');
+            let inTable = false;
+            let tableLines = [];
+            let result = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    inTable = true;
+                    tableLines.push(line);
+                } else {
+                    if (inTable) {
+                        result.push(renderHtmlTable(tableLines));
+                        tableLines = [];
+                        inTable = false;
+                    }
+                    result.push(lines[i]);
+                }
+            }
+            if (inTable) {
+                result.push(renderHtmlTable(tableLines));
+            }
+            return result.join('\n');
+        }
+
+        function renderHtmlTable(lines) {
+            if (lines.length < 2) return lines.join('\n');
+            const parseRow = (r) => r.split('|').map(c => c.trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+            const headers = parseRow(lines[0]);
+            const rows = lines.slice(2).map(parseRow);
+
+            const thHtml = headers.map((h, i) => `<th style="${i === 1 ? 'color:var(--accent-glow);' : ''}">${h}</th>`).join('');
+            const trHtml = rows.map(r => `
+                <tr>
+                    ${r.map((td, idx) => {
+                        const cls = idx === 0 ? 'metric-name' : (idx === 1 ? 'metric-target' : 'metric-desc');
+                        return `<td class="${cls}">${td}</td>`;
+                    }).join('')}
+                </tr>
+            `).join('');
+
+            return `<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
         }
 
         function escapeHtml(str) {
