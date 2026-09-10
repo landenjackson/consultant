@@ -1939,7 +1939,7 @@
             sendMessage();
         }
 
-        // Render all pending charts inside a container
+        // Render all pending charts inside a container with rich executive depth & tooltips
         function initializePendingCharts(container) {
             if (typeof Chart === 'undefined') return;
             const charts = container.querySelectorAll('.exec-chart-canvas-wrap canvas[data-chart-labels]');
@@ -1948,7 +1948,9 @@
                 try {
                     const labels = JSON.parse(canvas.dataset.chartLabels || '[]');
                     const values = JSON.parse(canvas.dataset.chartValues || '[]');
-                    const labelName = canvas.dataset.chartName || 'Target Value';
+                    const units = JSON.parse(canvas.dataset.chartUnits || '[]');
+                    const rawTexts = JSON.parse(canvas.dataset.chartRaws || '[]');
+                    const labelName = canvas.dataset.chartName || 'Target Benchmark';
 
                     if (labels.length > 0 && values.length > 0) {
                         new Chart(canvas, {
@@ -1958,26 +1960,60 @@
                                 datasets: [{
                                     label: labelName,
                                     data: values,
-                                    backgroundColor: 'rgba(34, 197, 94, 0.45)',
-                                    borderColor: '#22C55E',
+                                    backgroundColor: values.map(v => v >= 0 ? 'rgba(34, 197, 94, 0.45)' : 'rgba(248, 113, 113, 0.45)'),
+                                    borderColor: values.map(v => v >= 0 ? '#22C55E' : '#EF4444'),
                                     borderWidth: 1.5,
-                                    borderRadius: 6
+                                    borderRadius: 6,
+                                    hoverBackgroundColor: values.map(v => v >= 0 ? 'rgba(74, 222, 128, 0.7)' : 'rgba(239, 68, 68, 0.7)')
                                 }]
                             },
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {
-                                    legend: { display: false }
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: '#0F172A',
+                                        titleColor: '#FFFFFF',
+                                        bodyColor: '#4ADE80',
+                                        borderColor: 'rgba(34, 197, 94, 0.3)',
+                                        borderWidth: 1,
+                                        padding: 10,
+                                        displayColors: false,
+                                        callbacks: {
+                                            title: function(items) {
+                                                return items[0].label;
+                                            },
+                                            label: function(item) {
+                                                const idx = item.dataIndex;
+                                                const raw = rawTexts[idx] || item.raw;
+                                                return `Strategic Target: ${raw}`;
+                                            }
+                                        }
+                                    }
                                 },
                                 scales: {
                                     x: {
                                         grid: { display: false },
-                                        ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
+                                        ticks: { 
+                                            color: '#CBD5E1', 
+                                            font: { size: 10.5, family: 'Inter', weight: '500' },
+                                            maxRotation: 20
+                                        }
                                     },
                                     y: {
-                                        grid: { color: 'rgba(255,255,255,0.05)' },
-                                        ticks: { color: '#94A3B8', font: { size: 10, family: 'Inter' } }
+                                        grid: { color: 'rgba(255,255,255,0.06)' },
+                                        ticks: { 
+                                            color: '#94A3B8', 
+                                            font: { size: 10, family: 'Inter' },
+                                            callback: function(value) {
+                                                // Format with $ or % if applicable
+                                                const sampleUnit = units[0] || '';
+                                                if (sampleUnit.includes('$')) return '$' + value.toLocaleString();
+                                                if (sampleUnit.includes('%')) return value + '%';
+                                                return value.toLocaleString();
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2117,6 +2153,8 @@
             try {
                 const chartLabels = [];
                 const chartValues = [];
+                const chartUnits = [];
+                const chartRaws = [];
                 
                 rows.forEach(r => {
                     if (r.length >= 2) {
@@ -2124,8 +2162,10 @@
                         const cleanVal = r[1].replace(/<[^>]*>/g, '').replace(/[\*\_]/g, '').trim();
                         const numMatch = cleanVal.match(/([\+\-]?\d+(?:\.\d+)?)/);
                         if (numMatch && cleanLabel) {
-                            chartLabels.push(cleanLabel.slice(0, 20));
+                            chartLabels.push(cleanLabel.slice(0, 24));
                             chartValues.push(parseFloat(numMatch[1]));
+                            chartUnits.push(cleanVal.includes('$') ? '$' : (cleanVal.includes('%') ? '%' : ''));
+                            chartRaws.push(cleanVal);
                         }
                     }
                 });
@@ -2134,16 +2174,18 @@
                     const chartId = 'pivotChart_' + Math.random().toString(36).substr(2, 9);
                     const safeLabels = escapeHtml(JSON.stringify(chartLabels));
                     const safeValues = escapeHtml(JSON.stringify(chartValues));
+                    const safeUnits = escapeHtml(JSON.stringify(chartUnits));
+                    const safeRaws = escapeHtml(JSON.stringify(chartRaws));
                     const safeName = escapeHtml(headers[1] || 'Target Benchmark');
 
                     chartHtml = `
                         <div class="exec-chart-card">
                             <div class="exec-chart-header">
-                                <div class="exec-chart-title"><span>📊</span> Operational Pivot Chart</div>
-                                <span class="exec-chart-tag">Excel Analytics</span>
+                                <div class="exec-chart-title"><span>📊</span> Operational Pivot Chart: ${safeName}</div>
+                                <span class="exec-chart-tag">Interactive Excel Modeling</span>
                             </div>
                             <div class="exec-chart-canvas-wrap">
-                                <canvas id="${chartId}" data-chart-labels="${safeLabels}" data-chart-values="${safeValues}" data-chart-name="${safeName}"></canvas>
+                                <canvas id="${chartId}" data-chart-labels="${safeLabels}" data-chart-values="${safeValues}" data-chart-units="${safeUnits}" data-chart-raws="${safeRaws}" data-chart-name="${safeName}"></canvas>
                             </div>
                         </div>
                     `;
