@@ -35,7 +35,7 @@ const queryGemini = async (prompt, apiKey) => {
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s generous budget
+      const timeoutId = setTimeout(() => controller.abort(), 14000);
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -67,6 +67,20 @@ const queryGemini = async (prompt, apiKey) => {
       console.warn(`[Inference Failover] ${model}: ${err.message}`);
     }
   }
+
+  // Backup fallback using raw REST fetch to Google AI without abort
+  try {
+    const backupRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    if (backupRes.ok) {
+      const data = await backupRes.json();
+      return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || null;
+    }
+  } catch(e) {}
+
   return null;
 };
 
