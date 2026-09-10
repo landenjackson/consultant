@@ -1215,11 +1215,11 @@
                         </div>
                         <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.6 Flash • Sub-2s Speed</span>
                     </div>
-                    <h1 style="font-family:'Plus Jakarta Sans'; font-size:23px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
-                        Real-Time Commercial Intelligence & Profit Defense
+                    <h1 style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
+                        Welcome back, Landen.
                     </h1>
-                    <p style="color:var(--text-secondary); font-size:14px; line-height:1.6;">
-                        Sitting directly across the desk with real skin in the game. Audit cash leakage, draft company reports, design compensation & job structures, or launch high-converting non-discount campaigns.
+                    <p style="color:var(--text-secondary); font-size:14px; line-height:1.6; max-width:820px;">
+                        Your personal Strategic Intelligence Studio and Operations Room. Audit unit economics, polish executive resumes, prepare interview talking tracks, or draft 90-day board deliverables with zero robotic filler.
                     </p>
 
                     <!-- LIVE REAL-TIME TELEMETRY CAPLETS -->
@@ -1844,39 +1844,41 @@
             sendMessage();
         }
 
-        // EXECUTIVE INLINE STREAMING ANIMATION WITH EMERALD TELEMETRY PULSE
+        /* SMOOTH & FLUID CHAT STREAMING WITH GLOWING CURSOR */
         async function streamAssistantResponse(container, fullText, onComplete) {
             const formatted = formatExecutiveResponse(fullText);
             
-            // Render container skeleton
+            // Container skeleton with glowing cursor
             container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor"></span>`;
             const contentBox = container.querySelector('.stream-content');
             const cursor = container.querySelector('.typing-cursor');
 
             const words = fullText.split(' ');
-            let currentText = '';
-            let i = 0;
+            let currentWordIdx = 0;
 
-            const step = () => {
-                // Stream 3-4 words per tick for high-velocity natural typing
-                const chunk = words.slice(i, i + 4).join(' ');
-                i += 4;
-                currentText += (currentText ? ' ' : '') + chunk;
+            function renderNextChunk() {
+                // Adaptive natural cadence: 2 to 3 words per frame for human-paced flow
+                const wordsPerTick = Math.max(2, Math.min(4, Math.floor((words.length - currentWordIdx) / 18)));
+                currentWordIdx += wordsPerTick;
                 
-                contentBox.innerHTML = formatExecutiveResponse(currentText);
+                const partialText = words.slice(0, currentWordIdx).join(' ');
+                contentBox.innerHTML = formatExecutiveResponse(partialText);
+                
                 const feed = document.getElementById('chatFeed');
                 if (feed) feed.scrollTop = feed.scrollHeight;
 
-                if (i < words.length) {
-                    requestAnimationFrame(() => setTimeout(step, 20));
+                if (currentWordIdx < words.length) {
+                    setTimeout(() => requestAnimationFrame(renderNextChunk), 28);
                 } else {
                     if (cursor) cursor.remove();
                     contentBox.innerHTML = formatted;
+                    const feed = document.getElementById('chatFeed');
+                    if (feed) feed.scrollTop = feed.scrollHeight;
                     if (onComplete) onComplete();
                 }
-            };
+            }
 
-            step();
+            requestAnimationFrame(renderNextChunk);
         }
         function formatExecutiveResponse(text) {
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
