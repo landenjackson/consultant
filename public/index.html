@@ -161,20 +161,88 @@
             box-shadow: 0 0 10px var(--accent);
         }
 
-        /* MAIN CHAT STAGE */
-        main {
+        /* SPLIT CANVAS WORKSPACE ARCHITECTURE */
+        .workspace-stage {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: calc(100% - 60px);
+        }
+
+        #chatFeed {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px 20px 140px;
             max-width: 940px;
-            width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* DEDICATED LIVE CANVAS ARTIFACT PANE */
+        #canvasPane {
+            width: 0;
+            background: #0B0E14;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            z-index: 1;
+            z-index: 40;
+        }
+
+        #canvasPane.open {
+            width: 48%;
+            min-width: 380px;
+        }
+
+        .canvas-header {
+            height: 52px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0F141E;
+            flex-shrink: 0;
+        }
+
+        .canvas-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #E2E8F0;
+            outline: none;
+        }
+
+        .canvas-toolbar {
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            background: #0D111A;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 860px) {
+            #canvasPane.open {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100% !important;
+                z-index: 100;
+            }
         }
 
         /* UPLIFTING HERO BANNER & MISSION TILES */
@@ -983,98 +1051,127 @@
         </div>
     </header>
 
-    <!-- MAIN STRATEGY ARENA -->
-    <main id="chatFeed">
-        <!-- UPLIFTING HERO BANNER -->
-        <div id="heroBanner">
-            <div class="hero-banner-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span class="status-tag">Executive Strategy Advisory</span>
-                        <span style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Live Telemetry Active</span>
+    <!-- MAIN SPLIT WORKSPACE ARENA -->
+    <div class="workspace-stage">
+        <!-- CHAT STREAM -->
+        <main id="chatFeed">
+            <!-- UPLIFTING HERO BANNER -->
+            <div id="heroBanner">
+                <div class="hero-banner-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="status-tag">Executive Strategy Advisory</span>
+                            <span style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Live Telemetry Active</span>
+                        </div>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.8 Flash • Sub-2s Speed</span>
                     </div>
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.8 Flash • Sub-2s Speed</span>
-                </div>
-                <h1 style="font-family:'Plus Jakarta Sans'; font-size:23px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
-                    Real-Time Commercial Intelligence & Profit Defense
-                </h1>
-                <p style="color:var(--text-secondary); font-size:14px; line-height:1.6;">
-                    Sitting directly across the desk with real skin in the game. Audit cash leakage, draft company reports, design compensation & job structures, or launch high-converting non-discount campaigns.
-                </p>
+                    <h1 style="font-family:'Plus Jakarta Sans'; font-size:23px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
+                        Real-Time Commercial Intelligence & Profit Defense
+                    </h1>
+                    <p style="color:var(--text-secondary); font-size:14px; line-height:1.6;">
+                        Sitting directly across the desk with real skin in the game. Audit cash leakage, draft company reports, design compensation & job structures, or launch high-converting non-discount campaigns.
+                    </p>
 
-                <!-- LIVE REAL-TIME TELEMETRY CAPLETS -->
-                <div class="live-stat-strip">
-                    <div class="stat-capsule">
-                        <span class="stat-label">Model Engine</span>
-                        <span class="stat-value green">Gemini 3.8 Flash</span>
+                    <!-- LIVE REAL-TIME TELEMETRY CAPLETS -->
+                    <div class="live-stat-strip">
+                        <div class="stat-capsule">
+                            <span class="stat-label">Model Engine</span>
+                            <span class="stat-value green">Gemini 3.8 Flash</span>
+                        </div>
+                        <div class="stat-capsule">
+                            <span class="stat-label">Response Velocity</span>
+                            <span class="stat-value">Sub-2.0s REST</span>
+                        </div>
+                        <div class="stat-capsule">
+                            <span class="stat-label">Active Standard</span>
+                            <span class="stat-value">Human-in-the-Loop</span>
+                        </div>
+                        <div class="stat-capsule">
+                            <span class="stat-label">Security & Privacy</span>
+                            <span class="stat-value">Zero-Knowledge Vault</span>
+                        </div>
                     </div>
-                    <div class="stat-capsule">
-                        <span class="stat-label">Response Velocity</span>
-                        <span class="stat-value">Sub-2.0s REST</span>
+                </div>
+
+                <!-- 4 PRACTICAL REAL-WORLD MISSION CARDS -->
+                <div class="custom-modes-grid">
+                    <!-- MISSION 1: COMPANY REPORT & BOARD BRIEFING -->
+                    <div class="mode-tile" onclick="sendQuick('I have to finish a company strategy report for our quarterly review. Help me draft the executive summary, operational bottleneck diagnosis, and 90-day turnaround milestones.')">
+                        <div class="mode-tile-header">
+                            <span style="font-size:16px;">📑</span>
+                            <span>Company Strategy Report</span>
+                        </div>
+                        <div class="mode-tile-desc">
+                            Drafts executive summaries, operational risk sections, and actionable 90-day turnaround milestones.
+                        </div>
+                        <div class="mode-tile-cta">Draft Strategy Briefing →</div>
                     </div>
-                    <div class="stat-capsule">
-                        <span class="stat-label">Active Standard</span>
-                        <span class="stat-value">Human-in-the-Loop</span>
+
+                    <!-- MISSION 2: JOB DESCRIPTIONS & ORG STRUCTURE -->
+                    <div class="mode-tile" onclick="sendQuick('Structure high-accountability job descriptions and incentive compensation for an Operations Manager and Shift Dispatcher.')">
+                        <div class="mode-tile-header">
+                            <span style="font-size:16px;">👥</span>
+                            <span>Job Descriptions & KPIs</span>
+                        </div>
+                        <div class="mode-tile-desc">
+                            Models clear responsibilities, measurable KPI scorecards, and margin-aligned incentive compensation structures.
+                        </div>
+                        <div class="mode-tile-cta">Model Org Structure →</div>
                     </div>
-                    <div class="stat-capsule">
-                        <span class="stat-label">Security & Privacy</span>
-                        <span class="stat-value green">Zero-Knowledge Vault</span>
+
+                    <!-- MISSION 3: P&L AUDIT & DAILY CASH FLOW DEFENSE -->
+                    <div class="mode-tile" onclick="sendQuick('Audit our commercial operations: $24,000/day gross sales with 58% prime cost drag. Find our cash bleed and calculate exact breakeven volume.')">
+                        <div class="mode-tile-header">
+                            <span style="font-size:16px;">📊</span>
+                            <span>Daily Cash Flow & P&L Defense</span>
+                        </div>
+                        <div class="mode-tile-desc">
+                            Reconciles audited daily gross sales, direct labor drag, and prime costs to calculate exact take-home cash and breakeven volume.
+                        </div>
+                        <div class="mode-tile-cta">Run Cash Flow Audit →</div>
+                    </div>
+
+                    <!-- MISSION 4: CUSTOMER ACQUISITION & PRINT CAMPAIGNS -->
+                    <div class="mode-tile" onclick="sendQuick('We want to capture 40 new recurring monthly accounts in our local trade area without discounting. Build the door-hanger hook and distribution logistics.')">
+                        <div class="mode-tile-header">
+                            <span style="font-size:16px;">🚀</span>
+                            <span>High-Value Customer Acquisition</span>
+                        </div>
+                        <div class="mode-tile-desc">
+                            Generates print-ready door-hangers, high-converting hooks, VIP welcome keys, and non-discount retention architecture.
+                        </div>
+                        <div class="mode-tile-cta">Build Acquisition Plan →</div>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <!-- 4 PRACTICAL REAL-WORLD MISSION CARDS -->
-            <div class="custom-modes-grid">
-                <!-- MISSION 1: COMPANY REPORT & BOARD BRIEFING -->
-                <div class="mode-tile" onclick="sendQuick('I have to finish a company strategy report for our quarterly review. Help me draft the executive summary, operational bottleneck diagnosis, and 90-day turnaround milestones.')">
-                    <div class="mode-tile-header">
-                        <span style="font-size:16px;">📑</span>
-                        <span>Company Report & Board Briefing</span>
-                    </div>
-                    <div class="mode-tile-desc">
-                        Drafts executive summaries, operational risk sections, and actionable 90-day strategic milestones for leadership reviews.
-                    </div>
-                    <div class="mode-tile-cta">Draft Company Report →</div>
+        <!-- DEDICATED LIVE CANVAS ARTIFACT PANE (SIDE-BY-SIDE EDITOR) -->
+        <aside id="canvasPane">
+            <div class="canvas-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:16px;">🎨</span>
+                    <span id="canvasTitle" style="font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; color:#FFFFFF;">Strategy Canvas</span>
+                    <span style="font-size:11px; background:rgba(34,197,94,0.12); color:var(--accent-glow); padding:2px 8px; border-radius:12px; border:1px solid var(--border-glow);">Live Editable</span>
                 </div>
-
-                <!-- MISSION 2: JOB DESCRIPTION & TEAM RESTRUCTURE -->
-                <div class="mode-tile" onclick="sendQuick('We need to restructure our frontline operations team. Write high-accountability job descriptions and incentive compensation structures for a Lead Field Supervisor and Shift Dispatcher.')">
-                    <div class="mode-tile-header">
-                        <span style="font-size:16px;">👥</span>
-                        <span>Job Descriptions & Org Structure</span>
-                    </div>
-                    <div class="mode-tile-desc">
-                        Structures high-performance job descriptions, KPI scorecards, and margin-aligned incentive compensation frameworks.
-                    </div>
-                    <div class="mode-tile-cta">Model Org Structure →</div>
-                </div>
-
-                <!-- MISSION 3: FINANCIAL & P&L LEAKAGE AUDIT -->
-                <div class="mode-tile" onclick="sendQuick('Audit our commercial operations: $28,000/day revenue with 59% prime cost drag. Reconcile our daily cash, identify labor leakage, and calculate breakeven volume.')">
-                    <div class="mode-tile-header">
-                        <span style="font-size:16px;">📊</span>
-                        <span>Daily Cash Flow & P&L Defense</span>
-                    </div>
-                    <div class="mode-tile-desc">
-                        Reconciles audited daily gross sales, direct labor drag, and prime costs to calculate exact take-home cash and breakeven volume.
-                    </div>
-                    <div class="mode-tile-cta">Run Cash Flow Audit →</div>
-                </div>
-
-                <!-- MISSION 4: CUSTOMER ACQUISITION & PRINT CAMPAIGNS -->
-                <div class="mode-tile" onclick="sendQuick('We want to capture 40 new recurring monthly accounts in our local trade area without discounting. Build the door-hanger hook and distribution logistics.')">
-                    <div class="mode-tile-header">
-                        <span style="font-size:16px;">🚀</span>
-                        <span>High-Value Customer Acquisition</span>
-                    </div>
-                    <div class="mode-tile-desc">
-                        Generates print-ready door-hangers, high-converting hooks, VIP welcome keys, and non-discount retention architecture.
-                    </div>
-                    <div class="mode-tile-cta">Build Acquisition Plan →</div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button class="btn-export" onclick="copyCanvasText()" style="padding:4px 8px; font-size:11px;">📋 Copy</button>
+                    <button class="btn-export" onclick="toggleCanvas(false)" style="padding:4px 8px; font-size:11px;">✕</button>
                 </div>
             </div>
-        </div>
-    </main>
+            
+            <div id="canvasEditor" class="canvas-body" contenteditable="true" spellcheck="false">
+                <!-- Populated dynamically when user clicks [ 🎨 Open in Canvas ] -->
+            </div>
+
+            <div class="canvas-toolbar">
+                <span style="font-size:11.5px; color:var(--text-muted); font-weight:600;">Export Artifact:</span>
+                <button class="btn-export" onclick="exportCanvasWord()">📝 Word (.doc)</button>
+                <button class="btn-export" onclick="exportCanvasExcel()">📑 Excel (.xlsx)</button>
+                <button class="btn-export" onclick="exportCanvasTeaser()">📄 Bank Teaser</button>
+            </div>
+        </aside>
+    </div>
 
     <!-- FIXED BOTTOM INPUT DOCK -->
     <div class="dock-container">
@@ -1264,6 +1361,60 @@
                 sidebar.style.transform = 'translateX(-100%)';
                 overlay.style.display = 'none';
             }
+        }
+
+        // LIVE GEMINI-STYLE CANVAS CONTROLS
+        function openInCanvas(btn) {
+            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            if (!card) return;
+
+            const text = card.innerHTML;
+            const editor = document.getElementById('canvasEditor');
+            const pane = document.getElementById('canvasPane');
+            
+            if (editor && pane) {
+                // Strip out the bottom deliverables bar inside the canvas view
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = text;
+                const deliv = tempDiv.querySelector('.deliverables-bar');
+                if (deliv) deliv.remove();
+
+                editor.innerHTML = tempDiv.innerHTML;
+                pane.classList.add('open');
+            }
+        }
+
+        function toggleCanvas(open) {
+            const pane = document.getElementById('canvasPane');
+            if (pane) {
+                if (open) pane.classList.add('open');
+                else pane.classList.remove('open');
+            }
+        }
+
+        function copyCanvasText() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            navigator.clipboard.writeText(editor.innerText || editor.textContent);
+            alert("Canvas artifact copied to clipboard.");
+        }
+
+        function exportCanvasWord() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            exportWordDoc(editor);
+        }
+
+        function exportCanvasExcel() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            exportExcelXLSX(editor);
+        }
+
+        function exportCanvasTeaser() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            exportBankTeaser(editor);
         }
 
         function openVaultModal() {
@@ -1910,11 +2061,12 @@
                     const delivBar = document.createElement('div');
                     delivBar.className = 'deliverables-bar';
                     delivBar.innerHTML = `
+                        <button class="btn-export" onclick="openInCanvas(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎨 Open in Canvas</button>
                         <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
                         <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
                         <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
                         <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
-                        <button class="btn-export" onclick="saveToVault(this)" style="border-color:var(--accent); color:var(--accent-glow);">🔒 Save Vault</button>
+                        <button class="btn-export" onclick="saveToVault(this)">🔒 Save Vault</button>
                     `;
                     assistantCard.appendChild(delivBar);
                     chatFeed.scrollTop = chatFeed.scrollHeight;
