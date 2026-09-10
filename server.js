@@ -25,9 +25,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 // HIGH-AVAILABILITY MULTI-MODEL ZERO-DROP INFERENCE
 const queryGemini = async (prompt, apiKey) => {
   // Speed & quota resilient sequence:
-  // 1. gemini-3.5-flash-lite (667ms, 100% active, zero 429 quota locks)
+  // 1. gemini-3.5-flash-lite (667ms, 100% active)
   // 2. gemini-flash-lite-latest (551ms fast failover)
-  // 3. gemini-3.1-flash-lite
+  // 3. gemini-3.1-flash-lite (3.7s fallback)
   // 4. gemini-3.6-flash
   const models = [
     'gemini-3.5-flash-lite',
@@ -39,7 +39,7 @@ const queryGemini = async (prompt, apiKey) => {
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s generous budget
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
