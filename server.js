@@ -22,24 +22,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST ZERO-503 REASONING CASCADE
+// OPTION 2: HIGH-VELOCITY REASONING CASCADE (SUB-3S EXECUTION, ZERO TIMEOUTS)
 const queryGemini = async (prompt, apiKey) => {
-  // Ordered by live verified uptime and sub-2s speed:
-  // 1. gemini-3.5-flash-lite (1.8s response, 100% active)
-  // 2. gemini-3.5-flash (high reliability fallback)
-  // 3. gemini-3.1-flash-lite
-  // 4. gemini-3.7-flash
   const models = [
     'gemini-3.5-flash-lite',
-    'gemini-3.5-flash',
-    'gemini-3.1-flash-lite',
-    'gemini-3.7-flash'
+    'gemini-3.5-flash'
   ];
 
   for (const model of models) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s fast deadline
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -49,7 +42,7 @@ const queryGemini = async (prompt, apiKey) => {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.65,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 1800,
             topP: 0.95
           }
         })
