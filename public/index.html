@@ -736,7 +736,69 @@
             transform: translateY(-1px);
         }
 
-        /* LIVE STREAMING TYPEWRITER CURSOR & GLOW */
+        /* SUBAGENT TELEMETRY ORCHESTRATION HUD */
+        .subagent-hud {
+            background: rgba(14, 20, 30, 0.9);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .subagent-hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+        }
+
+        .subagent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-glow);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+
+        .subagent-step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        .subagent-step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subagent-step-item.active {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .subagent-step-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .subagent-step-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
         .typing-cursor {
             display: inline-block;
             width: 7px;
@@ -2078,7 +2140,21 @@
             assistantRow.className = 'chat-row';
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
-            assistantCard.innerHTML = `<div style="display:flex; align-items:center; gap:10px; color:var(--text-secondary);"><div class="spinner"></div> Synthesizing executive strategy with Gemini 3.8 Flash...</div>`;
+            
+            // Subagent Telemetry Live Activity HUD
+            assistantCard.innerHTML = `
+                <div class="subagent-hud">
+                    <div class="subagent-hud-header">
+                        <span class="subagent-badge"><span class="pulse-dot"></span> Subagent Orchestration Active</span>
+                        <span style="color:var(--text-muted); font-size:11px;">Hermes Telemetry</span>
+                    </div>
+                    <div class="subagent-step-list">
+                        <div class="subagent-step-item active"><span class="subagent-step-dot active"></span> 1. Scanning operational domain & ingesting parameters</div>
+                        <div class="subagent-step-item"><span class="subagent-step-dot"></span> 2. Synthesizing turnaround metrics & tables</div>
+                        <div class="subagent-step-item"><span class="subagent-step-dot"></span> 3. Cleared for production execution</div>
+                    </div>
+                </div>
+            `;
             assistantRow.appendChild(assistantCard);
             chatFeed.appendChild(assistantRow);
 
