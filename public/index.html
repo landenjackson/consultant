@@ -2037,31 +2037,35 @@
             });
         }
 
-        /* SMOOTH & FLUID CHAT STREAMING WITH GLOWING CURSOR */
+        /* SMOOTH & RAPID EXECUTIVE STREAMING ENGINE WITH NATURAL CADENCE */
         async function streamAssistantResponse(container, fullText, onComplete) {
             const formatted = formatExecutiveResponse(fullText);
             
-            // Container skeleton with glowing cursor
-            container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor"></span>`;
+            // Container skeleton with glowing emerald cursor & smooth fade-in
+            container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.2s ease;"></div><span class="typing-cursor"></span>`;
             const contentBox = container.querySelector('.stream-content');
             const cursor = container.querySelector('.typing-cursor');
 
+            // Tokenize by natural word boundaries
             const words = fullText.split(' ');
             let currentWordIdx = 0;
+            const totalWords = words.length;
 
+            // Target max stream duration between 1.2s to 2.2s for optimal speed and magic feel
             function renderNextChunk() {
-                // Adaptive natural cadence: 2 to 3 words per frame for human-paced flow
-                const wordsPerTick = Math.max(2, Math.min(4, Math.floor((words.length - currentWordIdx) / 18)));
-                currentWordIdx += wordsPerTick;
+                // Adaptive velocity: accelerate through long passages, smooth on short ones
+                const remaining = totalWords - currentWordIdx;
+                const step = Math.max(3, Math.min(8, Math.ceil(remaining / 12)));
+                currentWordIdx += step;
                 
-                const partialText = words.slice(0, currentWordIdx).join(' ');
-                contentBox.innerHTML = formatExecutiveResponse(partialText);
-                
-                const feed = document.getElementById('chatFeed');
-                if (feed) feed.scrollTop = feed.scrollHeight;
-
-                if (currentWordIdx < words.length) {
-                    setTimeout(() => requestAnimationFrame(renderNextChunk), 28);
+                if (currentWordIdx < totalWords) {
+                    const partialText = words.slice(0, currentWordIdx).join(' ');
+                    contentBox.innerHTML = formatExecutiveResponse(partialText);
+                    
+                    const feed = document.getElementById('chatFeed');
+                    if (feed) feed.scrollTop = feed.scrollHeight;
+                    
+                    setTimeout(() => requestAnimationFrame(renderNextChunk), 18);
                 } else {
                     if (cursor) cursor.remove();
                     contentBox.innerHTML = formatted;
@@ -2501,13 +2505,12 @@ ${escapeHtml(text)}
             assistantCard.innerHTML = `
                 <div class="subagent-hud">
                     <div class="subagent-hud-header">
-                        <span class="subagent-badge"><span class="pulse-dot"></span> Subagent Orchestration Active</span>
-                        <span style="color:var(--text-muted); font-size:11px;">Hermes Telemetry</span>
+                        <span class="subagent-badge"><span class="pulse-dot"></span> Orchestrated Intelligence</span>
+                        <span style="color:var(--accent-glow); font-size:11px; font-weight:600;">Sub-2s Realtime</span>
                     </div>
                     <div class="subagent-step-list">
-                        <div class="subagent-step-item active"><span class="subagent-step-dot active"></span> 1. ${docNameToSend ? `Ingesting & analyzing ${escapeHtml(docNameToSend)}` : 'Scanning operational domain & ingesting parameters'}</div>
-                        <div class="subagent-step-item"><span class="subagent-step-dot"></span> 2. Synthesizing turnaround metrics & tables</div>
-                        <div class="subagent-step-item"><span class="subagent-step-dot"></span> 3. Cleared for production execution</div>
+                        <div class="subagent-step-item active"><span class="subagent-step-dot active"></span> 1. ${docNameToSend ? `Analyzing ${escapeHtml(docNameToSend)}` : 'Synthesizing operational parameters'}</div>
+                        <div class="subagent-step-item"><span class="subagent-step-dot"></span> 2. Constructing high-leverage deliverables</div>
                     </div>
                 </div>
             `;
