@@ -1682,15 +1682,13 @@
 
         function updateQuotaDisplay() {
             try {
-                const count = getMemoCount();
-                const left = Math.max(0, 15 - count);
                 const isAuthorized = isCreatorOrSubscribed();
                 const quotaText = document.getElementById('quotaText');
                 if (quotaText) {
                     if (isAuthorized) {
                         quotaText.innerText = "Creator Access • Unlimited";
                     } else {
-                        quotaText.innerText = `${left} Free Memos Left`;
+                        quotaText.innerText = "30-Day Free Trial Active";
                     }
                 }
             } catch(e) {
