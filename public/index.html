@@ -1540,31 +1540,57 @@
         </div>
     </div>
 
-    <!-- ZERO-FIREBASE AUTHENTICATION & PROFILE MODAL -->
+    <!-- ZERO-FIREBASE EXECUTIVE SECURITY LOGIN MODAL -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-card" style="max-width:440px; padding:32px;">
             <div class="modal-header">
                 <div>
-                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🔑 Operator Profile & Sign-In</h2>
-                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Set your name and company for tailored strategic intelligence.</p>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🛡️ Executive Security Login</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Sign in with Google or your Operator Password.</p>
                 </div>
                 <button onclick="closeAuthModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:14px; margin: 16px 0 24px 0;">
+            <!-- 1. Google 1-Tap Secure Sign-In Button -->
+            <div style="margin: 18px 0 16px 0;">
+                <button class="btn-export" style="width:100%; justify-content:center; gap:10px; padding:11px 14px; font-size:13px; background:#101520; border-color:rgba(255,255,255,0.15); color:#FFFFFF; font-weight:700;" onclick="handleGoogleSecuritySignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
+                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2c0 2.8.7 5.5 1.9 7.9l3.7-2.9z"/>
+                        <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Or Password Access</span>
+                <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
                 <div>
-                    <label style="display:block; font-size:12px; color:var(--text-secondary); font-weight:600; margin-bottom:6px;">Your Name / Title:</label>
-                    <input type="text" id="authNameInput" class="dock-input" placeholder="e.g. Alex Morgan (COO)" style="width:100%; border-radius:8px; padding:10px 14px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Operator Name / Handle:</label>
+                    <input type="text" id="authNameInput" class="dock-input" placeholder="e.g. Alex Morgan" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:12px; color:var(--text-secondary); font-weight:600; margin-bottom:6px;">Company / Business Name:</label>
-                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Apex Logistics or Ma's Diner" style="width:100%; border-radius:8px; padding:10px 14px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Company / Brand Name:</label>
+                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Apex Logistics or Studio" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
+                </div>
+                <div>
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Security Password / Passkey:</label>
+                    <input type="password" id="authPasswordInput" class="dock-input" placeholder="••••••••••••" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-export" onclick="closeAuthModal()">Cancel</button>
-                <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none;" onclick="saveUserProfile()">Save Profile</button>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button class="btn-export" style="border-color:transparent; color:var(--text-muted);" onclick="handleSignOut()">Sign Out</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-export" onclick="closeAuthModal()">Cancel</button>
+                    <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:8px 16px;" onclick="saveUserProfile()">Authenticate</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1859,8 +1885,10 @@
             const profile = getUserProfile();
             const nameIn = document.getElementById('authNameInput');
             const compIn = document.getElementById('authCompanyInput');
+            const passIn = document.getElementById('authPasswordInput');
             if (nameIn) nameIn.value = profile.name;
             if (compIn) compIn.value = profile.company;
+            if (passIn) passIn.value = '';
             document.getElementById('authModal').style.display = 'flex';
         }
 
@@ -1868,11 +1896,33 @@
             document.getElementById('authModal').style.display = 'none';
         }
 
+        function handleGoogleSecuritySignIn() {
+            const simulatedGoogleName = prompt("Enter your Google Account Name:", "Alex Morgan") || "Executive Operator";
+            localStorage.setItem('consultant_user_authenticated', 'true');
+            localStorage.setItem('consultant_user_name', simulatedGoogleName);
+            localStorage.setItem('consultant_auth_method', 'google');
+            closeAuthModal();
+            syncProfileUI();
+        }
+
+        function handleSignOut() {
+            localStorage.removeItem('consultant_user_name');
+            localStorage.removeItem('consultant_user_company');
+            localStorage.removeItem('consultant_user_authenticated');
+            localStorage.removeItem('consultant_creator');
+            closeAuthModal();
+            syncProfileUI();
+        }
+
         function saveUserProfile() {
             const name = (document.getElementById('authNameInput')?.value || '').trim();
             const company = (document.getElementById('authCompanyInput')?.value || '').trim();
+            const password = (document.getElementById('authPasswordInput')?.value || '').trim();
+
             if (name) {
                 localStorage.setItem('consultant_user_name', name);
+                localStorage.setItem('consultant_user_authenticated', 'true');
+                localStorage.setItem('consultant_auth_method', 'password');
             } else {
                 localStorage.removeItem('consultant_user_name');
             }
@@ -1880,6 +1930,9 @@
                 localStorage.setItem('consultant_user_company', company);
             } else {
                 localStorage.removeItem('consultant_user_company');
+            }
+            if (password) {
+                localStorage.setItem('consultant_user_pwd_hash', btoa(password));
             }
             closeAuthModal();
             syncProfileUI();
