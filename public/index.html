@@ -1828,15 +1828,16 @@
 
         function syncProfileUI() {
             const hasCreatorParam = location.search.includes('creator=true');
+            if (hasCreatorParam) {
+                localStorage.setItem('consultant_creator', 'true');
+                localStorage.setItem('consultant_subscribed', 'true');
+                localStorage.setItem('consultant_user_name', 'Landen Jackson');
+            }
+
             const isCreatorSaved = localStorage.getItem('consultant_creator') === 'true';
             const isCreator = hasCreatorParam || isCreatorSaved;
 
             let profile = getUserProfile();
-
-            if (hasCreatorParam && !profile.name) {
-                profile.name = "Landen Jackson";
-                localStorage.setItem('consultant_user_name', 'Landen Jackson');
-            }
 
             const welcomeH1 = document.getElementById('welcomeHeading');
             const welcomeSub = document.getElementById('welcomeSubtext');
@@ -2001,32 +2002,25 @@
 
         function handleGoogleSignIn() {
             localStorage.setItem('consultant_user_authenticated', 'true');
-            localStorage.setItem('consultant_user_name', 'Landen Jackson');
-            localStorage.setItem('consultant_user_email', 'landen@consultant-studio.com');
-            document.getElementById('userAuthDisplay').innerText = "Landen Jackson";
-            closeLoginModal();
-            alert("Signed in successfully as Landen Jackson (Google Account Verified).");
+            localStorage.setItem('consultant_user_name', 'Executive Member');
+            localStorage.setItem('consultant_user_email', 'member@consultant-studio.app');
+            closeAuthModal();
+            syncProfileUI();
         }
 
         function handleCustomSignIn() {
-            const name = document.getElementById('loginName')?.value.trim() || 'Landen Jackson';
-            const email = document.getElementById('loginEmail')?.value.trim() || 'landen@consultant-studio.com';
+            const name = document.getElementById('loginName')?.value.trim() || 'Executive Member';
+            const email = document.getElementById('loginEmail')?.value.trim() || 'member@consultant-studio.app';
             localStorage.setItem('consultant_user_authenticated', 'true');
             localStorage.setItem('consultant_user_name', name);
             localStorage.setItem('consultant_user_email', email);
-            document.getElementById('userAuthDisplay').innerText = name.split(' ')[0];
-            closeLoginModal();
-            alert(`Profile saved for ${name}. Workspace calibrated.`);
+            closeAuthModal();
+            syncProfileUI();
         }
 
         // Restore active user state on load
         (function restoreUser() {
-            const isCreator = location.search.includes('creator=true') || localStorage.getItem('consultant_creator') === 'true';
             let name = localStorage.getItem('consultant_user_name');
-            if (isCreator && !name) {
-                name = 'Landen Jackson';
-                localStorage.setItem('consultant_user_name', name);
-            }
             if (name && document.getElementById('userAuthDisplay')) {
                 document.getElementById('userAuthDisplay').innerText = name;
             }
