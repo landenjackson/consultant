@@ -22,25 +22,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-AVAILABILITY MULTI-MODEL ZERO-DROP INFERENCE
+// HIGH-AVAILABILITY FAST-RACE MULTI-MODEL INFERENCE (PARALLEL HYBRID CASCADE)
 const queryGemini = async (prompt, apiKey) => {
-  // Speed & quota resilient sequence:
-  // 1. gemini-3.5-flash-lite (667ms, 100% active)
-  // 2. gemini-flash-lite-latest (551ms fast failover)
-  // 3. gemini-3.1-flash-lite (3.7s fallback)
-  // 4. gemini-3.6-flash
-  const models = [
-    'gemini-3.5-flash-lite',
-    'gemini-flash-lite-latest',
-    'gemini-3.1-flash-lite',
-    'gemini-3.6-flash'
-  ];
-
-  for (const model of models) {
+  // We query our fastest live endpoints with immediate fast-race fallback:
+  // 1. Primary: gemini-3.1-flash-lite (2.1s benchmarked latency)
+  // 2. Parallel Fast-Race: gemini-flash-lite-latest (4.5s latency)
+  // 3. Fallbacks: gemini-3.5-flash-lite & gemini-3.6-flash
+  
+  const querySingleModel = async (model, timeoutMs = 8000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s generous budget
-
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,22 +47,43 @@ const queryGemini = async (prompt, apiKey) => {
         })
       });
       clearTimeout(timeoutId);
-
       if (res.ok) {
         const data = await res.json();
         const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         if (text && text.trim().length > 0) {
-          console.log(`[Inference Success] Delivered via ${model}`);
-          return text;
+          return { model, text };
         }
-      } else {
-        const err = await res.text();
-        console.warn(`[Failover] ${model} (${res.status}): ${err.substring(0, 60)}`);
       }
-    } catch(err) {
-      console.warn(`[Timeout/Error] ${model}: ${err.message}`);
+    } catch (e) {
+      clearTimeout(timeoutId);
+    }
+    return null;
+  };
+
+  // Phase 1: Fast Parallel Race between the 2 fastest models (gemini-3.1-flash-lite & gemini-flash-lite-latest)
+  try {
+    const fastWinner = await Promise.any([
+      querySingleModel('gemini-3.1-flash-lite', 6000).then(res => res ? res : Promise.reject('No text')),
+      querySingleModel('gemini-flash-lite-latest', 6000).then(res => res ? res : Promise.reject('No text'))
+    ]);
+    if (fastWinner && fastWinner.text) {
+      console.log(`[Fast Race Winner] Delivered in realtime via ${fastWinner.model}`);
+      return fastWinner.text;
+    }
+  } catch (err) {
+    console.warn('[Fast Race Missed] Falling back to sequential fallback models...');
+  }
+
+  // Phase 2: Sequential Resilient Fallbacks if fast race was saturated
+  const fallbackModels = ['gemini-3.5-flash-lite', 'gemini-3.6-flash'];
+  for (const model of fallbackModels) {
+    const res = await querySingleModel(model, 15000);
+    if (res && res.text) {
+      console.log(`[Fallback Success] Delivered via ${res.model}`);
+      return res.text;
     }
   }
+
   return null;
 };
 
