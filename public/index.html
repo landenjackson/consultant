@@ -2469,10 +2469,13 @@ ${escapeHtml(text)}
             // User Message
             const userRow = document.createElement('div');
             userRow.className = 'chat-row';
-            const fileBadge = attachedFileNameStr ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached:</span> <strong>${escapeHtml(attachedFileNameStr)}</strong></div>` : '';
+            const fileBadge = attachedFileNameStr ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached & Ingested:</span> <strong>${escapeHtml(attachedFileNameStr)}</strong></div>` : '';
             userRow.innerHTML = `<div class="bubble-user">${fileBadge}${escapeHtml(text)}</div>`;
             chatFeed.appendChild(userRow);
 
+            // Capture file text for the request, then reset the dock
+            const docToSend = uploadedDocText;
+            const docNameToSend = attachedFileNameStr;
             removeAttachedFile(); // Clear file chip after sending
 
             messages.push({ role: 'user', content: text });
@@ -2491,7 +2494,7 @@ ${escapeHtml(text)}
                         <span style="color:var(--text-muted); font-size:11px;">Hermes Telemetry</span>
                     </div>
                     <div class="subagent-step-list">
-                        <div class="subagent-step-item active"><span class="subagent-step-dot active"></span> 1. Scanning operational domain & ingesting parameters</div>
+                        <div class="subagent-step-item active"><span class="subagent-step-dot active"></span> 1. ${docNameToSend ? `Ingesting & analyzing ${escapeHtml(docNameToSend)}` : 'Scanning operational domain & ingesting parameters'}</div>
                         <div class="subagent-step-item"><span class="subagent-step-dot"></span> 2. Synthesizing turnaround metrics & tables</div>
                         <div class="subagent-step-item"><span class="subagent-step-dot"></span> 3. Cleared for production execution</div>
                     </div>
@@ -2516,10 +2519,9 @@ ${escapeHtml(text)}
                     body: JSON.stringify({
                         messages,
                         workspace: selectedMode,
-                        documentText: (uploadedDocText ? uploadedDocText : '') + (memoryContext ? `\n${memoryContext}` : '')
+                        documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
                     })
                 });
-                uploadedDocText = "";
 
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}: Strategic engine unavailable`);
