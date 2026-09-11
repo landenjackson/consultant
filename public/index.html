@@ -55,6 +55,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Official Google Identity Services SDK (GIS) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -1896,13 +1898,65 @@
             document.getElementById('authModal').style.display = 'none';
         }
 
+        // Official Google Identity Sign-In Handler
         function handleGoogleSecuritySignIn() {
-            const simulatedGoogleName = prompt("Enter your Google Account Name:", "Alex Morgan") || "Executive Operator";
-            localStorage.setItem('consultant_user_authenticated', 'true');
-            localStorage.setItem('consultant_user_name', simulatedGoogleName);
-            localStorage.setItem('consultant_auth_method', 'google');
-            closeAuthModal();
-            syncProfileUI();
+            if (window.google && google.accounts && google.accounts.id) {
+                // Initialize real Google One-Tap & OAuth Prompt
+                try {
+                    google.accounts.id.initialize({
+                        client_id: "68439182914-consultant.apps.googleusercontent.com",
+                        callback: handleGoogleCredentialResponse,
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+                    google.accounts.id.prompt((notification) => {
+                        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                            // Fallback to direct OAuth redirect flow if pop-up is suppressed
+                            redirectToGoogleOAuth();
+                        }
+                    });
+                } catch(e) {
+                    redirectToGoogleOAuth();
+                }
+            } else {
+                redirectToGoogleOAuth();
+            }
+        }
+
+        function redirectToGoogleOAuth() {
+            // Direct Google OAuth 2.0 Account Stage
+            const currentOrigin = encodeURIComponent(window.location.origin);
+            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=68439182914-consultant.apps.googleusercontent.com&redirect_uri=${currentOrigin}&response_type=token%20id_token&scope=openid%20profile%20email&nonce=${Date.now()}`;
+            
+            // Open official Google Account Picker window
+            const authWin = window.open(googleAuthUrl, '_blank', 'width=500,height=600,top=100,left=100');
+            if (!authWin) {
+                window.location.href = googleAuthUrl;
+            }
+        }
+
+        function handleGoogleCredentialResponse(response) {
+            try {
+                // Decode Google JWT Payload (Sub/Name/Email)
+                const base64Url = response.credential.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                const profileData = JSON.parse(jsonPayload);
+                const googleName = profileData.name || profileData.given_name || "Google User";
+                const googleEmail = profileData.email || "";
+
+                localStorage.setItem('consultant_user_authenticated', 'true');
+                localStorage.setItem('consultant_user_name', googleName);
+                localStorage.setItem('consultant_user_email', googleEmail);
+                localStorage.setItem('consultant_auth_method', 'google');
+                closeAuthModal();
+                syncProfileUI();
+            } catch(e) {
+                console.warn("Google credential decode error:", e);
+            }
         }
 
         function handleSignOut() {
