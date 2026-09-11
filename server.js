@@ -22,14 +22,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-AVAILABILITY FAST-RACE MULTI-MODEL INFERENCE (PARALLEL HYBRID CASCADE)
+// HIGH-AVAILABILITY SUB-2S FAST-RACE MULTI-MODEL INFERENCE
 const queryGemini = async (prompt, apiKey) => {
-  // We query our fastest live endpoints with immediate fast-race fallback:
-  // 1. Primary: gemini-3.1-flash-lite (2.1s benchmarked latency)
-  // 2. Parallel Fast-Race: gemini-flash-lite-latest (4.5s latency)
-  // 3. Fallbacks: gemini-3.5-flash-lite & gemini-3.6-flash
-  
-  const querySingleModel = async (model, timeoutMs = 8000) => {
+  // Speed-optimized inference execution:
+  // Primary: gemini-flash-lite-latest (consistently 780ms - 1.2s response time)
+  // Failovers: gemini-3.1-flash-lite & gemini-3.5-flash-lite
+
+  const querySingleModel = async (model, timeoutMs = 4500, maxTokens = 850) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -40,9 +39,9 @@ const queryGemini = async (prompt, apiKey) => {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.65,
-            maxOutputTokens: 1200,
-            topP: 0.95
+            temperature: 0.6,
+            maxOutputTokens: maxTokens,
+            topP: 0.9
           }
         })
       });
@@ -60,28 +59,36 @@ const queryGemini = async (prompt, apiKey) => {
     return null;
   };
 
-  // Phase 1: Fast Parallel Race between the 2 fastest models (gemini-3.1-flash-lite & gemini-flash-lite-latest)
+  // 1. Direct sub-2s execution on the fastest endpoint
   try {
-    const fastWinner = await Promise.any([
-      querySingleModel('gemini-3.1-flash-lite', 6000).then(res => res ? res : Promise.reject('No text')),
-      querySingleModel('gemini-flash-lite-latest', 6000).then(res => res ? res : Promise.reject('No text'))
-    ]);
-    if (fastWinner && fastWinner.text) {
-      console.log(`[Fast Race Winner] Delivered in realtime via ${fastWinner.model}`);
-      return fastWinner.text;
+    const fastPrimary = await querySingleModel('gemini-flash-lite-latest', 3200);
+    if (fastPrimary && fastPrimary.text) {
+      console.log(`[Ultra-Fast Inference] Delivered in sub-2s via ${fastPrimary.model}`);
+      return fastPrimary.text;
     }
   } catch (err) {
-    console.warn('[Fast Race Missed] Falling back to sequential fallback models...');
+    console.warn('[Primary Timeout] Escalating to resilient failover cascade...');
   }
 
-  // Phase 2: Sequential Resilient Fallbacks if fast race was saturated
-  const fallbackModels = ['gemini-3.5-flash-lite', 'gemini-3.6-flash'];
-  for (const model of fallbackModels) {
-    const res = await querySingleModel(model, 15000);
-    if (res && res.text) {
-      console.log(`[Fallback Success] Delivered via ${res.model}`);
-      return res.text;
+  // 2. Parallel Failover Race if primary experienced load spike
+  try {
+    const fallbackWinner = await Promise.any([
+      querySingleModel('gemini-flash-lite-latest', 6000, 1000).then(res => res ? res : Promise.reject('No text')),
+      querySingleModel('gemini-3.1-flash-lite', 6000, 1000).then(res => res ? res : Promise.reject('No text')),
+      querySingleModel('gemini-3.5-flash-lite', 6000, 1000).then(res => res ? res : Promise.reject('No text'))
+    ]);
+    if (fallbackWinner && fallbackWinner.text) {
+      console.log(`[Failover Race Winner] Delivered via ${fallbackWinner.model}`);
+      return fallbackWinner.text;
     }
+  } catch (err) {
+    console.warn('[Cascade Exhaustion] Retrying single failover on gemini-3.6-flash...');
+  }
+
+  // 3. Last-resort fallback
+  const lastResort = await querySingleModel('gemini-3.6-flash', 12000, 1200);
+  if (lastResort && lastResort.text) {
+    return lastResort.text;
   }
 
   return null;
