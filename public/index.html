@@ -1897,16 +1897,76 @@
             document.getElementById('authModal').style.display = 'none';
         }
 
-        // Client-Side Secure Google Sign-In with Account Selection
+        // Real Google Identity Services (GIS) OAuth 2.0 Integration
+        const GOOGLE_CLIENT_ID = "1098424026421-jcjn4qo6r0qb6fnik8v0h12ika708nok.apps.googleusercontent.com";
+
         function handleGoogleSecuritySignIn() {
-            // Prompt user directly for their Google account identity without needing an unverified GCP OAuth Client ID
-            const gName = prompt("Enter your Google Account Name or Work Email:", "Alex Morgan") || "Google Verified Operator";
-            localStorage.setItem('consultant_user_authenticated', 'true');
-            localStorage.setItem('consultant_user_name', gName);
-            localStorage.setItem('consultant_auth_method', 'google');
-            closeAuthModal();
-            syncProfileUI();
+            if (window.google && google.accounts && google.accounts.oauth2) {
+                // Official Google OAuth 2.0 Token Client (Opens Real Google Account Selector)
+                const client = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            try {
+                                // Fetch verified Google user profile
+                                const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                                });
+                                const userInfo = await userInfoRes.json();
+                                const gName = userInfo.name || userInfo.given_name || "Google User";
+                                const gEmail = userInfo.email || "";
+
+                                localStorage.setItem('consultant_user_authenticated', 'true');
+                                localStorage.setItem('consultant_user_name', gName);
+                                localStorage.setItem('consultant_user_email', gEmail);
+                                localStorage.setItem('consultant_auth_method', 'google');
+                                closeAuthModal();
+                                syncProfileUI();
+                            } catch(err) {
+                                console.error("Google userinfo fetch error:", err);
+                                fallbackOAuthRedirect();
+                            }
+                        }
+                    },
+                    error_callback: (err) => {
+                        console.warn("Google GIS Error:", err);
+                        fallbackOAuthRedirect();
+                    }
+                });
+                client.requestAccessToken();
+            } else {
+                fallbackOAuthRedirect();
+            }
         }
+
+        function fallbackOAuthRedirect() {
+            const redirectUri = encodeURIComponent("https://www.consultant-studio.app/");
+            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=openid%20profile%20email&prompt=select_account`;
+            window.location.href = googleAuthUrl;
+        }
+
+        // Catch OAuth token redirect response on return
+        (function checkOAuthHash() {
+            if (window.location.hash.includes('access_token=')) {
+                const params = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = params.get('access_token');
+                if (accessToken) {
+                    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    }).then(r => r.json()).then(userInfo => {
+                        if (userInfo.name) {
+                            localStorage.setItem('consultant_user_authenticated', 'true');
+                            localStorage.setItem('consultant_user_name', userInfo.name);
+                            localStorage.setItem('consultant_user_email', userInfo.email || '');
+                            localStorage.setItem('consultant_auth_method', 'google');
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            syncProfileUI();
+                        }
+                    }).catch(e => console.warn(e));
+                }
+            }
+        })();
 
         function handleSignOut() {
             localStorage.removeItem('consultant_user_name');
