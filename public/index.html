@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Consultant Studio | Executive Intelligence Platform</title>
     <meta name="description" content="Personal Strategic Advocate and Chief of Staff. Real-time commercial guidance, custom industry modeling, and bottom-line revenue architecture.">
+    <!-- Progressive Web App (PWA) Manifest & Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#07090D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Consultant">
+    <link rel="apple-touch-icon" href="/brand/consultant_studio_official_icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1964,13 +1971,13 @@
                     const labelName = canvas.dataset.chartName || 'Target Benchmark';
 
                     if (labels.length > 0 && values.length > 0) {
-                        new Chart(canvas, {
+                        const chartInstance = new Chart(canvas, {
                             type: 'bar',
                             data: {
                                 labels: labels,
                                 datasets: [{
                                     label: labelName,
-                                    data: values,
+                                    data: [...values],
                                     backgroundColor: values.map(v => v >= 0 ? 'rgba(34, 197, 94, 0.45)' : 'rgba(248, 113, 113, 0.45)'),
                                     borderColor: values.map(v => v >= 0 ? '#22C55E' : '#EF4444'),
                                     borderWidth: 1.5,
@@ -1992,9 +1999,7 @@
                                         padding: 10,
                                         displayColors: false,
                                         callbacks: {
-                                            title: function(items) {
-                                                return items[0].label;
-                                            },
+                                            title: function(items) { return items[0].label; },
                                             label: function(item) {
                                                 const idx = item.dataIndex;
                                                 const raw = rawTexts[idx] || item.raw;
@@ -2041,11 +2046,95 @@
                             }
                         });
                         canvas.dataset.initialized = 'true';
+
+                        // Attach Interactive What-If Slider Control
+                        const cardParent = canvas.closest('.exec-chart-card');
+                        if (cardParent && !cardParent.querySelector('.whatif-slider-wrap')) {
+                            const sliderDiv = document.createElement('div');
+                            sliderDiv.className = 'whatif-slider-wrap';
+                            sliderDiv.style.cssText = "margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11.5px;";
+                            sliderDiv.innerHTML = `
+                                <span style="color:var(--accent-glow); font-weight:700; white-space:nowrap;">🪄 What-If Sensitivity:</span>
+                                <input type="range" min="80" max="150" value="100" style="flex:1; accent-color:#22C55E; cursor:pointer;" oninput="updateChartSensitivity(this, '${chartInstance.id || canvas.id}')">
+                                <span class="slider-pct-label" style="color:#FFF; font-weight:600; min-width:44px; text-align:right;">100%</span>
+                            `;
+                            cardParent.appendChild(sliderDiv);
+
+                            // Store reference for live slider updates
+                            window['chart_' + (chartInstance.id || canvas.id)] = {
+                                instance: chartInstance,
+                                baseValues: [...values]
+                            };
+                        }
                     }
                 } catch(e) {
                     console.warn("Chart initialization error:", e);
                 }
             });
+        }
+
+        // Live Sensitivity Recalculator
+        function updateChartSensitivity(rangeEl, chartKey) {
+            const pct = parseInt(rangeEl.value, 10);
+            const labelEl = rangeEl.parentElement.querySelector('.slider-pct-label');
+            if (labelEl) labelEl.innerText = `${pct}%`;
+
+            const ref = window['chart_' + chartKey];
+            if (ref && ref.instance && ref.baseValues) {
+                const multiplier = pct / 100.0;
+                ref.instance.data.datasets[0].data = ref.baseValues.map(v => Math.round(v * multiplier * 10) / 10);
+                ref.instance.update('none'); // Instant 60fps update without jitter
+            }
+        }
+
+        // 🎙️ EXECUTIVE VOICE BRIEFING AUDIO ENGINE (SPEECHSYNTHESIS)
+        let activeUtterance = null;
+        function playVoiceBriefing(btn) {
+            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            if (!card) return;
+
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                btn.innerHTML = '🎙️ Listen to Briefing';
+                btn.style.borderColor = 'var(--border)';
+                btn.style.color = 'var(--text-secondary)';
+                return;
+            }
+
+            const rawText = card.innerText || card.textContent;
+            // Clean out headers, table lines and noise for clean speech
+            const cleanSpeech = rawText
+                .replace(/CONSULTANT STUDIO[\s\S]*?\n/g, '')
+                .replace(/\|[^\n]+\|/g, '')
+                .replace(/★ Key Turnaround Catalyst/g, 'Key Strategic Move:')
+                .replace(/https?:\/\/\S+/g, '')
+                .slice(0, 700);
+
+            activeUtterance = new SpeechSynthesisUtterance(cleanSpeech);
+            activeUtterance.rate = 1.05; // Crisp executive cadence
+            activeUtterance.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Male') || v.name.includes('Google'))) || voices[0];
+            if (preferredVoice) activeUtterance.voice = preferredVoice;
+
+            btn.innerHTML = '⏹️ Stop Briefing';
+            btn.style.borderColor = 'var(--accent)';
+            btn.style.color = 'var(--accent-glow)';
+
+            activeUtterance.onend = () => {
+                btn.innerHTML = '🎙️ Listen to Briefing';
+                btn.style.borderColor = 'var(--border)';
+                btn.style.color = 'var(--text-secondary)';
+            };
+
+            activeUtterance.onerror = () => {
+                btn.innerHTML = '🎙️ Listen to Briefing';
+                btn.style.borderColor = 'var(--border)';
+                btn.style.color = 'var(--text-secondary)';
+            };
+
+            window.speechSynthesis.speak(activeUtterance);
         }
 
         /* SMOOTH & RAPID EXECUTIVE STREAMING ENGINE WITH NATURAL CADENCE */
@@ -2561,7 +2650,8 @@ ${escapeHtml(text)}
                     const delivBar = document.createElement('div');
                     delivBar.className = 'deliverables-bar';
                     delivBar.innerHTML = `
-                        <button class="btn-export" onclick="openInCanvas(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎨 Open in Canvas</button>
+                        <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Listen to Briefing</button>
+                        <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open in Canvas</button>
                         <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
                         <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
                         <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
@@ -2587,6 +2677,15 @@ ${escapeHtml(text)}
                 if (sendBtn) sendBtn.disabled = false;
                 chatFeed.scrollTop = chatFeed.scrollHeight;
             }
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('[PWA ServiceWorker Active]', reg.scope))
+                    .catch(err => console.warn('[PWA Registration Ignored]', err));
+            });
         }
     </script>
 </body>

@@ -1,17 +1,23 @@
 {
   "name": "Consultant Studio",
-  "short_name": "Consultant Studio",
-  "description": "Strategic executive intelligence partner for business founders, operators, and advisors.",
-  "start_url": "/",
+  "short_name": "Consultant",
+  "description": "Executive Strategic Intelligence & Operations Suite",
+  "start_url": "/?pwa=true",
   "display": "standalone",
-  "background_color": "#090A0C",
-  "theme_color": "#0e1f16",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/brand/consultant_studio_official_icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
