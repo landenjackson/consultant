@@ -2018,10 +2018,13 @@
 
         // Restore active user state on load
         (function restoreUser() {
-            const name = localStorage.getItem('consultant_user_name') || 'Landen Jackson';
-            localStorage.setItem('consultant_user_name', name);
-            localStorage.setItem('consultant_user_authenticated', 'true');
-            if (document.getElementById('userAuthDisplay')) {
+            const isCreator = location.search.includes('creator=true') || localStorage.getItem('consultant_creator') === 'true';
+            let name = localStorage.getItem('consultant_user_name');
+            if (isCreator && !name) {
+                name = 'Landen Jackson';
+                localStorage.setItem('consultant_user_name', name);
+            }
+            if (name && document.getElementById('userAuthDisplay')) {
                 document.getElementById('userAuthDisplay').innerText = name;
             }
         })();
