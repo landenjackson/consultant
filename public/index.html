@@ -1542,18 +1542,17 @@
         </div>
     </div>
 
-    <!-- ZERO-FIREBASE EXECUTIVE SECURITY LOGIN MODAL -->
+    <!-- EXECUTIVE PROTOCOL AUTHENTICATION & WORKSPACE CREDENTIAL MODAL -->
     <div class="modal-overlay" id="authModal">
-        <div class="modal-card" style="max-width:440px; padding:32px;">
+        <div class="modal-card" style="max-width:460px; padding:32px;">
             <div class="modal-header">
                 <div>
-                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🛡️ Executive Security Login</h2>
-                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Sign in with Google or your Operator Password.</p>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🛡️ Executive Protocol Access</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Authenticate your secure workspace session.</p>
                 </div>
                 <button onclick="closeAuthModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
             </div>
 
-            <!-- 1. Google 1-Tap Secure Sign-In Button -->
             <div style="margin: 18px 0 16px 0;">
                 <button class="btn-export" style="width:100%; justify-content:center; gap:10px; padding:11px 14px; font-size:13px; background:#101520; border-color:rgba(255,255,255,0.15); color:#FFFFFF; font-weight:700;" onclick="handleGoogleSecuritySignIn()">
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -1562,27 +1561,27 @@
                         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2c0 2.8.7 5.5 1.9 7.9l3.7-2.9z"/>
                         <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"/>
                     </svg>
-                    <span>Continue with Google</span>
+                    <span>Instant Workspace Access (Google Verified)</span>
                 </button>
             </div>
 
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
-                <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Or Password Access</span>
+                <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Or Encrypted Passkey</span>
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Operator Name / Handle:</label>
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Leader / Operator Name:</label>
                     <input type="text" id="authNameInput" class="dock-input" placeholder="e.g. Alex Morgan" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Company / Brand Name:</label>
-                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Apex Logistics or Studio" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Organization / Practice:</label>
+                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Apex Operations or Private Practice" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Security Password / Passkey:</label>
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Vault Encryption Passkey:</label>
                     <input type="password" id="authPasswordInput" class="dock-input" placeholder="••••••••••••" style="width:100%; border-radius:8px; padding:9px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
             </div>
@@ -1591,7 +1590,7 @@
                 <button class="btn-export" style="border-color:transparent; color:var(--text-muted);" onclick="handleSignOut()">Sign Out</button>
                 <div style="display:flex; gap:8px;">
                     <button class="btn-export" onclick="closeAuthModal()">Cancel</button>
-                    <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:8px 16px;" onclick="saveUserProfile()">Authenticate</button>
+                    <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:8px 16px;" onclick="saveUserProfile()">Authorize Workspace</button>
                 </div>
             </div>
         </div>
@@ -1655,39 +1654,39 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div>
-                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:22px; font-weight:800; color:#FFFFFF;">Unlock Unlimited Executive Strategy</h2>
-                    <p style="color:var(--text-secondary); font-size:13.5px; margin-top:3px;">All paid plans include a 30-day $0.00 free trial with immediate full-platform access.</p>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:22px; font-weight:800; color:#FFFFFF;">Institutional Intelligence Tiers</h2>
+                    <p style="color:var(--text-secondary); font-size:13.5px; margin-top:3px;">Select your deployment tier. All plans include 30-day full platform evaluation.</p>
                 </div>
                 <button onclick="closePricing()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
             </div>
             <div class="pricing-grid">
                 <!-- STARTER $15.99 -->
                 <div class="plan-box">
-                    <div class="plan-name">Starter Operator</div>
+                    <div class="plan-name">Operator Professional</div>
                     <div class="plan-price">$15.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ Unlimited Chats & Strategy Runs</li>
-                        <li>✓ <strong>5 .DOCX Document Uploads</strong></li>
-                        <li>✓ Live Cash Flow & P&L Calculation Engine</li>
-                        <li>✓ Standard Advisory Perspective</li>
-                        <li>✓ <strong>First 30 Days $0.00 (Free Trial)</strong></li>
+                        <li>✓ Unlimited Strategy Reasoning & Analysis</li>
+                        <li>✓ <strong>5 .DOCX / PDF Document Uploads</strong></li>
+                        <li>✓ Live Cash Flow & Forensic P&L Engine</li>
+                        <li>✓ Standard Advisory Telemetry</li>
+                        <li>✓ <strong>30-Day Evaluation Included ($0.00)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('starter', 1599, 'Starter Operator')">Start 30-Day Free Trial</button>
+                    <button class="btn-subscribe" onclick="checkout('starter', 1599, 'Operator Professional')">Deploy Professional</button>
                 </div>
 
                 <!-- PRO $39.99 -->
                 <div class="plan-box featured">
-                    <div class="plan-badge">POPULAR</div>
-                    <div class="plan-name" style="color:var(--accent-glow);">Pro Operator</div>
+                    <div class="plan-badge">MOST POPULAR</div>
+                    <div class="plan-name">Strategic Partner</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>Consult Like a Pro</strong></li>
-                        <li>✓ Unlimited Chats & Cash Flow Engine</li>
-                        <li>✓ <strong>10 Clicks Office Exports (.xlsx, .doc, .pptx)</strong></li>
-                        <li>✓ Multi-Domain Market Economics</li>
-                        <li>✓ <strong>First 30 Days $0.00 (Free Trial)</strong></li>
+                        <li>✓ <strong>10 Office Export Clicks (.xlsx, .doc)</strong></li>
+                        <li>✓ Sub-2s Multi-Model Accelerated Priority</li>
+                        <li>✓ What-If Sensitivity Sliders & Pivot Charts</li>
+                        <li>✓ Multi-Domain Market Catchment Modeling</li>
+                        <li>✓ <strong>30-Day Evaluation Included ($0.00)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Pro Operator')">Start 30-Day Pro Trial</button>
+                    <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Strategic Partner')">Deploy Partner Tier</button>
                 </div>
 
                 <!-- EXECUTIVE $79.99 -->
@@ -1695,13 +1694,13 @@
                     <div class="plan-name">Executive Boardroom</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>Manager & Executive Status</strong></li>
+                        <li>✓ <strong>Full Executive & C-Suite Authority</strong></li>
                         <li>✓ Unlimited .DOCX & Document Uploads</li>
-                        <li>✓ Idea Generation & Job Structure Modeling</li>
+                        <li>✓ Org Structure & KPI Incentive Modeling</li>
                         <li>✓ 1-Page Institutional Bank Teasers</li>
-                        <li>✓ <strong>First 30 Days $0.00 (Free Trial)</strong></li>
+                        <li>✓ <strong>30-Day Evaluation Included ($0.00)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('executive', 7999, 'Executive Boardroom')">Start 30-Day Executive Trial</button>
+                    <button class="btn-subscribe" onclick="checkout('executive', 7999, 'Executive Boardroom')">Deploy Boardroom Tier</button>
                 </div>
             </div>
         </div>
