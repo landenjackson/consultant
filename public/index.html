@@ -1698,18 +1698,18 @@
         }
 
         function isCreatorOrSubscribed() {
-            // Permanent free access bypass for Landen Jackson (Creator / Lead Strategic Advisor)
-            const isCreator = location.search.includes('creator=true') || 
-                              location.hostname === 'localhost' || 
-                              localStorage.getItem('consultant_creator') === 'true' ||
-                              localStorage.getItem('consultant_subscribed') === 'true' ||
-                              location.search.includes('subscribed=true');
-            
-            if (location.search.includes('creator=true') || location.hostname === 'localhost') {
+            // ONLY grant creator access if explicit ?creator=true parameter is provided
+            const hasCreatorParam = location.search.includes('creator=true');
+            if (hasCreatorParam) {
                 localStorage.setItem('consultant_creator', 'true');
                 localStorage.setItem('consultant_subscribed', 'true');
+                localStorage.setItem('consultant_user_name', 'Landen Jackson');
+                return true;
             }
-            return isCreator;
+
+            const isCreatorSaved = localStorage.getItem('consultant_creator') === 'true';
+            const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true' || location.search.includes('subscribed=true');
+            return isCreatorSaved || isSubscribed;
         }
 
         function updateQuotaDisplay() {
@@ -1827,10 +1827,13 @@
         }
 
         function syncProfileUI() {
-            const isCreator = location.search.includes('creator=true') || localStorage.getItem('consultant_creator') === 'true';
+            const hasCreatorParam = location.search.includes('creator=true');
+            const isCreatorSaved = localStorage.getItem('consultant_creator') === 'true';
+            const isCreator = hasCreatorParam || isCreatorSaved;
+
             let profile = getUserProfile();
 
-            if (isCreator && !profile.name) {
+            if (hasCreatorParam && !profile.name) {
                 profile.name = "Landen Jackson";
                 localStorage.setItem('consultant_user_name', 'Landen Jackson');
             }
