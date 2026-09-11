@@ -27,13 +27,13 @@ const queryAI = async (prompt) => {
   const geminiKey = process.env.GEMINI_API_KEY;
   const myclawKey = process.env.MYCLAW_API_KEY;
 
-  // Tier 1: Direct Google REST Endpoint (gemini-flash-lite-latest / gemini-3.1-flash-lite)
+  // Tier 1: Direct Google REST Endpoints with resilient timeout
   if (geminiKey) {
     const models = ['gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -57,17 +57,17 @@ const queryAI = async (prompt) => {
           }
         }
       } catch (e) {
-        // Proceed immediately to next failover
+        // Proceed immediately to next endpoint
       }
     }
   }
 
-  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (Never 503 / Zero Quota Lock)
+  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (with 15s budget)
   if (myclawKey) {
     try {
       console.log('[Failover Engaged] Querying High-Availability Enterprise Gateway...');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
