@@ -1670,7 +1670,18 @@
             const editor = document.getElementById('canvasEditor');
             if (!editor) return;
             navigator.clipboard.writeText(editor.innerText || editor.textContent);
-            alert("Canvas artifact copied to clipboard.");
+            
+            // Smooth non-blocking UI indicator
+            const titleEl = document.getElementById('canvasTitle');
+            if (titleEl) {
+                const origText = titleEl.innerText;
+                titleEl.innerText = "✓ Copied to Clipboard";
+                titleEl.style.color = "var(--accent-glow)";
+                setTimeout(() => {
+                    titleEl.innerText = origText;
+                    titleEl.style.color = "#FFFFFF";
+                }, 1800);
+            }
         }
 
         function exportCanvasWord() {

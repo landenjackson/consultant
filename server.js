@@ -119,6 +119,11 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: "Empty prompt provided." });
     }
 
+    // Build true multi-turn context from prior user/assistant turns
+    const conversationHistory = messages.length > 1 
+      ? messages.slice(-5, -1).map(m => `${m.role === 'user' ? 'Operator' : 'Consultant'}: ${m.content}`).join('\n\n')
+      : '';
+
     const qLower = userMessage.toLowerCase();
     const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone/i.test(qLower);
     const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
@@ -126,7 +131,7 @@ app.post('/api/chat', async (req, res) => {
 
     const humanInTheLoopVoice = `
 CORE IDENTITY & FOUNDING PHILOSOPHY:
-You are Consultant Studio, built with Landen Jackson's direct voice, operator standards, and "Human-in-the-Loop" philosophy. 
+You are Consultant Studio, built with Landen Jackson's direct voice, operator standards, and "Human-in-the-Loop" philosophy.
 Technology and algorithms construct the skeletons and research, but human discernment, conviction, and strategic instinct drive the final breakthrough.
 
 HUMAN CONVERSATION & EMOTIONAL INTELLIGENCE DIRECTIVES:
@@ -140,6 +145,7 @@ HUMAN CONVERSATION & EMOTIONAL INTELLIGENCE DIRECTIVES:
     if (isCareerOrResume) {
       systemPrompt = `${humanInTheLoopVoice}
 Operating Domain: "${workspace}"
+${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
 Inquiry & Career Context: "${userMessage}"
 ${documentText ? `Attached Resume & Retained Memory:\n"""\n${documentText}\n"""\n` : ''}
 
@@ -149,21 +155,21 @@ CAREER & INTERVIEW MANDATE:
 - Deliver talking points in a clean, human-readable table:
 | Strategic Focus / Milestone | Practical Action & Lever | Measurable Outcome |
 | :--- | :--- | :--- |
-- Highlight the single highest-leverage career turnaround move with: >> ★ Key Turnaround Move: [Action]
-- Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+- Highlight the single highest-leverage career turnaround move with: >> ★ Key Turnaround Move: [Action]`;
     } else if (isConversational) {
       systemPrompt = `${humanInTheLoopVoice}
 Operating Domain: "${workspace}"
+${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
 Conversation Follow-up: "${userMessage}"
 ${documentText ? `Retained Context & Memory:\n"""\n${documentText}\n"""\n` : ''}
 
 PEER DIALOGUE MANDATE:
 - Respond naturally, conversationally, and incisively as a trusted peer in the room.
-- Deliver 2 to 3 punchy, high-density paragraphs that directly resolve their specific question with zero generic filler.
-- Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+- Deliver 2 to 3 punchy, high-density paragraphs that directly resolve their specific question with zero generic filler.`;
     } else if (isMarketing) {
       systemPrompt = `${humanInTheLoopVoice}
 Operating Domain: "${workspace}"
+${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
 Growth Challenge: "${userMessage}"
 ${documentText ? `Attached Campaign Data:\n"""\n${documentText}\n"""\n` : ''}
 
@@ -172,11 +178,11 @@ GROWTH & NON-DISCOUNT ACQUISITION MANDATE:
 - Provide a clean comparison table for campaign assets:
 | Campaign Asset / Parameter | Specification | Target Standard |
 | :--- | :--- | :--- |
-- State the exact hook with: >> ★ Key Turnaround Move: [Action]
-- Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+- State the exact hook with: >> ★ Key Turnaround Move: [Action]`;
     } else {
       systemPrompt = `${humanInTheLoopVoice}
 Operating Domain: "${workspace}"
+${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
 Operational Challenge: "${userMessage}"
 ${documentText ? `Uploaded POS/P&L Data & Retained Memory:\n"""\n${documentText}\n"""\n` : ''}
 
@@ -186,8 +192,7 @@ FINANCIAL & P&L TELEMETRY MANDATE:
 | Financial Metric | Current Daily | Target Benchmark | Variance / Recovery |
 | :--- | :--- | :--- | :--- |
 - Explain the breakeven point and cash machine recovery in everyday business English.
-- State the turnaround catalyst with: >> ★ Key Turnaround Move: [Action]
-- Conclude with: Status: Cleared for Production Execution • Landen Jackson (Lead Strategic Operator)`;
+- State the turnaround catalyst with: >> ★ Key Turnaround Move: [Action]`;
     }
 
     console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'}]`);
