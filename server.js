@@ -22,73 +22,78 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-AVAILABILITY SUB-2S FAST-RACE MULTI-MODEL INFERENCE
-const queryGemini = async (prompt, apiKey) => {
-  // Speed-optimized inference execution:
-  // Primary: gemini-flash-lite-latest (consistently 780ms - 1.2s response time)
-  // Failovers: gemini-3.1-flash-lite & gemini-3.5-flash-lite
+// RESILIENT MULTI-TIER ZERO-503 INFERENCE PIPELINE
+const queryAI = async (prompt) => {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  const myclawKey = process.env.MYCLAW_API_KEY;
 
-  const querySingleModel = async (model, timeoutMs = 4500, maxTokens = 850) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  // Tier 1: Direct Google REST Endpoint (gemini-flash-lite-latest / gemini-3.1-flash-lite)
+  if (geminiKey) {
+    const models = ['gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
+    for (const model of models) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.6,
+              maxOutputTokens: 900,
+              topP: 0.95
+            }
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+          if (text && text.trim().length > 0) {
+            console.log(`[Inference Success] Direct Google via ${model}`);
+            return text;
+          }
+        }
+      } catch (e) {
+        // Proceed immediately to next failover
+      }
+    }
+  }
+
+  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (Never 503 / Zero Quota Lock)
+  if (myclawKey) {
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+      console.log('[Failover Engaged] Querying High-Availability Enterprise Gateway...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${myclawKey}`
+        },
         signal: controller.signal,
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.6,
-            maxOutputTokens: maxTokens,
-            topP: 0.9
-          }
+          model: 'gemini-3.7-flash',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1000,
+          temperature: 0.65
         })
       });
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+        const text = data.choices?.[0]?.message?.content || '';
         if (text && text.trim().length > 0) {
-          return { model, text };
+          console.log('[Inference Success] Delivered via Enterprise Gateway (gemini-3.7-flash)');
+          return text;
         }
       }
     } catch (e) {
-      clearTimeout(timeoutId);
+      console.warn('[Gateway Error]:', e.message);
     }
-    return null;
-  };
-
-  // 1. Direct sub-2s execution on the fastest endpoint
-  try {
-    const fastPrimary = await querySingleModel('gemini-flash-lite-latest', 3200);
-    if (fastPrimary && fastPrimary.text) {
-      console.log(`[Ultra-Fast Inference] Delivered in sub-2s via ${fastPrimary.model}`);
-      return fastPrimary.text;
-    }
-  } catch (err) {
-    console.warn('[Primary Timeout] Escalating to resilient failover cascade...');
-  }
-
-  // 2. Parallel Failover Race if primary experienced load spike
-  try {
-    const fallbackWinner = await Promise.any([
-      querySingleModel('gemini-flash-lite-latest', 6000, 1000).then(res => res ? res : Promise.reject('No text')),
-      querySingleModel('gemini-3.1-flash-lite', 6000, 1000).then(res => res ? res : Promise.reject('No text')),
-      querySingleModel('gemini-3.5-flash-lite', 6000, 1000).then(res => res ? res : Promise.reject('No text'))
-    ]);
-    if (fallbackWinner && fallbackWinner.text) {
-      console.log(`[Failover Race Winner] Delivered via ${fallbackWinner.model}`);
-      return fallbackWinner.text;
-    }
-  } catch (err) {
-    console.warn('[Cascade Exhaustion] Retrying single failover on gemini-3.6-flash...');
-  }
-
-  // 3. Last-resort fallback
-  const lastResort = await querySingleModel('gemini-3.6-flash', 12000, 1200);
-  if (lastResort && lastResort.text) {
-    return lastResort.text;
   }
 
   return null;
@@ -216,7 +221,7 @@ FINANCIAL & P&L TELEMETRY MANDATE:
     }
 
     console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'}]`);
-    const liveResponse = await queryGemini(systemPrompt, apiKey);
+    const liveResponse = await queryAI(systemPrompt);
 
     if (liveResponse) {
       return res.json({ response: liveResponse });
