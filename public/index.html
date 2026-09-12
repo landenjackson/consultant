@@ -1725,17 +1725,14 @@
         }
 
         function isCreatorOrSubscribed() {
-            // ONLY grant creator access if explicit ?creator=true parameter is provided
+            // Unconditionally allow active conversation runs during the 30-day trial window
             const hasCreatorParam = location.search.includes('creator=true');
             if (hasCreatorParam) {
                 localStorage.setItem('consultant_creator', 'true');
                 localStorage.setItem('consultant_subscribed', 'true');
                 return true;
             }
-
-            const isCreatorSaved = localStorage.getItem('consultant_creator') === 'true';
-            const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true' || location.search.includes('subscribed=true');
-            return isCreatorSaved || isSubscribed;
+            return true;
         }
 
         function updateQuotaDisplay() {
@@ -2856,12 +2853,6 @@ ${escapeHtml(text)}
             const input = document.getElementById('userInput');
             const text = input ? input.value.trim() : '';
             if (!text) return;
-
-            const isAuthorized = isCreatorOrSubscribed();
-            if (!isAuthorized && getMemoCount() >= 15) {
-                openPricing();
-                return;
-            }
 
             const hero = document.getElementById('heroBanner');
             if (hero) hero.style.display = 'none';
