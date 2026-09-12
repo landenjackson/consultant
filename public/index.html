@@ -2653,11 +2653,45 @@
             }
         }
 
+        // UNIVERSAL DIRECT FILE DOWNLOAD HELPER
+        function triggerFileDownload(blob, filename) {
+            try {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (document.body.contains(a)) document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 2000);
+            } catch(e) {
+                console.warn("Direct link fallback triggered:", e);
+                const a = document.createElement('a');
+                a.target = '_blank';
+                a.href = URL.createObjectURL(blob);
+                document.body.appendChild(a);
+                a.click();
+            }
+        }
+
+        // Helper to extract clean text from assistant bubble or canvas
+        function getTargetDocumentText(el) {
+            if (!el) return document.querySelector('.bubble-assistant')?.innerText || "Executive Strategy Analysis";
+            if (el.id === 'canvasEditor' || el.classList?.contains('canvas-body')) {
+                return el.innerText || el.textContent;
+            }
+            const bubble = el.closest('.bubble-assistant') || el.closest('#canvasPane') || document.querySelector('.bubble-assistant');
+            return bubble ? (bubble.innerText || bubble.textContent) : "Executive Strategy Analysis";
+        }
+
         function exportBankTeaser(btn) {
-            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
-            const text = card ? (card.innerText || card.textContent) : "Executive Strategy Briefing";
+            const text = getTargetDocumentText(btn);
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const mode = document.getElementById('customModeSelect')?.value || "Executive";
+            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
 
             const teaserHtml = `<!DOCTYPE html>
 <html>
@@ -2689,46 +2723,35 @@
 ${escapeHtml(text)}
     </div>
     <div class="footer">
-        <span>Lead Operator: Landen Jackson (Lead Strategic Operator)</span>
+        <span>Operator: ${escapeHtml(profile.name || 'Executive Member')}</span>
         <span>Confidential & Proprietary</span>
     </div>
 </body>
 </html>`;
 
-            try {
-                const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const win = window.open(url, '_blank');
-                if (!win) {
-                    triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
-                }
-            } catch(e) {
-                const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-                triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
-            }
+            const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
+            triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
         }
 
         function exportExcelXLSX(btn) {
-            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
-            const text = card ? (card.innerText || card.textContent) : "";
+            const text = getTargetDocumentText(btn);
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
 
             try {
-                // Ensure XLSX is available
                 if (typeof XLSX !== 'undefined') {
                     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                     const aoa = [
                         ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
-                        ["Lead Strategic Operator", "Landen Jackson", "Status: Cleared for Execution"],
+                        ["Executive Operator", profile.name || "Executive Member", "Status: Cleared for Execution"],
                         [],
                         ["Line Item / Category", "Strategic Directive / Metric", "Assessment / Target Standard"]
                     ];
 
                     lines.forEach((line, idx) => {
-                        // Clean out markdown noise
                         const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                        if (!cleanLine) return;
+                        if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
 
                         if (cleanLine.includes(':')) {
                             const [key, ...vals] = cleanLine.split(':');
@@ -2739,59 +2762,37 @@ ${escapeHtml(text)}
                     });
 
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
-                    
-                    // Column widths for clean readability in Excel
-                    ws['!cols'] = [
-                        { wch: 30 },
-                        { wch: 55 },
-                        { wch: 25 }
-                    ];
-
+                    ws['!cols'] = [{ wch: 32 }, { wch: 60 }, { wch: 28 }];
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Financial Strategy");
-
-                    // Direct binary write & download
-                    XLSX.writeFile(wb, `${mode}_Financial_Model_${Date.now()}.xlsx`);
+                    XLSX.utils.book_append_sheet(wb, ws, "Executive Strategy");
+                    XLSX.writeFile(wb, `${mode}_Model_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
-                console.error("SheetJS Export Error:", err);
+                console.warn("SheetJS export note:", err);
             }
 
-            // Universal CSV Fallback if SheetJS library is delayed
-            try {
-                const rows = [
-                    ["Category / Item", "Operational Directive", "Target Standard"]
-                ];
-                text.split('\n').forEach((l, idx) => {
-                    const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                    if (!cl) return;
-                    if (cl.includes(':')) {
-                        const [k, ...v] = cl.split(':');
-                        rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
-                    } else {
-                        rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
-                    }
-                });
-
-                const csvStr = "data:text/csv;charset=utf-8," + rows.map(r => r.join(",")).join("\n");
-                const encodedUri = encodeURI(csvStr);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `${mode}_Model_${Date.now()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (fallbackErr) {
-                alert("Could not generate spreadsheet: " + fallbackErr.message);
-            }
+            // Universal CSV Fallback
+            const rows = [["Category / Item", "Operational Directive", "Target Standard"]];
+            text.split('\n').forEach((l, idx) => {
+                const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
+                if (!cl || cl.startsWith('|')) return;
+                if (cl.includes(':')) {
+                    const [k, ...v] = cl.split(':');
+                    rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
+                } else {
+                    rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
+                }
+            });
+            const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
+            triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
         }
 
         function exportWordDoc(btn) {
-            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
-            const text = card ? (card.innerText || card.textContent) : "";
+            const text = getTargetDocumentText(btn);
             const mode = document.getElementById('customModeSelect')?.value || "Operations";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
 
             const docHtml = `<!DOCTYPE html>
 <html>
@@ -2802,35 +2803,29 @@ ${escapeHtml(text)}
         body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1E293B; padding: 40px; }
         h1 { color: #0F172A; font-size: 18pt; border-bottom: 2px solid #22C55E; padding-bottom: 6px; }
         .meta { font-size: 9.5pt; color: #64748B; margin-bottom: 20px; }
-        .body-text { margin-top: 15px; }
+        .body-text { margin-top: 15px; white-space: pre-wrap; word-break: break-word; }
     </style>
 </head>
 <body>
     <h1>CONSULTANT STUDIO: EXECUTIVE MEMORANDUM</h1>
     <div class="meta">
-        <strong>Domain:</strong> ${mode.toUpperCase()} &nbsp;|&nbsp; <strong>Date:</strong> ${timestamp} &nbsp;|&nbsp; <strong>Lead Operator:</strong> Landen Jackson
+        <strong>Domain:</strong> ${mode.toUpperCase()} &nbsp;|&nbsp; <strong>Date:</strong> ${timestamp} &nbsp;|&nbsp; <strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}
     </div>
     <div class="body-text">
-        ${text.replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')}
+${escapeHtml(text)}
     </div>
 </body>
 </html>`;
 
-            const win = window.open('', '_blank');
-            if (win) {
-                win.document.write(docHtml);
-                win.document.close();
-            } else {
-                const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
-                triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
-            }
+            const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
+            triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
         }
 
         function exportPowerPointDeck(btn) {
-            const card = btn ? btn.closest('.bubble-assistant') : document.querySelector('.bubble-assistant');
-            const text = card ? (card.innerText || card.textContent) : "";
+            const text = getTargetDocumentText(btn);
             const mode = document.getElementById('customModeSelect')?.value || "Executive";
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
 
             const pptHtml = `<!DOCTYPE html>
 <html>
@@ -2842,7 +2837,7 @@ ${escapeHtml(text)}
         .slide-card { background:#0F1216; border:2px solid #1C2028; border-left:6px solid #22C55E; border-radius:10px; padding:30px; margin-bottom:30px; }
         .slide-title { font-size:24px; font-weight:bold; color:#FFFFFF; margin-bottom:12px; }
         .slide-kicker { font-size:12px; color:#4ADE80; text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:6px; }
-        .slide-body { font-size:14px; color:#CBD5E1; line-height:1.6; }
+        .slide-body { font-size:14px; color:#CBD5E1; line-height:1.6; white-space: pre-wrap; word-break: break-word; }
     </style>
 </head>
 <body>
@@ -2852,27 +2847,21 @@ ${escapeHtml(text)}
         <div class="slide-body">
             <p><strong>Strategic Focus:</strong> Operations & Financial Telemetry</p>
             <p><strong>Date:</strong> ${timestamp}</p>
-            <p><strong>Lead Strategic Operator:</strong> Landen Jackson</p>
+            <p><strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}</p>
         </div>
     </div>
     <div class="slide-card">
         <div class="slide-kicker">Strategic Memorandum // Slide 2</div>
         <div class="slide-title">Executive Diagnosis & Operational Reality</div>
         <div class="slide-body">
-            ${text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}
+${escapeHtml(text)}
         </div>
     </div>
 </body>
 </html>`;
 
-            const win = window.open('', '_blank');
-            if (win) {
-                win.document.write(pptHtml);
-                win.document.close();
-            } else {
-                const blob = new Blob([pptHtml], { type: 'text/html;charset=utf-8' });
-                triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.html`);
-            }
+            const blob = new Blob([pptHtml], { type: 'text/html;charset=utf-8' });
+            triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.html`);
         }
 
         async function sendMessage() {
