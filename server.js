@@ -150,9 +150,13 @@ app.post('/api/chat', async (req, res) => {
       : '';
 
     const qLower = userMessage.toLowerCase();
-    const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone/i.test(qLower);
+    const docLower = documentText.toLowerCase();
+
+    // Check both user message AND uploaded file text for domain routing
+    const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone|eagle scout|curriculum vitae/i.test(qLower) ||
+                             /resume|résumé|education|experience|bachelor|curriculum vitae|coursework/i.test(docLower);
     const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
-    const isConversational = messages.length > 2 && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
+    const isConversational = messages.length > 2 && !isCareerOrResume && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
 
     const humanInTheLoopVoice = `
 CORE IDENTITY & FOUNDING PHILOSOPHY:

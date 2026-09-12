@@ -2188,17 +2188,24 @@
                     const result = await mammoth.extractRawText({ arrayBuffer });
                     uploadedDocText = result.value;
                 } else if (ext === 'pdf') {
-                    // Extract text from PDF documents
+                    // Extract text from PDF documents with robust item extraction
                     const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const loadingTask = pdfjsLib.getDocument({
+                        data: new Uint8Array(arrayBuffer),
+                        useSystemFonts: true,
+                        disableFontFace: true
+                    });
+                    const pdf = await loadingTask.promise;
                     let fullPdfText = "";
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(' ');
-                        fullPdfText += `\n--- Page ${i} ---\n` + pageText;
+                        const pageItems = textContent.items
+                            .map(item => (typeof item.str === 'string' ? item.str : ''))
+                            .filter(str => str.trim().length > 0);
+                        fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
                     }
-                    uploadedDocText = fullPdfText;
+                    uploadedDocText = fullPdfText.trim() || `[PDF Document: ${file.name} (Scanned Image or Vector)]`;
                 } else if (ext === 'xlsx' || ext === 'xls') {
                     // Extract text from Excel spreadsheets
                     const arrayBuffer = await file.arrayBuffer();
