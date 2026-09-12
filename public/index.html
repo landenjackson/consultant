@@ -2771,22 +2771,35 @@ ${escapeHtml(text)}
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
 
-            const docHtml = `<!DOCTYPE html>
-<html>
+            // Clean, compliant Word-compatible XML/HTML document with full styling
+            const docContent = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <title>Executive Strategy Memorandum</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
     <style>
-        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1E293B; padding: 40px; }
-        h1 { color: #0F172A; font-size: 18pt; border-bottom: 2px solid #22C55E; padding-bottom: 6px; }
-        .meta { font-size: 9.5pt; color: #64748B; margin-bottom: 20px; }
-        .body-text { margin-top: 15px; white-space: pre-wrap; word-break: break-word; }
+        @page { size: 8.5in 11.0in; margin: 1.0in 1.0in 1.0in 1.0in; }
+        body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; line-height: 1.6; color: #1E293B; background: #FFFFFF; }
+        h1 { color: #0F172A; font-size: 18pt; border-bottom: 2pt solid #22C55E; padding-bottom: 6pt; margin-bottom: 12pt; }
+        .meta { font-size: 9.5pt; color: #64748B; margin-bottom: 20pt; }
+        .body-text { margin-top: 15pt; white-space: pre-wrap; word-break: break-word; }
     </style>
 </head>
 <body>
     <h1>CONSULTANT STUDIO: EXECUTIVE MEMORANDUM</h1>
     <div class="meta">
-        <strong>Domain:</strong> ${mode.toUpperCase()} &nbsp;|&nbsp; <strong>Date:</strong> ${timestamp} &nbsp;|&nbsp; <strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}
+        <strong>Domain:</strong> ${escapeHtml(mode.toUpperCase())} &nbsp;|&nbsp; 
+        <strong>Date:</strong> ${escapeHtml(timestamp)} &nbsp;|&nbsp; 
+        <strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}
     </div>
     <div class="body-text">
 ${escapeHtml(text)}
@@ -2794,7 +2807,8 @@ ${escapeHtml(text)}
 </body>
 </html>`;
 
-            const blob = new Blob(['\ufeff' + docHtml], { type: 'application/msword;charset=utf-8' });
+            // Use octet-stream MIME type for bulletproof Safari/iOS native file saving
+            const blob = new Blob(['\ufeff', docContent], { type: 'application/msword' });
             triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
         }
 
