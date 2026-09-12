@@ -2451,11 +2451,16 @@
                             `;
                             cardParent.appendChild(sliderDiv);
 
-                            // Store reference for live slider updates
-                            window['chart_' + (chartInstance.id || canvas.id)] = {
+                            // Attach base values to dataset for resilient lookup
+                            chartInstance.data.datasets[0]._baseValues = [...values];
+
+                            // Store reference in global registry for live slider updates across all browsers
+                            const lookupKey = canvas.id;
+                            window.consultantChartRegistry[lookupKey] = {
                                 instance: chartInstance,
                                 baseValues: [...values]
                             };
+                            window['chart_' + lookupKey] = window.consultantChartRegistry[lookupKey];
                         }
                     }
                 } catch(e) {
@@ -2464,17 +2469,27 @@
             });
         }
 
-        // Live Sensitivity Recalculator
+        // Global Chart Registry for Universal Multi-Browser Sensitivity Updates
+        window.consultantChartRegistry = window.consultantChartRegistry || {};
+
+        // Live Sensitivity Recalculator with Cross-Browser Compatibility
         function updateChartSensitivity(rangeEl, chartKey) {
             const pct = parseInt(rangeEl.value, 10);
             const labelEl = rangeEl.parentElement.querySelector('.slider-pct-label');
             if (labelEl) labelEl.innerText = `${pct}%`;
 
-            const ref = window['chart_' + chartKey];
-            if (ref && ref.instance && ref.baseValues) {
-                const multiplier = pct / 100.0;
-                ref.instance.data.datasets[0].data = ref.baseValues.map(v => Math.round(v * multiplier * 10) / 10);
-                ref.instance.update('none'); // Instant 60fps update without jitter
+            // Retrieve from global registry or window fallback
+            const ref = window.consultantChartRegistry[chartKey] || window['chart_' + chartKey] || Chart.getChart(chartKey);
+            
+            if (ref) {
+                const chartInstance = ref.instance || ref;
+                const baseValues = ref.baseValues || (chartInstance.data && chartInstance.data.datasets[0] ? chartInstance.data.datasets[0]._baseValues : null);
+                
+                if (chartInstance && baseValues) {
+                    const multiplier = pct / 100.0;
+                    chartInstance.data.datasets[0].data = baseValues.map(v => Math.round(v * multiplier * 10) / 10);
+                    chartInstance.update('none'); // Instant zero-flicker update across Chrome/Google app
+                }
             }
         }
 
