@@ -2641,29 +2641,6 @@
                 document.body.appendChild(a);
                 a.click();
                 setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 1500);
-            } catch(e) {
-                console.error("Direct download failed:", e);
-                const a = document.createElement('a');
-                a.target = '_blank';
-                a.href = URL.createObjectURL(blob);
-                a.click();
-            }
-        }
-
-        // UNIVERSAL DIRECT FILE DOWNLOAD HELPER
-        function triggerFileDownload(blob, filename) {
-            try {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
                     if (document.body.contains(a)) document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 2000);
@@ -2817,7 +2794,7 @@ ${escapeHtml(text)}
 </body>
 </html>`;
 
-            const blob = new Blob([docHtml], { type: 'application/msword;charset=utf-8' });
+            const blob = new Blob(['\ufeff' + docHtml], { type: 'application/msword;charset=utf-8' });
             triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
         }
 
