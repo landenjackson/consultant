@@ -947,10 +947,13 @@
             background: #090D14;
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            padding: 16px 18px;
+            padding: 14px 14px;
             margin: 14px 0;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .exec-chart-header {
@@ -986,8 +989,10 @@
 
         .exec-chart-canvas-wrap {
             position: relative;
-            height: 190px;
+            height: 200px;
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         /* COMPACT & HIGHLY READABLE EXECUTIVE WORD-LIKE REPORT TABLE */
@@ -3102,6 +3107,10 @@ ${escapeHtml(text)}
             // Use octet-stream MIME type for bulletproof Safari/iOS native file saving
             const blob = new Blob(['\ufeff', docContent], { type: 'application/msword' });
             triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
+        }
+
+        function exportPitchDeck(btn) {
+            exportPowerPointDeck(btn);
         }
 
         function exportPowerPointDeck(btn) {
