@@ -2012,38 +2012,46 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        // Reset Chat Feed & Start Fresh Session
+        // Reset Chat Feed & Return to Clean Main Stage
         function resetChatSession() {
-            // Clear message history in memory
+            // Check if page needs clean reload or in-memory reset
+            if (window.location.search || window.location.hash) {
+                window.location.href = window.location.pathname;
+                return;
+            }
+
+            // Clear in-memory conversation
             messages = [];
-            
-            // Remove attached file state
             removeAttachedFile();
 
-            // Clear chat feed rows
+            // Clear chat rows
             const feed = document.getElementById('chatFeed');
             if (feed) {
                 const rows = feed.querySelectorAll('.chat-row');
                 rows.forEach(r => r.remove());
+                feed.scrollTop = 0;
             }
 
-            // Restore Hero Banner
+            // Restore Hero Banner & Mission Grid
             const hero = document.getElementById('heroBanner');
             if (hero) {
                 hero.style.display = 'block';
             }
 
-            // Close Canvas if open
+            // Close Canvas & Modals
             toggleCanvas(false);
+            closeVaultModal();
+            closeSettingsModal();
+            closePricing();
+            if (typeof closeOfficeModal === 'function') closeOfficeModal();
 
             // Clear text input
             const input = document.getElementById('userInput');
             if (input) {
                 input.value = '';
-                input.focus();
             }
 
-            scrollToTop();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Scroll to Top of the Strategy Stage
