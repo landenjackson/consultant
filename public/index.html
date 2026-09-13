@@ -2507,17 +2507,25 @@
             const labelEl = rangeEl.parentElement.querySelector('.slider-pct-label');
             if (labelEl) labelEl.innerText = `${pct}%`;
 
-            // Retrieve from global registry or window fallback
-            const ref = window.consultantChartRegistry[chartKey] || window['chart_' + chartKey] || Chart.getChart(chartKey);
+            // Find canvas element directly by ID if in DOM
+            const canvasEl = document.getElementById(chartKey) || rangeEl.closest('.exec-chart-card')?.querySelector('canvas');
+            const targetKey = canvasEl ? canvasEl.id : chartKey;
+
+            // Retrieve from global registry or window fallback or Chart.getChart
+            const ref = window.consultantChartRegistry[targetKey] || 
+                        window.consultantChartRegistry[chartKey] || 
+                        window['chart_' + targetKey] || 
+                        (canvasEl ? Chart.getChart(canvasEl) : null) || 
+                        Chart.getChart(chartKey);
             
             if (ref) {
                 const chartInstance = ref.instance || ref;
-                const baseValues = ref.baseValues || (chartInstance.data && chartInstance.data.datasets[0] ? chartInstance.data.datasets[0]._baseValues : null);
+                const baseValues = ref.baseValues || (chartInstance.data && chartInstance.data.datasets[0] ? chartInstance.data.datasets[0]._baseValues : null) || (canvasEl ? JSON.parse(canvasEl.dataset.chartValues || '[]') : null);
                 
-                if (chartInstance && baseValues) {
+                if (chartInstance && baseValues && baseValues.length > 0) {
                     const multiplier = pct / 100.0;
                     chartInstance.data.datasets[0].data = baseValues.map(v => Math.round(v * multiplier * 10) / 10);
-                    chartInstance.update('none'); // Instant zero-flicker update across Chrome/Google app
+                    chartInstance.update('none'); // Instant zero-flicker update across Chrome/Safari/WebView
                 }
             }
         }
