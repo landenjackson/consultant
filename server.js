@@ -155,7 +155,7 @@ app.post('/api/chat', async (req, res) => {
     // Check both user message AND uploaded file text for domain routing
     const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone|eagle scout|curriculum vitae/i.test(qLower) ||
                              /resume|résumé|education|experience|bachelor|curriculum vitae|coursework/i.test(docLower);
-    const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower);
+    const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer|seo|search engine|google business|map pack|rankings|local search/i.test(qLower);
     const isConversational = messages.length > 2 && !isCareerOrResume && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
 
     const humanInTheLoopVoice = `
