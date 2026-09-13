@@ -3002,10 +3002,76 @@
             triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
         }
 
+        // 1. OPEN STRATEGY TEASER DIRECTLY IN CANVAS/VIEWER (ZERO FILE DOWNLOAD GLITCHES)
+        function exportBankTeaser(btn) {
+            openInCanvas(btn);
+        }
+
+        // 2. EXCEL EXPORT (OFFICIAL OPENXML APPLICATION MIME TYPE FOR DIRECT EXCEL APP ASSOCIATION)
+        function exportExcelXLSX(btn) {
+            const text = getTargetDocumentText(btn);
+            const mode = document.getElementById('customModeSelect')?.value || "Operations";
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
+
+            try {
+                if (typeof XLSX !== 'undefined') {
+                    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    const aoa = [
+                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
+                        ["Executive Operator", profile.name || "Executive Member", "Status: Verified Institutional Grade"],
+                        [],
+                        ["Metric / Category", "Strategic Directive / Baseline", "Target Benchmark / Lift"]
+                    ];
+
+                    lines.forEach((line) => {
+                        const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
+                        if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
+
+                        if (cleanLine.includes(':')) {
+                            const [key, ...vals] = cleanLine.split(':');
+                            aoa.push([key.trim(), vals.join(':').trim(), "Target Benchmark"]);
+                        } else {
+                            aoa.push(["Directive", cleanLine, "Action Item"]);
+                        }
+                    });
+
+                    const ws = XLSX.utils.aoa_to_sheet(aoa);
+                    ws['!cols'] = [{ wch: 32 }, { wch: 54 }, { wch: 28 }];
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Executive_Strategy");
+                    
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    triggerFileDownload(blob, `${mode}_Model_${Date.now()}.xlsx`);
+                    return;
+                }
+            } catch(err) {
+                console.warn("SheetJS export note:", err);
+            }
+
+            // Universal CSV Fallback
+            const rows = [["Category / Item", "Operational Directive", "Target Standard"]];
+            text.split('\n').forEach((l, idx) => {
+                const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
+                if (!cl || cl.startsWith('|')) return;
+                if (cl.includes(':')) {
+                    const [k, ...v] = cl.split(':');
+                    rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
+                } else {
+                    rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
+                }
+            });
+            const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
+            triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
+        }
+
+        // 3. WORD EXPORT (OPENS DIRECTLY IN LIVE STRATEGY CANVAS FOR COPY/EDIT/EXPORT)
         function exportWordDoc(btn) {
             openInCanvas(btn);
         }
 
+        // 4. DECK EXPORT (DIRECT CANVAS MODAL / SLIDE PRESENTATION)
         function exportPitchDeck(btn) {
             openInCanvas(btn);
         }
