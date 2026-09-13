@@ -2940,67 +2940,7 @@
         }
 
         function exportBankTeaser(btn) {
-            const text = getTargetDocumentText(btn);
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const mode = document.getElementById('customModeSelect')?.value || "Executive";
-            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
-
-            const teaserHtml = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>1-Page Bank & Investor Teaser (${mode.toUpperCase()})</title>
-    <style>
-        @page { size: letter portrait; margin: 15mm; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 24px; color: #0F172A; max-width: 800px; margin: 0 auto; line-height: 1.6; background: #FFFFFF; }
-        .header { border-bottom: 3px solid #16A34A; padding-bottom: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .title { font-size: 20px; font-weight: 800; color: #0F172A; margin: 0; }
-        .sub { font-size: 11px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        .content { font-size: 13.5px; color: #334155; white-space: pre-wrap; word-break: break-word; }
-        .footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid #E2E8F0; font-size: 11px; color: #94A3B8; display: flex; justify-content: space-between; }
-        @media print { body { padding: 0; } }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div>
-            <h1 class="title">CONSULTANT STUDIO</h1>
-            <div class="sub">1-Page Institutional Strategy & Bank Teaser</div>
-        </div>
-        <div style="text-align: right; font-size: 11px; color: #64748B;">
-            <div><strong>Date:</strong> ${timestamp}</div>
-            <div><strong>Standard:</strong> Verified Institutional Grade</div>
-        </div>
-    </div>
-    <div class="content">
-${escapeHtml(text)}
-    </div>
-    <div class="footer">
-        <span>Operator: ${escapeHtml(profile.name || 'Executive Member')}</span>
-        <span>Confidential & Proprietary</span>
-    </div>
-    <script>
-        // Trigger clean print dialog if opened in tab
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.location.protocol.startsWith('http')) {
-                setTimeout(() => window.print(), 350);
-            }
-        });
-    <\/script>
-</body>
-</html>`;
-
-            // Open directly in new browser tab for 1-tap PDF save / Print on iOS & Safari
-            const printWin = window.open('', '_blank');
-            if (printWin) {
-                printWin.document.open();
-                printWin.document.write(teaserHtml);
-                printWin.document.close();
-            } else {
-                const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-                triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
-            }
+            openInCanvas(btn);
         }
 
         function exportExcelXLSX(btn) {
@@ -3110,50 +3050,11 @@ ${escapeHtml(text)}
         }
 
         function exportPitchDeck(btn) {
-            exportPowerPointDeck(btn);
+            openInCanvas(btn);
         }
 
         function exportPowerPointDeck(btn) {
-            const text = getTargetDocumentText(btn);
-            const mode = document.getElementById('customModeSelect')?.value || "Executive";
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
-
-            const pptHtml = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Executive Presentation Deck</title>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background:#090A0C; color:#FFFFFF; padding:30px; }
-        .slide-card { background:#0F1216; border:2px solid #1C2028; border-left:6px solid #22C55E; border-radius:10px; padding:30px; margin-bottom:30px; }
-        .slide-title { font-size:24px; font-weight:bold; color:#FFFFFF; margin-bottom:12px; }
-        .slide-kicker { font-size:12px; color:#4ADE80; text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:6px; }
-        .slide-body { font-size:14px; color:#CBD5E1; line-height:1.6; white-space: pre-wrap; word-break: break-word; }
-    </style>
-</head>
-<body>
-    <div class="slide-card">
-        <div class="slide-kicker">Executive Strategy Briefing // Slide 1</div>
-        <div class="slide-title">CONSULTANT STUDIO: ${mode.toUpperCase()}</div>
-        <div class="slide-body">
-            <p><strong>Strategic Focus:</strong> Operations & Financial Telemetry</p>
-            <p><strong>Date:</strong> ${timestamp}</p>
-            <p><strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}</p>
-        </div>
-    </div>
-    <div class="slide-card">
-        <div class="slide-kicker">Strategic Memorandum // Slide 2</div>
-        <div class="slide-title">Executive Diagnosis & Operational Reality</div>
-        <div class="slide-body">
-${escapeHtml(text)}
-        </div>
-    </div>
-</body>
-</html>`;
-
-            const blob = new Blob([pptHtml], { type: 'text/html;charset=utf-8' });
-            triggerFileDownload(blob, `${mode}_Executive_Deck_${Date.now()}.html`);
+            openInCanvas(btn);
         }
 
         async function sendMessage() {
