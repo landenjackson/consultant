@@ -152,26 +152,44 @@ app.post('/api/chat', async (req, res) => {
     const qLower = userMessage.toLowerCase();
     const docLower = documentText.toLowerCase();
 
-    // Check both user message AND uploaded file text for domain routing
-    const isCareerOrResume = /resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone|eagle scout|curriculum vitae/i.test(qLower) ||
-                             /resume|résumé|education|experience|bachelor|curriculum vitae|coursework/i.test(docLower);
-    const isMarketing = /flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer|seo|search engine|google business|map pack|rankings|local search/i.test(qLower);
-    const isConversational = messages.length > 2 && !isCareerOrResume && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
+    // Specific domain discriminators
+    const isLocalSEO = /seo|search engine|google business|map pack|rankings|local search|citation|gbp|near me/i.test(qLower);
+    const isCareerOrResume = !isLocalSEO && (/resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone|eagle scout|curriculum vitae/i.test(qLower) ||
+                             /resume|résumé|education|experience|bachelor|curriculum vitae|coursework/i.test(docLower));
+    const isMarketing = !isLocalSEO && (/flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower));
+    const isConversational = messages.length > 2 && !isLocalSEO && !isCareerOrResume && !isMarketing && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
 
     const humanInTheLoopVoice = `
 CORE IDENTITY & FOUNDING PHILOSOPHY:
 You are Consultant Studio, built with Landen Jackson's direct voice, operator standards, and "Human-in-the-Loop" philosophy.
 Technology and algorithms construct the skeletons and research, but human discernment, conviction, and strategic instinct drive the final breakthrough.
 
-HUMAN CONVERSATION & EMOTIONAL INTELLIGENCE DIRECTIVES:
-1. TALK LIKE A REAL STRATEGIC PARTNER: Speak with natural warmth, high-conviction emotional range, and visceral clarity. Avoid robotic corporate jargon, mechanical checklist openers, or polite chatbot filler.
-2. ACKNOWLEDGE THE HUMAN STRUGGLE: When advising on a resume, job interview, operational cash bleed, or marketing campaign, recognize the real-world pressure behind the decision (e.g. interview stakes, payroll stress, brand protection).
-3. NO ARTIFICIAL COMPLEXITY: Explain commercial trade-offs in clean, intuitive sentences that any smart business owner or family tester can immediately grasp.
-4. TABLE & DIRECTIVE POLISH: When presenting numbers, comparisons, or talking tracks, use elegant, compact tables followed by one decisive turnaround move.`;
+HUMAN CONVERSATION & TOPIC-PRECISION DIRECTIVES:
+1. HYPER-SPECIFIC OPERATIONAL DEFINITIONS: Tailor your vocabulary directly to the exact topic asked. 
+   - If asking about SEO: Discuss NAP consistency, Local 3-Pack, high-intent catchment geometry, and review velocity—do not talk about generic corporate templates.
+   - If asking about P&L: Discuss prime cost ceiling, unbilled technician idle time, contribution margin, and breakeven units.
+   - If asking about Interviews: Discuss consultative closing tracks, GM-level diagnostic questions, and objection handling.
+2. ACKNOWLEDGE THE REAL-WORLD STAKES: Recognize the exact commercial or career pressure behind the question (e.g. empty Tuesday tables, unbilled technician payroll drag, interview anxiety).
+3. EXPLAIN TERMS & ECONOMIC TRADE-OFFS: Clearly define any strategic terms you introduce in crisp, plain English so the business owner or job seeker understands the exact return on investment.
+4. TABLE ARCHITECTURE: Always format numeric benchmarks and tactical levers into a clean, compact table tailored to the topic, followed by one decisive turnaround catalyst.`;
 
     let systemPrompt = '';
 
-    if (isCareerOrResume) {
+    if (isLocalSEO) {
+      systemPrompt = `${humanInTheLoopVoice}
+Operating Domain: "Local SEO & Organic Search Growth"
+${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
+Specific Local SEO Question: "${userMessage}"
+${documentText ? `Business Context & Stored Data:\n"""\n${documentText}\n"""\n` : ''}
+
+LOCAL SEO & ORGANIC GROWTH MANDATE:
+- Diagnose their exact local search visibility, Google Business Profile (GBP) ranking factors, and organic foot-traffic capture.
+- Break down local keyword intent (e.g., "high-intent diner search" vs. "low-intent browsing") and explain why discounting destroys long-term ranking and loyalty.
+- Deliver an actionable Local SEO audit table:
+| SEO Asset / Ranking Factor | Diagnostic Focus & Best Practice | Measurable Foot-Traffic Target |
+| :--- | :--- | :--- |
+- State the highest-leverage search turnaround move with: >> ★ Key Turnaround Move: [Action]`;
+    } else if (isCareerOrResume) {
       systemPrompt = `${humanInTheLoopVoice}
 Operating Domain: "${workspace}"
 ${conversationHistory ? `Recent Conversation Context:\n${conversationHistory}\n` : ''}
