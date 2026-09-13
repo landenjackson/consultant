@@ -3010,10 +3010,10 @@ ${escapeHtml(text)}
                         ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
                         ["Executive Operator", profile.name || "Executive Member", "Status: Cleared for Execution"],
                         [],
-                        ["Line Item / Category", "Strategic Directive / Metric", "Assessment / Target Standard"]
+                        ["Metric / Category", "Strategic Directive / Baseline", "Target Benchmark / Lift"]
                     ];
 
-                    lines.forEach((line, idx) => {
+                    lines.forEach((line) => {
                         const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
                         if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
 
@@ -3021,15 +3021,19 @@ ${escapeHtml(text)}
                             const [key, ...vals] = cleanLine.split(':');
                             aoa.push([key.trim(), vals.join(':').trim(), "Target Benchmark"]);
                         } else {
-                            aoa.push([`Point ${idx + 1}`, cleanLine, "Operational Directive"]);
+                            aoa.push(["Directive", cleanLine, "Action Item"]);
                         }
                     });
 
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
-                    ws['!cols'] = [{ wch: 32 }, { wch: 60 }, { wch: 28 }];
+                    ws['!cols'] = [{ wch: 32 }, { wch: 54 }, { wch: 28 }];
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Executive Strategy");
-                    XLSX.writeFile(wb, `${mode}_Model_${Date.now()}.xlsx`);
+                    XLSX.utils.book_append_sheet(wb, ws, "Executive_Strategy");
+                    
+                    // Direct binary buffer generation with explicit openxml MIME type for iOS Excel app association
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    triggerFileDownload(blob, `${mode}_Model_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
