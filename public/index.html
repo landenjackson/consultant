@@ -3003,45 +3003,7 @@
         }
 
         function exportWordDoc(btn) {
-            const text = getTargetDocumentText(btn);
-            const mode = document.getElementById('customModeSelect')?.value || "Operations";
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
-
-            // Pure, robust HTML-based Rich Text Document that opens universally in Word, Pages, and Safari QuickLook
-            const docContent = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Executive Strategy Memorandum</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Calibri, Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #1E293B; background: #FFFFFF; padding: 30px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #0F172A; font-size: 20px; border-bottom: 2px solid #22C55E; padding-bottom: 8px; margin-bottom: 12px; font-weight: 800; }
-        .meta { font-size: 11px; color: #64748B; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .body-text { margin-top: 15px; white-space: pre-wrap; word-break: break-word; }
-        .footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid #E2E8F0; font-size: 11px; color: #94A3B8; text-align: right; }
-    </style>
-</head>
-<body>
-    <h1>CONSULTANT STUDIO: EXECUTIVE MEMORANDUM</h1>
-    <div class="meta">
-        <strong>Domain:</strong> ${escapeHtml(mode.toUpperCase())} &nbsp;|&nbsp; 
-        <strong>Date:</strong> ${escapeHtml(timestamp)} &nbsp;|&nbsp; 
-        <strong>Operator:</strong> ${escapeHtml(profile.name || 'Executive Member')}
-    </div>
-    <div class="body-text">
-${escapeHtml(text)}
-    </div>
-    <div class="footer">
-        Confidential & Proprietary &nbsp;|&nbsp; Generated via Consultant Studio
-    </div>
-</body>
-</html>`;
-
-            // Deliver as .doc with standard text/html charset for instant native Safari QuickLook and MS Word opening
-            const blob = new Blob(['\ufeff', docContent], { type: 'text/html;charset=utf-8' });
-            triggerFileDownload(blob, `${mode}_Executive_Memo_${Date.now()}.doc`);
+            openInCanvas(btn);
         }
 
         function exportPitchDeck(btn) {
