@@ -3042,14 +3042,51 @@
             }
         }
 
-        // Helper to extract clean text from assistant bubble or canvas
+        // Helper to extract clean text from assistant bubble or canvas (strictly excluding bottom deliverables buttons)
         function getTargetDocumentText(el) {
-            if (!el) return document.querySelector('.bubble-assistant')?.innerText || "Executive Strategy Analysis";
-            if (el.id === 'canvasEditor' || el.classList?.contains('canvas-body')) {
-                return el.innerText || el.textContent;
+            let targetEl = null;
+            if (el) {
+                if (el.id === 'canvasEditor' || el.classList?.contains('canvas-body')) {
+                    targetEl = el;
+                } else {
+                    targetEl = el.closest('.bubble-assistant') || el.closest('#canvasPane') || document.querySelector('.bubble-assistant');
+                }
+            } else {
+                targetEl = document.querySelector('.bubble-assistant');
             }
-            const bubble = el.closest('.bubble-assistant') || el.closest('#canvasPane') || document.querySelector('.bubble-assistant');
-            return bubble ? (bubble.innerText || bubble.textContent) : "Executive Strategy Analysis";
+
+            if (!targetEl) return "Executive Strategy Analysis";
+
+            // If the element has a .stream-content wrapper, extract directly from it
+            const streamBox = targetEl.querySelector('.stream-content');
+            if (streamBox) {
+                return streamBox.innerText || streamBox.textContent;
+            }
+
+            // Otherwise clone and remove .deliverables-bar
+            const clone = targetEl.cloneNode(true);
+            const deliv = clone.querySelector('.deliverables-bar');
+            if (deliv) deliv.remove();
+            return (clone.innerText || clone.textContent).trim();
+        }
+
+        function copyCanvasText() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            const cleanText = getTargetDocumentText(editor);
+            navigator.clipboard.writeText(cleanText);
+
+            // Smooth non-blocking UI indicator
+            const titleEl = document.getElementById('canvasTitle');
+            if (titleEl) {
+                const origText = titleEl.innerText;
+                titleEl.innerText = "✓ Clean Text Copied";
+                titleEl.style.color = "var(--accent-glow)";
+                setTimeout(() => {
+                    titleEl.innerText = origText;
+                    titleEl.style.color = "#FFFFFF";
+                }, 1800);
+            }
         }
 
         function exportBankTeaser(btn) {
