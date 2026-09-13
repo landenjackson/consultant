@@ -2756,7 +2756,6 @@
                         let values = [];
                         let labelName = 'Benchmark Metric';
 
-                        // Support both {labels, datasets: [{data}]} AND {data: {labels, datasets}} formats
                         if (chartConfig.labels) {
                             labels = chartConfig.labels;
                         } else if (chartConfig.data && chartConfig.data.labels) {
@@ -2790,11 +2789,18 @@
                         return '';
                     }
                 })
+                // 1b. Clean any generic code blocks (```json, ```javascript, ```) that shouldn't appear in executive memos
+                .replace(/```(?:json|javascript|js|html|css)?\s*([\s\S]*?)```/gi, (m, code) => {
+                    return `<div style="background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:12px; margin:10px 0; font-family:monospace; font-size:12px; color:#94A3B8; overflow-x:auto;">${escapeHtml(code.trim())}</div>`;
+                })
                 // 2. Clean raw LaTeX math syntax
                 .replace(/\$\$[\s\S]*?\$\$/g, '')
                 .replace(/\$([^\$\n]+)\$/g, '$1')
                 .replace(/\\text\{([^}]+)\}/g, '$1')
                 .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
+                .replace(/\\le|\\leq/g, '≤')
+                .replace(/\\ge|\\geq/g, '≥')
+                .replace(/\\times/g, '×')
                 .replace(/\\left\(|\\right\)/g, '')
                 // 3. Strip orphaned trailing brackets, braces, and dots
                 .replace(/^[\s\}\]\,\.]{1,4}$/gm, '')
