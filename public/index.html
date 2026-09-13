@@ -2820,14 +2820,16 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>1-Page Bank & Investor Teaser (${mode.toUpperCase()})</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #0F172A; max-width: 800px; margin: 0 auto; line-height: 1.6; background: #FFFFFF; }
-        .header { border-bottom: 3px solid #16A34A; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .title { font-size: 22px; font-weight: 800; color: #0F172A; margin: 0; }
-        .sub { font-size: 12px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        .content { font-size: 14px; color: #334155; white-space: pre-wrap; word-break: break-word; }
-        .footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 12px; color: #94A3B8; display: flex; justify-content: space-between; }
+        @page { size: letter portrait; margin: 15mm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 24px; color: #0F172A; max-width: 800px; margin: 0 auto; line-height: 1.6; background: #FFFFFF; }
+        .header { border-bottom: 3px solid #16A34A; padding-bottom: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .title { font-size: 20px; font-weight: 800; color: #0F172A; margin: 0; }
+        .sub { font-size: 11px; color: #64748B; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .content { font-size: 13.5px; color: #334155; white-space: pre-wrap; word-break: break-word; }
+        .footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid #E2E8F0; font-size: 11px; color: #94A3B8; display: flex; justify-content: space-between; }
         @media print { body { padding: 0; } }
     </style>
 </head>
@@ -2837,7 +2839,7 @@
             <h1 class="title">CONSULTANT STUDIO</h1>
             <div class="sub">1-Page Institutional Strategy & Bank Teaser</div>
         </div>
-        <div style="text-align: right; font-size: 12px; color: #64748B;">
+        <div style="text-align: right; font-size: 11px; color: #64748B;">
             <div><strong>Date:</strong> ${timestamp}</div>
             <div><strong>Standard:</strong> Verified Institutional Grade</div>
         </div>
@@ -2849,11 +2851,27 @@ ${escapeHtml(text)}
         <span>Operator: ${escapeHtml(profile.name || 'Executive Member')}</span>
         <span>Confidential & Proprietary</span>
     </div>
+    <script>
+        // Trigger clean print dialog if opened in tab
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol.startsWith('http')) {
+                setTimeout(() => window.print(), 350);
+            }
+        });
+    <\/script>
 </body>
 </html>`;
 
-            const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
-            triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
+            // Open directly in new browser tab for 1-tap PDF save / Print on iOS & Safari
+            const printWin = window.open('', '_blank');
+            if (printWin) {
+                printWin.document.open();
+                printWin.document.write(teaserHtml);
+                printWin.document.close();
+            } else {
+                const blob = new Blob([teaserHtml], { type: 'text/html;charset=utf-8' });
+                triggerFileDownload(blob, `Bank_Teaser_${mode}_${Date.now()}.html`);
+            }
         }
 
         function exportExcelXLSX(btn) {
