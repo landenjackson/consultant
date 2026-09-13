@@ -1300,6 +1300,9 @@
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="scrollToTop(); toggleSidebar(false);">
                 <span>🏠</span> <span>Strategy Stage (Top)</span>
             </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
+                <span>🏢</span> <span>Microsoft Office 365 Hub</span>
+            </button>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
                 <span>🔒</span> <span>Strategy & Research Vault</span>
             </button>
@@ -1741,6 +1744,88 @@
         </div>
     </div>
 
+    <!-- MICROSOFT OFFICE 365 & ENTERPRISE SUITE HUB -->
+    <div class="modal-overlay" id="officeModal">
+        <div class="modal-card" style="max-width:680px; padding:32px;">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+                        <span style="color:#0078D4;">🏢</span> Microsoft 365 & Office Suite
+                    </h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Direct integration with Microsoft Word, Excel, PowerPoint, and OneDrive.</p>
+                </div>
+                <button onclick="closeOfficeModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+                <!-- WORD 365 -->
+                <div style="background:rgba(0,120,212,0.06); border:1px solid rgba(0,120,212,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px; color:#0078D4;">📝</span>
+                        <div>
+                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">Microsoft Word 365</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Executive briefs & turnarounds</div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Export verified MSO-compliant memos formatted for corporate Word and Teams distribution.</p>
+                    <button class="btn-export" onclick="exportWordDoc(); closeOfficeModal();" style="border-color:#0078D4; color:#60A5FA; justify-content:center;">
+                        <span>📥</span> Export to Microsoft Word
+                    </button>
+                </div>
+
+                <!-- EXCEL 365 -->
+                <div style="background:rgba(16,124,65,0.06); border:1px solid rgba(16,124,65,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px; color:#107C41;">📑</span>
+                        <div>
+                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">Microsoft Excel 365</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Forensic P&L & unit economics</div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Instant workbook generation with structured telemetry sheets and sensitivity matrices.</p>
+                    <button class="btn-export" onclick="exportExcelXLSX(); closeOfficeModal();" style="border-color:#107C41; color:#4ADE80; justify-content:center;">
+                        <span>📥</span> Export to Microsoft Excel
+                    </button>
+                </div>
+
+                <!-- POWERPOINT 365 -->
+                <div style="background:rgba(216,59,1,0.06); border:1px solid rgba(216,59,1,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px; color:#D83B01;">📊</span>
+                        <div>
+                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">PowerPoint 365</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Boardroom pitch decks</div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Converts 90-day strategy milestones into presentation-ready executive slide decks.</p>
+                    <button class="btn-export" onclick="exportPitchDeck(); closeOfficeModal();" style="border-color:#D83B01; color:#FB923C; justify-content:center;">
+                        <span>📥</span> Export to PowerPoint Deck
+                    </button>
+                </div>
+
+                <!-- ONEDRIVE / TEAMS SYNC -->
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:24px; color:#38BDF8;">☁️</span>
+                        <div>
+                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">OneDrive & Teams Sync</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Encrypted local workspace</div>
+                        </div>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All generated artifacts conform to Microsoft Office OpenXML standards for drag-and-drop OneDrive syncing.</p>
+                    <button class="btn-export" onclick="exportBankTeaser(); closeOfficeModal();" style="justify-content:center;">
+                        <span>📄</span> 1-Page Investor Brief
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
+                <span style="font-size:12px; color:var(--text-muted);">Compatible with Microsoft Office 365, Desktop 2016-2024, and Office Online.</span>
+                <button class="btn-export" onclick="closeOfficeModal()">Close Hub</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SETTINGS & FONT CONTROLS MODAL -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card" style="max-width:440px; padding:28px;">
@@ -2058,6 +2143,16 @@
             } else {
                 fallbackOAuthRedirect();
             }
+        }
+
+        function openOfficeModal() {
+            const m = document.getElementById('officeModal');
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeOfficeModal() {
+            const m = document.getElementById('officeModal');
+            if (m) m.style.display = 'none';
         }
 
         function fallbackOAuthRedirect() {
