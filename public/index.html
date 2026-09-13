@@ -2612,24 +2612,28 @@
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
             let clean = text
-                // Scrub any leftover raw LaTeX math code
+                // Clean LaTeX artifacts
                 .replace(/\$\$[\s\S]*?\$\$/g, '')
                 .replace(/\$([^\$\n]+)\$/g, '$1')
                 .replace(/\\text\{([^}]+)\}/g, '$1')
                 .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 / $2')
                 .replace(/\\left\(|\\right\)/g, '')
-                .replace(/### 1\.\s*Operational Reality:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
-                .replace(/### 1\.\s*Strategic Campaign Angle:\s*"?([^"\n]+)"?/gi, '<div class="exec-lead" style="font-weight:700; color:#FFFFFF; margin-bottom:12px; font-size:15px;">$1</div>')
-                .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15px; font-family:\'Plus Jakarta Sans\';">$1</div>')
-                .replace(/###\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15px; font-family:\'Plus Jakarta Sans\';">$1</div>')
-                .replace(/##\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:18px 0 10px; font-size:16px; font-family:\'Plus Jakarta Sans\';">$1</div>')
-                .replace(/>> ★\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:12px 14px; border-radius:10px; margin:12px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF;">$1</div></div>')
-                .replace(/★ Key Turnaround Move:\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:12px 14px; border-radius:10px; margin:12px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF;">$1</div></div>')
+                // Format Section Headings
+                .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15.5px; font-family:\'Plus Jakarta Sans\'; letter-spacing:-0.01em;">$1</div>')
+                .replace(/###\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:16px 0 8px; font-size:15.5px; font-family:\'Plus Jakarta Sans\'; letter-spacing:-0.01em;">$1</div>')
+                .replace(/##\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:18px 0 10px; font-size:16.5px; font-family:\'Plus Jakarta Sans\'; letter-spacing:-0.01em;">$1</div>')
+                // Turnaround Catalyst Formatting
+                .replace(/>> ★\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:14px 16px; border-radius:10px; margin:14px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF; font-size:14px;">$1</div></div>')
+                .replace(/★ Key Turnaround Move:\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:14px 16px; border-radius:10px; margin:14px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF; font-size:14px;">$1</div></div>')
+                // Remove prompt leak artifacts
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
                 .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
 
             // Robust multi-column table parser
             clean = parseAllTables(clean);
+
+            // Format Blockquotes (Scripts & Talking Tracks)
+            clean = clean.replace(/^>\s*"?([^"\n]+)"?$/gm, '<div style="background:rgba(15,23,42,0.6); border-left:3px solid var(--accent); padding:10px 14px; border-radius:0 8px 8px 0; margin:10px 0; font-style:italic; color:#F1F5F9; font-size:13.5px;">"$1"</div>');
 
             // Convert bullet lines
             clean = clean.replace(/^[•\*\-]\s*(.*?)$/gm, '<li style="margin-bottom:6px;">$1</li>');

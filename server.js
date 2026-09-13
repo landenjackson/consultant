@@ -33,7 +33,7 @@ const queryAI = async (prompt) => {
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const timeoutId = setTimeout(() => controller.abort(), 9000);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,8 +41,8 @@ const queryAI = async (prompt) => {
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.6,
-              maxOutputTokens: 900,
+              temperature: 0.65,
+              maxOutputTokens: 2048, // Generous limit to guarantee full, non-truncated deliverables
               topP: 0.95
             }
           })
@@ -62,12 +62,12 @@ const queryAI = async (prompt) => {
     }
   }
 
-  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (with 15s budget)
+  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (with 18s budget)
   if (myclawKey) {
     try {
       console.log('[Failover Engaged] Querying High-Availability Enterprise Gateway...');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -78,7 +78,7 @@ const queryAI = async (prompt) => {
         body: JSON.stringify({
           model: 'gemini-3.7-flash',
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1000,
+          max_tokens: 2500, // Complete and unclipped responses
           temperature: 0.65
         })
       });
