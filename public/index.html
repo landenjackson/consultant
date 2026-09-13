@@ -2752,21 +2752,37 @@
                     try {
                         const chartConfig = JSON.parse(jsonStr.trim());
                         const chartId = 'directChart_' + Math.random().toString(36).substr(2, 9);
-                        const labels = chartConfig.labels || [];
-                        const title = chartConfig.title || 'Operational & Financial Telemetry';
-                        const dataset = (chartConfig.datasets && chartConfig.datasets[0]) ? chartConfig.datasets[0] : { label: 'Benchmark', data: [] };
-                        const values = dataset.data || [];
-                        const units = values.map(v => typeof v === 'number' && v > 100 ? '$' : '');
-                        const raws = values.map(v => typeof v === 'number' && v > 100 ? `$${v.toLocaleString()}` : String(v));
+                        let labels = [];
+                        let values = [];
+                        let labelName = 'Benchmark Metric';
+
+                        // Support both {labels, datasets: [{data}]} AND {data: {labels, datasets}} formats
+                        if (chartConfig.labels) {
+                            labels = chartConfig.labels;
+                        } else if (chartConfig.data && chartConfig.data.labels) {
+                            labels = chartConfig.data.labels;
+                        }
+
+                        const datasets = chartConfig.datasets || (chartConfig.data ? chartConfig.data.datasets : []);
+                        if (datasets && datasets.length > 0) {
+                            values = datasets[0].data || [];
+                            labelName = datasets[0].label || 'Benchmark Metric';
+                        }
+
+                        const title = chartConfig.title || (chartConfig.options && chartConfig.options.plugins && chartConfig.options.plugins.title ? chartConfig.options.plugins.title.text : 'Operational & Financial Telemetry');
+                        const units = values.map(v => typeof v === 'number' && v > 100 ? '$' : (v <= 100 && v > 0 ? '%' : ''));
+                        const raws = values.map(v => typeof v === 'number' ? v.toLocaleString() : String(v));
+
+                        if (labels.length === 0 || values.length === 0) return '';
 
                         return `
-                            <div class="exec-chart-card" style="margin: 16px 0; background: rgba(12, 16, 23, 0.85); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 10px; padding: 14px;">
-                                <div class="exec-chart-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                                    <div class="exec-chart-title" style="font-weight:700; color:#FFF; font-size:13.5px;"><span>📊</span> ${escapeHtml(title)}</div>
-                                    <span class="exec-chart-tag" style="font-size:10px; color:var(--accent-glow); background:rgba(34,197,94,0.1); padding:2px 8px; border-radius:4px; border:1px solid rgba(34,197,94,0.2);">Interactive Telemetry</span>
+                            <div class="exec-chart-card" style="margin: 16px 0; background: #090D14; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px; box-sizing: border-box; overflow: hidden; width: 100%;">
+                                <div class="exec-chart-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                    <div class="exec-chart-title" style="font-weight:700; color:#FFF; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; display:flex; align-items:center; gap:6px;"><span>📊</span> ${escapeHtml(title)}</div>
+                                    <span class="exec-chart-tag" style="font-size:10px; color:var(--accent-glow); background:rgba(34,197,94,0.1); padding:2px 7px; border-radius:6px; border:1px solid rgba(34,197,94,0.25); font-weight:600;">Interactive Telemetry</span>
                                 </div>
-                                <div class="exec-chart-canvas-wrap" style="position:relative; height:190px; width:100%;">
-                                    <canvas id="${chartId}" data-chart-labels="${escapeHtml(JSON.stringify(labels))}" data-chart-values="${escapeHtml(JSON.stringify(values))}" data-chart-units="${escapeHtml(JSON.stringify(units))}" data-chart-raws="${escapeHtml(JSON.stringify(raws))}" data-chart-name="${escapeHtml(dataset.label || 'Target')}"></canvas>
+                                <div class="exec-chart-canvas-wrap" style="position:relative; height:200px; width:100%; box-sizing:border-box;">
+                                    <canvas id="${chartId}" data-chart-labels="${escapeHtml(JSON.stringify(labels))}" data-chart-values="${escapeHtml(JSON.stringify(values))}" data-chart-units="${escapeHtml(JSON.stringify(units))}" data-chart-raws="${escapeHtml(JSON.stringify(raws))}" data-chart-name="${escapeHtml(labelName)}"></canvas>
                                 </div>
                             </div>
                         `;
