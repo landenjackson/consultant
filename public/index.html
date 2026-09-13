@@ -1993,22 +1993,27 @@
 
         // LIVE GEMINI-STYLE CANVAS CONTROLS
         function openInCanvas(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? (btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant')) : document.querySelector('.bubble-assistant');
             if (!card) return;
 
-            const text = card.innerHTML;
+            const content = card.querySelector('.stream-content') ? card.querySelector('.stream-content').innerHTML : card.innerHTML;
             const editor = document.getElementById('canvasEditor');
             const pane = document.getElementById('canvasPane');
-            
+
             if (editor && pane) {
-                // Strip out the bottom deliverables bar inside the canvas view
+                // Strip out bottom deliverables bar if present
                 const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = text;
+                tempDiv.innerHTML = content;
                 const deliv = tempDiv.querySelector('.deliverables-bar');
                 if (deliv) deliv.remove();
 
                 editor.innerHTML = tempDiv.innerHTML;
                 pane.classList.add('open');
+                
+                // On mobile devices, ensure smooth focus and scroll into canvas
+                if (window.innerWidth <= 768) {
+                    pane.scrollIntoView({ behavior: 'smooth' });
+                }
             }
         }
 
