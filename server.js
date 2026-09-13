@@ -22,18 +22,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// RESILIENT MULTI-TIER ZERO-503 INFERENCE PIPELINE
+// RESILIENT MULTI-TIER GOOGLE AI PRO & ENTERPRISE INFERENCE PIPELINE
 const queryAI = async (prompt) => {
   const geminiKey = process.env.GEMINI_API_KEY;
   const myclawKey = process.env.MYCLAW_API_KEY;
 
-  // Tier 1: Direct Google REST Endpoints with resilient timeout
+  // Tier 1: Direct Google Pro & Flash REST Endpoints with resilient timeout
   if (geminiKey) {
-    const models = ['gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
+    const models = ['gemini-3.6-flash', 'gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 9000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -42,7 +42,7 @@ const queryAI = async (prompt) => {
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.65,
-              maxOutputTokens: 2048, // Generous limit to guarantee full, non-truncated deliverables
+              maxOutputTokens: 2500, // Generous capacity for complete deep-reasoning outputs
               topP: 0.95
             }
           })
@@ -52,7 +52,7 @@ const queryAI = async (prompt) => {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Inference Success] Direct Google via ${model}`);
+            console.log(`[Google AI Pro Inference Success] Delivered via Google ${model}`);
             return text;
           }
         }
