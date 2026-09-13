@@ -2930,13 +2930,22 @@
 
         // Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
         function parseAllTables(text) {
-            const lines = text.split('\n');
+            // First convert ASCII box-drawing table representations into standard markdown tables
+            let normalized = text.replace(/\+[=\-\+]+\+/g, '').replace(/\|([^\n]+)\|/g, (m) => m);
+
+            const lines = normalized.split('\n');
             let inTable = false;
             let tableLines = [];
             let result = [];
 
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
+                let line = lines[i].trim();
+                
+                // If it's an ASCII table boundary like +---+ or +===+, ignore boundary noise
+                if (/^[\+\-\=\|]{4,}$/.test(line)) {
+                    continue;
+                }
+
                 if (line.startsWith('|') && line.endsWith('|')) {
                     inTable = true;
                     tableLines.push(line);
