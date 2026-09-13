@@ -170,9 +170,11 @@ ACTION-FIRST EXECUTIVE WRITING STANDARDS:
 
 DYNAMIC & CONTEXT-CORRELATED CHARTS ONLY:
 - NO STATIC OR REPEATED DATA: Charts and numbers must dynamically represent the EXACT scenario, business scale, and problem provided by the user.
-- If analyzing a marketing campaign: Chart CAC vs. LTV or conversion % across channels.
-- If analyzing a service business: Chart revenue per truck, billable labor utilization %, and prime cost drag.
-- If analyzing a job candidate: Chart historical on-time completion rates, team quota attainment, or SLA metrics.
+- REAL-WORLD GROUNDED BENCHMARKS (2025/2026 Empirical Data):
+  * HVAC & Trades: Median SDE Multiple 2.73x (under $1M) to 5.2x EBITDA ($1M-$5M). Labor prime ceiling ≤35%.
+  * Restaurants / Food Service: Median SDE Multiple 1.63x (under $1M) to 3.4x EBITDA ($1M-$5M). Prime cost ceiling ≤60% (30% food / 30% labor).
+  * Retail Sales / Telecom: Floor rep conversion benchmark 22%-35%, accessory attach rate >45%.
+  * Professional Services & Tech: 4.0x - 8.5x EBITDA, gross retention >88%, billing utilization target 75%.
 - Format all charts dynamically with balanced values using:
   \`\`\`chart
   {"type":"bar","title":"[Context-Specific Operational Metric]","labels":["[Label 1]","[Label 2]","[Label 3]"],"datasets":[{"label":"[Realistic Benchmark Unit]","data":[10, 20, 30]}]}
