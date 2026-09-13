@@ -3196,11 +3196,12 @@ ${escapeHtml(text)}
                     delivBar.className = 'deliverables-bar';
                     delivBar.innerHTML = `
                         <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Listen to Briefing</button>
+                        <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Send to Office 365</button>
                         <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open in Canvas</button>
                         <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
                         <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
                         <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
-                        <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+                        <button class="btn-export" onclick="exportPitchDeck(this)">📊 Deck (.pptx)</button>
                         <button class="btn-export" onclick="saveToVault(this)">🔒 Save Vault</button>
                     `;
                     assistantCard.appendChild(delivBar);
