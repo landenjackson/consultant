@@ -1980,7 +1980,7 @@
         }
 
         // UNIFIED MESSAGES REPOSITORY FOR MULTI-TURN THREAD CONTINUATION
-        const messages = [];
+        let messages = [];
         let isGenerating = false;
         let uploadedDocText = "";
 
@@ -2020,19 +2020,21 @@
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
 
-        // Reset Chat Feed & Return to Clean Main Stage
+        // Reset Chat Feed & Return to Clean Main Stage (Repeatable infinitely)
         function resetChatSession() {
-            // Check if page needs clean reload or in-memory reset
-            if (window.location.search || window.location.hash) {
-                window.location.href = window.location.pathname;
-                return;
-            }
-
-            // Clear in-memory conversation
+            // Clear in-memory conversation array
             messages = [];
-            removeAttachedFile();
+            uploadedDocText = "";
+            attachedFileNameStr = "";
+            isGenerating = false;
 
-            // Clear chat rows
+            // Clear file attachment UI
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = "";
+            const preview = document.getElementById('fileAttachmentPreview');
+            if (preview) preview.style.display = 'none';
+
+            // Clear chat feed rows
             const feed = document.getElementById('chatFeed');
             if (feed) {
                 const rows = feed.querySelectorAll('.chat-row');
@@ -2053,10 +2055,16 @@
             closePricing();
             if (typeof closeOfficeModal === 'function') closeOfficeModal();
 
-            // Clear text input
+            // Clear text input and re-enable send button
             const input = document.getElementById('userInput');
             if (input) {
                 input.value = '';
+                input.disabled = false;
+            }
+            const sendBtn = document.getElementById('sendBtn');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerText = "Execute";
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
