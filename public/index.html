@@ -1702,8 +1702,8 @@
         </div>
 
         <div class="dock-box">
-            <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(event)">
-            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach CSV, P&L, or Document">
+            <input type="file" id="fileInput" accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.json,.png,.jpg,.jpeg,.webp,.heic" style="display:none" onchange="handleFileUpload(event)">
+            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach CSV, P&L, Screenshot, or Document">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
@@ -2567,6 +2567,13 @@
                         fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
                     });
                     uploadedDocText = fullSheetText;
+                } else if (file.type.startsWith('image/')) {
+                    // Handle iPhone Screenshots & Photos via Data URL base64 ingestion
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedDocText = `[Attached Image / Screenshot: ${file.name} (DataURI: ${e.target.result.slice(0, 50)}...)]`;
+                    };
+                    reader.readAsDataURL(file);
                 } else {
                     // Standard CSV, TXT, MD, JSON
                     uploadedDocText = await file.text();
