@@ -2796,26 +2796,23 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 HIGH-VELOCITY MAGICAL EXECUTIVE TYPEWRITER ENGINE */
+        /* 🪄 CRAFTED FLUID EXECUTIVE TYPING ENGINE */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                // Ensure fresh container structure
-                container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.15s ease;"></div><span class="typing-cursor"></span>`;
+                container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);"></div><span class="typing-cursor"></span>`;
                 const contentBox = container.querySelector('.stream-content');
                 const cursor = container.querySelector('.typing-cursor');
                 const feed = document.getElementById('chatFeed');
 
-                // Tokenize into natural executive words
                 const words = fullText.split(' ');
                 const totalWords = words.length;
                 let currentWordIdx = 0;
 
-                // Adaptive burst velocity: fast on long tables, silky on conversational text
                 function typeStep() {
                     if (currentWordIdx < totalWords) {
                         const remaining = totalWords - currentWordIdx;
-                        // Dynamic burst: increases speed toward the end so user never waits long
-                        const step = Math.max(2, Math.min(7, Math.ceil(remaining / 14)));
+                        // Smooth, non-jarring word progression
+                        const step = Math.max(2, Math.min(5, Math.ceil(remaining / 18)));
                         currentWordIdx += step;
 
                         const partialSlice = words.slice(0, currentWordIdx).join(' ');
@@ -2823,10 +2820,8 @@
 
                         if (feed) feed.scrollTop = feed.scrollHeight;
 
-                        // Ultra-smooth 14ms cadence for 60fps typing feel
-                        setTimeout(() => requestAnimationFrame(typeStep), 14);
+                        setTimeout(() => requestAnimationFrame(typeStep), 20);
                     } else {
-                        // Typing complete: finalize formatting, remove cursor, render charts
                         if (cursor) cursor.remove();
                         contentBox.innerHTML = formatExecutiveResponse(fullText);
                         initializePendingCharts(container);
