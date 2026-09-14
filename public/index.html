@@ -2091,41 +2091,38 @@
             }
         }
 
-        // LIVE GEMINI-STYLE CANVAS CONTROLS WITH RELIABLE CHART INITIALIZATION
+        // LIVE GEMINI-STYLE CANVAS CONTROLS WITH DIRECT VISUAL SYNCHRONIZATION
         function openInCanvas(btn) {
             const card = btn ? (btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant')) : document.querySelector('.bubble-assistant');
             if (!card) return;
 
-            const content = card.querySelector('.stream-content') ? card.querySelector('.stream-content').innerHTML : card.innerHTML;
             const editor = document.getElementById('canvasEditor');
             const pane = document.getElementById('canvasPane');
 
             if (editor && pane) {
-                // Strip out bottom deliverables bar if present
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = content;
-                const deliv = tempDiv.querySelector('.deliverables-bar');
+                // Open canvas pane first so container width expands immediately
+                pane.classList.add('open');
+
+                // Clone content cleanly
+                const clone = (card.querySelector('.stream-content') || card).cloneNode(true);
+                const deliv = clone.querySelector('.deliverables-bar');
                 if (deliv) deliv.remove();
+                clone.querySelectorAll('.whatif-slider-wrap').forEach(w => w.remove());
 
-                // Remove old slider wrappers in clone so fresh ones mount cleanly
-                tempDiv.querySelectorAll('.whatif-slider-wrap').forEach(w => w.remove());
-
-                // Reset canvas dataset attributes with unique IDs for the canvas pane
-                tempDiv.querySelectorAll('canvas').forEach(c => {
+                // Reset canvas attributes so new instances mount cleanly
+                clone.querySelectorAll('canvas').forEach(c => {
                     c.dataset.initialized = 'false';
                     c.removeAttribute('data-initialized');
                     c.id = 'canvas_chart_' + Math.random().toString(36).substr(2, 9);
                 });
 
-                editor.innerHTML = tempDiv.innerHTML;
-                pane.classList.add('open');
+                editor.innerHTML = clone.innerHTML;
 
-                // Allow DOM reflow and layout expansion before initializing charts (zero blank charts)
+                // Fire Chart.js initialization after panel animation settles
                 setTimeout(() => {
                     initializePendingCharts(editor);
-                }, 60);
+                }, 150);
 
-                // On mobile devices, ensure smooth focus and scroll into canvas
                 if (window.innerWidth <= 768) {
                     pane.scrollIntoView({ behavior: 'smooth' });
                 }
