@@ -22,27 +22,38 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// RESILIENT MULTI-TIER GOOGLE AI PRO & ENTERPRISE INFERENCE PIPELINE
-const queryAI = async (prompt) => {
+// RESILIENT MULTI-TIER GOOGLE AI PRO & ENTERPRISE INFERENCE PIPELINE (SUPPORTS TEXT & MULTIMODAL IMAGES)
+const queryAI = async (prompt, imageObj = null) => {
   const geminiKey = process.env.GEMINI_API_KEY;
   const myclawKey = process.env.MYCLAW_API_KEY;
 
-  // Tier 1: Direct Google Pro & Flash REST Endpoints with resilient timeout
+  // Tier 1: Direct Google Pro & Flash REST Endpoints with native vision multimodal support
   if (geminiKey) {
     const models = ['gemini-3.6-flash', 'gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const parts = [{ text: prompt }];
+        if (imageObj && imageObj.mimeType && imageObj.data) {
+          parts.unshift({
+            inlineData: {
+              mimeType: imageObj.mimeType,
+              data: imageObj.data
+            }
+          });
+        }
+
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: [{ parts }],
             generationConfig: {
               temperature: 0.65,
-              maxOutputTokens: 2500, // Generous capacity for complete deep-reasoning outputs
+              maxOutputTokens: 2500,
               topP: 0.95
             }
           })
@@ -52,7 +63,7 @@ const queryAI = async (prompt) => {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Google AI Pro Inference Success] Delivered via Google ${model}`);
+            console.log(`[Google AI Pro Vision/Text Success] Delivered via Google ${model}`);
             return text;
           }
         }
@@ -62,12 +73,14 @@ const queryAI = async (prompt) => {
     }
   }
 
-  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw (with 18s budget)
+  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw
   if (myclawKey) {
     try {
       console.log('[Failover Engaged] Querying High-Availability Enterprise Gateway...');
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+      const messages = [{ role: 'user', content: prompt }];
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -77,8 +90,8 @@ const queryAI = async (prompt) => {
         signal: controller.signal,
         body: JSON.stringify({
           model: 'gemini-3.7-flash',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 2500, // Complete and unclipped responses
+          messages,
+          max_tokens: 2500,
           temperature: 0.65
         })
       });
@@ -183,8 +196,20 @@ ${documentText ? `Attached Context & Document Data:\n"""\n${documentText}\n"""\n
 
 Deliver an incisive, tailored response that directly resolves this specific request with zero canned filler.`;
 
-    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'}]`);
-    const liveResponse = await queryAI(systemPrompt);
+    // Extract embedded base64 image data if attached
+    let imageObj = null;
+    if (documentText && documentText.includes('data:image/')) {
+      const match = documentText.match(/data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([^\s\]]+)/);
+      if (match) {
+        imageObj = {
+          mimeType: match[1],
+          data: match[2]
+        };
+      }
+    }
+
+    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'} | Multimodal Image: ${!!imageObj}]`);
+    const liveResponse = await queryAI(systemPrompt, imageObj);
 
     if (liveResponse) {
       return res.json({ response: liveResponse });

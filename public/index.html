@@ -2567,11 +2567,12 @@
                         fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
                     });
                     uploadedDocText = fullSheetText;
-                } else if (file.type.startsWith('image/')) {
-                    // Handle iPhone Screenshots & Photos via Data URL base64 ingestion
+                } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name)) {
+                    // Handle iPhone Screenshots & Photos via full base64 DataURI ingestion
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        uploadedDocText = `[Attached Image / Screenshot: ${file.name} (DataURI: ${e.target.result.slice(0, 50)}...)]`;
+                        uploadedDocText = `[Attached Image / Screenshot: ${file.name}]\n${e.target.result}`;
+                        if (nameLabel) nameLabel.innerText = `${file.name} (ready)`;
                     };
                     reader.readAsDataURL(file);
                 } else {
