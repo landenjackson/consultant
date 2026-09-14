@@ -2091,7 +2091,7 @@
             }
         }
 
-        // LIVE GEMINI-STYLE CANVAS CONTROLS
+        // LIVE GEMINI-STYLE CANVAS CONTROLS WITH RELIABLE CHART INITIALIZATION
         function openInCanvas(btn) {
             const card = btn ? (btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant')) : document.querySelector('.bubble-assistant');
             if (!card) return;
@@ -2107,17 +2107,23 @@
                 const deliv = tempDiv.querySelector('.deliverables-bar');
                 if (deliv) deliv.remove();
 
-                // Reset canvas dataset attributes so charts re-initialize cleanly
+                // Remove old slider wrappers in clone so fresh ones mount cleanly
+                tempDiv.querySelectorAll('.whatif-slider-wrap').forEach(w => w.remove());
+
+                // Reset canvas dataset attributes with unique IDs for the canvas pane
                 tempDiv.querySelectorAll('canvas').forEach(c => {
                     c.dataset.initialized = 'false';
+                    c.removeAttribute('data-initialized');
                     c.id = 'canvas_chart_' + Math.random().toString(36).substr(2, 9);
                 });
 
                 editor.innerHTML = tempDiv.innerHTML;
                 pane.classList.add('open');
 
-                // Initialize Chart.js instances inside the canvas pane
-                initializePendingCharts(editor);
+                // Allow DOM reflow and layout expansion before initializing charts (zero blank charts)
+                setTimeout(() => {
+                    initializePendingCharts(editor);
+                }, 60);
 
                 // On mobile devices, ensure smooth focus and scroll into canvas
                 if (window.innerWidth <= 768) {
