@@ -2926,12 +2926,26 @@
                         return '';
                     }
                 })
-                // 1b. Clean text pseudo-charts (e.g. 'text $200k | | 150k |')
+                // 1b. Clean text pseudo-charts and ASCII tree/box diagrams (e.g. 'text $200k | | 150k |' or '[Day 1-30] | ├──')
                 .replace(/text\s+\$\d+k[\s\S]*?(?=\n\n|\n[A-Z#]|$)/gi, '')
                 .replace(/text\s+\d+%[\s\S]*?(?=\n\n|\n[A-Z#]|$)/gi, '')
+                .replace(/\[(?:Day|Phase|Week)\s*[^\]]+\]\s*\|\s*[├└├──│\-\s]+[\s\S]*?(?=\n\n|\n[A-Z#]|$)/gi, (m) => {
+                    // Convert ASCII box/tree milestones into clean executive list cards
+                    const cleaned = m
+                        .replace(/[├└│─\-\|]/g, ' ')
+                        .replace(/\[(.*?)\]/g, '\n<strong style="color:var(--accent-glow); font-size:13px;">$1</strong>\n• ')
+                        .replace(/\s{2,}/g, ' ')
+                        .trim();
+                    return `<div style="background:#0C1017; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 16px; margin:14px 0;">${cleaned}</div>`;
+                })
                 // 1c. Clean any generic code blocks (```json, ```javascript, ```) that shouldn't appear in executive memos
                 .replace(/```(?:json|javascript|js|html|css)?\s*([\s\S]*?)```/gi, (m, code) => {
-                    return `<div style="background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:12px; margin:10px 0; font-family:monospace; font-size:12px; color:#94A3B8; overflow-x:auto;">${escapeHtml(code.trim())}</div>`;
+                    // Check if it looks like an ASCII diagram or raw text
+                    if (code.includes('├──') || code.includes('└──') || code.includes('[Day') || code.includes('[Phase')) {
+                        const cleaned = code.replace(/[├└│─]/g, '•').replace(/\|\s*/g, '\n');
+                        return `<div style="background:#0C1017; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 16px; margin:14px 0; color:#E2E8F0; font-size:13px; line-height:1.6;">${escapeHtml(cleaned)}</div>`;
+                    }
+                    return `<div style="background:#0C1017; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:13px; color:#E2E8F0; line-height:1.6;">${escapeHtml(code.trim())}</div>`;
                 })
                 // 2. Clean raw LaTeX math syntax
                 .replace(/\$\$[\s\S]*?\$\$/g, '')
@@ -2942,11 +2956,12 @@
                 .replace(/\\ge|\\geq/g, '≥')
                 .replace(/\\times/g, '×')
                 .replace(/\\left\(|\\right\)/g, '')
-                // 3. Strip orphaned trailing brackets, braces, and dots
+                // 3. Strip orphaned trailing brackets, braces, lone hash symbols, and dots
+                .replace(/^#\s*$/gm, '')
                 .replace(/^[\s\}\]\,\.]{1,4}$/gm, '')
                 .replace(/\n[\s\}\]]{1,3}\n/g, '\n')
-                // 4. Strip "Part 1:", "Part 2:", etc.
-                .replace(/^Part \d+:\s*/gim, '')
+                // 4. Strip "Part 1:", "Part 2:", "Phase 1:", "Phase 2:", etc.
+                .replace(/^(?:Part|Phase)\s+\d+:\s*/gim, '')
                 // 5. Format Section Headings cleanly
                 .replace(/### \d+\.\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:18px 0 8px; font-size:15.5px; font-family:\'Plus Jakarta Sans\'; letter-spacing:-0.01em;">$1</div>')
                 .replace(/###\s*([^\n]+)/g, '<div class="exec-card-title" style="font-weight:800; color:#FFFFFF; margin:18px 0 8px; font-size:15.5px; font-family:\'Plus Jakarta Sans\'; letter-spacing:-0.01em;">$1</div>')
