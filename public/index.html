@@ -2107,9 +2107,18 @@
                 const deliv = tempDiv.querySelector('.deliverables-bar');
                 if (deliv) deliv.remove();
 
+                // Reset canvas dataset attributes so charts re-initialize cleanly
+                tempDiv.querySelectorAll('canvas').forEach(c => {
+                    c.dataset.initialized = 'false';
+                    c.id = 'canvas_chart_' + Math.random().toString(36).substr(2, 9);
+                });
+
                 editor.innerHTML = tempDiv.innerHTML;
                 pane.classList.add('open');
-                
+
+                // Initialize Chart.js instances inside the canvas pane
+                initializePendingCharts(editor);
+
                 // On mobile devices, ensure smooth focus and scroll into canvas
                 if (window.innerWidth <= 768) {
                     pane.scrollIntoView({ behavior: 'smooth' });
