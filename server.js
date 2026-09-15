@@ -40,11 +40,11 @@ const queryAI = async (prompt, imageObjs = []) => {
     });
   }
 
-  // Pure Google Gemini Fast Pipeline - Races the fastest available Gemini model
+  // Pure Google Gemini Fast Pipeline - Direct 15s connection for reliable generation
   if (myclawKey) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 9000); // 9s hard budget
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s realistic window for deep answers
 
       const messages = [{ role: 'user', content: contentPayload }];
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
@@ -57,7 +57,7 @@ const queryAI = async (prompt, imageObjs = []) => {
         body: JSON.stringify({
           model: 'gemini-2.5-flash',
           messages,
-          max_tokens: 650,
+          max_tokens: 700,
           temperature: 0.6
         })
       });
@@ -72,10 +72,9 @@ const queryAI = async (prompt, imageObjs = []) => {
       }
     } catch (e) {
       console.warn('[Gemini 2.5 failover to 2.0]:', e.message);
-      // Fast fallback to gemini-2.0-flash
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -86,7 +85,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model: 'gemini-2.0-flash',
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 650,
+            max_tokens: 700,
             temperature: 0.6
           })
         });
