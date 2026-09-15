@@ -40,10 +40,10 @@ const queryAI = async (prompt, imageObjs = []) => {
     });
   }
 
-  // Fast Model Cascade: prioritize ultra-fast models with rapid 15s timeout
+  // Pure Google Gemini Fast Pipeline - Strictly ZERO OpenAI / GPT models
   if (myclawKey) {
-    const fastModels = ['gemini-2.5-flash', 'gpt-4o-mini', 'gemini-2.0-flash', 'gemini-3.7-flash'];
-    for (const model of fastModels) {
+    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-3.7-flash', 'gemini-2.0-flash'];
+    for (const model of geminiOnlyModels) {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 18000); // 18s failover window
@@ -59,7 +59,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 1200, // Compact fast generation
+            max_tokens: 1200,
             temperature: 0.6
           })
         });
@@ -68,12 +68,12 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Enterprise Gateway Success] Delivered via ${model}`);
+            console.log(`[Enterprise Gemini Success] Delivered via ${model}`);
             return text;
           }
         }
       } catch (e) {
-        console.warn(`[Gateway Failover from ${model}]:`, e.message);
+        console.warn(`[Gemini Failover from ${model}]:`, e.message);
       }
     }
   }
