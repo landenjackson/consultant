@@ -502,30 +502,57 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* MICROSOFT COPILOT EXECUTIVE DOCUMENT CARD STYLING */
         .bubble-user {
             align-self: flex-end;
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.08) 100%);
-            border: 1px solid rgba(34, 197, 94, 0.35);
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #FFFFFF;
-            padding: 14px 20px;
-            border-radius: 16px 16px 4px 16px;
+            padding: 10px 16px;
+            border-radius: 12px 12px 2px 12px;
             max-width: 82%;
-            font-size: 14.5px;
-            line-height: 1.55;
+            font-size: 13.5px;
+            line-height: 1.5;
             font-weight: 500;
         }
 
         .bubble-assistant {
             align-self: flex-start;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px 28px;
+            background: #0D1117;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 20px 24px;
             width: 100%;
-            font-size: 14.5px;
-            line-height: 1.7;
+            box-sizing: border-box;
+            font-size: 14px;
+            line-height: 1.68;
+            color: #E2E8F0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            contain: content;
+        }
+
+        .bubble-assistant p {
+            margin-bottom: 12px;
             color: #CBD5E1;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .bubble-assistant strong {
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .bubble-assistant ul {
+            margin: 8px 0 14px 18px;
+            padding: 0;
+        }
+
+        .bubble-assistant li {
+            margin-bottom: 6px;
+            color: #CBD5E1;
+            line-height: 1.6;
         }
 
         /* EXECUTIVE SECTIONS INSIDE ADVISORY RESPONSES */
@@ -1113,6 +1140,57 @@
 
         /* COMPACT MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+
+            main {
+                padding: 10px 8px 120px;
+                gap: 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .chat-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .bubble-assistant {
+                padding: 14px 14px;
+                border-radius: 10px;
+                font-size: 13.5px;
+                line-height: 1.6;
+            }
+
+            .bubble-user {
+                padding: 8px 12px;
+                font-size: 13px;
+                max-width: 90%;
+            }
+
+            .exec-chart-card {
+                padding: 10px !important;
+                margin: 10px 0 !important;
+            }
+
+            .exec-table-wrap {
+                margin: 10px 0 !important;
+            }
+
+            .deliverables-bar {
+                gap: 6px;
+                padding-top: 10px;
+                margin-top: 12px;
+            }
+
+            .btn-export {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
             header {
                 height: 52px;
                 padding: 0 12px;
