@@ -40,12 +40,12 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    // Sequential fallback with generous 30s timeout per tier to allow complete generation
+    // Sequential fallback with generous 4000 max_tokens to prevent clipping on detailed audits
     const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const timeoutId = setTimeout(() => controller.abort(), 28000);
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -57,7 +57,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1200,
+            max_tokens: 3500, // Generous 3500 token ceiling — full audits & 7-point playbooks will NEVER be clipped
             temperature: 0.6
           })
         });

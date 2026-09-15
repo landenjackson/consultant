@@ -3681,7 +3681,7 @@
                 for (let attempt = 1; attempt <= 2; attempt++) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 28000); // 28s generous client window
+                        const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s generous client window
 
                         res = await fetch('/api/chat', {
                             method: 'POST',
