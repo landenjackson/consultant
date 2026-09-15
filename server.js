@@ -40,13 +40,13 @@ const queryAI = async (prompt, imageObjs = []) => {
     });
   }
 
-  // Pure Google Gemini Fast Pipeline - Strictly ZERO OpenAI / GPT models
+  // Pure Google Gemini Fast Pipeline - Prioritizes 2.5-flash and 2.0-flash with tight token limits for rapid delivery
   if (myclawKey) {
-    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.7-flash'];
+    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
     for (const model of geminiOnlyModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout for complete first-principles generation
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s failover window
 
         const messages = [{ role: 'user', content: contentPayload }];
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 2000,
-            temperature: 0.7 // Elevated temperature for creative, domain-specific variety
+            max_tokens: 800, // Compact, high-velocity response for fast 3-5s delivery
+            temperature: 0.7
           })
         });
         clearTimeout(timeoutId);
@@ -68,7 +68,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model}`);
+            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
             return text;
           }
         }
