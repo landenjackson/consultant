@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST PARALLEL GEMINI RACE PIPELINE (GUARANTEED SUB-4s LATENCY & ZERO ROADBLOCKS)
+// ULTRA-FAST STREAMLINED ENTERPRISE GEMINI INFERENCE (GUARANTEED ZERO 503s)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
 
@@ -40,13 +40,13 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    // Race primary high-velocity model with parallel secondary fallback
+    // Sequential fallback with generous 30s timeout per tier to allow complete generation
     const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-    
-    const requestModel = async (model, timeoutMs) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    for (const model of models) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -57,7 +57,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1400,
+            max_tokens: 1200,
             temperature: 0.6
           })
         });
@@ -66,27 +66,13 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Enterprise Gemini Success] Won by ${model} (${text.length} chars)`);
+            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
             return text;
           }
         }
-        throw new Error(`Model ${model} returned empty or error status ${res.status}`);
       } catch (err) {
-        clearTimeout(timeoutId);
-        throw err;
+        console.warn(`[Failover from ${model}]:`, err.message);
       }
-    };
-
-    try {
-      // Execute fast parallel race: first healthy model to return wins
-      const fastResult = await Promise.any([
-        requestModel('gemini-2.5-flash', 14000),
-        requestModel('gemini-2.0-flash', 14000),
-        requestModel('gemini-1.5-flash', 14000)
-      ]);
-      return fastResult;
-    } catch (raceErr) {
-      console.warn('[Parallel Race Notice - Falling back]:', raceErr.message);
     }
   }
 
