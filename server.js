@@ -46,7 +46,7 @@ const queryAI = async (prompt, imageObjs = []) => {
     for (const model of geminiOnlyModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s failover window
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s failover window
 
         const messages = [{ role: 'user', content: contentPayload }];
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 800, // Compact, high-velocity response for fast 3-5s delivery
-            temperature: 0.7
+            max_tokens: 500, // Compact, high-velocity response for strict 3-5s delivery
+            temperature: 0.6
           })
         });
         clearTimeout(timeoutId);
