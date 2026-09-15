@@ -40,15 +40,42 @@ const queryAI = async (prompt, imageObjs = []) => {
     });
   }
 
-  // Pure Google Gemini Fast Pipeline - Prioritizes 2.5-flash and 2.0-flash with tight token limits for rapid delivery
+  // Pure Google Gemini Fast Pipeline - Races the fastest available Gemini model
   if (myclawKey) {
-    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-    for (const model of geminiOnlyModels) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 9000); // 9s hard budget
+
+      const messages = [{ role: 'user', content: contentPayload }];
+      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${myclawKey}`
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'gemini-2.5-flash',
+          messages,
+          max_tokens: 650,
+          temperature: 0.6
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || '';
+        if (text && text.trim().length > 0) {
+          console.log(`[Enterprise Gemini Success] Delivered via gemini-2.5-flash (${text.length} chars)`);
+          return text;
+        }
+      }
+    } catch (e) {
+      console.warn('[Gemini 2.5 failover to 2.0]:', e.message);
+      // Fast fallback to gemini-2.0-flash
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s failover window
-
-        const messages = [{ role: 'user', content: contentPayload }];
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -57,9 +84,9 @@ const queryAI = async (prompt, imageObjs = []) => {
           },
           signal: controller.signal,
           body: JSON.stringify({
-            model,
-            messages,
-            max_tokens: 500, // Compact, high-velocity response for strict 3-5s delivery
+            model: 'gemini-2.0-flash',
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 650,
             temperature: 0.6
           })
         });
@@ -67,13 +94,10 @@ const queryAI = async (prompt, imageObjs = []) => {
         if (res.ok) {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 0) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
-            return text;
-          }
+          if (text && text.trim().length > 0) return text;
         }
-      } catch (e) {
-        console.warn(`[Gemini Failover from ${model}]:`, e.message);
+      } catch (e2) {
+        console.warn('[Gemini 2.0 error]:', e2.message);
       }
     }
   }
