@@ -1702,8 +1702,8 @@
         </div>
 
         <div class="dock-box">
-            <input type="file" id="fileInput" accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.json,.png,.jpg,.jpeg,.webp,.heic" style="display:none" onchange="handleFileUpload(event)">
-            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach CSV, P&L, Screenshot, or Document">
+            <input type="file" id="fileInput" accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.json,.png,.jpg,.jpeg,.webp,.heic" multiple style="display:none" onchange="handleFileUpload(event)">
+            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach up to 10 Files, CSVs, P&Ls, Screenshots, or Photos">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
@@ -2584,102 +2584,109 @@
 
         let attachedFileNameStr = "";
 
+        // MULTI-FILE & MULTI-PHOTO (UP TO 10 ASSETS) INGESTION HANDLER
         async function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            attachedFileNameStr = file.name;
+            const files = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+
+            // Allow up to 10 files in batch
+            const selectedFiles = files.slice(0, 10);
 
             const preview = document.getElementById('fileAttachmentPreview');
             const nameLabel = document.getElementById('attachedFileName');
             if (preview && nameLabel) {
-                nameLabel.innerText = `${file.name} (reading...)`;
+                nameLabel.innerText = selectedFiles.length === 1 ? `Reading ${selectedFiles[0].name}...` : `Reading ${selectedFiles.length} files...`;
                 preview.style.display = 'flex';
             }
 
-            try {
-                const ext = file.name.split('.').pop().toLowerCase();
+            attachedFileNameStr = selectedFiles.map(f => f.name).join(', ');
+            let combinedDocText = "";
 
-                if (ext === 'docx') {
-                    // Extract full text from Word .docx
-                    const arrayBuffer = await file.arrayBuffer();
-                    const result = await mammoth.extractRawText({ arrayBuffer });
-                    uploadedDocText = result.value;
-                } else if (ext === 'pdf') {
-                    // Extract text from PDF documents with robust item extraction
-                    const arrayBuffer = await file.arrayBuffer();
-                    const loadingTask = pdfjsLib.getDocument({
-                        data: new Uint8Array(arrayBuffer),
-                        useSystemFonts: true,
-                        disableFontFace: true
-                    });
-                    const pdf = await loadingTask.promise;
-                    let fullPdfText = "";
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageItems = textContent.items
-                            .map(item => (typeof item.str === 'string' ? item.str : ''))
-                            .filter(str => str.trim().length > 0);
-                        fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
+            try {
+                for (let idx = 0; idx < selectedFiles.length; idx++) {
+                    const file = selectedFiles[idx];
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    let currentFileText = "";
+
+                    if (ext === 'docx') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const result = await mammoth.extractRawText({ arrayBuffer });
+                        currentFileText = result.value || "";
+                    } else if (ext === 'pdf') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const loadingTask = pdfjsLib.getDocument({
+                            data: new Uint8Array(arrayBuffer),
+                            useSystemFonts: true,
+                            disableFontFace: true
+                        });
+                        const pdf = await loadingTask.promise;
+                        let fullPdfText = "";
+                        for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageItems = textContent.items
+                                .map(item => (typeof item.str === 'string' ? item.str : ''))
+                                .filter(str => str.trim().length > 0);
+                            fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
+                        }
+                        currentFileText = fullPdfText.trim() || `[PDF Document: ${file.name}]`;
+                    } else if (ext === 'xlsx' || ext === 'xls') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const wb = XLSX.read(arrayBuffer, { type: 'array' });
+                        let fullSheetText = "";
+                        wb.SheetNames.forEach(sheetName => {
+                            const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
+                            fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
+                        });
+                        currentFileText = fullSheetText;
+                    } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name)) {
+                        // Compress & scale high-res iPhone photos/screenshots on-device
+                        currentFileText = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                const img = new Image();
+                                img.onload = function() {
+                                    const maxDim = 1200;
+                                    let width = img.width;
+                                    let height = img.height;
+                                    if (width > maxDim || height > maxDim) {
+                                        if (width > height) {
+                                            height = Math.round((height * maxDim) / width);
+                                            width = maxDim;
+                                        } else {
+                                            width = Math.round((width * maxDim) / height);
+                                            height = maxDim;
+                                        }
+                                    }
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = width;
+                                    canvas.height = height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, width, height);
+                                    const compressedDataUri = canvas.toDataURL('image/jpeg', 0.85);
+                                    resolve(`[Attached Image / Screenshot: ${file.name}]\n${compressedDataUri}`);
+                                };
+                                img.onerror = () => resolve(`[Attached Image: ${file.name}]`);
+                                img.src = event.target.result;
+                            };
+                            reader.onerror = () => resolve(`[Attached Image: ${file.name}]`);
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        currentFileText = await file.text();
                     }
-                    uploadedDocText = fullPdfText.trim() || `[PDF Document: ${file.name} (Scanned Image or Vector)]`;
-                } else if (ext === 'xlsx' || ext === 'xls') {
-                    // Extract text from Excel spreadsheets
-                    const arrayBuffer = await file.arrayBuffer();
-                    const wb = XLSX.read(arrayBuffer, { type: 'array' });
-                    let fullSheetText = "";
-                    wb.SheetNames.forEach(sheetName => {
-                        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
-                        fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
-                    });
-                    uploadedDocText = fullSheetText;
-                } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name)) {
-                    // Compress & scale high-res iPhone photos/screenshots on-device for sub-second uploads
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = new Image();
-                        img.onload = function() {
-                            const maxDim = 1200;
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > maxDim || height > maxDim) {
-                                if (width > height) {
-                                    height = Math.round((height * maxDim) / width);
-                                    width = maxDim;
-                                } else {
-                                    width = Math.round((width * maxDim) / height);
-                                    height = maxDim;
-                                }
-                            }
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            const compressedDataUri = canvas.toDataURL('image/jpeg', 0.85);
-                            uploadedDocText = `[Attached Image / Screenshot: ${file.name}]\n${compressedDataUri}`;
-                            if (nameLabel) nameLabel.innerText = `${file.name} (ready)`;
-                        };
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    // Standard CSV, TXT, MD, JSON
-                    uploadedDocText = await file.text();
+
+                    combinedDocText += `\n=== FILE [${idx + 1}/${selectedFiles.length}]: ${file.name} ===\n${currentFileText}\n`;
                 }
 
+                uploadedDocText = combinedDocText.trim();
                 if (nameLabel) {
-                    nameLabel.innerText = `${file.name} (ready)`;
+                    nameLabel.innerText = selectedFiles.length === 1 ? `${selectedFiles[0].name} (ready)` : `${selectedFiles.length} files attached (ready)`;
                 }
             } catch (err) {
-                console.error("Document Parsing Error:", err);
-                // Fallback to raw text
-                try {
-                    uploadedDocText = await file.text();
-                } catch(e) {
-                    uploadedDocText = `[File attached: ${file.name}]`;
-                }
-                if (nameLabel) nameLabel.innerText = file.name;
+                console.error("Multi-File Parsing Error:", err);
+                uploadedDocText = `[Attached batch: ${attachedFileNameStr}]`;
+                if (nameLabel) nameLabel.innerText = `${selectedFiles.length} files attached`;
             }
         }
 

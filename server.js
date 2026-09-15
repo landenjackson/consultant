@@ -23,24 +23,28 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 });
 
 // RESILIENT MULTI-TIER GOOGLE AI PRO & ENTERPRISE INFERENCE PIPELINE (SUPPORTS TEXT & MULTIMODAL IMAGES)
-const queryAI = async (prompt, imageObj = null) => {
+const queryAI = async (prompt, imageObjs = []) => {
   const geminiKey = process.env.GEMINI_API_KEY;
   const myclawKey = process.env.MYCLAW_API_KEY;
 
-  // Tier 1: Direct Google Pro & Flash REST Endpoints with native vision multimodal support
+  // Tier 1: Direct Google Pro & Flash REST Endpoints with native vision multimodal support (Up to 10 images)
   if (geminiKey) {
     const models = ['gemini-3.6-flash', 'gemini-flash-lite-latest', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        const timeoutId = setTimeout(() => controller.abort(), 14000);
 
         const parts = [{ text: prompt }];
-        if (imageObj && imageObj.mimeType && imageObj.data) {
-          parts.unshift({
-            inlineData: {
-              mimeType: imageObj.mimeType,
-              data: imageObj.data
+        if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+          imageObjs.slice(0, 10).forEach(img => {
+            if (img && img.mimeType && img.data) {
+              parts.unshift({
+                inlineData: {
+                  mimeType: img.mimeType,
+                  data: img.data
+                }
+              });
             }
           });
         }
@@ -63,7 +67,7 @@ const queryAI = async (prompt, imageObj = null) => {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Google AI Pro Vision/Text Success] Delivered via Google ${model}`);
+            console.log(`[Google AI Pro Vision/Text Success] Delivered via Google ${model} (${imageObjs.length} images attached)`);
             return text;
           }
         }
@@ -202,20 +206,21 @@ ${documentText ? `Attached Context & Document Data:\n"""\n${documentText}\n"""\n
 
 Deliver an incisive, tailored response that directly resolves this specific request with zero canned filler.`;
 
-    // Extract embedded base64 image data if attached
-    let imageObj = null;
+    // Extract all embedded base64 image data if attached (Up to 10 images)
+    let imageObjs = [];
     if (documentText && documentText.includes('data:image/')) {
-      const match = documentText.match(/data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([^\s\]]+)/);
-      if (match) {
-        imageObj = {
+      const regex = /data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([^\s\]]+)/g;
+      let match;
+      while ((match = regex.exec(documentText)) !== null && imageObjs.length < 10) {
+        imageObjs.push({
           mimeType: match[1],
           data: match[2]
-        };
+        });
       }
     }
 
-    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'} | Multimodal Image: ${!!imageObj}]`);
-    const liveResponse = await queryAI(systemPrompt, imageObj);
+    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'} | Multimodal Images: ${imageObjs.length}]`);
+    const liveResponse = await queryAI(systemPrompt, imageObjs);
 
     if (liveResponse) {
       return res.json({ response: liveResponse });
