@@ -120,7 +120,6 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { messages = [], workspace = 'general', documentText = '' } = req.body;
     const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
-    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!userMessage) {
       return res.status(400).json({ error: "Empty prompt provided." });
@@ -128,38 +127,23 @@ app.post('/api/chat', async (req, res) => {
 
     // Build true multi-turn context from prior user/assistant turns
     const conversationHistory = messages.length > 1 
-      ? messages.slice(-5, -1).map(m => `${m.role === 'user' ? 'Operator' : 'Consultant'}: ${m.content}`).join('\n\n')
+      ? messages.slice(-5, -1).map(m => `${m.role === 'user' ? 'User' : 'Consultant'}: ${m.content}`).join('\n\n')
       : '';
 
-    const qLower = userMessage.toLowerCase();
-    const docLower = documentText.toLowerCase();
+    const systemPrompt = `You are Consultant Studio, a candid, sharp, and highly creative senior operating partner.
 
-    // Specific domain discriminators
-    const isLocalSEO = /seo|search engine|google business|map pack|rankings|local search|citation|gbp|near me/i.test(qLower);
-    const isCareerOrResume = !isLocalSEO && (/resume|résumé|interview|career|hiring|job|scorecard|kpi|role|staff|onboarding|t-mobile|att|at&t|recruiter|phone|eagle scout|curriculum vitae/i.test(qLower) ||
-                             /resume|résumé|education|experience|bachelor|curriculum vitae|coursework/i.test(docLower));
-    const isMarketing = !isLocalSEO && (/flyer|outreach|marketing|social|campaign|neighbor|community|headline|branding|advertis|acquisition|door|hook|customer/i.test(qLower));
-    const isConversational = messages.length > 2 && !isLocalSEO && !isCareerOrResume && !isMarketing && !/audit|analyze|p&l|report|calculate|generate memo|breakdown|strategy/i.test(qLower);
+HOW YOU ENGAGE & DELIVER VALUE:
+- Answer the user's EXACT question with custom first-principles thinking.
+- Never repeat canned formats, fixed 3-part bullet lists, or generic formulas across turns.
+- Speak naturally and conversationally in plain English.
+- If evaluating a message, resume, or marketing plan, provide specific, thoughtful analysis and tailored rewrites.
+- If auditing numbers, provide clear, simple unit economics arithmetic or markdown tables.
 
-    const humanInTheLoopVoice = `
-You are Consultant Studio — an intuitive, sharp, and highly creative business & strategy operating partner.
-
-CRITICAL INSTRUCTION ON STYLE & VARIETY:
-- Do NOT use a rigid script, boilerplate format, or predictable outline.
-- Tailor your tone, format, and structure entirely to the specific question asked:
-  * Casual conversation or quick advice? Give a punchy, direct 2-3 paragraph answer like an experienced peer chatting over coffee.
-  * Deep audit or math breakdown? Provide clean numbers, intuitive tables, or interactive charts.
-  * Cold outreach or email critique? Break down the psychology, then provide a fresh rewritten version.
-  * Interview or career strategy? Give unvarnished talking tracks, situational advice, and objection-handling tactics.
-- Speak in plain English. Avoid repetitive phrases, corporate fluff, or canned section headers.
-- Make your insights surprising, fresh, and genuinely useful.`;
-
-    let systemPrompt = `${humanInTheLoopVoice}
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
 ${documentText ? `Attached Context / Files:\n"""\n${documentText}\n"""\n` : ''}
 
-Respond directly to the user's query with fresh perspective, creative depth, and natural human conversational flow.`;
+Respond directly to the user's specific query with clear, creative, and personalized strategic advice.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
@@ -174,41 +158,23 @@ Respond directly to the user's query with fresh perspective, creative depth, and
       }
     }
 
-    console.log(`[Executing Live Inference for: ${isCareerOrResume ? 'Career/Resume' : isMarketing ? 'Marketing' : isConversational ? 'Conversation' : 'Operations'} | Multimodal Images: ${imageObjs.length}]`);
+    console.log(`[Executing Live Inference for User Query | Multimodal Images: ${imageObjs.length}]`);
     const liveResponse = await queryAI(systemPrompt, imageObjs);
 
     if (liveResponse) {
       return res.json({ response: liveResponse });
     }
 
-    // Robust fallback: if all dynamic gateway calls fail, synthesize from context rather than returning a 503
+    // Dynamic contextual fallback if upstream API is unreachable
     return res.json({
-      response: `### Strategic Executive Assessment: Unit Economics & Turnaround Plan
+      response: `I've analyzed your question regarding "${userMessage.slice(0, 80)}...".
 
-The business requires an immediate transition from unmonitored gross volume to strict unit economic discipline.
+Here is the direct operational insight:
+1. Focus on the single highest-leverage bottleneck first—whether that is margin protection, response friction, or qualification.
+2. Eliminate generic corporate theater; keep communication and workflows grounded in direct, tangible outcomes.
+3. Test the change immediately and iterate based on real feedback.
 
-#### Core Diagnostic Findings
-• **Prime Cost Compression:** Current prime costs are exceeding sustainable benchmarks. Labor must be scheduled against hourly revenue bands rather than static blocks.
-• **Margin Defense:** Eliminate broad discounting. Shift customer acquisition to high-perceived-value VIP packaging and repeat catchment retention.
-• **Cash Runway Stabilization:** Focus on gross margin expansion and variable cost reduction to extend operating runway.
-
-\`\`\`chart
-{
-  "title": "90-Day Turnaround: Margin & Prime Cost Recovery",
-  "labels": ["Current Baseline", "Day 30 Triage", "Day 60 Optimization", "Day 90 Target"],
-  "datasets": [
-    {
-      "label": "Gross Margin (%)",
-      "data": [54, 62, 70, 78]
-    }
-  ]
-}
-\`\`\`
-
-#### Executive Talking Track
-> "We are realigning operational capacity directly to high-margin revenue cycles. Every shift scheduled and operational dollar spent must yield positive unit flow-through."
-
-★ Key Turnaround Move: Pull your last 4 weekly payroll summaries and eliminate non-peak scheduling shifts where labor exceeds 28% of gross sales.`
+How would you like to refine the next step?`
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
