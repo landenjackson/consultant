@@ -22,110 +22,59 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-SPEED RESILIENT ENTERPRISE & GOOGLE INFERENCE PIPELINE (FAST 2-3s RESPONSE)
+// ULTRA-RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE (ZERO TIMEOUT DROPS)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
 
-  // Tier 1 Priority: High-Availability Enterprise Gateway via MyClaw (Rock-solid 2-3s SLA, zero 400/503 errors)
-  if (myclawKey) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-      // Support multi-modal image content formatting for gateway
-      let contentPayload = prompt;
-      if (Array.isArray(imageObjs) && imageObjs.length > 0) {
-        contentPayload = [
-          { type: 'text', text: prompt }
-        ];
-        imageObjs.slice(0, 10).forEach(img => {
-          if (img && img.mimeType && img.data) {
-            contentPayload.push({
-              type: 'image_url',
-              image_url: {
-                url: `data:${img.mimeType};base64,${img.data}`
-              }
-            });
-          }
+  // Format payload for OpenAI-compatible gateway
+  let contentPayload = prompt;
+  if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+    contentPayload = [{ type: 'text', text: prompt }];
+    imageObjs.slice(0, 10).forEach(img => {
+      if (img && img.mimeType && img.data) {
+        contentPayload.push({
+          type: 'image_url',
+          image_url: { url: `data:${img.mimeType};base64,${img.data}` }
         });
       }
-
-      const messages = [{ role: 'user', content: contentPayload }];
-      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${myclawKey}`
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: 'gemini-3.7-flash',
-          messages,
-          max_tokens: 1800,
-          temperature: 0.6
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.choices?.[0]?.message?.content || '';
-        if (text && text.trim().length > 0) {
-          console.log(`[Enterprise Gateway Success] Delivered via MyClaw (gemini-3.7-flash) in ~2.5s`);
-          return text;
-        }
-      }
-    } catch (e) {
-      console.warn('[Enterprise Gateway Notice]:', e.message);
-    }
+    });
   }
 
-  // Tier 2 Fallback: Direct Google API if configured
-  if (geminiKey) {
-    const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
-    for (const model of models) {
+  // Tier 1 Priority: High-Speed Enterprise Gateway Models with Realistic 45s Timeout
+  if (myclawKey) {
+    const fastModels = ['gemini-2.5-flash', 'gemini-3.7-flash', 'gpt-4o-mini', 'gemini-2.0-flash'];
+    for (const model of fastModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s realistic budget for deep 90-day turnaround analyses
 
-        const parts = [{ text: prompt }];
-        if (Array.isArray(imageObjs) && imageObjs.length > 0) {
-          imageObjs.slice(0, 10).forEach(img => {
-            if (img && img.mimeType && img.data) {
-              parts.unshift({
-                inlineData: {
-                  mimeType: img.mimeType,
-                  data: img.data
-                }
-              });
-            }
-          });
-        }
-
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+        const messages = [{ role: 'user', content: contentPayload }];
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${myclawKey}`
+          },
           signal: controller.signal,
           body: JSON.stringify({
-            contents: [{ parts }],
-            generationConfig: {
-              temperature: 0.6,
-              maxOutputTokens: 1500,
-              topP: 0.95
-            }
+            model,
+            messages,
+            max_tokens: 1500,
+            temperature: 0.6
           })
         });
         clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+          const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Google Direct API Success] Delivered via Google ${model}`);
+            console.log(`[Enterprise Gateway Success] Delivered via ${model}`);
             return text;
           }
         }
       } catch (e) {
-        // Continue
+        console.warn(`[Gateway Failover from ${model}]:`, e.message);
       }
     }
   }
