@@ -1146,15 +1146,16 @@
             font-size: var(--base-font-size, 14.5px);
         }
 
-        /* COMPACT MOBILE OPTIMIZATION */
+        /* COMPACT MOBILE OPTIMIZATION — CLEAN VERTICAL EDITORIAL FLOW */
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden;
+                font-size: 15px;
             }
 
             main {
-                padding: 10px 8px 120px;
-                gap: 10px;
+                padding: 14px 12px 130px;
+                gap: 14px;
                 width: 100%;
                 box-sizing: border-box;
             }
@@ -1167,36 +1168,64 @@
             }
 
             .bubble-assistant {
-                padding: 14px 14px;
-                border-radius: 10px;
-                font-size: 13.5px;
-                line-height: 1.6;
+                padding: 18px 16px;
+                border-radius: 12px;
+                font-size: 14.5px;
+                line-height: 1.72;
+                letter-spacing: -0.005em;
+            }
+
+            .bubble-assistant p {
+                margin-bottom: 14px;
+                font-size: 14.5px;
+                line-height: 1.72;
+            }
+
+            .bubble-assistant ul {
+                margin: 10px 0 16px 14px;
+                padding-left: 6px;
+            }
+
+            .bubble-assistant li {
+                margin-bottom: 8px;
+                line-height: 1.68;
+                font-size: 14.5px;
+            }
+
+            .exec-card-title {
+                font-size: 15.5px !important;
+                margin: 20px 0 10px !important;
             }
 
             .bubble-user {
-                padding: 8px 12px;
-                font-size: 13px;
-                max-width: 90%;
+                padding: 10px 14px;
+                font-size: 14px;
+                line-height: 1.55;
+                max-width: 88%;
             }
 
             .exec-chart-card {
-                padding: 10px !important;
-                margin: 10px 0 !important;
+                padding: 12px !important;
+                margin: 14px 0 !important;
+                border-radius: 10px;
             }
 
             .exec-table-wrap {
-                margin: 10px 0 !important;
+                margin: 14px 0 !important;
             }
 
             .deliverables-bar {
-                gap: 6px;
-                padding-top: 10px;
-                margin-top: 12px;
+                gap: 8px;
+                padding-top: 12px;
+                margin-top: 14px;
+                display: flex;
+                flex-wrap: wrap;
             }
 
             .btn-export {
-                padding: 5px 8px;
-                font-size: 11px;
+                padding: 6px 10px;
+                font-size: 11.5px;
+                border-radius: 8px;
             }
 
             header {
