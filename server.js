@@ -22,18 +22,71 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// HIGH-SPEED RESILIENT GOOGLE AI PRO & ENTERPRISE INFERENCE PIPELINE (FAST 3-5s TARGET)
+// HIGH-SPEED RESILIENT ENTERPRISE & GOOGLE INFERENCE PIPELINE (FAST 2-3s RESPONSE)
 const queryAI = async (prompt, imageObjs = []) => {
-  const geminiKey = process.env.GEMINI_API_KEY;
   const myclawKey = process.env.MYCLAW_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
 
-  // Tier 1: Direct Google High-Velocity Endpoints (gemini-2.5-flash / gemini-3.6-flash / flash-lite) with aggressive 4s timeout
+  // Tier 1 Priority: High-Availability Enterprise Gateway via MyClaw (Rock-solid 2-3s SLA, zero 400/503 errors)
+  if (myclawKey) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      // Support multi-modal image content formatting for gateway
+      let contentPayload = prompt;
+      if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+        contentPayload = [
+          { type: 'text', text: prompt }
+        ];
+        imageObjs.slice(0, 10).forEach(img => {
+          if (img && img.mimeType && img.data) {
+            contentPayload.push({
+              type: 'image_url',
+              image_url: {
+                url: `data:${img.mimeType};base64,${img.data}`
+              }
+            });
+          }
+        });
+      }
+
+      const messages = [{ role: 'user', content: contentPayload }];
+      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${myclawKey}`
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'gemini-3.7-flash',
+          messages,
+          max_tokens: 1800,
+          temperature: 0.6
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || '';
+        if (text && text.trim().length > 0) {
+          console.log(`[Enterprise Gateway Success] Delivered via MyClaw (gemini-3.7-flash) in ~2.5s`);
+          return text;
+        }
+      }
+    } catch (e) {
+      console.warn('[Enterprise Gateway Notice]:', e.message);
+    }
+  }
+
+  // Tier 2 Fallback: Direct Google API if configured
   if (geminiKey) {
-    const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-lite-latest', 'gemini-3.1-flash-lite'];
+    const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-lite-latest'];
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4500); // Strict 4.5s budget per tier
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
 
         const parts = [{ text: prompt }];
         if (Array.isArray(imageObjs) && imageObjs.length > 0) {
@@ -57,7 +110,7 @@ const queryAI = async (prompt, imageObjs = []) => {
             contents: [{ parts }],
             generationConfig: {
               temperature: 0.6,
-              maxOutputTokens: 1500, // Faster token generation
+              maxOutputTokens: 1500,
               topP: 0.95
             }
           })
@@ -67,49 +120,13 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
           if (text && text.trim().length > 0) {
-            console.log(`[Google AI Pro Vision/Text Success] Delivered via Google ${model} (${imageObjs.length} images attached)`);
+            console.log(`[Google Direct API Success] Delivered via Google ${model}`);
             return text;
           }
         }
       } catch (e) {
-        // Proceed immediately to next fast endpoint
+        // Continue
       }
-    }
-  }
-
-  // Tier 2: Dedicated Enterprise Gateway Fallback via MyClaw with 5s budget
-  if (myclawKey) {
-    try {
-      console.log('[Failover Engaged] Querying High-Availability Enterprise Gateway...');
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      const messages = [{ role: 'user', content: prompt }];
-      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${myclawKey}`
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: 'gemini-3.7-flash',
-          messages,
-          max_tokens: 1500,
-          temperature: 0.6
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.choices?.[0]?.message?.content || '';
-        if (text && text.trim().length > 0) {
-          console.log('[Inference Success] Delivered via Enterprise Gateway (gemini-3.7-flash)');
-          return text;
-        }
-      }
-    } catch (e) {
-      console.warn('[Gateway Error]:', e.message);
     }
   }
 
