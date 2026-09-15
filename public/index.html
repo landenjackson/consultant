@@ -2997,14 +2997,42 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 INSTANT SMOOTH EXECUTIVE RENDERING ENGINE (ZERO STREAMING DELAY) */
+        /* 🪄 CRAFTED FLUID EXECUTIVE TYPING ENGINE (SMOOTH 60FPS ANIMATION) */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.12s ease-out;">${formatExecutiveResponse(fullText)}</div>`;
-                initializePendingCharts(container);
+                container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor" style="display:inline-block; width:6px; height:14px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.8s infinite;"></span>`;
+                const contentBox = container.querySelector('.stream-content');
+                const cursor = container.querySelector('.typing-cursor');
                 const feed = document.getElementById('chatFeed');
-                if (feed) feed.scrollTop = feed.scrollHeight;
-                if (onComplete) onComplete();
+
+                const words = fullText.split(' ');
+                const totalWords = words.length;
+                let currentWordIdx = 0;
+
+                function typeStep() {
+                    if (currentWordIdx < totalWords) {
+                        // Smooth, adaptive 3-to-6 word cadence for fluid non-jarring delivery
+                        const remaining = totalWords - currentWordIdx;
+                        const step = Math.max(2, Math.min(6, Math.ceil(remaining / 16)));
+                        currentWordIdx += step;
+
+                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
+                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
+
+                        if (feed) feed.scrollTop = feed.scrollHeight;
+
+                        // Ultra-smooth 60fps frame timing
+                        setTimeout(() => requestAnimationFrame(typeStep), 18);
+                    } else {
+                        if (cursor) cursor.remove();
+                        contentBox.innerHTML = formatExecutiveResponse(fullText);
+                        initializePendingCharts(container);
+                        if (feed) feed.scrollTop = feed.scrollHeight;
+                        if (onComplete) onComplete();
+                    }
+                }
+
+                requestAnimationFrame(typeStep);
             } catch (err) {
                 console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
