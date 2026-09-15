@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE (TARGET SUB-4s LATENCY)
+// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -43,12 +43,12 @@ const queryAI = async (prompt, imageObjs = []) => {
   if (myclawKey) {
     const models = hasImages
       ? ['gemini-3.7-flash']
-      : ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+      : ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
 
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 18000);
+        const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s generous budget
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -60,8 +60,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 850, // Streamlined token size for fast sub-4s generation
-            temperature: 0.55
+            max_tokens: 4000, // 4,000 token limit ensures deep analyses and tables NEVER truncate mid-sentence
+            temperature: 0.6
           })
         });
         clearTimeout(timeoutId);
