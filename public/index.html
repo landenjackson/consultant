@@ -2203,16 +2203,60 @@
             }
         }
 
+        // Helper function to extract clean text without button labels or UI tags
+        function getCleanStrategyText(el) {
+            if (!el) return '';
+            const clone = el.cloneNode(true);
+            
+            // Remove all UI buttons, bars, sliders, HUD telemetry, and script tags
+            const junkSelectors = [
+                '.deliverables-bar', 
+                '.subagent-hud', 
+                '.canvas-toolbar', 
+                '.canvas-header', 
+                '.whatif-slider-wrap', 
+                '.exec-chart-tag',
+                'button',
+                'script',
+                'style'
+            ];
+            junkSelectors.forEach(sel => {
+                clone.querySelectorAll(sel).forEach(node => node.remove());
+            });
+
+            let text = clone.innerText || clone.textContent || '';
+            
+            // Strip any remaining button labels or leaked export strings
+            text = text
+                .replace(/🎙️\s*Listen to Briefing/gi, '')
+                .replace(/🏢\s*Send to Office 365/gi, '')
+                .replace(/🎨\s*Open in Canvas/gi, '')
+                .replace(/📄\s*1-Page Bank Teaser/gi, '')
+                .replace(/📑\s*Excel \(\.xlsx\)/gi, '')
+                .replace(/📝\s*Word \(\.doc\)/gi, '')
+                .replace(/📊\s*Deck \(\.pptx\)/gi, '')
+                .replace(/🔒\s*Save Vault/gi, '')
+                .replace(/📋\s*Copy Strategy/gi, '')
+                .replace(/🖨️\s*Print \/ PDF/gi, '')
+                .replace(/Interactive Telemetry/gi, '')
+                .replace(/🪄 Stress-Test Model:[^\n]+/gi, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+
+            return text;
+        }
+
         function copyCanvasText() {
             const editor = document.getElementById('canvasEditor');
             if (!editor) return;
-            navigator.clipboard.writeText(editor.innerText || editor.textContent);
+            const text = getCleanStrategyText(editor);
+            navigator.clipboard.writeText(text);
             
             // Smooth non-blocking UI indicator
             const titleEl = document.getElementById('canvasTitle');
             if (titleEl) {
                 const origText = titleEl.innerText;
-                titleEl.innerText = "✓ Copied to Clipboard";
+                titleEl.innerText = "✓ Clean Text Copied";
                 titleEl.style.color = "var(--accent-glow)";
                 setTimeout(() => {
                     titleEl.innerText = origText;
@@ -2224,11 +2268,11 @@
         function exportCanvasWord() {
             const editor = document.getElementById('canvasEditor');
             if (!editor) return;
-            const text = editor.innerText || editor.textContent;
+            const text = getCleanStrategyText(editor);
             navigator.clipboard.writeText(text);
             const titleEl = document.getElementById('canvasTitle');
             if (titleEl) {
-                titleEl.innerText = "✓ Formatted Text Copied";
+                titleEl.innerText = "✓ Strategy Copied (No Buttons)";
                 titleEl.style.color = "var(--accent-glow)";
                 setTimeout(() => {
                     titleEl.innerText = "Strategy Canvas";
