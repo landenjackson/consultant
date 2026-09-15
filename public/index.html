@@ -3568,32 +3568,38 @@
                 let res = null;
                 let data = null;
 
-                // Resilient client-side request handler with guaranteed synthesis fallback
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s client-side window
+                // Resilient client-side request handler with guaranteed retry
+                let res = null;
+                let data = null;
 
-                    res = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: controller.signal,
-                        body: JSON.stringify({
-                            messages,
-                            workspace: selectedMode,
-                            documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
-                        })
-                    });
-                    clearTimeout(timeoutId);
+                for (let attempt = 1; attempt <= 2; attempt++) {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 28000); // 28s generous client window
 
-                    if (res && res.ok) {
-                        data = await res.json();
+                        res = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            signal: controller.signal,
+                            body: JSON.stringify({
+                                messages,
+                                workspace: selectedMode,
+                                documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
+                            })
+                        });
+                        clearTimeout(timeoutId);
+
+                        if (res && res.ok) {
+                            data = await res.json();
+                            if (data && data.response) break;
+                        }
+                    } catch (netErr) {
+                        console.warn(`[Client Request Notice - Attempt ${attempt}]`, netErr.message);
                     }
-                } catch (netErr) {
-                    console.warn('[Client Network Notice]', netErr.message);
                 }
 
                 if (!data || !data.response) {
-                    throw new Error("Reasoning stream interrupted. Please resend message.");
+                    throw new Error("Unable to synthesize response. Please check connection and retry.");
                 }
 
                 const responseText = data.response || "Strategy synthesized.";
