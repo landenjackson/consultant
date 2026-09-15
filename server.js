@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE
+// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE (TARGET SUB-4s LATENCY)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -41,16 +41,14 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    // When images/screenshots are attached, route EXCLUSIVELY to gemini-3.7-flash (the verified multimodal vision model)
-    // For pure text queries, use ultra-fast gemini-2.5-flash -> gemini-3.7-flash -> gemini-2.0-flash
     const models = hasImages
       ? ['gemini-3.7-flash']
-      : ['gemini-2.5-flash', 'gemini-3.7-flash', 'gemini-2.0-flash'];
+      : ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 28000);
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -62,8 +60,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 3500, // Full complete analysis without clipping
-            temperature: 0.6
+            max_tokens: 850, // Streamlined token size for fast sub-4s generation
+            temperature: 0.55
           })
         });
         clearTimeout(timeoutId);
@@ -71,7 +69,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model} (Images: ${hasImages}, Len: ${text.length})`);
+            console.log(`[Enterprise Gemini Success] Delivered via ${model} (Len: ${text.length})`);
             return text;
           }
         }
