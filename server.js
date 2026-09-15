@@ -22,12 +22,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST STREAMLINED ENTERPRISE GEMINI INFERENCE (GUARANTEED ZERO 503s)
+// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
+  const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
 
   let contentPayload = prompt;
-  if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+  if (hasImages) {
     contentPayload = [{ type: 'text', text: prompt }];
     imageObjs.slice(0, 10).forEach(img => {
       if (img && img.mimeType && img.data) {
@@ -40,8 +41,12 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    // Sequential fallback with generous 4000 max_tokens to prevent clipping on detailed audits
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // When images/screenshots are attached, route EXCLUSIVELY to gemini-3.7-flash (the verified multimodal vision model)
+    // For pure text queries, use ultra-fast gemini-2.5-flash -> gemini-3.7-flash -> gemini-2.0-flash
+    const models = hasImages
+      ? ['gemini-3.7-flash']
+      : ['gemini-2.5-flash', 'gemini-3.7-flash', 'gemini-2.0-flash'];
+
     for (const model of models) {
       try {
         const controller = new AbortController();
@@ -57,7 +62,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 3500, // Generous 3500 token ceiling — full audits & 7-point playbooks will NEVER be clipped
+            max_tokens: 3500, // Full complete analysis without clipping
             temperature: 0.6
           })
         });
@@ -65,8 +70,8 @@ const queryAI = async (prompt, imageObjs = []) => {
         if (res.ok) {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 0) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
+          if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
+            console.log(`[Enterprise Gemini Success] Delivered via ${model} (Images: ${hasImages}, Len: ${text.length})`);
             return text;
           }
         }
