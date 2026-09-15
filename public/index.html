@@ -2791,16 +2791,25 @@
                         });
                         canvas.dataset.initialized = 'true';
 
-                        // Attach Interactive What-If Slider Control
+                        // Attach Interactive What-If Slider Control with Contextual Scenario Labels
                         const cardParent = canvas.closest('.exec-chart-card');
                         if (cardParent && !cardParent.querySelector('.whatif-slider-wrap')) {
                             const sliderDiv = document.createElement('div');
                             sliderDiv.className = 'whatif-slider-wrap';
-                            sliderDiv.style.cssText = "margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11.5px;";
+                            sliderDiv.style.cssText = "margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:6px; font-size:11.5px;";
                             sliderDiv.innerHTML = `
-                                <span style="color:var(--accent-glow); font-weight:700; white-space:nowrap;">🪄 What-If Sensitivity:</span>
-                                <input type="range" min="80" max="150" value="100" style="flex:1; accent-color:#22C55E; cursor:pointer;" oninput="updateChartSensitivity(this, '${chartInstance.id || canvas.id}')">
-                                <span class="slider-pct-label" style="color:#FFF; font-weight:600; min-width:44px; text-align:right;">100%</span>
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                                    <span style="color:var(--accent-glow); font-weight:700; white-space:nowrap; display:flex; align-items:center; gap:5px;">
+                                        <span>🪄 Stress-Test Model:</span>
+                                        <span class="scenario-badge" style="font-size:10px; font-weight:600; padding:1px 6px; border-radius:4px; background:rgba(34,197,94,0.12); color:#4ADE80; border:1px solid rgba(34,197,94,0.3);">Base Target Plan</span>
+                                    </span>
+                                    <span class="slider-pct-label" style="color:#FFF; font-weight:700; min-width:44px; text-align:right;">100%</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span style="font-size:10px; color:#64748B; font-weight:600;">-20% Worst Case</span>
+                                    <input type="range" min="80" max="150" value="100" style="flex:1; accent-color:#22C55E; cursor:pointer;" oninput="updateChartSensitivity(this, '${chartInstance.id || canvas.id}')">
+                                    <span style="font-size:10px; color:#64748B; font-weight:600;">+50% Bull Run</span>
+                                </div>
                             `;
                             cardParent.appendChild(sliderDiv);
 
@@ -2825,11 +2834,44 @@
         // Global Chart Registry for Universal Multi-Browser Sensitivity Updates
         window.consultantChartRegistry = window.consultantChartRegistry || {};
 
-        // Live Sensitivity Recalculator with Cross-Browser Compatibility
+        // Live Sensitivity Recalculator with Contextual Statistical Scenarios
         function updateChartSensitivity(rangeEl, chartKey) {
             const pct = parseInt(rangeEl.value, 10);
-            const labelEl = rangeEl.parentElement.querySelector('.slider-pct-label');
+            const parent = rangeEl.closest('.whatif-slider-wrap');
+            const labelEl = parent ? parent.querySelector('.slider-pct-label') : null;
+            const badgeEl = parent ? parent.querySelector('.scenario-badge') : null;
+
             if (labelEl) labelEl.innerText = `${pct}%`;
+
+            // Update scenario classification badge dynamically based on variance
+            if (badgeEl) {
+                if (pct < 90) {
+                    badgeEl.innerText = "Severe Downside Risk";
+                    badgeEl.style.background = "rgba(248, 113, 113, 0.15)";
+                    badgeEl.style.color = "#F87171";
+                    badgeEl.style.borderColor = "rgba(248, 113, 113, 0.4)";
+                } else if (pct < 100) {
+                    badgeEl.innerText = "Conservative Case";
+                    badgeEl.style.background = "rgba(251, 191, 36, 0.15)";
+                    badgeEl.style.color = "#FBBF24";
+                    badgeEl.style.borderColor = "rgba(251, 191, 36, 0.4)";
+                } else if (pct === 100) {
+                    badgeEl.innerText = "Base Target Plan";
+                    badgeEl.style.background = "rgba(34, 197, 94, 0.12)";
+                    badgeEl.style.color = "#4ADE80";
+                    badgeEl.style.borderColor = "rgba(34, 197, 94, 0.3)";
+                } else if (pct <= 125) {
+                    badgeEl.innerText = "Optimized Growth";
+                    badgeEl.style.background = "rgba(56, 189, 248, 0.15)";
+                    badgeEl.style.color = "#38BDF8";
+                    badgeEl.style.borderColor = "rgba(56, 189, 248, 0.4)";
+                } else {
+                    badgeEl.innerText = "Aggressive Bull Run";
+                    badgeEl.style.background = "rgba(168, 85, 247, 0.15)";
+                    badgeEl.style.color = "#C084FC";
+                    badgeEl.style.borderColor = "rgba(168, 85, 247, 0.4)";
+                }
+            }
 
             // Find canvas element directly by ID if in DOM
             const canvasEl = document.getElementById(chartKey) || rangeEl.closest('.exec-chart-card')?.querySelector('canvas');
