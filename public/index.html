@@ -3513,63 +3513,32 @@
                 let res = null;
                 let data = null;
 
-                // Resilient client-side retry loop (Tries up to 2 times automatically before erroring)
-                for (let attempt = 1; attempt <= 2; attempt++) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s client-side window
+                // Resilient client-side request handler
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s window for deep live analysis
 
-                        res = await fetch('/api/chat', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            signal: controller.signal,
-                            body: JSON.stringify({
-                                messages,
-                                workspace: selectedMode,
-                                documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
-                            })
-                        });
-                        clearTimeout(timeoutId);
+                    res = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            messages,
+                            workspace: selectedMode,
+                            documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
+                        })
+                    });
+                    clearTimeout(timeoutId);
 
-                        if (res && res.ok) {
-                            data = await res.json();
-                            if (data && data.response) break;
-                        }
-                    } catch (netErr) {
-                        console.warn(`[Client Retry Attempt ${attempt}]`, netErr.message);
+                    if (res && res.ok) {
+                        data = await res.json();
                     }
+                } catch (netErr) {
+                    console.warn('[Client Network Notice]', netErr.message);
                 }
 
                 if (!data || !data.response) {
-                    // Guaranteed Instant Local Strategic Synthesis (Eliminates all 503 error notices permanently)
-                    data = {
-                        response: `### Strategic Executive Assessment & Operational Directive
-
-We have evaluated the current operational parameters and unit economics to provide a direct execution path.
-
-#### 1. Core Operating Diagnostic
-• **Prime Cost & Unit Efficiency:** Maintain strict cost thresholds across active dayparts. Reallocate downtime hours to high-traffic surges.
-• **Margin Defense:** Protect top-line realization by eliminating blanket discounting. Shift acquisition toward high-perceived-value VIP packaging.
-• **Workflow Throughput:** Optimize station communication and frontline handoffs to shave cycle times and expand customer capacity.
-
-\`\`\`chart
-{
-  "title": "90-Day Stabilization: Efficiency & Margin Recovery",
-  "labels": ["Current Baseline", "Day 30 Triage", "Day 60 Optimization", "Day 90 Target"],
-  "datasets": [
-    {
-      "label": "Gross Margin (%)",
-      "data": [55, 63, 71, 78]
-    }
-  ]
-}
-\`\`\`
-
-#### 2. Executive Talking Track
-> "We are realigning operational resources directly with profitable volume. Every shift scheduled and operational dollar spent must produce positive contribution margin."
-
-★ Key Turnaround Move: Pull your weekly labor and inventory metrics, and eliminate non-peak operational expenditure exceeding 28% of gross revenue.`
-                    };
+                    throw new Error("Unable to synthesize response. Please retry in 1 moment.");
                 }
 
                 const responseText = data.response || "Strategy synthesized.";

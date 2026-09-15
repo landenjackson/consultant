@@ -46,7 +46,7 @@ const queryAI = async (prompt, imageObjs = []) => {
     for (const model of geminiOnlyModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout for complete first-principles generation
 
         const messages = [{ role: 'user', content: contentPayload }];
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 2500, // Full complete response without truncation
-            temperature: 0.5
+            max_tokens: 2000,
+            temperature: 0.7 // Elevated temperature for creative, domain-specific variety
           })
         });
         clearTimeout(timeoutId);
