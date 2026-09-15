@@ -1995,47 +1995,16 @@
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
             },
 
-            // Assemble a rich, contextual cognitive memory snapshot for AI inference
+            // Assemble a clean, unobtrusive operator context for AI inference
             buildCognitiveContext: function() {
-                const state = this.getState();
                 const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+                if (vault.length === 0) return '';
                 
-                let memoryPrompt = "\n=== 🏛️ OPERATOR 4-TIER COGNITIVE MEMORY & KNOWLEDGE GRAPH ===\n";
-                
-                // Tier 1: Operator Core Philosophy & Verified Attributes
-                memoryPrompt += "1. OPERATOR NON-NEGOTIABLES & VOICE:\n";
-                memoryPrompt += "• Philosophy: Strict Human-in-the-Loop AI leverage (AI accelerates research/data, human provides craftsmanship/empathy).\n";
-                memoryPrompt += "• Operational Baseline: Non-discount margin defense, high-velocity frontline throughput, penny-balanced unit economics.\n";
-                memoryPrompt += "• Standard: Florida State University Marketing Alum, Eagle Scout discipline, empirical rigor (p < .001).\n";
-                memoryPrompt += "• Executive Tone: Direct, unvarnished peer partner, zero generic filler, zero code-like ASCII artifacts.\n\n";
-
-                // Tier 2: Domain Context & Benchmarks (Hospitality, Telecom, SaaS)
-                memoryPrompt += "2. HISTORICAL DOMAIN CONTEXT & BENCHMARKS:\n";
-                memoryPrompt += "• Hospitality / Food Service: 62% prime cost ceiling, hourly sales-banded labor matrices, weekly protein variance cycle counts, table-turn ticket compression.\n";
-                memoryPrompt += "• Retail / Telecom: Store floor throughput, quota pacing, ARPU preservation, 99% fulfillment SLAs, frontline team coaching.\n";
-                memoryPrompt += "• B2B / Agency Outreach: CEO-level peer dialogue, non-hallucinating agent workflows, addressing client operational friction directly.\n\n";
-
-                // Tier 3: Retained Strategy Vault Highlights
-                if (vault.length > 0) {
-                    memoryPrompt += "3. STRATEGY VAULT HISTORICAL CASES & PRIOR ARTIFACTS:\n";
-                    vault.slice(0, 4).forEach(v => {
-                        const snippet = v.text ? v.text.slice(0, 180).replace(/\n/g, ' ') : '';
-                        memoryPrompt += `• [Case: ${v.title}]: ${snippet}...\n`;
-                    });
-                    memoryPrompt += "\n";
-                }
-
-                // Tier 4: Dynamic Dynamic Insights (if any logged)
-                const customCategories = Object.keys(state);
-                if (customCategories.length > 0) {
-                    memoryPrompt += "4. ACTIVE EVOLVING LEARNINGS:\n";
-                    customCategories.forEach(cat => {
-                        const items = Object.entries(state[cat]).map(([k, v]) => `${k}: ${v.value}`).join(' | ');
-                        memoryPrompt += `• [${cat}]: ${items}\n`;
-                    });
-                }
-
-                memoryPrompt += "=============================================================\n";
+                let memoryPrompt = "\n[Operator Context - Prior Discussion Topics]:\n";
+                vault.slice(0, 3).forEach(v => {
+                    const snippet = v.title ? v.title.slice(0, 100) : '';
+                    memoryPrompt += `• Prior Topic: ${snippet}\n`;
+                });
                 return memoryPrompt;
             }
         };
