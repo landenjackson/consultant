@@ -2997,41 +2997,14 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 CRAFTED FLUID EXECUTIVE TYPING ENGINE */
+        /* 🪄 INSTANT SMOOTH EXECUTIVE RENDERING ENGINE (ZERO STREAMING DELAY) */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);"></div><span class="typing-cursor"></span>`;
-                const contentBox = container.querySelector('.stream-content');
-                const cursor = container.querySelector('.typing-cursor');
+                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.12s ease-out;">${formatExecutiveResponse(fullText)}</div>`;
+                initializePendingCharts(container);
                 const feed = document.getElementById('chatFeed');
-
-                const words = fullText.split(' ');
-                const totalWords = words.length;
-                let currentWordIdx = 0;
-
-                function typeStep() {
-                    if (currentWordIdx < totalWords) {
-                        const remaining = totalWords - currentWordIdx;
-                        // Smooth, non-jarring word progression
-                        const step = Math.max(2, Math.min(5, Math.ceil(remaining / 18)));
-                        currentWordIdx += step;
-
-                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
-                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
-
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-
-                        setTimeout(() => requestAnimationFrame(typeStep), 20);
-                    } else {
-                        if (cursor) cursor.remove();
-                        contentBox.innerHTML = formatExecutiveResponse(fullText);
-                        initializePendingCharts(container);
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-                        if (onComplete) onComplete();
-                    }
-                }
-
-                requestAnimationFrame(typeStep);
+                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;

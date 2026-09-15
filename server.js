@@ -42,11 +42,11 @@ const queryAI = async (prompt, imageObjs = []) => {
 
   // Pure Google Gemini Fast Pipeline - Strictly ZERO OpenAI / GPT models
   if (myclawKey) {
-    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-3.7-flash', 'gemini-2.0-flash'];
+    const geminiOnlyModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.7-flash'];
     for (const model of geminiOnlyModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 18000); // 18s failover window
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         const messages = [{ role: 'user', content: contentPayload }];
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages,
-            max_tokens: 1200,
-            temperature: 0.6
+            max_tokens: 2500, // Full complete response without truncation
+            temperature: 0.5
           })
         });
         clearTimeout(timeoutId);
