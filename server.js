@@ -165,17 +165,7 @@ Respond directly to the user's specific query with clear, creative, and personal
       return res.json({ response: liveResponse });
     }
 
-    // Dynamic contextual fallback if upstream API is unreachable
-    return res.json({
-      response: `I've analyzed your question regarding "${userMessage.slice(0, 80)}...".
-
-Here is the direct operational insight:
-1. Focus on the single highest-leverage bottleneck first—whether that is margin protection, response friction, or qualification.
-2. Eliminate generic corporate theater; keep communication and workflows grounded in direct, tangible outcomes.
-3. Test the change immediately and iterate based on real feedback.
-
-How would you like to refine the next step?`
-    });
+    return res.status(503).json({ error: "Inference engine momentarily busy. Please resend." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

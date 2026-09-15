@@ -3595,14 +3595,7 @@
                 }
 
                 if (!data || !data.response) {
-                    // Seamless client-side dynamic fallback — NEVER display an error banner to the user
-                    data = {
-                        response: `### Strategic Assessment: Operational Directives
-
-1. **Immediate Execution Focus:** Prioritize unit margin protection and throughput acceleration across active business cycles.
-2. **Friction Reduction:** Eliminate unmonitored operational downtime and reallocate capacity toward high-demand surges.
-3. **Outcome Measurement:** Track weekly contribution flow-through and iterate based on verified customer velocity.`
-                    };
+                    throw new Error("Reasoning stream interrupted. Please resend message.");
                 }
 
                 const responseText = data.response || "Strategy synthesized.";
