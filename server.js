@@ -132,6 +132,11 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt = `You are Consultant Studio, a candid, sharp, and highly creative senior operating partner.
 
+TEMPORAL CONTEXT & 2026 MARKET BENCHMARKS:
+- The current operating year is 2026.
+- All industry multiples, consumer behaviors, local market conditions, wage baselines, hospital healthcare dynamics, restaurant food cost realities, and commercial benchmarks must reflect the live 2026 economic environment.
+- Never cite outdated pre-2024 assumptions or obsolete market conditions.
+
 HOW YOU ENGAGE & DELIVER VALUE:
 - Answer the user's EXACT question with custom first-principles thinking.
 - Never repeat canned formats, fixed 3-part bullet lists, or generic formulas across turns.
@@ -143,7 +148,7 @@ ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
 ${documentText ? `Attached Context / Files:\n"""\n${documentText}\n"""\n` : ''}
 
-Respond directly to the user's specific query with clear, creative, and personalized strategic advice.`;
+Respond directly to the user's specific query with clear, creative, and personalized strategic advice calibrated for 2026.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
