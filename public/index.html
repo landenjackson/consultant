@@ -3134,15 +3134,31 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 INSTANT STABLE EXECUTIVE DOCUMENT RENDERING (ZERO CHAT JITTER) */
+        /* 🪄 FLUID APPLE-GRADE SMOOTH CHAT STREAMING & REVEAL ENGINE */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                // Instantly render fully formatted response without typing jitter or layout jumping
-                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.15s ease-out;">${formatExecutiveResponse(fullText)}</div>`;
-                initializePendingCharts(container);
+                // Smooth progressive block-by-block reveal to prevent layout thrashing
+                const formatted = formatExecutiveResponse(fullText);
+                container.innerHTML = `<div class="stream-content" style="display:block; opacity:0; transform:translateY(8px); transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);">${formatted}</div>`;
                 
+                // Trigger hardware-accelerated CSS transition on next paint
+                requestAnimationFrame(() => {
+                    const el = container.querySelector('.stream-content');
+                    if (el) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }
+                });
+
+                initializePendingCharts(container);
+
                 const feed = document.getElementById('chatFeed');
-                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (feed) {
+                    feed.scrollTo({
+                        top: feed.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
                 if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
