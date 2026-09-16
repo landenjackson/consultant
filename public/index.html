@@ -1592,16 +1592,16 @@
 
                     <!-- FAST-START STRATEGIC HUB BUTTONS (JOB SEEKERS, OPERATORS, CREATORS, AI EXPERTS) -->
                     <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
-                        <button onclick="document.getElementById('chatInput').value='Audit our 90-day unit economics and gross margin leaks down to the penny.'; document.getElementById('chatInput').focus();" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); color:#4ADE80; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <button onclick="document.getElementById('userInput').value='Audit our 90-day unit economics and gross margin leaks down to the penny.'; document.getElementById('userInput').focus();" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); color:#4ADE80; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
                             🏢 P&L & Margin Audit
                         </button>
-                        <button onclick="document.getElementById('chatInput').value='Tailor my 1-page executive resume and prepare high-conviction retail sales interview talking tracks.'; document.getElementById('chatInput').focus();" style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); color:#60A5FA; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <button onclick="document.getElementById('userInput').value='Tailor my 1-page executive resume and prepare high-conviction retail sales interview talking tracks.'; document.getElementById('userInput').focus();" style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); color:#60A5FA; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
                             👔 Executive Career & Interview Hub
                         </button>
-                        <button onclick="document.getElementById('chatInput').value='Design a local community non-discount marketing campaign and analog brand strategy.'; document.getElementById('chatInput').focus();" style="background:rgba(234,179,8,0.08); border:1px solid rgba(234,179,8,0.3); color:#FACC15; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <button onclick="document.getElementById('userInput').value='Design a local community non-discount marketing campaign and analog brand strategy.'; document.getElementById('userInput').focus();" style="background:rgba(234,179,8,0.08); border:1px solid rgba(234,179,8,0.3); color:#FACC15; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
                             📍 Hyperlocal & Analog Branding
                         </button>
-                        <button onclick="document.getElementById('chatInput').value='Build an automated research pipeline with human-in-the-loop validation and zero hallucination guardrails.'; document.getElementById('chatInput').focus();" style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.3); color:#C084FC; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <button onclick="document.getElementById('userInput').value='Build an automated research pipeline with human-in-the-loop validation and zero hallucination guardrails.'; document.getElementById('userInput').focus();" style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.3); color:#C084FC; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
                             ⚡ AI Workflow & Creator Strategy
                         </button>
                     </div>
@@ -3799,7 +3799,7 @@ What specific numbers or operational targets should we stress-test next?`
                 });
 
                 messages.push({ role: 'assistant', content: responseText });
-                CognitiveMemory.learnFromTurn(userText, responseText);
+                CognitiveMemory.learnFromTurn(text, responseText);
 
             } catch (err) {
                 console.error("Chat Execution Error:", err);
