@@ -2256,25 +2256,38 @@
         }
 
         function isCreatorOrSubscribed() {
-            // Unconditionally allow active conversation runs during the 30-day trial window
             const hasCreatorParam = location.search.includes('creator=true');
             if (hasCreatorParam) {
                 localStorage.setItem('consultant_creator', 'true');
                 localStorage.setItem('consultant_subscribed', 'true');
+                localStorage.setItem('consultant_plan', 'Creator Executive');
                 return true;
             }
+
+            // Check if user returned from successful Stripe checkout
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('subscribed') === 'true') {
+                localStorage.setItem('consultant_subscribed', 'true');
+                const plan = urlParams.get('plan') || 'starter';
+                localStorage.setItem('consultant_plan', plan);
+            }
+
             return true;
         }
 
         function updateQuotaDisplay() {
             try {
-                const isAuthorized = isCreatorOrSubscribed();
+                const isCreator = localStorage.getItem('consultant_creator') === 'true' || location.search.includes('creator=true');
+                const isSubscribed = localStorage.getItem('consultant_subscribed') === 'true';
+                const plan = localStorage.getItem('consultant_plan');
                 const quotaText = document.getElementById('quotaText');
                 if (quotaText) {
-                    if (isAuthorized) {
-                        quotaText.innerText = "Creator Access • Unlimited";
+                    if (isCreator) {
+                        quotaText.innerText = "Creator Access • Unlimited Strategy & Uploads";
+                    } else if (isSubscribed && plan) {
+                        quotaText.innerText = `${plan.toUpperCase()} Tier • Unlimited Access`;
                     } else {
-                        quotaText.innerText = "30-Day Free Trial Active";
+                        quotaText.innerText = "30-Day Free Trial • Unlimited Access";
                     }
                 }
             } catch(e) {
