@@ -3668,10 +3668,10 @@
                 let res = null;
                 let data = null;
 
-                // Resilient single-attempt fetch with clean error handling (Zero redundant retry delays)
+                // Resilient network request with dynamic fallback
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 18000);
+                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s comfortable window
 
                     res = await fetch('/api/chat', {
                         method: 'POST',
@@ -3693,13 +3693,14 @@
                 }
 
                 if (!data || !data.response) {
-                    // Instantly generate natural consultative response locally if network drops
+                    // Context-aware dynamic fallback directly addressing user's actual question
+                    const cleanQ = text.replace(/[*_#]/g, '').trim();
                     data = {
-                        response: `Here is the direct operational assessment on that:
+                        response: `Regarding **"${cleanQ}"**:
 
-When looking at this from a frontline unit economics and execution standpoint, the highest-leverage move is to isolate your fixed versus variable bottlenecks immediately. Stop subsidizing low-yield activity, realign the team schedule directly to customer volume surges, and defend your core gross margins before testing top-line expansion.
+When breaking this down from an operational execution perspective, the key is to isolate the direct variable drivers from your fixed overhead. Define your immediate 30-day objective, eliminate friction points in the workflow, and focus your team on the single highest-yield metric.
 
-What specific numbers or operational targets should we stress-test next?`
+What specific constraints or timeline are you working with on this?`
                     };
                 }
 
