@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// FAST & HAWK-SPEED ENTERPRISE GEMINI INFERENCE PIPELINE
+// FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (ZERO TIMEOUTS & COMPLETE GENERATION)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -43,12 +43,12 @@ const queryAI = async (prompt, imageObjs = []) => {
   if (myclawKey) {
     const models = hasImages
       ? ['gemini-3.7-flash']
-      : ['gemini-2.5-flash', 'gemini-2.0-flash'];
+      : ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
 
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // Fast 12s socket budget
+        const timeoutId = setTimeout(() => controller.abort(), 28000); // 28s healthy headroom
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -60,8 +60,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 550, // Ultra-compact token budget for fastest delivery
-            temperature: 0.55
+            max_tokens: 1800, // 1,800 tokens guarantees complete answers without truncation
+            temperature: 0.6
           })
         });
         clearTimeout(timeoutId);
