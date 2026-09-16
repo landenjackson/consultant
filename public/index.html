@@ -3257,8 +3257,21 @@
         function formatExecutiveResponse(text) {
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
+            // Strip any raw UI button tokens from AI generation text
+            let clean = text
+                .replace(/🎙️\s*Listen to Briefing/gi, '')
+                .replace(/🏢\s*Send to Office 365/gi, '')
+                .replace(/🎨\s*Open in Canvas/gi, '')
+                .replace(/📄\s*1-Page Bank Teaser/gi, '')
+                .replace(/📑\s*Excel \(\.xlsx\)/gi, '')
+                .replace(/📝\s*Word \(\.doc\)/gi, '')
+                .replace(/📊\s*Deck \(\.pptx\)/gi, '')
+                .replace(/🔒\s*Save Vault/gi, '')
+                .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
+                .trim();
+
             // 1. Intercept & Render ```chart JSON blocks into Chart.js Canvas components
-            let clean = text.replace(/```chart\s*([\s\S]*?)```/gi, (match, jsonStr) => {
+            clean = clean.replace(/```chart\s*([\s\S]*?)```/gi, (match, jsonStr) => {
                 try {
                     const chartConfig = JSON.parse(jsonStr.trim());
                     const chartId = 'directChart_' + Math.random().toString(36).substr(2, 9);
@@ -3299,7 +3312,7 @@
             // 2. Parse all tables
             clean = parseAllTables(clean);
 
-            // 3. Compile markdown with marked for standard clean book-like output
+            // 3. Compile markdown with marked for standard clean output
             if (typeof marked !== 'undefined' && marked.parse) {
                 try {
                     return marked.parse(clean, { gfm: true, breaks: true });
@@ -3310,7 +3323,6 @@
 
             return clean;
         }
-
         // Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
         function parseAllTables(text) {
             // First convert ASCII box-drawing table representations into standard markdown tables
