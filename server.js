@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (ZERO TIMEOUTS & COMPLETE GENERATION)
+// FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (PARALLEL FAST RACE)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -41,15 +41,42 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    const models = hasImages
-      ? ['gemini-3.7-flash']
-      : ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-
-    for (const model of models) {
+    // For vision, route directly to gemini-3.7-flash
+    if (hasImages) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s generous server timeout
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${myclawKey}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: 'gemini-3.7-flash',
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 1500,
+            temperature: 0.6
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content || '';
+          if (text && text.trim().length > 0) return text;
+        }
+      } catch (err) {
+        console.warn('[Vision error]:', err.message);
+      }
+      return null;
+    }
 
+    // For text, race gemini-2.5-flash and gemini-2.0-flash simultaneously to return the fastest response in under 3-4s
+    const querySingleModel = async (model) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -60,8 +87,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1500,
-            temperature: 0.65
+            max_tokens: 1200,
+            temperature: 0.6
           })
         });
         clearTimeout(timeoutId);
@@ -69,12 +96,30 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
+            console.log(`[Fast Race Winner: ${model}] (${text.length} chars)`);
             return text;
           }
         }
+        throw new Error(`Model ${model} returned non-OK status`);
       } catch (err) {
-        console.warn(`[Failover from ${model}]:`, err.message);
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    };
+
+    try {
+      // Promise.any takes whichever model finishes first
+      const fastestResponse = await Promise.any([
+        querySingleModel('gemini-2.5-flash'),
+        querySingleModel('gemini-2.0-flash')
+      ]);
+      return fastestResponse;
+    } catch (raceErr) {
+      console.warn('[Parallel Race Notice - Sequential Fallback to 1.5]:', raceErr.message);
+      try {
+        return await querySingleModel('gemini-1.5-flash');
+      } catch(e) {
+        console.error('[Sequential Fallback failed]:', e.message);
       }
     }
   }
