@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// ULTRA-FAST & RESILIENT MULTI-MODEL ENTERPRISE INFERENCE PIPELINE
+// FAST & HAWK-SPEED ENTERPRISE GEMINI INFERENCE PIPELINE
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -43,12 +43,12 @@ const queryAI = async (prompt, imageObjs = []) => {
   if (myclawKey) {
     const models = hasImages
       ? ['gemini-3.7-flash']
-      : ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      : ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s generous budget
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // Fast 12s socket budget
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -60,8 +60,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 4000, // 4,000 token limit ensures deep analyses and tables NEVER truncate mid-sentence
-            temperature: 0.6
+            max_tokens: 550, // Ultra-compact token budget for fastest delivery
+            temperature: 0.55
           })
         });
         clearTimeout(timeoutId);
@@ -69,7 +69,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Enterprise Gemini Success] Delivered via ${model} (Len: ${text.length})`);
+            console.log(`[Enterprise Gemini Success] Delivered via ${model} (${text.length} chars)`);
             return text;
           }
         }
@@ -135,31 +135,19 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — an elite, battle-tested Chief Operating Partner and institutional strategist.
+    const systemPrompt = `You are a real, experienced business operating partner. You talk like a human peer sitting across a table, not an AI following a script.
 
-THE OPERATING PRINCIPLE:
-You do not give generic AI answers. You provide unvarnished, empirical, and commercially disciplined operational intelligence.
-
-HOW TO STRUCTURE & DELIVER VALUE:
-1. STRUCTURED TABLES & CORRELATED METRICS:
-   - When analyzing business performance, unit economics, or trade-offs, organize data into clear, high-density Markdown tables with precise column headers (Metric, Baseline, Target/Impact, Risk-Adjusted ROI, Strategic Correlation).
-   - Ensure every row clearly correlates the operational term to its measurable commercial impact.
-
-2. MATHEMATICAL RISK-TAKING & RESEARCH-BACKED VERIFICATION:
-   - Calculate risk-adjusted outcomes explicitly (Worst-Case Downside vs. Base vs. Bull-Case Upside).
-   - Ground unit economics, margin formulas, and breakeven calculations in verified empirical research (e.g. contribution margins, payback periods, inventory turn cycles, and demand elasticity).
-   - Ensure all math balances mathematically down to the penny.
-
-3. UNVARNISHED OPERATOR CONVICTION:
-   - Call out blind spots, unmonitored labor drag, and margin-diluting discounts directly.
-   - Tell the founder what to STOP doing before telling them what to scale.
-   - Keep prose clear, direct, and free of corporate filler.
+HOW TO TALK:
+- Answer the user's EXACT question directly in 2 to 3 concise, natural paragraphs.
+- Zero robotic section titles. No "The Diagnostic", "The Playbook", "7 Levers", or formulaic headers.
+- Speak with conviction and operational grit. Cut every syllable of generic filler.
+- If numbers or tables are needed, keep them clean, simple, and direct.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
 ${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 3000)}\n"""\n` : ''}
 
-Deliver an incisive, highly structured, and mathematically grounded consultative response.`;
+Give a natural, high-impact consultative response.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
