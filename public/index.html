@@ -3691,10 +3691,10 @@
                 let res = null;
                 let data = null;
 
-                // Resilient network request with dynamic fallback
+                // Resilient live network request with generous 55s timeout window
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s comfortable window
+                    const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s generous window so Gemini answers NEVER timeout
 
                     res = await fetch('/api/chat', {
                         method: 'POST',
@@ -3716,18 +3716,10 @@
                 }
 
                 if (!data || !data.response) {
-                    // Context-aware dynamic fallback directly addressing user's actual question
-                    const cleanQ = text.replace(/[*_#]/g, '').trim();
-                    data = {
-                        response: `Regarding **"${cleanQ}"**:
-
-When breaking this down from an operational execution perspective, the key is to isolate the direct variable drivers from your fixed overhead. Define your immediate 30-day objective, eliminate friction points in the workflow, and focus your team on the single highest-yield metric.
-
-What specific constraints or timeline are you working with on this?`
-                    };
+                    throw new Error("Live inference connection timed out. Please check your network and resend.");
                 }
 
-                const responseText = data.response || "Strategy synthesized.";
+                const responseText = data.response;
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 streamAssistantResponse(assistantCard, responseText, () => {

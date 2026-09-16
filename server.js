@@ -48,7 +48,7 @@ const queryAI = async (prompt, imageObjs = []) => {
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 28000); // 28s healthy headroom
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s generous server timeout
 
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -60,8 +60,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1800, // 1,800 tokens guarantees complete answers without truncation
-            temperature: 0.6
+            max_tokens: 1500,
+            temperature: 0.65
           })
         });
         clearTimeout(timeoutId);
