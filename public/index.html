@@ -2159,16 +2159,47 @@
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
             },
 
-            // Assemble a clean, unobtrusive operator context for AI inference
+            // Auto-extract and retain strategic business context from conversations
+            learnFromTurn: function(userQuery, aiResponse) {
+                try {
+                    const state = this.getState();
+                    state.strategies = state.strategies || [];
+                    
+                    // Keep a rolling record of active business domains and strategic decisions
+                    const summarySnippet = aiResponse.split('\n')[0].replace(/[*#]/g, '').trim().slice(0, 120);
+                    state.strategies.unshift({
+                        query: userQuery.slice(0, 150),
+                        takeaway: summarySnippet,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    state.strategies = state.strategies.slice(0, 10); // Keep last 10 strategic memory nodes
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+                } catch(e) {
+                    console.warn('[Memory Retention Notice]', e);
+                }
+            },
+
+            // Assemble a clean, high-signal persistent strategy context for AI inference
             buildCognitiveContext: function() {
+                const state = this.getState();
                 const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
-                if (vault.length === 0) return '';
+                const strategies = state.strategies || [];
                 
-                let memoryPrompt = "\n[Operator Context - Prior Discussion Topics]:\n";
-                vault.slice(0, 3).forEach(v => {
-                    const snippet = v.title ? v.title.slice(0, 100) : '';
-                    memoryPrompt += `• Prior Topic: ${snippet}\n`;
-                });
+                if (vault.length === 0 && strategies.length === 0) return '';
+                
+                let memoryPrompt = "\n[Persistent Strategic Memory & Prior Decisions]:\n";
+                if (strategies.length > 0) {
+                    strategies.slice(0, 3).forEach(s => {
+                        memoryPrompt += `• Prior Focus: "${s.query}" → Decision: ${s.takeaway}\n`;
+                    });
+                }
+                if (vault.length > 0) {
+                    vault.slice(0, 2).forEach(v => {
+                        const snippet = v.title ? v.title.slice(0, 80) : '';
+                        memoryPrompt += `• Vaulted Strategy: "${snippet}"\n`;
+                    });
+                }
                 return memoryPrompt;
             }
         };
@@ -3752,6 +3783,7 @@ What specific numbers or operational targets should we stress-test next?`
                 });
 
                 messages.push({ role: 'assistant', content: responseText });
+                CognitiveMemory.learnFromTurn(userText, responseText);
 
             } catch (err) {
                 console.error("Chat Execution Error:", err);
