@@ -3196,41 +3196,15 @@
         /* 🪄 CRAFTED FLUID APPLE-GRADE EXECUTIVE STREAMING TYPER */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.2s ease;"></div><span class="typing-cursor" style="display:inline-block; width:6px; height:15px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.75s infinite;"></span>`;
+                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.2s ease;"></div>`;
                 const contentBox = container.querySelector('.stream-content');
-                const cursor = container.querySelector('.typing-cursor');
                 const feed = document.getElementById('chatFeed');
 
-                const words = fullText.split(' ');
-                const totalWords = words.length;
-                let currentWordIdx = 0;
-
-                function typeStep() {
-                    if (currentWordIdx < totalWords) {
-                        // Smooth, adaptive 3-to-6 word cadence per frame for ultra-clean streaming
-                        const remaining = totalWords - currentWordIdx;
-                        const step = Math.max(2, Math.min(6, Math.ceil(remaining / 18)));
-                        currentWordIdx += step;
-
-                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
-                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
-
-                        if (feed) {
-                            feed.scrollTop = feed.scrollHeight;
-                        }
-
-                        // Smooth 60fps frame rate
-                        setTimeout(() => requestAnimationFrame(typeStep), 16);
-                    } else {
-                        if (cursor) cursor.remove();
-                        contentBox.innerHTML = formatExecutiveResponse(fullText);
-                        initializePendingCharts(container);
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-                        if (onComplete) onComplete();
-                    }
-                }
-
-                requestAnimationFrame(typeStep);
+                // Render complete formatted HTML immediately so tables, cards, and formatting are 100% stable and pristine
+                contentBox.innerHTML = formatExecutiveResponse(fullText);
+                initializePendingCharts(container);
+                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
@@ -3350,9 +3324,9 @@
             clean = paragraphs.map(p => {
                 p = p.trim();
                 if (!p) return '';
-                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li') || p.startsWith('<table')) return p;
-                return `<p style="margin-bottom:14px; line-height:1.7; color:#CBD5E1; font-size:14px;">${p.replace(/\n/g, '<br>')}</p>`;
-            }).join('');
+                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li') || p.startsWith('<table') || p.includes('class="exec-table-wrap"')) return p;
+                return `<p style="margin-bottom:14px; line-height:1.75; color:#E2E8F0; font-size:14.5px; letter-spacing:-0.01em;">${p.replace(/\n/g, '<br>')}</p>`;
+            }).filter(Boolean).join('');
 
             return clean;
         }
