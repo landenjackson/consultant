@@ -3233,38 +3233,15 @@
         /* 🪄 CRAFTED FLUID APPLE-GRADE EXECUTIVE STREAMING TYPER */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                container.innerHTML = `<div class="stream-content" style="display:inline; animation: fadeIn 0.15s ease;"></div><span class="typing-cursor" style="display:inline-block; width:6px; height:15px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.75s infinite;"></span>`;
+                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.2s ease;"></div>`;
                 const contentBox = container.querySelector('.stream-content');
-                const cursor = container.querySelector('.typing-cursor');
                 const feed = document.getElementById('chatFeed');
 
-                const words = fullText.split(' ');
-                const totalWords = words.length;
-                let currentWordIdx = 0;
-
-                function typeStep() {
-                    if (currentWordIdx < totalWords) {
-                        // Smooth, adaptive 3-to-6 word cadence per frame for fluid animation
-                        const remaining = totalWords - currentWordIdx;
-                        const step = Math.max(2, Math.min(6, Math.ceil(remaining / 18)));
-                        currentWordIdx += step;
-
-                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
-                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-
-                        // Smooth 60fps frame rate
-                        setTimeout(() => requestAnimationFrame(typeStep), 16);
-                    } else {
-                        if (cursor) cursor.remove();
-                        contentBox.innerHTML = formatExecutiveResponse(fullText);
-                        initializePendingCharts(container);
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-                        if (onComplete) onComplete();
-                    }
-                }
-
-                requestAnimationFrame(typeStep);
+                // Render complete formatted HTML directly to guarantee zero unescaped HTML code block leaks
+                contentBox.innerHTML = formatExecutiveResponse(fullText);
+                initializePendingCharts(container);
+                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
@@ -3272,6 +3249,7 @@
                 if (onComplete) onComplete();
             }
         }
+
         function formatExecutiveResponse(text) {
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
@@ -3311,23 +3289,13 @@
 
                     if (labels.length === 0 || values.length === 0) return '';
 
-                    return `
-                        <div class="exec-chart-card" style="margin: 16px 0; background: #090D14; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px; box-sizing: border-box; overflow: hidden; width: 100%;">
-                            <div class="exec-chart-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                                <div class="exec-chart-title" style="font-weight:700; color:#FFF; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; display:flex; align-items:center; gap:6px;"><span>📊</span> ${escapeHtml(title)}</div>
-                                <span class="exec-chart-tag" style="font-size:10px; color:var(--accent-glow); background:rgba(34,197,94,0.1); padding:2px 7px; border-radius:6px; border:1px solid rgba(34,197,94,0.25); font-weight:600;">Interactive Telemetry</span>
-                            </div>
-                            <div class="exec-chart-canvas-wrap" style="position:relative; height:200px; width:100%; box-sizing:border-box;">
-                                <canvas id="${chartId}" data-chart-labels="${escapeHtml(JSON.stringify(labels))}" data-chart-values="${escapeHtml(JSON.stringify(values))}" data-chart-units="${escapeHtml(JSON.stringify(units))}" data-chart-raws="${escapeHtml(JSON.stringify(raws))}" data-chart-name="${escapeHtml(labelName)}"></canvas>
-                            </div>
-                        </div>
-                    `;
+                    return `<div class="exec-chart-card" style="margin: 16px 0; background: #090D14; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px; box-sizing: border-box; overflow: hidden; width: 100%;"><div class="exec-chart-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05);"><div class="exec-chart-title" style="font-weight:700; color:#FFF; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; display:flex; align-items:center; gap:6px;"><span>📊</span> ${escapeHtml(title)}</div><span class="exec-chart-tag" style="font-size:10px; color:var(--accent-glow); background:rgba(34,197,94,0.1); padding:2px 7px; border-radius:6px; border:1px solid rgba(34,197,94,0.25); font-weight:600;">Interactive Telemetry</span></div><div class="exec-chart-canvas-wrap" style="position:relative; height:200px; width:100%; box-sizing:border-box;"><canvas id="${chartId}" data-chart-labels="${escapeHtml(JSON.stringify(labels))}" data-chart-values="${escapeHtml(JSON.stringify(values))}" data-chart-units="${escapeHtml(JSON.stringify(units))}" data-chart-raws="${escapeHtml(JSON.stringify(raws))}" data-chart-name="${escapeHtml(labelName)}"></canvas></div></div>`;
                 } catch (e) {
                     return '';
                 }
             });
 
-            // 2. Parse all tables
+            // 2. Parse all tables with un-indented HTML to prevent 4-space markdown code block conversion
             clean = parseAllTables(clean);
 
             // 3. Compile markdown with marked for standard clean output
@@ -3341,7 +3309,8 @@
 
             return clean;
         }
-        // Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
+
+// Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
         function parseAllTables(text) {
             // First convert ASCII box-drawing table representations into standard markdown tables
             let normalized = text.replace(/\+[=\-\+]+\+/g, '').replace(/\|([^\n]+)\|/g, (m) => m);
@@ -3384,14 +3353,10 @@
             const rows = lines.slice(2).map(parseRow);
 
             const thHtml = headers.map((h, i) => `<th style="${i === 1 ? 'color:var(--accent-glow);' : ''}">${h}</th>`).join('');
-            const trHtml = rows.map(r => `
-                <tr>
-                    ${r.map((td, idx) => {
-                        const cls = idx === 0 ? 'metric-name' : (idx === 1 ? 'metric-target' : 'metric-desc');
-                        return `<td class="${cls}">${td}</td>`;
-                    }).join('')}
-                </tr>
-            `).join('');
+            const trHtml = rows.map(r => `<tr>${r.map((td, idx) => {
+                const cls = idx === 0 ? 'metric-name' : (idx === 1 ? 'metric-target' : 'metric-desc');
+                return `<td class="${cls}">${td}</td>`;
+            }).join('')}</tr>`).join('');
 
             // Automatically generate Pivot Chart for numeric/financial benchmarks
             let chartHtml = '';
@@ -3423,84 +3388,16 @@
                     const safeRaws = escapeHtml(JSON.stringify(chartRaws));
                     const safeName = escapeHtml(headers[1] || 'Target Benchmark');
 
-                    chartHtml = `
-                        <div class="exec-chart-card">
-                            <div class="exec-chart-header">
-                                <div class="exec-chart-title"><span>📊</span> Operational Pivot Chart: ${safeName}</div>
-                                <span class="exec-chart-tag">Interactive Excel Modeling</span>
-                            </div>
-                            <div class="exec-chart-canvas-wrap">
-                                <canvas id="${chartId}" data-chart-labels="${safeLabels}" data-chart-values="${safeValues}" data-chart-units="${safeUnits}" data-chart-raws="${safeRaws}" data-chart-name="${safeName}"></canvas>
-                            </div>
-                        </div>
-                    `;
+                    chartHtml = `<div class="exec-chart-card"><div class="exec-chart-header"><div class="exec-chart-title"><span>📊</span> Operational Pivot Chart: ${safeName}</div><span class="exec-chart-tag">Interactive Excel Modeling</span></div><div class="exec-chart-canvas-wrap"><canvas id="${chartId}" data-chart-labels="${safeLabels}" data-chart-values="${safeValues}" data-chart-units="${safeUnits}" data-chart-raws="${safeRaws}" data-chart-name="${safeName}"></canvas></div><div class="whatif-slider-wrap"><div class="whatif-slider-header"><span class="whatif-title">🪄 Stress-Test Sensitivity (${safeName})</span><span id="sliderVal_${chartId}" class="whatif-val">0% (Baseline)</span></div><input type="range" class="whatif-range" min="-30" max="60" value="0" step="5" oninput="updateWhatIfScenario('${chartId}', this.value)"></div></div>`;
                 }
             } catch(e) {
                 console.warn("Pivot Chart Extraction Error:", e);
             }
 
-            return `${chartHtml}<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>`;
+            return `<div class="exec-table-wrap"><table class="exec-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table></div>${chartHtml}`;
         }
 
-        function escapeHtml(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
-        }
-
-        // 1-CLICK INSTANT EXPORTER WITH DIRECT BLOB DOWNLOAD TRIGGER
-        function triggerFileDownload(blob, filename) {
-            try {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    if (document.body.contains(a)) document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 2000);
-            } catch(e) {
-                console.warn("Direct link fallback triggered:", e);
-                const a = document.createElement('a');
-                a.target = '_blank';
-                a.href = URL.createObjectURL(blob);
-                document.body.appendChild(a);
-                a.click();
-            }
-        }
-
-        // Helper to extract clean text from assistant bubble or canvas (strictly excluding bottom deliverables buttons)
-        function getTargetDocumentText(el) {
-            let targetEl = null;
-            if (el) {
-                if (el.id === 'canvasEditor' || el.classList?.contains('canvas-body')) {
-                    targetEl = el;
-                } else {
-                    targetEl = el.closest('.bubble-assistant') || el.closest('#canvasPane') || document.querySelector('.bubble-assistant');
-                }
-            } else {
-                targetEl = document.querySelector('.bubble-assistant');
-            }
-
-            if (!targetEl) return "Executive Strategy Analysis";
-
-            // If the element has a .stream-content wrapper, extract directly from it
-            const streamBox = targetEl.querySelector('.stream-content');
-            if (streamBox) {
-                return streamBox.innerText || streamBox.textContent;
-            }
-
-            // Otherwise clone and remove .deliverables-bar
-            const clone = targetEl.cloneNode(true);
-            const deliv = clone.querySelector('.deliverables-bar');
-            if (deliv) deliv.remove();
-            return (clone.innerText || clone.textContent).trim();
-        }
-
-        function copyCanvasText() {
+function copyCanvasText() {
             const editor = document.getElementById('canvasEditor');
             if (!editor) return;
             const cleanText = getTargetDocumentText(editor);
