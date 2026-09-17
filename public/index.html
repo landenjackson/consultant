@@ -303,7 +303,7 @@
             overflow: hidden;
             position: relative;
             width: 100%;
-            height: calc(100% - 60px);
+            height: 100%;
         }
 
         #chatFeed {
@@ -316,6 +316,8 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            height: 100%;
+            box-sizing: border-box;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -378,6 +380,12 @@
                 width: 100% !important;
                 z-index: 100;
             }
+        }
+
+        /* KEYFRAME ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* UPLIFTING HERO BANNER & MISSION TILES */
