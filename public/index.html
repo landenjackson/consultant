@@ -3495,6 +3495,24 @@ function copyCanvasText() {
             triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
         }
 
+        function triggerFileDownload(blob, filename) {
+            try {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (document.body.contains(a)) document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 2000);
+            } catch (e) {
+                console.warn('File download fallback:', e);
+            }
+        }
+
         // 1. OPEN STRATEGY TEASER DIRECTLY IN CANVAS/VIEWER (ZERO FILE DOWNLOAD GLITCHES)
         function exportBankTeaser(btn) {
             openInCanvas(btn);
