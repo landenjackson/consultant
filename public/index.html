@@ -3281,9 +3281,17 @@
                 // 6. Format Catalyst & Turnaround Move
                 .replace(/>> ★\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:14px 16px; border-radius:10px; margin:14px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF; font-size:14px;">$1</div></div>')
                 .replace(/★ Key Turnaround Move:\s*([^\n]+)/g, '<div class="catalyst-card" style="background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); padding:14px 16px; border-radius:10px; margin:14px 0;"><div class="catalyst-title" style="color:var(--accent-glow); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">★ Key Turnaround Catalyst</div><div style="font-weight:600; color:#FFFFFF; font-size:14px;">$1</div></div>')
-                // 7. Remove prompt leaks
+                // 7. Remove prompt leaks and button text artifacts
+                .replace(/🎙️?\s*Listen to Briefing/gi, '')
+                .replace(/🏢?\s*Send to Office 365/gi, '')
+                .replace(/🎨?\s*Open in Canvas/gi, '')
+                .replace(/📄?\s*1-Page Bank Teaser/gi, '')
+                .replace(/📑?\s*Excel \(\.xlsx\)/gi, '')
+                .replace(/📝?\s*Word \(\.doc\)/gi, '')
+                .replace(/📊?\s*Deck \(\.pptx\)/gi, '')
+                .replace(/🔒?\s*Save Vault/gi, '')
                 .replace(/BOARDROOM DELIVERABLES BAR[\s\S]*$/i, '')
-                .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i, '');
+                .replace(/\[ 📄 1-Page Bank Teaser \][\s\S]*$/i);
 
             // 7. Robust multi-column table parser
             clean = parseAllTables(clean);
