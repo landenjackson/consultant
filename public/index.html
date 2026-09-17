@@ -3265,8 +3265,29 @@
         function formatExecutiveResponse(text) {
             if (!text) return '<p style="color:var(--text-muted);">No strategy text generated.</p>';
 
+            // Check if response is structured JSON with message + actions protocol
+            let userMessage = text;
+            try {
+                const trimmed = text.trim();
+                if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                    const parsed = JSON.parse(trimmed);
+                    if (parsed.message) {
+                        userMessage = parsed.message;
+                        if (Array.isArray(parsed.actions)) {
+                            // Execute structured actions safely
+                            parsed.actions.forEach(action => {
+                                console.log('[Executing Structured Action]:', action);
+                                if (action.type === 'OPEN_CANVAS') openInCanvas();
+                                else if (action.type === 'OPEN_OFFICE') openOfficeModal();
+                                else if (action.type === 'OPEN_PRICING') openPricing();
+                            });
+                        }
+                    }
+                }
+            } catch(e) {}
+
             // Strip any raw UI button tokens from AI generation text
-            let clean = text
+            let clean = userMessage
                 .replace(/🎙️\s*Listen to Briefing/gi, '')
                 .replace(/🏢\s*Send to Office 365/gi, '')
                 .replace(/🎨\s*Open in Canvas/gi, '')
@@ -3311,23 +3332,15 @@
             clean = parseAllTables(clean);
 
             // 3. Robust Native Formatting (Headings, bold, lists, blockquotes)
-            // Blockquotes
             clean = clean.replace(/^>\s*(.*?)$/gm, '<div style="background:linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(12,16,23,0.8) 100%); border-left:3.5px solid var(--accent); border:1px solid rgba(34,197,94,0.25); border-left-width:3.5px; border-radius:8px; padding:12px 16px; margin:14px 0; color:#FFFFFF; font-size:14px; line-height:1.6;">$1</div>');
-            
-            // Headings (using double quotes for clean attributes)
             clean = clean.replace(/^###\s*(.*?)$/gm, '<h3 style="font-weight:700; font-size:16px; color:#FFFFFF; margin:18px 0 8px;">$1</h3>');
             clean = clean.replace(/^##\s*(.*?)$/gm, '<h2 style="font-weight:800; font-size:18px; color:#FFFFFF; margin:20px 0 10px;">$1</h2>');
             clean = clean.replace(/^#\s*(.*?)$/gm, '<h1 style="font-weight:800; font-size:20px; color:#FFFFFF; margin:22px 0 10px;">$1</h1>');
-
-            // Bold & Italics
             clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#FFFFFF; font-weight:700;">$1</strong>');
             clean = clean.replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-            // Bullets
             clean = clean.replace(/^[•\*\-]\s+(.*?)$/gm, '<li style="margin-bottom:8px; line-height:1.65; color:#E2E8F0; font-size:14px;">$1</li>');
             clean = clean.replace(/(<li[\s\S]*?<\/li>)/g, '<ul style="margin:10px 0 16px 20px; padding:0; list-style-type:disc;">$1</ul>');
 
-            // Paragraphs
             const parts = clean.split(/\n\n+/);
             clean = parts.map(p => {
                 p = p.trim();
