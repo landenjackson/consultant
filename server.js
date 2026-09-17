@@ -180,31 +180,26 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — an institutional-grade Turnaround Operating Partner, Fractional Chief Restructuring Officer (CRO), and Private Equity Value Creation engine.
+    const systemPrompt = `You are Consultant Studio — a trusted, razor-sharp strategic partner having a natural conversation with an operator.
 
-PROGRESSIVE DISCLOSURE ARCHITECTURE (3-TIER EXECUTIVE PRESENTATION):
-1. TIER 1: EXECUTIVE TRIAGE CAPSULE (5-Second Scan):
-   - Lead immediately with a concise callout block:
-     > **Bottom Line:** [1-sentence core operational verdict]
-     > **Primary Drivers:** [2 key bold metrics, e.g. Zero-Cash Runway: 42 Days | Weekly Net Burn: -$14,200]
+HOW TO ANSWER:
+1. TALK LIKE A REAL HUMAN CONSULTANT:
+   - Answer the user's specific question directly in 2 to 3 natural, insightful paragraphs.
+   - Zero rigid boilerplate, zero robotic section labels (DO NOT output "TIER 1", "TIER 2", "TIER 3", "EXECUTIVE TRIAGE CAPSULE", "DECISION LEVERS", or formulaic templates).
+   - Talk naturally with genuine conviction and commercial insight.
 
-2. TIER 2: DECISION LEVERS & TRADE-OFFS (30-Second Evaluation):
-   - Provide a high-density 3-to-4 row comparison table or structured breakdown of immediate operational realities.
-   - Deliver 1 actionable "Cut vs. Double-Down" trade-off pair with exact scripts for vendors, lenders, or staff.
+2. SHARP INSIGHT + CONCRETE MOVE:
+   - Give them clear, direct advice grounded in real-world unit economics, margin defense, and practical execution.
+   - If a quick table or script helps, include it naturally, but keep it clean and conversational.
 
-3. TIER 3: MULTI-TURN DIAGNOSTIC PROBE:
-   - End with 1 surgical diagnostic question probing deeper into specific line items, vendor aging, or debt covenants to unlock the next level of forensic modeling.
-
-TONE & BEHAVIORAL CALIBRATION:
-- Clinical, authoritative, unvarnished restructuring advisor voice.
-- Zero TV-drama bravado. Grounded in cash physics, vendor concentration, and debtor-in-possession (DIP) reality.
-- 2 to 3 muscular paragraphs. No walls of text. No robotic section headers.
+3. NATURAL CLOSING QUESTION:
+   - Close with one thoughtful, high-conviction question that keeps the dialogue moving forward naturally.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
 ${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 3000)}\n"""\n` : ''}
 
-Deliver an institutional turnaround response following progressive disclosure.`;
+Deliver a natural, insightful, and conversational response.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
@@ -229,7 +224,7 @@ Deliver an institutional turnaround response following progressive disclosure.`;
     // High-conviction synthetic execution if all external APIs momentarily lag
     const cleanPrompt = userMessage.replace(/[*_#]/g, '').trim();
     return res.json({
-      response: `**Tier 1: Executive Triage Capsule**\n\n> **Bottom Line:** Immediate operational turnaround on "${cleanPrompt.slice(0, 80)}" requires freezing non-essential cash burn and isolating direct variable bottlenecks.\n> **Primary Drivers:** Working Capital Liquidity Floor | Minimum 30-Day Debt Service Covenant Defense\n\n**Tier 2: Immediate Turnaround Levers**\n\n| Operational Lever | Baseline Drag | Target Standard | Risk-Adjusted Impact |\n| :--- | :--- | :--- | :--- |\n| Discretionary SG&A | Unmonitored overhead | Zero-base review | Instant 15–20% cash preservation |\n| Vendor Terms (AP) | Due upon receipt | 45-day stretch | Working capital buffer expansion |\n| Unit Contribution | Variable bleed | Positive contribution floor | DSCR covenant compliance |\n\n**Cut:** Freeze non-critical contractor spend, unapproved software seats, and off-cycle purchasing immediately.\n**Double Down:** Focus leadership on daily cash flow pacing and primary customer volume flow-through.\n\n*Lender & Vendor Script:* "We are currently running an operational working capital review to ensure 100% covenant defensibility and scheduled fulfillment."\n\n**Tier 3: Diagnostic Probe**\nWhat is your current weekly cash burn rate and nearest debt covenant milestone?`
+      response: `Looking at this directly from an operational standpoint on "${cleanPrompt.slice(0, 70)}":\n\nThe immediate priority is to separate your fixed overhead from your direct variable drivers. When you eliminate unmonitored drag and focus the team on your primary revenue flow-through, you protect your bottom line without adding unnecessary complexity.\n\nWhat specific numbers or constraints are you working with on this right now?`
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
