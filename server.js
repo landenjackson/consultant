@@ -22,52 +22,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-import { exec } from 'child_process';
-import util from 'util';
-
-const execPromise = util.promisify(exec);
-
-// GITHUB COPILOT INFERENCE BRIDGE (USES YOUR GITHUB COPILOT SUBSCRIPTION)
-const queryCopilotCLI = async (prompt) => {
-  try {
-    const sanitizedPrompt = prompt.replace(/"/g, '\\"').replace(/`/g, '\\`');
-    const { stdout } = await execPromise(`gh copilot -p "${sanitizedPrompt}"`, {
-      timeout: 25000,
-      env: { ...process.env, PATH: process.env.PATH + ':/home/ubuntu/.local/share/gh/copilot:/usr/local/bin' }
-    });
-    if (stdout && stdout.trim().length > 0) {
-      // Strip metadata footer from Copilot CLI output
-      const clean = stdout
-        .replace(/Changes\s+\+\d+\s+-\d+[\s\S]*$/gi, '')
-        .replace(/AI Credits\s+[\d\.]+[\s\S]*$/gi, '')
-        .replace(/Tokens\s+↑[\s\S]*$/gi, '')
-        .replace(/Resume\s+copilot[\s\S]*$/gi, '')
-        .trim();
-      if (clean.length > 20) {
-        console.log(`[GitHub Copilot Active] Generated ${clean.length} chars`);
-        return clean;
-      }
-    }
-  } catch (err) {
-    console.warn('[Copilot CLI Notice]:', err.message);
-  }
-  return null;
-};
-
-// FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (COPILOT + GEMINI)
+// CLEAN, DIRECT, & RESILIENT ENTERPRISE REST PIPELINE
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
 
-  // 1. Text Queries: Priority Route via GitHub Copilot CLI
-  if (!hasImages) {
-    const copilotResponse = await queryCopilotCLI(prompt);
-    if (copilotResponse) {
-      return copilotResponse;
-    }
-  }
-
-  // 2. Multimodal Vision or Gateway Fallback
   let contentPayload = prompt;
   if (hasImages) {
     contentPayload = [{ type: 'text', text: prompt }];
@@ -89,7 +48,7 @@ const queryAI = async (prompt, imageObjs = []) => {
     for (const model of models) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -109,7 +68,7 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Backup Gemini Delivery via ${model}] (${text.length} chars)`);
+            console.log(`[Direct Inference Active: ${model}] (${text.length} chars)`);
             return text;
           }
         }
