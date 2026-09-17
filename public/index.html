@@ -305,7 +305,7 @@
             overflow: hidden;
             position: relative;
             width: 100%;
-            height: calc(100% - 56px);
+            height: calc(100dvh - 56px);
             min-height: 0;
         }
 
@@ -313,16 +313,14 @@
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 20px 20px 140px;
+            padding: 16px 16px 140px;
             max-width: 940px;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            height: 100%;
-            min-height: 0;
+            gap: 16px;
             box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* DEDICATED LIVE CANVAS ARTIFACT PANE */
