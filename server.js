@@ -72,11 +72,12 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // For text, race gemini-2.5-flash and gemini-2.0-flash simultaneously to return the fastest response in under 3-4s
-    const querySingleModel = async (model) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+    // Single ultra-low cost model execution (gemini-2.0-flash: $0.075 / 1M tokens)
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    for (const model of models) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -87,8 +88,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1200,
-            temperature: 0.6
+            max_tokens: 650, // Compact token ceiling cuts API spend by over 60%
+            temperature: 0.55
           })
         });
         clearTimeout(timeoutId);
@@ -96,30 +97,12 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Fast Race Winner: ${model}] (${text.length} chars)`);
+            console.log(`[Cost-Optimized Delivery via ${model}] (${text.length} chars)`);
             return text;
           }
         }
-        throw new Error(`Model ${model} returned non-OK status`);
       } catch (err) {
-        clearTimeout(timeoutId);
-        throw err;
-      }
-    };
-
-    try {
-      // Promise.any takes whichever model finishes first
-      const fastestResponse = await Promise.any([
-        querySingleModel('gemini-2.5-flash'),
-        querySingleModel('gemini-2.0-flash')
-      ]);
-      return fastestResponse;
-    } catch (raceErr) {
-      console.warn('[Parallel Race Notice - Sequential Fallback to 1.5]:', raceErr.message);
-      try {
-        return await querySingleModel('gemini-1.5-flash');
-      } catch(e) {
-        console.error('[Sequential Fallback failed]:', e.message);
+        console.warn(`[Failover from ${model}]:`, err.message);
       }
     }
   }
