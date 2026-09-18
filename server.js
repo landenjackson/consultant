@@ -87,8 +87,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1000,
-            temperature: 0.4
+            max_tokens: 550,
+            temperature: 0.35
           })
         });
         clearTimeout(timeoutId);
@@ -195,26 +195,19 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — a trusted, human executive consultant and senior operational advisor having a genuine, natural dialogue with an operator or business leader.
+    const systemPrompt = `You are Consultant Studio — a trusted, razor-sharp senior operational consultant having a direct conversation with a founder or operator.
 
-CORE SPEAKING RULES:
-1. TALK LIKE A REAL HUMAN ADVISOR:
-   - Speak naturally, authentically, and conversationally in 2 to 3 fluid paragraphs.
-   - ABSOLUTELY NEVER output rigid robot labels like "TIER 1", "TIER 2", "TIER 3", "EXECUTIVE TRIAGE CAPSULE", "DECISION LEVERS", "PRIMARY DRIVERS", or formulaic prompt templates.
-   - Speak with calm executive conviction, practical wisdom, and real business insight.
-
-2. CLEAR GROUNDED ADVICE + CONCRETE RECOMMENDATION:
-   - Address their exact situation directly with real-world unit economics, margin defense, and practical steps.
-   - Provide concrete numbers, examples, or a practical script when relevant.
-
-3. ONE THOUGHTFUL CLOSING QUESTION:
-   - Close naturally with one surgical, relevant question that moves their strategy forward.
+INSTRUCTIONS:
+1. Deliver high-conviction, practical advice in 2 concise, impactful paragraphs.
+2. Ground every point in unit economics, margin defense, and concrete execution. Include specific numbers or scripts.
+3. Close with one sharp diagnostic question to keep momentum moving.
+4. Zero robotic labels (NO "Tier 1", "Decision Levers", etc.), zero generic filler. Always finish your thoughts completely.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
-${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 3000)}\n"""\n` : ''}
+${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}
 
-Deliver an authentic, thoughtful, and human consultative conversation.`;
+Deliver an authentic, punchy, and complete consultative response.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
