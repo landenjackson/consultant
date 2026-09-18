@@ -1199,12 +1199,13 @@
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden;
-                font-size: 15px;
+                overflow-y: auto;
+                font-size: 14.5px;
             }
 
             main {
-                padding: 14px 12px 130px;
-                gap: 14px;
+                padding: 12px 10px 140px;
+                gap: 12px;
                 width: 100%;
                 box-sizing: border-box;
             }
@@ -1217,6 +1218,26 @@
             }
 
             .bubble-assistant {
+                padding: 16px 16px;
+                border-radius: 12px;
+                font-size: 14px;
+                line-height: 1.6;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .bubble-user {
+                padding: 10px 14px;
+                font-size: 13.5px;
+                max-width: 90%;
+            }
+
+            .input-dock {
+                width: calc(100% - 20px) !important;
+                bottom: 10px !important;
+                padding: 8px 10px !important;
+            }
+        }
                 padding: 18px 16px;
                 border-radius: 12px;
                 font-size: 14.5px;
@@ -1581,7 +1602,7 @@
                             <span class="status-tag">Executive Strategy Advisory</span>
                             <span style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Live Telemetry Active</span>
                         </div>
-                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 3.6 Flash • Sub-2s Speed</span>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini Flash Direct • High-Velocity REST</span>
                     </div>
                     <h1 id="welcomeHeading" style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
                         Welcome to Consultant Studio.
