@@ -72,10 +72,10 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // For text, race gemini-2.5-flash and gemini-2.0-flash simultaneously to return the fastest response in under 2-3s
+    // For text, race gemini-2.0-flash and gemini-1.5-flash simultaneously with a tight 380-token budget for 3-4s delivery
     const querySingleModel = async (model) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -87,8 +87,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1200,
-            temperature: 0.55
+            max_tokens: 380,
+            temperature: 0.35
           })
         });
         clearTimeout(timeoutId);
@@ -108,19 +108,14 @@ const queryAI = async (prompt, imageObjs = []) => {
     };
 
     try {
-      // Promise.any takes whichever model finishes first
+      // Promise.any takes whichever model finishes first (gemini-2.0-flash vs gemini-1.5-flash)
       const fastestResponse = await Promise.any([
-        querySingleModel('gemini-2.5-flash'),
-        querySingleModel('gemini-2.0-flash')
+        querySingleModel('gemini-2.0-flash'),
+        querySingleModel('gemini-1.5-flash')
       ]);
       return fastestResponse;
     } catch (raceErr) {
-      console.warn('[Parallel Race Notice - Sequential Fallback to 1.5]:', raceErr.message);
-      try {
-        return await querySingleModel('gemini-1.5-flash');
-      } catch(e) {
-        console.error('[Sequential Fallback failed]:', e.message);
-      }
+      console.warn('[Parallel Race Notice]:', raceErr.message);
     }
   }
 
