@@ -55,6 +55,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <!-- Official Google Identity Services SDK (GIS) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
@@ -3651,8 +3652,51 @@
             openInCanvas(btn);
         }
 
-        function exportPowerPointDeck(btn) {
-            openInCanvas(btn);
+        // 4. POWERPOINT DECK EXPORT (CLIENT-SIDE NATIVE PPTX GENERATION VIA PPTXGENJS)
+        async function exportPowerPointDeck(btn) {
+            try {
+                if (typeof PptxGenJS === 'undefined') {
+                    openInCanvas(btn);
+                    return;
+                }
+
+                const card = btn.closest('.bubble-assistant');
+                const rawText = card ? (card.querySelector('.stream-content')?.innerText || card.innerText) : '';
+                const cleanText = getCleanStrategyText(rawText);
+
+                const pptx = new PptxGenJS();
+                pptx.layout = 'LAYOUT_16x9';
+
+                // Slide 1: Title Slide (Obsidian Dark Luxury Theme)
+                const s1 = pptx.addSlide();
+                s1.background = { color: '07090D' };
+                s1.addText('CONSULTANT STUDIO', { x: 0.8, y: 1.5, fontSize: 16, color: '4ADE80', bold: true, fontFace: 'Arial' });
+                s1.addText('Executive Operational Strategy & Turnaround Memo', { x: 0.8, y: 2.2, fontSize: 32, color: 'FFFFFF', bold: true, fontFace: 'Arial', w: 8.5 });
+                s1.addText(`Generated: ${new Date().toLocaleDateString()} | Confidential Executive Deliverable`, { x: 0.8, y: 4.5, fontSize: 14, color: '94A3B8', fontFace: 'Arial' });
+
+                // Split paragraphs into content slides
+                const paragraphs = cleanText.split('\n\n').map(p => p.trim()).filter(p => p.length > 20);
+                
+                if (paragraphs.length > 0) {
+                    paragraphs.forEach((para, idx) => {
+                        const s = pptx.addSlide();
+                        s.background = { color: '07090D' };
+                        s.addText(`OPERATIONAL INITIATIVE 0${idx + 1}`, { x: 0.8, y: 0.8, fontSize: 14, color: '4ADE80', bold: true, fontFace: 'Arial' });
+                        s.addText(para.slice(0, 800), { x: 0.8, y: 1.6, fontSize: 18, color: 'F8FAFC', fontFace: 'Arial', w: 8.5, h: 4.5, lineSpacing: 26 });
+                        s.addText('www.consultant-studio.app', { x: 0.8, y: 6.8, fontSize: 11, color: '64748B', fontFace: 'Arial' });
+                    });
+                } else {
+                    const s = pptx.addSlide();
+                    s.background = { color: '07090D' };
+                    s.addText('STRATEGY BRIEFING', { x: 0.8, y: 0.8, fontSize: 14, color: '4ADE80', bold: true, fontFace: 'Arial' });
+                    s.addText(cleanText.slice(0, 900), { x: 0.8, y: 1.6, fontSize: 18, color: 'F8FAFC', fontFace: 'Arial', w: 8.5, h: 4.5, lineSpacing: 26 });
+                }
+
+                await pptx.writeFile({ fileName: `ConsultantStudio_BoardDeck_${Date.now()}.pptx` });
+            } catch (err) {
+                console.error("PPTX export fallback to canvas:", err);
+                openInCanvas(btn);
+            }
         }
 
         async function sendMessage() {
