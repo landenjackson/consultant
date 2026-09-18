@@ -3146,17 +3146,41 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 FLUID INSTANT RESPONSIVE TYPER */
+        /* 🪄 HIGH-VELOCITY FLUID STREAMING ANIMATION (60FPS / SUB-1S COMPLETION) */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                // Instant clean formatting
-                container.innerHTML = `<div class="stream-content" style="display:block; animation: fadeIn 0.15s ease;">${formatExecutiveResponse(fullText)}</div>`;
-                initializePendingCharts(container);
+                container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor" style="display:inline-block; width:5px; height:15px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.6s infinite;"></span>`;
+                const contentBox = container.querySelector('.stream-content');
+                const cursor = container.querySelector('.typing-cursor');
                 const feed = document.getElementById('chatFeed');
-                if (feed) feed.scrollTop = feed.scrollHeight;
-                if (onComplete) onComplete();
+
+                const words = fullText.split(' ');
+                const totalWords = words.length;
+                let currentWordIdx = 0;
+
+                function typeStep() {
+                    if (currentWordIdx < totalWords) {
+                        // High-velocity burst (6-10 words per frame) so streaming finishes in under 600ms
+                        currentWordIdx += Math.max(6, Math.min(12, Math.ceil(totalWords / 10)));
+                        if (currentWordIdx > totalWords) currentWordIdx = totalWords;
+
+                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
+                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
+
+                        if (feed) feed.scrollTop = feed.scrollHeight;
+                        setTimeout(() => requestAnimationFrame(typeStep), 20);
+                    } else {
+                        if (cursor) cursor.remove();
+                        contentBox.innerHTML = formatExecutiveResponse(fullText);
+                        initializePendingCharts(container);
+                        if (feed) feed.scrollTop = feed.scrollHeight;
+                        if (onComplete) onComplete();
+                    }
+                }
+
+                requestAnimationFrame(typeStep);
             } catch (err) {
-                console.error("Render error:", err);
+                console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
                 initializePendingCharts(container);
                 if (onComplete) onComplete();
