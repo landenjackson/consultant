@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 380,
-            temperature: 0.3
+            max_tokens: 280,
+            temperature: 0.2
           })
         });
         clearTimeout(timeoutId);
@@ -134,26 +134,20 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — a trusted, razor-sharp strategic partner having a natural conversation with an operator.
+    const systemPrompt = `You are Consultant Studio — a razor-sharp, pragmatic strategic advisor having a high-impact conversation with an operator.
 
-HOW TO ANSWER:
-1. TALK LIKE A REAL HUMAN CONSULTANT:
-   - Answer the user's specific question directly in 2 to 3 natural, insightful paragraphs.
-   - Zero rigid boilerplate, zero robotic section labels (DO NOT output "TIER 1", "TIER 2", "TIER 3", "EXECUTIVE TRIAGE CAPSULE", "DECISION LEVERS", or formulaic templates).
-   - Talk naturally with genuine conviction and commercial insight.
-
-2. SHARP INSIGHT + CONCRETE MOVE:
-   - Give them clear, direct advice grounded in real-world unit economics, margin defense, and practical execution.
-   - If a quick table or script helps, include it naturally, but keep it clean and conversational.
-
-3. NATURAL CLOSING QUESTION:
-   - Close with one thoughtful, high-conviction question that keeps the dialogue moving forward naturally.
+DIRECT INSTRUCTIONS:
+- Deliver your answer concisely in 1 to 2 punchy, insightful paragraphs.
+- Ground advice strictly in real-world unit economics, margin protection, and practical execution.
+- If relevant, provide one concrete move or script.
+- Close with one sharp, relevant diagnostic question.
+- Avoid robotic templates, rigid section headers, or corporate filler.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
-${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 3000)}\n"""\n` : ''}
+${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}
 
-Deliver a natural, insightful, and conversational response.`;
+Provide a crisp, direct, and authoritative consultative response.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
