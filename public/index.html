@@ -55,7 +55,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <!-- Official Google Identity Services SDK (GIS) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
@@ -3655,7 +3656,8 @@
         // 4. POWERPOINT DECK EXPORT (CLIENT-SIDE NATIVE PPTX GENERATION VIA PPTXGENJS)
         async function exportPowerPointDeck(btn) {
             try {
-                if (typeof PptxGenJS === 'undefined') {
+                const PptxConstructor = window.PptxGenJS || window.pptxgen;
+                if (!PptxConstructor) {
                     openInCanvas(btn);
                     return;
                 }
@@ -3664,7 +3666,7 @@
                 const rawText = card ? (card.querySelector('.stream-content')?.innerText || card.innerText) : '';
                 const cleanText = getCleanStrategyText(rawText);
 
-                const pptx = new PptxGenJS();
+                const pptx = new PptxConstructor();
                 pptx.layout = 'LAYOUT_16x9';
 
                 // Slide 1: Title Slide (Obsidian Dark Luxury Theme)
