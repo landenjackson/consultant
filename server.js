@@ -72,10 +72,10 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // For text, race gemini-2.0-flash and gemini-1.5-flash with streamlined 350-token ceiling for sub-3s loading time
+    // For text, race gemini-2.0-flash and gemini-1.5-flash with balanced 600-token ceiling for complete responses
     const querySingleModel = async (model) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 16000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -87,8 +87,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 350,
-            temperature: 0.25
+            max_tokens: 600,
+            temperature: 0.35
           })
         });
         clearTimeout(timeoutId);
