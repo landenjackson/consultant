@@ -72,69 +72,56 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // For text, race gemini-2.0-flash and gemini-1.5-flash with balanced 600-token ceiling for complete responses
-    const querySingleModel = async (model) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 16000);
-      try {
-        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${myclawKey}`
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model,
-            messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 850,
-            temperature: 0.35
-          })
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Fast Race Winner: ${model}] (${text.length} chars)`);
-            return text;
-          }
-        }
-        throw new Error(`Model ${model} returned status ${res.status}`);
-      } catch (err) {
-        clearTimeout(timeoutId);
-        throw err;
-      }
-    };
-
+    // Direct single high-reliability query to gemini-2.0-flash with generous 1,200 token budget
     try {
-      const fastestResponse = await Promise.any([
-        querySingleModel('gemini-2.0-flash'),
-        querySingleModel('gemini-1.5-flash')
-      ]);
-      return fastestResponse;
-    } catch (raceErr) {
-      console.warn('[Parallel Race Notice - Running direct fallback]:', raceErr.message);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${myclawKey}`
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'gemini-2.0-flash',
+          messages: [{ role: 'user', content: contentPayload }],
+          max_tokens: 1200,
+          temperature: 0.3
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || '';
+        if (text && text.trim().length > 0) {
+          console.log(`[Direct Inference Success: gemini-2.0-flash] (${text.length} chars)`);
+          return text;
+        }
+      }
+      throw new Error(`Primary inference returned status ${res.status}`);
+    } catch (err) {
+      console.warn('[Direct Inference fallback]:', err.message);
       try {
-        const fallbackRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        const fbRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${myclawKey}`
           },
           body: JSON.stringify({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1000,
-            temperature: 0.4
+            max_tokens: 1200,
+            temperature: 0.3
           })
         });
-        if (fallbackRes.ok) {
-          const fbData = await fallbackRes.json();
+        if (fbRes.ok) {
+          const fbData = await fbRes.json();
           return fbData.choices?.[0]?.message?.content || null;
         }
       } catch (fbErr) {
-        console.error('[Direct fallback failed]:', fbErr.message);
+        console.error('[Fallback failed]:', fbErr.message);
       }
     }
   }
