@@ -3784,19 +3784,19 @@
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
             
-            // High-Tech Executive Auditing Engine Live Telemetry Feed
+            // Clean, Natural Human Loading Feed
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
                 <div class="subagent-hud" id="${hudId}">
                     <div class="subagent-hud-header">
-                        <span class="subagent-badge"><span class="pulse-dot"></span> Strategy & Unit Math Telemetry</span>
-                        <span style="color:var(--accent-glow); font-size:11.5px; font-weight:700;">Live Inference</span>
+                        <span class="subagent-badge"><span class="pulse-dot"></span> Reviewing Your Details</span>
+                        <span style="color:var(--accent-glow); font-size:11.5px; font-weight:700;">Working...</span>
                     </div>
                     <div class="telemetry-feed">
-                        <div class="telemetry-line active" id="${hudId}_step1"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">⚡ [0.2s] ${docNameToSend ? `Ingesting ${escapeHtml(docNameToSend)}` : 'Parsing operational parameters & unit constraints...'}</span></div>
-                        <div class="telemetry-line" id="${hudId}_step2"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">📊 [0.9s] Stress-testing cash burn & margin defense models...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step3"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">🛡️ [1.6s] Eliminating low-yield bottlenecks & synthesizing actions...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step4"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">✨ [2.2s] Compiling executive briefing & deliverables...</span></div>
+                        <div class="telemetry-line active" id="${hudId}_step1"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">⚡ ${docNameToSend ? `Reading ${escapeHtml(docNameToSend)}...` : 'Looking over what you shared...'}</span></div>
+                        <div class="telemetry-line" id="${hudId}_step2"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">📊 Finding where money and time are getting stuck...</span></div>
+                        <div class="telemetry-line" id="${hudId}_step3"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">🛡️ Mapping out the direct fix with real numbers...</span></div>
+                        <div class="telemetry-line" id="${hudId}_step4"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">✨ Writing your game plan...</span></div>
                     </div>
                 </div>
             `;
