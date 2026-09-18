@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
-// CLEAN, DIRECT, & RESILIENT ENTERPRISE REST PIPELINE
+// FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (PARALLEL FAST RACE)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -41,14 +41,42 @@ const queryAI = async (prompt, imageObjs = []) => {
   }
 
   if (myclawKey) {
-    const models = hasImages
-      ? ['gemini-3.7-flash']
-      : ['gemini-2.0-flash', 'gemini-1.5-flash'];
-
-    for (const model of models) {
+    // For vision, route directly to gemini-3.7-flash
+    if (hasImages) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 18000);
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${myclawKey}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: 'gemini-3.7-flash',
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 1500,
+            temperature: 0.6
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content || '';
+          if (text && text.trim().length > 0) return text;
+        }
+      } catch (err) {
+        console.warn('[Vision error]:', err.message);
+      }
+      return null;
+    }
+
+    // For text, race gemini-2.5-flash and gemini-2.0-flash simultaneously to return the fastest response in under 2-3s
+    const querySingleModel = async (model) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -60,7 +88,7 @@ const queryAI = async (prompt, imageObjs = []) => {
             model,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: 1200,
-            temperature: 0.4
+            temperature: 0.55
           })
         });
         clearTimeout(timeoutId);
@@ -68,12 +96,30 @@ const queryAI = async (prompt, imageObjs = []) => {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
           if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Direct Inference Active: ${model}] (${text.length} chars)`);
+            console.log(`[Fast Race Winner: ${model}] (${text.length} chars)`);
             return text;
           }
         }
+        throw new Error(`Model ${model} returned non-OK status`);
       } catch (err) {
-        console.warn(`[Failover from ${model}]:`, err.message);
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    };
+
+    try {
+      // Promise.any takes whichever model finishes first
+      const fastestResponse = await Promise.any([
+        querySingleModel('gemini-2.5-flash'),
+        querySingleModel('gemini-2.0-flash')
+      ]);
+      return fastestResponse;
+    } catch (raceErr) {
+      console.warn('[Parallel Race Notice - Sequential Fallback to 1.5]:', raceErr.message);
+      try {
+        return await querySingleModel('gemini-1.5-flash');
+      } catch(e) {
+        console.error('[Sequential Fallback failed]:', e.message);
       }
     }
   }
@@ -134,26 +180,31 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — an unvarnished, razor-sharp strategic partner having a high-conviction conversation with an operator.
+    const systemPrompt = `You are Consultant Studio — an institutional-grade Turnaround Operating Partner, Fractional Chief Restructuring Officer (CRO), and Private Equity Value Creation engine.
 
-HOW TO ANSWER:
-1. COMPLETE, WELL-ROUNDED STRATEGIC ADVICE:
-   - Provide a complete, fully formed answer in 2 to 3 natural paragraphs.
-   - Ground every statement in unit economics, frontline physics, and practical margin defense.
-   - Never cut off mid-thought; always finish your complete sentence and paragraph.
-   - Zero robotic buzzwords, zero formulaic section headers, zero generic filler.
+PROGRESSIVE DISCLOSURE ARCHITECTURE (3-TIER EXECUTIVE PRESENTATION):
+1. TIER 1: EXECUTIVE TRIAGE CAPSULE (5-Second Scan):
+   - Lead immediately with a concise callout block:
+     > **Bottom Line:** [1-sentence core operational verdict]
+     > **Primary Drivers:** [2 key bold metrics, e.g. Zero-Cash Runway: 42 Days | Weekly Net Burn: -$14,200]
 
-2. CONCRETE TACTICAL MOVE & NUMBERS:
-   - Deliver one specific operational move, calculation, or script that directly solves their specific problem.
+2. TIER 2: DECISION LEVERS & TRADE-OFFS (30-Second Evaluation):
+   - Provide a high-density 3-to-4 row comparison table or structured breakdown of immediate operational realities.
+   - Deliver 1 actionable "Cut vs. Double-Down" trade-off pair with exact scripts for vendors, lenders, or staff.
 
-3. STRATEGIC CLOSING QUESTION:
-   - Close with one thoughtful diagnostic question to keep the strategic momentum moving forward.
+3. TIER 3: MULTI-TURN DIAGNOSTIC PROBE:
+   - End with 1 surgical diagnostic question probing deeper into specific line items, vendor aging, or debt covenants to unlock the next level of forensic modeling.
+
+TONE & BEHAVIORAL CALIBRATION:
+- Clinical, authoritative, unvarnished restructuring advisor voice.
+- Zero TV-drama bravado. Grounded in cash physics, vendor concentration, and debtor-in-possession (DIP) reality.
+- 2 to 3 muscular paragraphs. No walls of text. No robotic section headers.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
-${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}
+${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 3000)}\n"""\n` : ''}
 
-Deliver a complete, high-correlation consultative response.`;
+Deliver an institutional turnaround response following progressive disclosure.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
