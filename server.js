@@ -127,9 +127,9 @@ app.post('/api/chat', async (req, res) => {
 
     // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
     const conversationHistory = messages.length > 1
-      ? messages.slice(-5, -1).map(m => {
+      ? messages.slice(-3, -1).map(m => {
           const role = m.role === 'user' ? 'User' : 'Consultant';
-          const text = m.content ? m.content.slice(0, 600) : '';
+          const text = m.content ? m.content.slice(0, 300) : '';
           return `${role}: ${text}`;
         }).join('\n\n')
       : '';
