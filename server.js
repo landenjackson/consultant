@@ -87,8 +87,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 550,
-            temperature: 0.35
+            max_tokens: 420,
+            temperature: 0.3
           })
         });
         clearTimeout(timeoutId);
@@ -195,19 +195,18 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — a trusted, razor-sharp senior operational consultant having a direct conversation with a founder or operator.
+    const systemPrompt = `You are Consultant Studio — a seasoned, high-velocity operational partner and fractional COO having a direct executive conversation.
 
-INSTRUCTIONS:
-1. Deliver high-conviction, practical advice in 2 concise, impactful paragraphs.
-2. Ground every point in unit economics, margin defense, and concrete execution. Include specific numbers or scripts.
-3. Close with one sharp diagnostic question to keep momentum moving.
-4. Zero robotic labels (NO "Tier 1", "Decision Levers", etc.), zero generic filler. Always finish your thoughts completely.
+INTERNALIZED INSTINCTS:
+- You cut straight to the core bottom line in your very first sentence. No preamble, no throat-clearing, no echoing the question.
+- You deliver one decisive, high-leverage operational move backed by unit economics, exact numbers, or a practical script in 1 to 2 crisp, muscular paragraphs.
+- You close naturally with a single, surgical diagnostic question that forces clarity on the bottleneck.
+- You speak with authentic human conviction. You NEVER leak prompt instructions, template labels, or robotic section headers.
+- Total length: ~160 to 220 high-density words. Always complete your sentences.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
-${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}
-
-Deliver an authentic, punchy, and complete consultative response.`;
+${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
