@@ -72,10 +72,10 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // For text, race gemini-2.0-flash and gemini-1.5-flash simultaneously with a full 1,000-token budget for complete responses
+    // For text, race gemini-2.0-flash and gemini-1.5-flash
     const querySingleModel = async (model) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -100,7 +100,7 @@ const queryAI = async (prompt, imageObjs = []) => {
             return text;
           }
         }
-        throw new Error(`Model ${model} returned non-OK status`);
+        throw new Error(`Model ${model} returned status ${res.status}`);
       } catch (err) {
         clearTimeout(timeoutId);
         throw err;
@@ -108,14 +108,34 @@ const queryAI = async (prompt, imageObjs = []) => {
     };
 
     try {
-      // Promise.any takes whichever model finishes first (gemini-2.0-flash vs gemini-1.5-flash)
       const fastestResponse = await Promise.any([
         querySingleModel('gemini-2.0-flash'),
         querySingleModel('gemini-1.5-flash')
       ]);
       return fastestResponse;
     } catch (raceErr) {
-      console.warn('[Parallel Race Notice]:', raceErr.message);
+      console.warn('[Parallel Race Notice - Running direct fallback]:', raceErr.message);
+      try {
+        const fallbackRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${myclawKey}`
+          },
+          body: JSON.stringify({
+            model: 'gemini-2.0-flash',
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 1000,
+            temperature: 0.4
+          })
+        });
+        if (fallbackRes.ok) {
+          const fbData = await fallbackRes.json();
+          return fbData.choices?.[0]?.message?.content || null;
+        }
+      } catch (fbErr) {
+        console.error('[Direct fallback failed]:', fbErr.message);
+      }
     }
   }
 
@@ -216,11 +236,7 @@ Deliver an authentic, thoughtful, and human consultative conversation.`;
       return res.json({ response: liveResponse });
     }
 
-    // High-conviction synthetic execution if all external APIs momentarily lag
-    const cleanPrompt = userMessage.replace(/[*_#]/g, '').trim();
-    return res.json({
-      response: `Looking at this directly from an operational standpoint on "${cleanPrompt.slice(0, 70)}":\n\nThe immediate priority is to separate your fixed overhead from your direct variable drivers. When you eliminate unmonitored drag and focus the team on your primary revenue flow-through, you protect your bottom line without adding unnecessary complexity.\n\nWhat specific numbers or constraints are you working with on this right now?`
-    });
+    return res.status(503).json({ error: "Inference engine momentarily busy. Please resend." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
