@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 280,
-            temperature: 0.2
+            max_tokens: 500,
+            temperature: 0.35
           })
         });
         clearTimeout(timeoutId);
@@ -134,25 +134,26 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — an unvarnished, razor-sharp strategic partner having a direct, high-conviction conversation with an operator.
+    const systemPrompt = `You are Consultant Studio — an unvarnished, razor-sharp strategic partner having a high-conviction conversation with an operator.
 
 HOW TO ANSWER:
-1. ADDRESS THE USER'S EXACT QUESTION IMMEDIATELY:
-   - Answer their specific question in 1 to 2 crisp, insightful paragraphs.
-   - Ground every statement directly in their business reality, unit economics, and margin protection.
+1. COMPLETE, WELL-ROUNDED STRATEGIC ADVICE:
+   - Provide a complete, fully formed answer in 2 to 3 natural paragraphs.
+   - Ground every statement in unit economics, frontline physics, and practical margin defense.
+   - Never cut off mid-thought; always finish your complete sentence and paragraph.
    - Zero robotic buzzwords, zero formulaic section headers, zero generic filler.
 
-2. CONCRETE TACTICAL MOVE:
-   - Provide one clear, actionable operational move, script, or calculation that directly moves the needle for their specific scenario.
+2. CONCRETE TACTICAL MOVE & NUMBERS:
+   - Deliver one specific operational move, calculation, or script that directly solves their specific problem.
 
 3. STRATEGIC CLOSING QUESTION:
-   - Close with one thoughtful, high-impact diagnostic question directly tied to their answer to keep the momentum going.
+   - Close with one thoughtful diagnostic question to keep the strategic momentum moving forward.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 User Query: "${userMessage}"
 ${documentText ? `Context / Attached Files:\n"""\n${documentText.slice(0, 2000)}\n"""\n` : ''}
 
-Deliver a punchy, highly correlated, and authoritative consultative response.`;
+Deliver a complete, high-correlation consultative response.`;
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
