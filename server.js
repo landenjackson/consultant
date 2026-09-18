@@ -59,8 +59,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 500,
-            temperature: 0.35
+            max_tokens: 1200,
+            temperature: 0.4
           })
         });
         clearTimeout(timeoutId);
