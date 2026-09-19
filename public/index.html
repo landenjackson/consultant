@@ -3882,10 +3882,10 @@
                 let res = null;
                 let data = null;
 
-                // Resilient single-attempt fetch with clean error handling (Zero redundant retry delays)
+                // Resilient single-attempt fetch with generous 45s timeout to eliminate client network dropouts
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 18000);
+                    const timeoutId = setTimeout(() => controller.abort(), 45000);
 
                     res = await fetch('/api/chat', {
                         method: 'POST',
@@ -3907,14 +3907,7 @@
                 }
 
                 if (!data || !data.response) {
-                    // Instantly generate natural consultative response locally if network drops
-                    data = {
-                        response: `Here is the direct operational assessment on that:
-
-When looking at this from a frontline unit economics and execution standpoint, the highest-leverage move is to isolate your fixed versus variable bottlenecks immediately. Stop subsidizing low-yield activity, realign the team schedule directly to customer volume surges, and defend your core gross margins before testing top-line expansion.
-
-What specific numbers or operational targets should we stress-test next?`
-                    };
+                    throw new Error("Unable to reach inference engine. Please retry.");
                 }
 
                 const responseText = data.response || "Strategy synthesized.";
