@@ -3466,6 +3466,32 @@
             }
         }
 
+        /* DYNAMIC CONTEXTUAL TOPIC SUGGESTIONS ENGINE (SIMILAR TO GOOGLE AI STUDIO / CLAUDE) */
+        function generateTopicSuggestions(text) {
+            const lower = (text || '').toLowerCase();
+            const suggestions = [];
+
+            if (lower.includes('seo') || lower.includes('google') || lower.includes('foot traffic') || lower.includes('review') || lower.includes('map')) {
+                suggestions.push({ icon: '📍', label: 'Audit Google Maps Category & NAP', prompt: 'Audit my Google Business Profile primary category, delivery radius, and NAP citation consistency.' });
+                suggestions.push({ icon: '⭐', label: 'Design Post-Meal Review Flywheel', prompt: 'How do I set up a post-meal QR review capture system that generates 50+ Google reviews a month?' });
+                suggestions.push({ icon: '🎯', label: 'Map 5-Min Catchment Keywords', prompt: 'What are the top 5 high-intent local takeout and delivery keywords for my neighborhood catchment?' });
+            } else if (lower.includes('resume') || lower.includes('interview') || lower.includes('career') || lower.includes('bullet') || lower.includes('job')) {
+                suggestions.push({ icon: '📑', label: 'Reframe Top 3 Resume Bullets', prompt: 'Reframe my top 3 work achievements into quantified dollar impact and enterprise value.' });
+                suggestions.push({ icon: '🎙️', label: 'Build Executive Interview Track', prompt: 'Give me the exact 60-second talking track for answering "What is your biggest operational win?"' });
+                suggestions.push({ icon: '🎯', label: 'Audit ATS Keyword Gaps', prompt: 'What specific operational keywords or metric benchmarks am I currently missing for executive search?' });
+            } else if (lower.includes('cash') || lower.includes('p&l') || lower.includes('margin') || lower.includes('ticket') || lower.includes('revenue') || lower.includes('burn') || lower.includes('food')) {
+                suggestions.push({ icon: '📊', label: 'Build 13-Week Cash Waterfall', prompt: 'How do I model my 13-week cash flow to identify my zero-cash date and critical vendor stretch limits?' });
+                suggestions.push({ icon: '✂️', label: 'Isolate Variable Cost Leaks', prompt: 'Break down my prime costs (COGS + labor) and identify the top 2 variable leaks to cut this week.' });
+                suggestions.push({ icon: '📄', label: 'Generate 1-Page Bank Teaser', prompt: 'Draft a 1-page institutional debt coverage and DSCR teaser memo for my lender.' });
+            } else {
+                suggestions.push({ icon: '📈', label: 'Calculate Net Margin Impact', prompt: 'What is the exact before-and-after dollar impact on net margin for this move?' });
+                suggestions.push({ icon: '💬', label: 'Get Team Talking Track', prompt: 'Draft the exact 30-second staff talking track for tomorrow morning to execute this.' });
+                suggestions.push({ icon: '🛡️', label: 'Stress-Test 15% Downturn', prompt: 'Stress-test this scenario if customer volume drops 15% next month.' });
+            }
+
+            return suggestions;
+        }
+
         /* INTERACTIVE ACTION CHIPS & SENSITIVITY SLIDER STYLING */
         function triggerPresetAction(text) {
             const input = document.getElementById('userInput');
@@ -3885,15 +3911,15 @@
                     `;
                     assistantCard.appendChild(sliderWidget);
 
-                    // 2. INTERACTIVE "NEXT MOVE" ACTION CHIPS (DECISION FLYWHEEL)
+                    // 2. DYNAMIC CONTEXTUAL "NEXT MOVE" ACTION CHIPS (INTELLIGENT SUGGESTIONS BASED ON THE TOPIC)
                     const actionChips = document.createElement('div');
                     actionChips.className = 'action-chips-container';
                     actionChips.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;';
-                    actionChips.innerHTML = `
-                        <button class="action-chip" onclick="triggerPresetAction('What is the exact before-and-after dollar impact on net margin?')">📈 Calculate Net Margin Impact</button>
-                        <button class="action-chip" onclick="triggerPresetAction('Draft the exact 30-second staff talking track for tomorrow morning')">💬 Get Team Talking Track</button>
-                        <button class="action-chip" onclick="triggerPresetAction('Stress-test this scenario if customer volume drops 15% next month')">🛡️ Stress-Test 15% Downturn</button>
-                    `;
+                    
+                    const dynamicSuggestions = generateTopicSuggestions(responseText);
+                    actionChips.innerHTML = dynamicSuggestions.map(s => `
+                        <button class="action-chip" onclick="triggerPresetAction('${escapeHtml(s.prompt)}')">${s.icon} ${escapeHtml(s.label)}</button>
+                    `).join('');
                     assistantCard.appendChild(actionChips);
 
                     // 3. Add Deliverables & Vault Bar
