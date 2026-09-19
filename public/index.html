@@ -3334,16 +3334,6 @@
 
             return parsedHtml;
         }
-            const paragraphs = clean.split(/\n\n+/);
-            clean = paragraphs.map(p => {
-                p = p.trim();
-                if (!p) return '';
-                if (p.startsWith('<div') || p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<li') || p.startsWith('<table')) return p;
-                return `<p style="margin-bottom:14px; line-height:1.7; color:#CBD5E1; font-size:14px;">${p.replace(/\n/g, '<br>')}</p>`;
-            }).join('');
-
-            return clean;
-        }
 
         // Dedicated line-by-line Markdown Table to Executive Word-Grade Table converter
         function parseAllTables(text) {
