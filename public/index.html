@@ -3520,6 +3520,45 @@
             }
         }
 
+        /* INTERACTIVE ACTION CHIPS & SENSITIVITY SLIDER STYLING */
+        function triggerPresetAction(text) {
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.value = text;
+                sendMessage();
+            }
+        }
+
+        function updateSensitivityMath(sliderId, value) {
+            const valEl = document.getElementById(`${sliderId}_val`);
+            const mathEl = document.getElementById(`${sliderId}_math`);
+            const numVal = parseInt(value, 10);
+            const delta = numVal - 100;
+            
+            if (valEl) {
+                if (delta > 0) {
+                    valEl.innerText = `${numVal}% (+${delta}% Upside)`;
+                    valEl.style.color = '#4ADE80';
+                } else if (delta < 0) {
+                    valEl.innerText = `${numVal}% (${delta}% Stress Test)`;
+                    valEl.style.color = '#F87171';
+                } else {
+                    valEl.innerText = '100% (Baseline)';
+                    valEl.style.color = 'var(--accent-glow)';
+                }
+            }
+
+            if (mathEl) {
+                if (delta > 0) {
+                    mathEl.innerHTML = `🚀 <strong>+${delta}% Volume Gain:</strong> Expands gross margin flow-through by ~<strong>+$${(delta * 45).toLocaleString()}</strong>/mo with zero fixed cost increase.`;
+                } else if (delta < 0) {
+                    mathEl.innerHTML = `⚠️ <strong>${delta}% Volume Contraction:</strong> Requires cutting non-essential variable spend to preserve breakeven cash threshold.`;
+                } else {
+                    mathEl.innerHTML = `💡 <em>Slide to simulate revenue volume and operational flow-through</em>`;
+                }
+            }
+        }
+
         // Helper to extract clean text from assistant bubble or canvas (strictly excluding bottom deliverables buttons)
         function getTargetDocumentText(el) {
             let targetEl = null;
@@ -3883,7 +3922,42 @@ What specific numbers or operational targets should we stress-test next?`
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 streamAssistantResponse(assistantCard, responseText, () => {
-                    // Add Deliverables & Vault Bar
+                    // 1. DYNAMIC WHAT-IF SENSITIVITY SLIDER WIDGET (INTERACTIVE UNIT MATH)
+                    const sliderWidget = document.createElement('div');
+                    sliderWidget.className = 'sensitivity-card';
+                    sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
+                    const sliderId = 'slider_' + Date.now();
+                    sliderWidget.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
+                                <span>🪄</span> Interactive What-If Sensitivity
+                            </span>
+                            <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow);">100% (Baseline)</span>
+                        </div>
+                        <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
+                            <span>-30% Stress Test</span>
+                            <span>Baseline</span>
+                            <span>+30% Growth Upside</span>
+                        </div>
+                        <div id="${sliderId}_math" style="margin-top:8px; font-size:11.5px; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                            💡 <em>Slide to simulate revenue volume and operational flow-through</em>
+                        </div>
+                    `;
+                    assistantCard.appendChild(sliderWidget);
+
+                    // 2. INTERACTIVE "NEXT MOVE" ACTION CHIPS (DECISION FLYWHEEL)
+                    const actionChips = document.createElement('div');
+                    actionChips.className = 'action-chips-container';
+                    actionChips.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;';
+                    actionChips.innerHTML = `
+                        <button class="action-chip" onclick="triggerPresetAction('What is the exact before-and-after dollar impact on net margin?')">📈 Calculate Net Margin Impact</button>
+                        <button class="action-chip" onclick="triggerPresetAction('Draft the exact 30-second staff talking track for tomorrow morning')">💬 Get Team Talking Track</button>
+                        <button class="action-chip" onclick="triggerPresetAction('Stress-test this scenario if customer volume drops 15% next month')">🛡️ Stress-Test 15% Downturn</button>
+                    `;
+                    assistantCard.appendChild(actionChips);
+
+                    // 3. Add Deliverables & Vault Bar
                     const delivBar = document.createElement('div');
                     delivBar.className = 'deliverables-bar';
                     delivBar.innerHTML = `
