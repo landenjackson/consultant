@@ -2396,6 +2396,8 @@
                 const clone = (card.querySelector('.stream-content') || card).cloneNode(true);
                 const deliv = clone.querySelector('.deliverables-bar');
                 if (deliv) deliv.remove();
+                clone.querySelectorAll('.sensitivity-card').forEach(w => w.remove());
+                clone.querySelectorAll('.action-chips-container').forEach(w => w.remove());
                 clone.querySelectorAll('.whatif-slider-wrap').forEach(w => w.remove());
 
                 // Reset canvas attributes so new instances mount cleanly
@@ -2433,11 +2435,13 @@
             
             // Remove all UI buttons, bars, sliders, HUD telemetry, and script tags
             const junkSelectors = [
-                '.deliverables-bar', 
-                '.subagent-hud', 
-                '.canvas-toolbar', 
-                '.canvas-header', 
-                '.whatif-slider-wrap', 
+                '.deliverables-bar',
+                '.subagent-hud',
+                '.sensitivity-card',
+                '.action-chips-container',
+                '.canvas-toolbar',
+                '.canvas-header',
+                '.whatif-slider-wrap',
                 '.exec-chart-tag',
                 'button',
                 'script',
