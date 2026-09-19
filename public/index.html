@@ -3909,29 +3909,35 @@
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 streamAssistantResponse(assistantCard, responseText, () => {
-                    // 1. DYNAMIC WHAT-IF SENSITIVITY SLIDER WIDGET (INTERACTIVE UNIT MATH)
-                    const sliderWidget = document.createElement('div');
-                    sliderWidget.className = 'sensitivity-card';
-                    sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
-                    const sliderId = 'slider_' + Date.now();
-                    sliderWidget.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
-                                <span>🪄</span> Interactive What-If Sensitivity
-                            </span>
-                            <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow);">100% (Baseline)</span>
-                        </div>
-                        <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
-                        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
-                            <span>-30% Stress Test</span>
-                            <span>Baseline</span>
-                            <span>+30% Growth Upside</span>
-                        </div>
-                        <div id="${sliderId}_math" style="margin-top:8px; font-size:11.5px; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
-                            💡 <em>Slide to simulate revenue volume and operational flow-through</em>
-                        </div>
-                    `;
-                    assistantCard.appendChild(sliderWidget);
+                    // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
+                    const lowerText = (responseText + " " + text).toLowerCase();
+                    const isFinancialOrOps = lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$');
+                    const isResumeOrCareer = lowerText.includes('resume') || lowerText.includes('interview') || lowerText.includes('bullet') || lowerText.includes('job description') || lowerText.includes('career track');
+
+                    if (isFinancialOrOps && !isResumeOrCareer) {
+                        const sliderWidget = document.createElement('div');
+                        sliderWidget.className = 'sensitivity-card';
+                        sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
+                        const sliderId = 'slider_' + Date.now();
+                        sliderWidget.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
+                                    <span>🪄</span> Interactive What-If Sensitivity
+                                </span>
+                                <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow);">100% (Baseline)</span>
+                            </div>
+                            <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
+                            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
+                                <span>-30% Stress Test</span>
+                                <span>Baseline</span>
+                                <span>+30% Growth Upside</span>
+                            </div>
+                            <div id="${sliderId}_math" style="margin-top:8px; font-size:11.5px; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                                💡 <em>Slide to simulate revenue volume and operational flow-through</em>
+                            </div>
+                        `;
+                        assistantCard.appendChild(sliderWidget);
+                    }
 
                     // 2. DYNAMIC CONTEXTUAL "NEXT MOVE" ACTION CHIPS (INTELLIGENT SUGGESTIONS BASED ON THE TOPIC)
                     const actionChips = document.createElement('div');
