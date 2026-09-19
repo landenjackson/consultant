@@ -3466,30 +3466,52 @@
             }
         }
 
-        /* DYNAMIC CONTEXTUAL TOPIC SUGGESTIONS ENGINE (SIMILAR TO GOOGLE AI STUDIO / CLAUDE) */
+        /* UNIVERSAL DYNAMIC TOPIC & ACTION SUGGESTIONS ENGINE (GOOGLE AI STUDIO STYLE) */
         function generateTopicSuggestions(text) {
             const lower = (text || '').toLowerCase();
             const suggestions = [];
 
-            if (lower.includes('seo') || lower.includes('google') || lower.includes('foot traffic') || lower.includes('review') || lower.includes('map')) {
-                suggestions.push({ icon: '📍', label: 'Audit Google Maps Category & NAP', prompt: 'Audit my Google Business Profile primary category, delivery radius, and NAP citation consistency.' });
-                suggestions.push({ icon: '⭐', label: 'Design Post-Meal Review Flywheel', prompt: 'How do I set up a post-meal QR review capture system that generates 50+ Google reviews a month?' });
-                suggestions.push({ icon: '🎯', label: 'Map 5-Min Catchment Keywords', prompt: 'What are the top 5 high-intent local takeout and delivery keywords for my neighborhood catchment?' });
-            } else if (lower.includes('resume') || lower.includes('interview') || lower.includes('career') || lower.includes('bullet') || lower.includes('job')) {
-                suggestions.push({ icon: '📑', label: 'Reframe Top 3 Resume Bullets', prompt: 'Reframe my top 3 work achievements into quantified dollar impact and enterprise value.' });
-                suggestions.push({ icon: '🎙️', label: 'Build Executive Interview Track', prompt: 'Give me the exact 60-second talking track for answering "What is your biggest operational win?"' });
-                suggestions.push({ icon: '🎯', label: 'Audit ATS Keyword Gaps', prompt: 'What specific operational keywords or metric benchmarks am I currently missing for executive search?' });
-            } else if (lower.includes('cash') || lower.includes('p&l') || lower.includes('margin') || lower.includes('ticket') || lower.includes('revenue') || lower.includes('burn') || lower.includes('food')) {
-                suggestions.push({ icon: '📊', label: 'Build 13-Week Cash Waterfall', prompt: 'How do I model my 13-week cash flow to identify my zero-cash date and critical vendor stretch limits?' });
-                suggestions.push({ icon: '✂️', label: 'Isolate Variable Cost Leaks', prompt: 'Break down my prime costs (COGS + labor) and identify the top 2 variable leaks to cut this week.' });
-                suggestions.push({ icon: '📄', label: 'Generate 1-Page Bank Teaser', prompt: 'Draft a 1-page institutional debt coverage and DSCR teaser memo for my lender.' });
-            } else {
-                suggestions.push({ icon: '📈', label: 'Calculate Net Margin Impact', prompt: 'What is the exact before-and-after dollar impact on net margin for this move?' });
-                suggestions.push({ icon: '💬', label: 'Get Team Talking Track', prompt: 'Draft the exact 30-second staff talking track for tomorrow morning to execute this.' });
-                suggestions.push({ icon: '🛡️', label: 'Stress-Test 15% Downturn', prompt: 'Stress-test this scenario if customer volume drops 15% next month.' });
+            // 1. Scan for specific questions asked by the consultant at the end of the text
+            const questionMatches = text.match(/([A-Z][^\.\n\?!]*\?)/g);
+            if (questionMatches && questionMatches.length > 0) {
+                const lastQuestion = questionMatches[questionMatches.length - 1].trim();
+                if (lastQuestion.length > 15 && lastQuestion.length < 100) {
+                    suggestions.push({
+                        icon: '💬',
+                        label: `Answer: "${lastQuestion.slice(0, 38)}..."`,
+                        prompt: `Let's break down that question: "${lastQuestion}"`
+                    });
+                }
             }
 
-            return suggestions;
+            // 2. Domain & Contextual Action Discovery
+            if (lower.includes('seo') || lower.includes('google') || lower.includes('foot traffic') || lower.includes('review') || lower.includes('map') || lower.includes('local')) {
+                suggestions.push({ icon: '📍', label: 'Audit GBP Category & NAP', prompt: 'Audit my Google Business Profile primary category, delivery radius, and NAP citation consistency.' });
+                suggestions.push({ icon: '⭐', label: 'Design Post-Meal Review Flywheel', prompt: 'How do I set up a post-meal QR review capture system that generates 50+ Google reviews a month?' });
+                suggestions.push({ icon: '🎯', label: 'Map 5-Min Catchment Keywords', prompt: 'What are the top 5 high-intent local takeout and delivery keywords for my neighborhood catchment?' });
+            } else if (lower.includes('resume') || lower.includes('interview') || lower.includes('career') || lower.includes('bullet') || lower.includes('job') || lower.includes('salary') || lower.includes('hire')) {
+                suggestions.push({ icon: '📑', label: 'Reframe Top 3 Resume Bullets', prompt: 'Reframe my top 3 work achievements into quantified dollar impact and enterprise value.' });
+                suggestions.push({ icon: '🎙️', label: 'Build 60s Interview Talking Track', prompt: 'Give me the exact 60-second talking track for answering "What is your biggest operational win?"' });
+                suggestions.push({ icon: '🎯', label: 'Audit ATS Benchmark Gaps', prompt: 'What specific operational keywords or metric benchmarks am I currently missing for executive search?' });
+            } else if (lower.includes('cash') || lower.includes('p&l') || lower.includes('margin') || lower.includes('ticket') || lower.includes('revenue') || lower.includes('burn') || lower.includes('food') || lower.includes('pricing') || lower.includes('cogs')) {
+                suggestions.push({ icon: '📊', label: 'Model 13-Week Cash Waterfall', prompt: 'How do I model my 13-week cash flow to identify my zero-cash date and critical vendor stretch limits?' });
+                suggestions.push({ icon: '✂️', label: 'Isolate Variable Cost Leaks', prompt: 'Break down my prime costs (COGS + labor) and identify the top 2 variable leaks to cut this week.' });
+                suggestions.push({ icon: '📄', label: 'Draft 1-Page Bank Teaser', prompt: 'Draft a 1-page institutional debt coverage and DSCR teaser memo for my lender.' });
+            } else if (lower.includes('marketing') || lower.includes('ad') || lower.includes('brand') || lower.includes('social') || lower.includes('customer') || lower.includes('lead')) {
+                suggestions.push({ icon: '🎯', label: 'Build Zero-Discount Lead Hook', prompt: 'How do we generate high-intent customer inquiries without giving away profit-killing discounts?' });
+                suggestions.push({ icon: '📈', label: 'Calculate CAC vs Customer LTV', prompt: 'Model my customer acquisition cost (CAC) against 90-day repeat lifetime value.' });
+                suggestions.push({ icon: '📣', label: 'Draft 30-Day Launch Campaign', prompt: 'Give me a structured 30-day organic launch timeline focused on direct conversion.' });
+            } else if (lower.includes('team') || lower.includes('staff') || lower.includes('labor') || lower.includes('schedule') || lower.includes('operation') || lower.includes('process')) {
+                suggestions.push({ icon: '⏱️', label: 'Eliminate Workflow Bottlenecks', prompt: 'How do we restructure the daily workflow sequence to cut labor idle time by 20%?' });
+                suggestions.push({ icon: '💬', label: 'Draft Staff Morning Huddle Script', prompt: 'Give me the exact 2-minute morning shift huddle script to align the team on daily targets.' });
+                suggestions.push({ icon: '📊', label: 'Set Up Daily Metric Scorecard', prompt: 'Design a simple 3-metric daily scorecard that my team can fill out in 60 seconds.' });
+            } else {
+                suggestions.push({ icon: '📈', label: 'Calculate Bottom-Line Net Impact', prompt: 'What is the exact dollar impact and payback period for executing this move?' });
+                suggestions.push({ icon: '📋', label: 'Map 30-Day Execution Milestones', prompt: 'Break this down into an actionable 30-day week-by-week operational milestone plan.' });
+                suggestions.push({ icon: '🛡️', label: 'Stress-Test Worst-Case Downside', prompt: 'What is the biggest downside risk to this strategy and how do we hedge against it?' });
+            }
+
+            return suggestions.slice(0, 4);
         }
 
         /* INTERACTIVE ACTION CHIPS & SENSITIVITY SLIDER STYLING */
