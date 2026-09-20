@@ -498,13 +498,28 @@
         }
 
         /* SMOOTH POLISHED ENTRY & EXIT ANIMATIONS (MATCHING APP TRANSITIONS) */
-        /* REACT-BITS SPLIT-TEXT STAGGERED HEADLINE ANIMATION */
+        /* REACT-BITS SPLIT-TEXT STAGGERED HEADLINE & CHAT WORD ENTRANCE ANIMATION */
         .split-char {
             display: inline-block;
             opacity: 0;
             transform: translateY(22px) scale(0.96);
             animation: splitCharIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             will-change: transform, opacity;
+        }
+
+        .split-word-in {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: splitWordFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes splitWordFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes splitCharIn {
@@ -3241,7 +3256,7 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 CRAFTED NATURAL 60FPS STREAMING ANIMATION (SMOOTH & POLISHED) */
+        /* 🪄 CRAFTED REACT-BITS SPLIT-TEXT STREAMING ANIMATION (SMOOTH WORD-BY-WORD STAGGER) */
         async function streamAssistantResponse(container, fullText, onComplete) {
             try {
                 container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor" style="display:inline-block; width:5px; height:15px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.65s infinite;"></span>`;
@@ -3255,7 +3270,7 @@
 
                 function typeStep() {
                     if (currentWordIdx < totalWords) {
-                        // Natural 3-to-6 word cadence per frame (smooth, elegant, and readable)
+                        // Staggered word chunking (3-5 words per step)
                         const remaining = totalWords - currentWordIdx;
                         const step = Math.max(3, Math.min(6, Math.ceil(remaining / 12)));
                         currentWordIdx += step;
