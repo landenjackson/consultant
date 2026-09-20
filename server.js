@@ -257,6 +257,15 @@ app.post('/api/chat', async (req, res) => {
       ? 'Adopt an encouraging, frontline operator tone with clear, step-by-step practical moves.'
       : 'Adopt a direct, candid peer COO voice focused on unvarnished business realities and unit economics.';
 
+    // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
+    const conversationHistory = messages.length > 1
+      ? messages.slice(-3, -1).map(m => {
+          const role = m.role === 'user' ? 'User' : 'Consultant';
+          const text = m.content ? m.content.slice(0, 300) : '';
+          return `${role}: ${text}`;
+        }).join('\n\n')
+      : '';
+
     const systemPrompt = `You are Consultant Studio — a trusted, direct strategic partner having a helpful, unpretentious conversation.
 
 ${toneDirective}
