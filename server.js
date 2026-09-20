@@ -24,7 +24,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '«redacted:apikey_28701d1ef1a950e4010af1b3b6c8d5c3203_2ca8fdc9c2dbec871f7084338acbaa89381dcdaff5fb735b4b5111c13b305b7f»';
 
-// TYPESAFE JEV SYSTEM ONE FAST EVALUATOR (~150ms DECISION ENGINE)
+// TYPESAFE JEV SYSTEM ONE MULTI-PRIMITIVE EVALUATOR (~150ms DECISION ENGINE)
 const evaluateWithJev = async (userText) => {
   if (!TYPESAFE_API_KEY) return null;
   try {
@@ -38,7 +38,7 @@ const evaluateWithJev = async (userText) => {
       },
       signal: controller.signal,
       body: JSON.stringify({
-        state: String(userText || '').slice(0, 800),
+        state: String(userText || '').slice(0, 1000),
         model: 'jev-latest',
         questions: {
           intent: {
@@ -50,6 +50,24 @@ const evaluateWithJev = async (userText) => {
               growth: 'Local SEO, foot-traffic, customer acquisition, marketing campaigns',
               operations: 'Kitchen/floor workflow, team scheduling, logistics, general business strategy'
             }
+          },
+          urgency: {
+            type: 'score',
+            instructions: 'How urgent or high-stakes is this operational situation?',
+            criteria: ['Routine query or exploratory question', 'Moderate pressure or active bottleneck', 'Critical cash crunch, immediate deadline, or turnaround emergency']
+          },
+          needs_math: {
+            type: 'noul',
+            instructions: 'Does this request involve numbers, pricing, margins, or financial calculations?'
+          },
+          tone_archetype: {
+            type: 'choice',
+            instructions: 'What consulting tone best serves this specific situation?',
+            criteria: {
+              peer_coo: 'Direct, unvarnished peer executive giving clear math and strategic trade-offs',
+              tactical_coach: 'Encouraging, grounded operator giving step-by-step frontline actions',
+              career_strategist: 'Sharp executive recruiter focusing on quantifiable business outcomes and credibility'
+            }
           }
         }
       })
@@ -57,8 +75,18 @@ const evaluateWithJev = async (userText) => {
     clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
-      console.log(`[TypeSafe Jev Fast Evaluator] Domain: ${data.answers?.intent?.choice} (${Math.round((data.answers?.intent?.confidence || 0) * 100)}% conf)`);
-      return data.answers?.intent?.choice || null;
+      const answers = data.answers || {};
+      const intent = answers.intent?.choice || 'operations';
+      const urgencyScore = answers.urgency?.score || 0;
+      const needsMath = (answers.needs_math?.noul || 0) > 0.45;
+      const tone = answers.tone_archetype?.choice || 'peer_coo';
+      console.log(`[TypeSafe Jev Evaluator] Domain: ${intent} | Urgency: ${urgencyScore.toFixed(2)} | Math: ${needsMath} | Tone: ${tone}`);
+      return {
+        domain: intent,
+        urgency: urgencyScore,
+        needsMath,
+        tone
+      };
     } else {
       const errText = await res.text();
       console.error(`[TypeSafe Jev Error ${res.status}]:`, errText);
@@ -220,19 +248,20 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: "Empty prompt provided." });
     }
 
-    // Fast-path domain classification with TypeSafe Jev (~150ms)
-    const detectedDomain = await evaluateWithJev(userMessage);
-
-    // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
-    const conversationHistory = messages.length > 1
-      ? messages.slice(-3, -1).map(m => {
-          const role = m.role === 'user' ? 'User' : 'Consultant';
-          const text = m.content ? m.content.slice(0, 300) : '';
-          return `${role}: ${text}`;
-        }).join('\n\n')
-      : '';
+    // Fast-path decision evaluation with TypeSafe Jev (~150ms)
+    const jevSignals = await evaluateWithJev(userMessage);
+    const detectedDomain = jevSignals?.domain || null;
+    const toneDirective = jevSignals?.tone === 'career_strategist'
+      ? 'Adopt a sharp, metric-focused executive recruiter lens emphasizing quantified business impact and credibility.'
+      : jevSignals?.tone === 'tactical_coach'
+      ? 'Adopt an encouraging, frontline operator tone with clear, step-by-step practical moves.'
+      : 'Adopt a direct, candid peer COO voice focused on unvarnished business realities and unit economics.';
 
     const systemPrompt = `You are Consultant Studio — a trusted, direct strategic partner having a helpful, unpretentious conversation.
+
+${toneDirective}
+${jevSignals?.needsMath ? 'CRITICAL: The user is asking about financial/margin numbers. Provide exact, penny-balanced arithmetic and clear breakeven calculations in plain text.' : ''}
+${jevSignals?.urgency > 1.2 ? 'CRITICAL: The user is in a high-urgency turnaround or crunch scenario. Lead immediately with the #1 highest-leverage triage move to stabilize cash and operations.' : ''}
 
 CRITICAL INSTRUCTIONS (GIVE REAL ANSWERS, NOT ENDLESS INTERROGATION):
 1. ALWAYS ANSWER THE USER'S QUESTION FIRST:
