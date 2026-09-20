@@ -22,6 +22,49 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
   apiVersion: '2023-10-16'
 });
 
+const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '«redacted:apikey_28701d1ef1a950e4010af1b3b6c8d5c3203_2ca8fdc9c2dbec871f7084338acbaa89381dcdaff5fb735b4b5111c13b305b7f»';
+
+// TYPESAFE JEV SYSTEM ONE FAST EVALUATOR (~150ms DECISION ENGINE)
+const evaluateWithJev = async (userText) => {
+  if (!TYPESAFE_API_KEY) return null;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const res = await fetch('https://api.typesafe.ai/v1/systemone', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${TYPESAFE_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        state: userText.slice(0, 800),
+        model: 'jev-latest',
+        questions: {
+          intent: {
+            type: 'choice',
+            instructions: 'What is the primary operational domain of this request?',
+            criteria: {
+              career: 'Resumes, job applications, interview prep, career reframing',
+              finance: 'P&L audits, cash flow waterfalls, unit economics, debt covenants, margin leaks',
+              growth: 'Local SEO, foot-traffic, customer acquisition, marketing campaigns',
+              operations: 'Kitchen/floor workflow, team scheduling, logistics, general business strategy'
+            }
+          }
+        }
+      })
+    });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      return data.answers?.intent?.choice || null;
+    }
+  } catch (err) {
+    // Non-blocking fallback
+  }
+  return null;
+};
+
 // FAST & RESILIENT ENTERPRISE INFERENCE PIPELINE (PARALLEL FAST RACE)
 const queryAI = async (prompt, imageObjs = []) => {
   const myclawKey = process.env.MYCLAW_API_KEY;
@@ -173,6 +216,9 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: "Empty prompt provided." });
     }
 
+    // Fast-path domain classification with TypeSafe Jev (~150ms)
+    const detectedDomain = await evaluateWithJev(userMessage);
+
     // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
     const conversationHistory = messages.length > 1
       ? messages.slice(-3, -1).map(m => {
@@ -218,7 +264,7 @@ User Query: "${userMessage}"`;
     const liveResponse = await queryAI(systemPrompt, imageObjs);
 
     if (liveResponse) {
-      return res.json({ response: liveResponse });
+      return res.json({ response: liveResponse, domain: detectedDomain });
     }
 
     return res.status(503).json({ error: "Inference engine momentarily busy. Please resend." });
