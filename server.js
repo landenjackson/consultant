@@ -248,15 +248,6 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: "Empty prompt provided." });
     }
 
-    // Fast-path decision evaluation with TypeSafe Jev (~150ms)
-    const jevSignals = await evaluateWithJev(userMessage);
-    const detectedDomain = jevSignals?.domain || null;
-    const toneDirective = jevSignals?.tone === 'career_strategist'
-      ? 'Adopt a sharp, metric-focused executive recruiter lens emphasizing quantified business impact and credibility.'
-      : jevSignals?.tone === 'tactical_coach'
-      ? 'Adopt an encouraging, frontline operator tone with clear, step-by-step practical moves.'
-      : 'Adopt a direct, candid peer COO voice focused on unvarnished business realities and unit economics.';
-
     // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
     const conversationHistory = messages.length > 1
       ? messages.slice(-3, -1).map(m => {
@@ -266,7 +257,18 @@ app.post('/api/chat', async (req, res) => {
         }).join('\n\n')
       : '';
 
-    const systemPrompt = `You are Consultant Studio — a trusted, direct strategic partner having a helpful, unpretentious conversation.
+    // Fast speculative fan-out: Run TypeSafe Jev System One evaluation IN PARALLEL with prompt assembly
+    const jevPromise = evaluateWithJev(userMessage);
+
+    // Initial system prompt base
+    const buildSystemPrompt = (jevSignals) => {
+      const toneDirective = jevSignals?.tone === 'career_strategist'
+        ? 'Adopt a sharp, metric-focused executive recruiter lens emphasizing quantified business impact and credibility.'
+        : jevSignals?.tone === 'tactical_coach'
+        ? 'Adopt an encouraging, frontline operator tone with clear, step-by-step practical moves.'
+        : 'Adopt a direct, candid peer COO voice focused on unvarnished business realities and unit economics.';
+
+      return `You are Consultant Studio — a trusted, direct strategic partner having a helpful, unpretentious conversation.
 
 ${toneDirective}
 ${jevSignals?.needsMath ? 'CRITICAL: The user is asking about financial/margin numbers. Provide exact, penny-balanced arithmetic and clear breakeven calculations in plain text.' : ''}
@@ -288,6 +290,7 @@ CRITICAL INSTRUCTIONS (GIVE REAL ANSWERS, NOT ENDLESS INTERROGATION):
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
 ${documentText ? `ATTACHED CONTEXT / DOCUMENT:\n"""\n${documentText.slice(0, 4000)}\n"""\n` : ''}
 User Query: "${userMessage}"`;
+    };
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
     let imageObjs = [];
@@ -302,11 +305,15 @@ User Query: "${userMessage}"`;
       }
     }
 
+    // Await Jev signals with tight boundary, then execute LLM inference
+    const jevSignals = await jevPromise;
+    const finalPrompt = buildSystemPrompt(jevSignals);
+
     console.log(`[Executing Live Inference for User Query | Multimodal Images: ${imageObjs.length}]`);
-    const liveResponse = await queryAI(systemPrompt, imageObjs);
+    const liveResponse = await queryAI(finalPrompt, imageObjs);
 
     if (liveResponse) {
-      return res.json({ response: liveResponse, domain: detectedDomain });
+      return res.json({ response: liveResponse, domain: jevSignals?.domain || null });
     }
 
     return res.status(503).json({ error: "Inference engine momentarily busy. Please resend." });
