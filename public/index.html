@@ -498,6 +498,22 @@
         }
 
         /* SMOOTH POLISHED ENTRY & EXIT ANIMATIONS (MATCHING APP TRANSITIONS) */
+        /* REACT-BITS SPLIT-TEXT STAGGERED HEADLINE ANIMATION */
+        .split-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(22px) scale(0.96);
+            animation: splitCharIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes splitCharIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         @keyframes chatCardEnter {
             0% {
                 opacity: 0;
@@ -3984,13 +4000,52 @@
             }
         }
 
+        // Initialize SplitText Headline Animation on Welcome Banner
+        function initSplitTextAnimation() {
+            try {
+                const heading = document.getElementById('welcomeHeading');
+                if (!heading || heading.dataset.splitInit === 'true') return;
+                heading.dataset.splitInit = 'true';
+
+                const text = heading.innerText.trim();
+                heading.innerHTML = '';
+                
+                // Split text into characters with staggered animation delays
+                let charCount = 0;
+                const words = text.split(' ');
+                words.forEach((word, wIdx) => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.style.display = 'inline-block';
+                    wordSpan.style.whiteSpace = 'nowrap';
+                    
+                    for (let i = 0; i < word.length; i++) {
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'split-char';
+                        charSpan.innerText = word[i];
+                        charSpan.style.animationDelay = `${(charCount * 0.028) + 0.15}s`;
+                        wordSpan.appendChild(charSpan);
+                        charCount++;
+                    }
+                    heading.appendChild(wordSpan);
+                    if (wIdx < words.length - 1) {
+                        heading.appendChild(document.createTextNode(' '));
+                    }
+                });
+            } catch (e) {
+                console.warn('[SplitText Animation Ignored]', e);
+            }
+        }
+
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                initSplitTextAnimation();
                 navigator.serviceWorker.register('/sw.js')
                     .then(reg => console.log('[PWA ServiceWorker Active]', reg.scope))
                     .catch(err => console.warn('[PWA Registration Ignored]', err));
             });
+        } else {
+            window.addEventListener('DOMContentLoaded', initSplitTextAnimation);
         }
     </script>
 </body>
