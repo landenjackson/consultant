@@ -29,7 +29,7 @@ const evaluateWithJev = async (userText) => {
   if (!TYPESAFE_API_KEY) return null;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const res = await fetch('https://api.typesafe.ai/v1/systemone', {
       method: 'POST',
       headers: {
@@ -38,7 +38,7 @@ const evaluateWithJev = async (userText) => {
       },
       signal: controller.signal,
       body: JSON.stringify({
-        state: userText.slice(0, 800),
+        state: String(userText || '').slice(0, 800),
         model: 'jev-latest',
         questions: {
           intent: {
@@ -57,10 +57,14 @@ const evaluateWithJev = async (userText) => {
     clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
+      console.log(`[TypeSafe Jev Fast Evaluator] Domain: ${data.answers?.intent?.choice} (${Math.round((data.answers?.intent?.confidence || 0) * 100)}% conf)`);
       return data.answers?.intent?.choice || null;
+    } else {
+      const errText = await res.text();
+      console.error(`[TypeSafe Jev Error ${res.status}]:`, errText);
     }
   } catch (err) {
-    // Non-blocking fallback
+    console.error('[TypeSafe Jev Fetch Exception]:', err.message);
   }
   return null;
 };
