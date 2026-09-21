@@ -3529,41 +3529,16 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 CRAFTED REACT-BITS SPLIT-TEXT STREAMING ANIMATION (SMOOTH WORD-BY-WORD STAGGER) */
-        async function streamAssistantResponse(container, fullText, onComplete) {
+        /* 🪄 INSTANT CRISP 60FPS STREAMING & IMMEDIATE FORMATTED RENDERING */
+        function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                container.innerHTML = `<div class="stream-content" style="display:inline;"></div><span class="typing-cursor" style="display:inline-block; width:5px; height:15px; background:var(--accent-glow); margin-left:4px; vertical-align:middle; border-radius:2px; animation: cursorBlink 0.65s infinite;"></span>`;
-                const contentBox = container.querySelector('.stream-content');
-                const cursor = container.querySelector('.typing-cursor');
+                // Instantly render complete formatted markdown so tables, charts and bullet points never get clipped
+                container.innerHTML = `<div class="stream-content" style="display:block; animation: chatCardEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;">${formatExecutiveResponse(fullText)}</div>`;
+                initializePendingCharts(container);
+                
                 const feed = document.getElementById('chatFeed');
-
-                const words = fullText.split(' ');
-                const totalWords = words.length;
-                let currentWordIdx = 0;
-
-                function typeStep() {
-                    if (currentWordIdx < totalWords) {
-                        // High-speed staggered word chunking (6-10 words per tick)
-                        const remaining = totalWords - currentWordIdx;
-                        const step = Math.max(6, Math.min(14, Math.ceil(remaining / 6)));
-                        currentWordIdx += step;
-                        if (currentWordIdx > totalWords) currentWordIdx = totalWords;
-
-                        const partialSlice = words.slice(0, currentWordIdx).join(' ');
-                        contentBox.innerHTML = formatExecutiveResponse(partialSlice);
-
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-                        setTimeout(() => requestAnimationFrame(typeStep), 12);
-                    } else {
-                        if (cursor) cursor.remove();
-                        contentBox.innerHTML = formatExecutiveResponse(fullText);
-                        initializePendingCharts(container);
-                        if (feed) feed.scrollTop = feed.scrollHeight;
-                        if (onComplete) onComplete();
-                    }
-                }
-
-                requestAnimationFrame(typeStep);
+                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
@@ -4231,10 +4206,10 @@
                     streamAssistantResponse(assistantCard, responseText, () => {
                         // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
                         const lowerText = (responseText + " " + text).toLowerCase();
-                        const isFinancialOrOps = lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$');
-                        const isResumeOrCareer = lowerText.includes('resume') || lowerText.includes('interview') || lowerText.includes('bullet') || lowerText.includes('job description') || lowerText.includes('career track');
+                        const isFinancialOrOps = (lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$')) &&
+                            !lowerText.includes('resume') && !lowerText.includes('interview') && !lowerText.includes('bullet') && !lowerText.includes('job description') && !lowerText.includes('career track');
 
-                        if (isFinancialOrOps && !isResumeOrCareer) {
+                        if (isFinancialOrOps) {
                             const sliderWidget = document.createElement('div');
                             sliderWidget.className = 'sensitivity-card';
                             sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
@@ -4244,7 +4219,7 @@
                                     <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
                                         <span>🪄</span> Dynamic What-If Sensitivity Modeling
                                     </span>
-                                    <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow); font-family:var(--font-mono, monospace);">100% (Baseline)</span>
+                                    <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow); font-family:monospace;">100% (Baseline)</span>
                                 </div>
                                 <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
                                 <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
@@ -4293,7 +4268,7 @@
                     });
 
                     messages.push({ role: 'assistant', content: responseText });
-                }, 150);
+                }, 50);
 
             } catch (err) {
                 console.error("Chat Execution Error:", err);
