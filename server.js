@@ -120,7 +120,7 @@ const queryAI = async (prompt, imageObjs = []) => {
     if (hasImages) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const timeoutId = setTimeout(() => controller.abort(), 35000);
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -131,8 +131,8 @@ const queryAI = async (prompt, imageObjs = []) => {
           body: JSON.stringify({
             model: 'gemini-3.7-flash',
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 1500,
-            temperature: 0.6
+            max_tokens: 1200,
+            temperature: 0.5
           })
         });
         clearTimeout(timeoutId);
@@ -147,56 +147,55 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // Direct single high-reliability query to gemini-2.0-flash with calibrated token budget for fast execution
-    try {
+    // High-speed parallel fast race between gemini-2.0-flash and gemini-2.5-flash (Returns whoever answers first)
+    const fetchModel = async (modelName, maxTokens = 420) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 18000);
-      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${myclawKey}`
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: 'gemini-2.0-flash',
-          messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 500,
-          temperature: 0.2
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.choices?.[0]?.message?.content || '';
-        if (text && text.trim().length > 0) {
-          console.log(`[Direct Inference Success: gemini-2.0-flash] (${text.length} chars)`);
-          return text;
-        }
-      }
-      throw new Error(`Primary inference returned status ${res.status}`);
-    } catch (err) {
-      console.warn('[Direct Inference fallback]:', err.message);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       try {
-        const fbRes = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${myclawKey}`
           },
+          signal: controller.signal,
           body: JSON.stringify({
-            model: 'gemini-2.5-flash',
+            model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 500,
+            max_tokens: maxTokens,
             temperature: 0.2
           })
         });
-        if (fbRes.ok) {
-          const fbData = await fbRes.json();
-          return fbData.choices?.[0]?.message?.content || null;
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content || '';
+          if (text && text.trim().length > 0) {
+            return { model: modelName, text };
+          }
         }
+        throw new Error(`${modelName} returned status ${res.status}`);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    };
+
+    try {
+      // Race gemini-2.0-flash for instant sub-3s output
+      const winner = await Promise.any([
+        fetchModel('gemini-2.0-flash', 420),
+        fetchModel('gemini-2.5-flash', 420)
+      ]);
+      console.log(`[Fast Race Winner: ${winner.model}] (${winner.text.length} chars)`);
+      return winner.text;
+    } catch (err) {
+      console.warn('[Parallel race failed, attempting single fallback]:', err.message);
+      try {
+        const fallback = await fetchModel('gemini-2.0-flash', 420);
+        return fallback.text;
       } catch (fbErr) {
-        console.error('[Fallback failed]:', fbErr.message);
+        console.error('[All inference attempts failed]:', fbErr.message);
       }
     }
   }
