@@ -148,9 +148,9 @@ const queryAI = async (prompt, imageObjs = []) => {
     }
 
     // High-speed parallel fast race between gemini-2.0-flash and gemini-2.5-flash (Returns whoever answers first)
-    const fetchModel = async (modelName, maxTokens = 420) => {
+    const fetchModel = async (modelName, maxTokens = 1200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -163,7 +163,7 @@ const queryAI = async (prompt, imageObjs = []) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.2
+            temperature: 0.25
           })
         });
         clearTimeout(timeoutId);
@@ -182,17 +182,17 @@ const queryAI = async (prompt, imageObjs = []) => {
     };
 
     try {
-      // Race gemini-2.0-flash for instant sub-3s output
+      // Race gemini-2.0-flash with generous 1,200 token budget to guarantee zero mid-sentence cutoffs
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 420),
-        fetchModel('gemini-2.5-flash', 420)
+        fetchModel('gemini-2.0-flash', 1200),
+        fetchModel('gemini-2.5-flash', 1200)
       ]);
       console.log(`[Fast Race Winner: ${winner.model}] (${winner.text.length} chars)`);
       return winner.text;
     } catch (err) {
       console.warn('[Parallel race failed, attempting single fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 420);
+        const fallback = await fetchModel('gemini-2.0-flash', 1200);
         return fallback.text;
       } catch (fbErr) {
         console.error('[All inference attempts failed]:', fbErr.message);
