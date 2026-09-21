@@ -147,10 +147,10 @@ const queryAI = async (prompt, imageObjs = []) => {
       return null;
     }
 
-    // Direct single high-reliability query to gemini-2.0-flash with calibrated ~600 token budget for sub-2s latency
+    // Direct single high-reliability query to gemini-2.0-flash with calibrated token budget for fast execution
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -161,8 +161,8 @@ const queryAI = async (prompt, imageObjs = []) => {
         body: JSON.stringify({
           model: 'gemini-2.0-flash',
           messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 650,
-          temperature: 0.25
+          max_tokens: 500,
+          temperature: 0.2
         })
       });
       clearTimeout(timeoutId);
@@ -185,10 +185,10 @@ const queryAI = async (prompt, imageObjs = []) => {
             'Authorization': `Bearer ${myclawKey}`
           },
           body: JSON.stringify({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 650,
-            temperature: 0.25
+            max_tokens: 500,
+            temperature: 0.2
           })
         });
         if (fbRes.ok) {
