@@ -289,7 +289,7 @@ CONVERSATIONAL PHILOSOPHY & ANTI-PATTERNS:
    - Keep responses focused (typically 120–220 words). Deliver sharp, high-density feedback without robotic filler.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
-${documentText ? `ATTACHED CONTEXT / DOCUMENT:\n"""\n${documentText.slice(0, 4000)}\n"""\n` : ''}
+${documentText ? `ATTACHED CLIENT FILE / DOCUMENT CONTENT:\n"""\n${documentText.slice(0, 6000)}\n"""\nCRITICAL FILE INSTRUCTION: The user has attached the above document/spreadsheet/resume. Base your entire analysis, rewrites, and answers DIRECTLY on the exact figures, bullets, and facts in this attached content. Do NOT doubt the numbers or claim they look implausible/missing unless the file is genuinely blank. Reference the exact text and provide the polished output immediately.\n` : ''}
 User Query: "${userMessage}"`;
     };
 

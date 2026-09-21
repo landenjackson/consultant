@@ -3200,7 +3200,7 @@
                             fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
                         }
                         currentFileText = fullPdfText.trim() || `[PDF Document: ${file.name}]`;
-                    } else if (ext === 'xlsx' || ext === 'xls') {
+                    } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
                         const arrayBuffer = await file.arrayBuffer();
                         const wb = XLSX.read(arrayBuffer, { type: 'array' });
                         let fullSheetText = "";
@@ -3209,6 +3209,8 @@
                             fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
                         });
                         currentFileText = fullSheetText;
+                    } else if (ext === 'txt' || ext === 'json' || ext === 'md') {
+                        currentFileText = await file.text();
                     } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name)) {
                         // Compress & scale high-res iPhone photos/screenshots on-device
                         currentFileText = await new Promise((resolve) => {
