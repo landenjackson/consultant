@@ -2840,18 +2840,25 @@
         function saveToVault(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
-            
-            // Extract clean strategy text with zero UI junk or button labels
-            const text = getCleanStrategyText(card);
-            const title = text.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(l => l.length > 0)[0]?.substring(0, 45) || 'Executive Strategy';
+
+            // Extract clean strategy text
+            let text = getCleanStrategyText(card);
+            if (!text || text.trim().length === 0) {
+                const streamBox = card.querySelector('.stream-content');
+                text = streamBox ? (streamBox.innerText || streamBox.textContent) : (card.innerText || card.textContent);
+            }
+            text = (text || '').trim();
+
+            const lines = text.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(l => l.length > 0);
+            const title = lines[0]?.substring(0, 50) || 'Executive Strategy Memo';
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             vault.unshift({ id: `vault_${Date.now()}`, title, text, timestamp });
             localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
             updateVaultCount();
-            
-            // Clean non-intrusive confirmation on button
+
+            // Instant visual confirmation on button
             const orig = btn.innerText;
             btn.innerText = "✓ Saved";
             btn.style.color = "var(--accent-glow)";
