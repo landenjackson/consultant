@@ -2339,34 +2339,20 @@
             const preview = document.getElementById('fileAttachmentPreview');
             if (preview) preview.style.display = 'none';
 
-            // Animate exit of current chat rows
+            // Remove chat rows immediately
             const feed = document.getElementById('chatFeed');
             if (feed) {
                 const rows = feed.querySelectorAll('.chat-row');
-                if (rows.length > 0) {
-                    rows.forEach(r => r.classList.add('exiting'));
-                    setTimeout(() => {
-                        rows.forEach(r => r.remove());
-                        feed.scrollTop = 0;
-                        const hero = document.getElementById('heroBanner');
-                        if (hero) {
-                            hero.style.display = 'flex';
-                            hero.style.animation = 'chatCardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
-                        }
-                    }, 220);
-                } else {
-                    const hero = document.getElementById('heroBanner');
-                    if (hero) hero.style.display = 'flex';
-                }
-            } else {
-                const hero = document.getElementById('heroBanner');
-                if (hero) hero.style.display = 'flex';
+                rows.forEach(r => r.remove());
+                feed.scrollTop = 0;
             }
 
-            // Restore Hero Banner & Mission Grid
+            // Restore Hero Banner & Dashboard Grid immediately
             const hero = document.getElementById('heroBanner');
             if (hero) {
                 hero.style.display = 'block';
+                hero.style.opacity = '1';
+                hero.style.visibility = 'visible';
             }
 
             // Close Canvas & Modals
@@ -2379,8 +2365,9 @@
             // Clear text input and re-enable send button
             const input = document.getElementById('userInput');
             if (input) {
-                input.value = '';
+                input.value = "";
                 input.disabled = false;
+                input.focus();
             }
             const sendBtn = document.getElementById('sendBtn');
             if (sendBtn) {
@@ -2463,6 +2450,30 @@
         // Helper function to extract clean text without button labels or UI tags
         function getCleanStrategyText(el) {
             if (!el) return '';
+            
+            // If el is an object with textContent or text, extract directly
+            if (typeof el === 'object' && !el.nodeType && (el.textContent || el.text)) {
+                return String(el.textContent || el.text || '')
+                    .replace(/🎙️\s*Listen to Briefing/gi, '')
+                    .replace(/🏢\s*Send to Office 365/gi, '')
+                    .replace(/🎨\s*Open in Canvas/gi, '')
+                    .replace(/📑\s*1-Click PDF Report/gi, '')
+                    .replace(/📄\s*1-Page Bank Teaser/gi, '')
+                    .replace(/📊\s*Excel \(\.xlsx\)/gi, '')
+                    .replace(/📑\s*Excel \(\.xlsx\)/gi, '')
+                    .replace(/📝\s*Word \(\.doc\)/gi, '')
+                    .replace(/📈\s*Deck \(\.pptx\)/gi, '')
+                    .replace(/📊\s*Deck \(\.pptx\)/gi, '')
+                    .replace(/🔒\s*Save Vault/gi, '')
+                    .replace(/📋\s*Copy Strategy/gi, '')
+                    .replace(/🖨️\s*Print \/ PDF/gi, '')
+                    .replace(/Interactive Telemetry/gi, '')
+                    .replace(/🪄 Stress-Test Model:[^\n]+/gi, '')
+                    .replace(/\n{3,}/g, '\n\n')
+                    .trim();
+            }
+
+            if (!el.cloneNode) return String(el.innerText || el.textContent || '');
             const clone = el.cloneNode(true);
             
             // Remove all UI buttons, bars, sliders, HUD telemetry, and script tags
@@ -2490,9 +2501,12 @@
                 .replace(/🎙️\s*Listen to Briefing/gi, '')
                 .replace(/🏢\s*Send to Office 365/gi, '')
                 .replace(/🎨\s*Open in Canvas/gi, '')
+                .replace(/📑\s*1-Click PDF Report/gi, '')
                 .replace(/📄\s*1-Page Bank Teaser/gi, '')
+                .replace(/📊\s*Excel \(\.xlsx\)/gi, '')
                 .replace(/📑\s*Excel \(\.xlsx\)/gi, '')
                 .replace(/📝\s*Word \(\.doc\)/gi, '')
+                .replace(/📈\s*Deck \(\.pptx\)/gi, '')
                 .replace(/📊\s*Deck \(\.pptx\)/gi, '')
                 .replace(/🔒\s*Save Vault/gi, '')
                 .replace(/📋\s*Copy Strategy/gi, '')
