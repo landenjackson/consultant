@@ -2450,11 +2450,26 @@
         // Helper function to extract clean text without button labels or UI tags
         function getCleanStrategyText(el) {
             if (!el) return '';
-            
-            // If el is an object with textContent or text, extract directly
-            if (typeof el === 'object' && !el.nodeType && (el.textContent || el.text)) {
-                return String(el.textContent || el.text || '')
-                    .replace(/🎙️\s*Listen to Briefing/gi, '')
+
+            function stripSensitivityAndButtons(str) {
+                return String(str || '')
+                    // Strip What-If Sensitivity slider block and variations
+                    .replace(/🪄\s*Interactive\s*What-If\s*Sensitivity[\s\S]*?(?:💡\s*Slide\s*to\s*simulate[^\n]*\n?)/gi, '')
+                    .replace(/Interactive\s*What-If\s*Sensitivity[\s\S]*?(?:100%\s*\(Baseline\)|-30%\s*Stress\s*Test|\+30%\s*Growth\s*Upside)[\s\S]*?(?:💡[^\n]*\n?)/gi, '')
+                    .replace(/100%\s*\(Baseline\)[\s\S]*?\+30%\s*Growth\s*Upside/gi, '')
+                    .replace(/💡\s*Slide\s*to\s*simulate\s*revenue\s*volume\s*and\s*operational\s*flow-through/gi, '')
+                    .replace(/📈\s*Calculate\s*Net\s*Margin\s*Impact/gi, '')
+                    .replace(/💬\s*Get\s*Team\s*Talking\s*Track/gi, '')
+                    .replace(/🛡️\s*Stress-Test\s*15%\s*Downturn/gi, '')
+                    // Strip action chips
+                    .replace(/💬\s*Answer:[^\n]+/gi, '')
+                    .replace(/📍\s*Audit\s*GBP[^\n]+/gi, '')
+                    .replace(/⭐️\s*Design\s*Post-Meal[^\n]+/gi, '')
+                    .replace(/🎯\s*Map\s*5-Min[^\n]+/gi, '')
+                    .replace(/⏱️\s*Eliminate\s*Workflow[^\n]+/gi, '')
+                    .replace(/📋\s*Map\s*30-Day[^\n]+/gi, '')
+                    // Strip deliverable buttons
+                    .replace(/🎙️?\s*Listen to Briefing/gi, '')
                     .replace(/🏢\s*Send to Office 365/gi, '')
                     .replace(/🎨\s*Open in Canvas/gi, '')
                     .replace(/📑\s*1-Click PDF Report/gi, '')
@@ -2473,9 +2488,14 @@
                     .trim();
             }
 
-            if (!el.cloneNode) return String(el.innerText || el.textContent || '');
+            // If el is an object with textContent or text, extract directly
+            if (typeof el === 'object' && !el.nodeType && (el.textContent || el.text)) {
+                return stripSensitivityAndButtons(el.textContent || el.text);
+            }
+
+            if (!el.cloneNode) return stripSensitivityAndButtons(el.innerText || el.textContent || '');
             const clone = el.cloneNode(true);
-            
+
             // Remove all UI buttons, bars, sliders, HUD telemetry, and script tags
             const junkSelectors = [
                 '.deliverables-bar',
@@ -2495,28 +2515,7 @@
             });
 
             let text = clone.innerText || clone.textContent || '';
-            
-            // Strip any remaining button labels or leaked export strings
-            text = text
-                .replace(/🎙️\s*Listen to Briefing/gi, '')
-                .replace(/🏢\s*Send to Office 365/gi, '')
-                .replace(/🎨\s*Open in Canvas/gi, '')
-                .replace(/📑\s*1-Click PDF Report/gi, '')
-                .replace(/📄\s*1-Page Bank Teaser/gi, '')
-                .replace(/📊\s*Excel \(\.xlsx\)/gi, '')
-                .replace(/📑\s*Excel \(\.xlsx\)/gi, '')
-                .replace(/📝\s*Word \(\.doc\)/gi, '')
-                .replace(/📈\s*Deck \(\.pptx\)/gi, '')
-                .replace(/📊\s*Deck \(\.pptx\)/gi, '')
-                .replace(/🔒\s*Save Vault/gi, '')
-                .replace(/📋\s*Copy Strategy/gi, '')
-                .replace(/🖨️\s*Print \/ PDF/gi, '')
-                .replace(/Interactive Telemetry/gi, '')
-                .replace(/🪄 Stress-Test Model:[^\n]+/gi, '')
-                .replace(/\n{3,}/g, '\n\n')
-                .trim();
-
-            return text;
+            return stripSensitivityAndButtons(text);
         }
 
         function copyCanvasText() {
@@ -2899,8 +2898,24 @@
 
         function renderVaultItems() {
             const container = document.getElementById('vaultItemsContainer');
-            const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+            let vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             if (!container) return;
+
+            // Retroactively sanitize any existing stored vault items that have leaked UI text
+            let updated = false;
+            vault = vault.map(item => {
+                const clean = getCleanStrategyText({ textContent: item.text }) || item.text;
+                if (clean !== item.text) {
+                    updated = true;
+                    item.text = clean;
+                    const lines = clean.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(l => l.length > 0);
+                    item.title = lines[0]?.substring(0, 50) || 'Executive Strategy Memo';
+                }
+                return item;
+            });
+            if (updated) {
+                localStorage.setItem('consultant_vault', JSON.stringify(vault));
+            }
 
             if (vault.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13.5px;">Your Strategy Vault is empty. Click <strong>[ 🔒 Save Vault ]</strong> on any strategy response to save it for job interviews, research, or company reviews.</div>`;
