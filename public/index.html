@@ -2840,15 +2840,33 @@
         function saveToVault(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
-            const text = card.innerText || card.textContent;
-            const title = text.split('\n')[0].replace(/^[#\s•]+/, '').substring(0, 45) || 'Executive Strategy';
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             
+            // Extract clean strategy text with zero UI junk or button labels
+            const text = getCleanStrategyText(card);
+            const title = text.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(l => l.length > 0)[0]?.substring(0, 45) || 'Executive Strategy';
+            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
             const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             vault.unshift({ id: `vault_${Date.now()}`, title, text, timestamp });
             localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
             updateVaultCount();
-            alert(`Saved to Vault: "${title}"`);
+            
+            // Clean non-intrusive confirmation on button
+            const orig = btn.innerText;
+            btn.innerText = "✓ Saved";
+            btn.style.color = "var(--accent-glow)";
+            setTimeout(() => {
+                btn.innerText = orig;
+                btn.style.color = "";
+            }, 1800);
+        }
+
+        function purgeVault() {
+            if (confirm("Are you sure you want to clear all items in your Strategy Vault?")) {
+                localStorage.removeItem('consultant_vault');
+                renderVaultItems();
+                updateVaultCount();
+            }
         }
 
         function updateVaultCount() {
@@ -2896,15 +2914,22 @@
             row.className = 'chat-row';
             const card = document.createElement('div');
             card.className = 'bubble-assistant';
-            card.innerHTML = formatExecutiveResponse(item.text);
+            
+            // Clean text without button labels or sensitivity artifacts
+            const cleanText = getCleanStrategyText({ textContent: item.text }) || item.text;
+            card.innerHTML = formatExecutiveResponse(cleanText);
 
             const delivBar = document.createElement('div');
             delivBar.className = 'deliverables-bar';
             delivBar.innerHTML = `
-                <button class="btn-export" onclick="exportBankTeaser(this)">📄 1-Page Bank Teaser</button>
-                <button class="btn-export" onclick="exportExcelXLSX(this)">📑 Excel (.xlsx)</button>
+                <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Listen to Briefing</button>
+                <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Send to Office 365</button>
+                <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open in Canvas</button>
+                <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 1-Click PDF Report</button>
+                <button class="btn-export" onclick="exportExcelXLSX(this)">📊 Excel (.xlsx)</button>
                 <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
-                <button class="btn-export" onclick="exportPowerPointDeck(this)">📊 Deck (.pptx)</button>
+                <button class="btn-export" onclick="exportPitchDeck(this)">📈 Deck (.pptx)</button>
+                <button class="btn-export" onclick="saveToVault(this)">🔒 Save Vault</button>
             `;
             card.appendChild(delivBar);
             row.appendChild(card);
