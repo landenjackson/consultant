@@ -529,6 +529,28 @@
             }
         }
 
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-fade-in-up {
+                animation-duration: 0.05s;
+                transform: none;
+            }
+        }
+
         @keyframes chatCardEnter {
             0% {
                 opacity: 0;
@@ -4184,7 +4206,7 @@
                 }
 
                 if (!data || !data.response) {
-                    throw new Error("Unable to reach inference engine. Please retry.");
+                    throw new Error("Unable to reach inference engine. Please verify your connection or retry.");
                 }
 
                 const responseText = data.response || "Strategy synthesized.";
@@ -4194,80 +4216,113 @@
                 clearTimeout(t2);
                 clearTimeout(t3);
 
+                // Smooth exit transition for the Loading Telemetry card
+                const loadingHud = assistantCard.querySelector('.subagent-hud');
+                if (loadingHud) {
+                    loadingHud.style.transition = 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+                    loadingHud.style.opacity = '0';
+                    loadingHud.style.transform = 'translateY(-6px) scale(0.98)';
+                }
+
                 // Stream response with smooth word-by-word animation and glowing green cursor
-                streamAssistantResponse(assistantCard, responseText, () => {
-                    // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
-                    const lowerText = (responseText + " " + text).toLowerCase();
-                    const isFinancialOrOps = lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$');
-                    const isResumeOrCareer = lowerText.includes('resume') || lowerText.includes('interview') || lowerText.includes('bullet') || lowerText.includes('job description') || lowerText.includes('career track');
+                setTimeout(() => {
+                    streamAssistantResponse(assistantCard, responseText, () => {
+                        // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
+                        const lowerText = (responseText + " " + text).toLowerCase();
+                        const isFinancialOrOps = lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$');
+                        const isResumeOrCareer = lowerText.includes('resume') || lowerText.includes('interview') || lowerText.includes('bullet') || lowerText.includes('job description') || lowerText.includes('career track');
 
-                    if (isFinancialOrOps && !isResumeOrCareer) {
-                        const sliderWidget = document.createElement('div');
-                        sliderWidget.className = 'sensitivity-card';
-                        sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
-                        const sliderId = 'slider_' + Date.now();
-                        sliderWidget.innerHTML = `
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                                <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
-                                    <span>🪄</span> Interactive What-If Sensitivity
-                                </span>
-                                <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow);">100% (Baseline)</span>
-                            </div>
-                            <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
-                            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
-                                <span>-30% Stress Test</span>
-                                <span>Baseline</span>
-                                <span>+30% Growth Upside</span>
-                            </div>
-                            <div id="${sliderId}_math" style="margin-top:8px; font-size:11.5px; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
-                                💡 <em>Slide to simulate revenue volume and operational flow-through</em>
-                            </div>
+                        if (isFinancialOrOps && !isResumeOrCareer) {
+                            const sliderWidget = document.createElement('div');
+                            sliderWidget.className = 'sensitivity-card';
+                            sliderWidget.style.cssText = 'background:#090D14; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px 14px; margin-top:14px;';
+                            const sliderId = 'slider_' + Date.now();
+                            sliderWidget.innerHTML = `
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <span style="font-size:12px; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:5px;">
+                                        <span>🪄</span> Interactive What-If Sensitivity
+                                    </span>
+                                    <span id="${sliderId}_val" style="font-size:12px; font-weight:800; color:var(--accent-glow);">100% (Baseline)</span>
+                                </div>
+                                <input type="range" id="${sliderId}" min="70" max="130" value="100" step="5" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateSensitivityMath('${sliderId}', this.value)">
+                                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
+                                    <span>-30% Stress Test</span>
+                                    <span>Baseline</span>
+                                    <span>+30% Growth Upside</span>
+                                </div>
+                                <div id="${sliderId}_math" style="margin-top:8px; font-size:11.5px; color:var(--text-secondary); background:rgba(255,255,255,0.02); padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.05);">
+                                    💡 <em>Slide to simulate revenue volume and operational flow-through</em>
+                                </div>
+                            `;
+                            assistantCard.appendChild(sliderWidget);
+                        }
+
+                        // 2. DYNAMIC CONTEXTUAL "NEXT MOVE" ACTION CHIPS (INTELLIGENT SUGGESTIONS BASED ON THE TOPIC)
+                        const actionChips = document.createElement('div');
+                        actionChips.className = 'action-chips-container';
+                        actionChips.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;';
+                        
+                        const dynamicSuggestions = generateTopicSuggestions(responseText);
+                        actionChips.innerHTML = dynamicSuggestions.map(s => `
+                            <button class="action-chip" onclick="triggerPresetAction('${escapeHtml(s.prompt)}')">${s.icon} ${escapeHtml(s.label)}</button>
+                        `).join('');
+                        assistantCard.appendChild(actionChips);
+
+                        // 3. Add Deliverables & Vault Bar
+                        const delivBar = document.createElement('div');
+                        delivBar.className = 'deliverables-bar';
+                        delivBar.innerHTML = `
+                            <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Listen to Briefing</button>
+                            <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Send to Office 365</button>
+                            <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open in Canvas</button>
+                            <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 1-Click PDF Report</button>
+                            <button class="btn-export" onclick="exportExcelXLSX(this)">📊 Excel (.xlsx)</button>
+                            <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
+                            <button class="btn-export" onclick="exportPitchDeck(this)">📈 Deck (.pptx)</button>
+                            <button class="btn-export" onclick="saveToVault(this)">🔒 Save Vault</button>
                         `;
-                        assistantCard.appendChild(sliderWidget);
-                    }
+                        assistantCard.appendChild(delivBar);
+                        chatFeed.scrollTop = chatFeed.scrollHeight;
 
-                    // 2. DYNAMIC CONTEXTUAL "NEXT MOVE" ACTION CHIPS (INTELLIGENT SUGGESTIONS BASED ON THE TOPIC)
-                    const actionChips = document.createElement('div');
-                    actionChips.className = 'action-chips-container';
-                    actionChips.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;';
-                    
-                    const dynamicSuggestions = generateTopicSuggestions(responseText);
-                    actionChips.innerHTML = dynamicSuggestions.map(s => `
-                        <button class="action-chip" onclick="triggerPresetAction('${escapeHtml(s.prompt)}')">${s.icon} ${escapeHtml(s.label)}</button>
-                    `).join('');
-                    assistantCard.appendChild(actionChips);
+                        // Increment memo count
+                        const current = getMemoCount();
+                        localStorage.setItem('consultant_memo_count', (current + 1).toString());
+                        updateQuotaDisplay();
+                    });
 
-                    // 3. Add Deliverables & Vault Bar
-                    const delivBar = document.createElement('div');
-                    delivBar.className = 'deliverables-bar';
-                    delivBar.innerHTML = `
-                        <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Listen to Briefing</button>
-                        <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Send to Office 365</button>
-                        <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open in Canvas</button>
-                        <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 1-Click PDF Report</button>
-                        <button class="btn-export" onclick="exportExcelXLSX(this)">📊 Excel (.xlsx)</button>
-                        <button class="btn-export" onclick="exportWordDoc(this)">📝 Word (.doc)</button>
-                        <button class="btn-export" onclick="exportPitchDeck(this)">📈 Deck (.pptx)</button>
-                        <button class="btn-export" onclick="saveToVault(this)">🔒 Save Vault</button>
-                    `;
-                    assistantCard.appendChild(delivBar);
-                    chatFeed.scrollTop = chatFeed.scrollHeight;
-
-                    // Increment memo count
-                    const current = getMemoCount();
-                    localStorage.setItem('consultant_memo_count', (current + 1).toString());
-                    updateQuotaDisplay();
-                });
-
-                messages.push({ role: 'assistant', content: responseText });
+                    messages.push({ role: 'assistant', content: responseText });
+                }, 150);
 
             } catch (err) {
                 console.error("Chat Execution Error:", err);
-                assistantCard.innerHTML = `<span style="color:#F87171;">Engine Notice: ${err.message}. Please retry in 1 moment.</span>`;
+                const safePrompt = escapeHtml(text);
+                assistantCard.innerHTML = `
+                    <div style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:8px; color:#F87171; font-weight:700; font-size:13.5px;">
+                            <span>⚠️</span> <span>Execution Interrupted</span>
+                        </div>
+                        <p style="font-size:12.5px; color:var(--text-secondary); margin:0; line-height:1.5;">
+                            ${escapeHtml(err.message || 'Request timed out while generating your strategy. Please verify your connection or retry.')}
+                        </p>
+                        <div style="display:flex; gap:8px; margin-top:4px;">
+                            <button class="btn-export" style="background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.4); color:#FCA5A5; padding:6px 14px; font-weight:700;" onclick="retryExecution('${safePrompt}')">
+                                🔄 Retry Execution
+                            </button>
+                        </div>
+                    </div>
+                `;
             } finally {
                 isGenerating = false;
                 if (sendBtn) sendBtn.disabled = false;
                 chatFeed.scrollTop = chatFeed.scrollHeight;
+            }
+        }
+
+        function retryExecution(promptText) {
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.value = promptText;
+                sendMessage();
             }
         }
 
