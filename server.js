@@ -176,7 +176,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
   // TIER 1: Ultra-Reliable Fast Speculative Race (25s Abort Window to prevent false fallback triggers)
   if (activeMyclawKey && !hasImages) {
-    const fetchModel = async (modelName, maxTokens = 1500) => {
+    const fetchModel = async (modelName, maxTokens = 3500) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000);
       try {
@@ -211,16 +211,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 1500),
-        fetchModel('gemini-3.7-flash', 1500),
-        fetchModel('gpt-4o-mini', 1500)
+        fetchModel('gemini-2.0-flash', 3500),
+        fetchModel('gemini-3.7-flash', 3500),
+        fetchModel('gpt-4o-mini', 3500)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
       console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 1500);
+        const fallback = await fetchModel('gemini-2.0-flash', 3500);
         return { text: fallback.text, isFallback: false };
       } catch (fbErr) {
         console.error('[All server inference exhausted]:', fbErr.message);
