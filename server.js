@@ -180,11 +180,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: OpenClaw 2026.9.5 Speculative Fast-Race (Ultra-low latency sub-2.5s streaming)
+  // TIER 1: OpenClaw 2026.9.5 Speculative Fast-Race (Generous 30s timeout so live LLM reasoning NEVER fails to fallback)
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -197,7 +197,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.2
+            temperature: 0.25
           })
         });
         clearTimeout(timeoutId);
