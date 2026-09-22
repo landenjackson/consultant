@@ -3979,18 +3979,18 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 INSTANT CRISP 60FPS STREAMING & SMOOTH TOP-TO-BOTTOM RENDERING */
+        // 🪄 OpenClaw 2026.9.5 Instant 60FPS Streaming & Zero-Jank Auto-Scroll
         function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                // Render complete formatted markdown with top-to-bottom staggered reading entrance
+                // Instantly render complete formatted markdown with top-to-bottom staggered reading cascade
                 container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
                 initializePendingCharts(container);
 
                 const feed = document.getElementById('chatFeed');
                 if (feed) {
-                    // Smooth auto-scroll pinning to comfortable reading position
+                    // OpenClaw 2026.9.5 smooth top-of-reply anchor
                     feed.scrollTo({
-                        top: container.offsetTop - 20,
+                        top: container.offsetTop - 15,
                         behavior: 'smooth'
                     });
                 }

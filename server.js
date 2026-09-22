@@ -180,11 +180,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Ultra-Reliable Fast Speculative Race (25s Abort Window to prevent false fallback triggers)
+  // TIER 1: OpenClaw 2026.9.5 Speculative Fast-Race (Ultra-low latency sub-2.5s streaming)
   if (activeMyclawKey && !hasImages) {
-    const fetchModel = async (modelName, maxTokens = 3500) => {
+    const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -197,7 +197,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.25
+            temperature: 0.2
           })
         });
         clearTimeout(timeoutId);
@@ -217,16 +217,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 3500),
-        fetchModel('gemini-3.7-flash', 3500),
-        fetchModel('gpt-4o-mini', 3500)
+        fetchModel('gemini-2.0-flash', 2200),
+        fetchModel('gemini-2.5-flash', 2200),
+        fetchModel('gpt-4o-mini', 2200)
       ]);
-      console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
+      console.log(`[⚡ OpenClaw 2026.9.5 Fast Race Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
-      console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
+      console.warn('[Parallel race failed, attempting single fast fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 3500);
+        const fallback = await fetchModel('gemini-2.0-flash', 2200);
         return { text: fallback.text, isFallback: false };
       } catch (fbErr) {
         console.error('[All server inference exhausted]:', fbErr.message);
