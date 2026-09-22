@@ -1902,19 +1902,19 @@
                         </div>
 
                         <!-- EXCEL DATA TABLE -->
-                        <div style="overflow-x:auto;">
-                            <table class="exec-table" style="width:100%; font-size:11.5px; border-collapse:collapse; font-family:monospace;">
+                        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;">
+                            <table class="exec-table" style="min-width:780px; width:100%; font-size:11.5px; border-collapse:collapse; font-family:monospace; white-space:nowrap;">
                                 <thead>
                                     <tr style="background:#0F141E; color:var(--text-muted); text-align:left;">
-                                        <th style="padding:6px 8px;">Month</th>
-                                        <th style="padding:6px 8px;">Projected Revenue</th>
-                                        <th style="padding:6px 8px;">COGS</th>
-                                        <th style="padding:6px 8px;">Gross Margin</th>
-                                        <th style="padding:6px 8px;">Fixed OpEx</th>
-                                        <th style="padding:6px 8px;">Adjusted Labor</th>
-                                        <th style="padding:6px 8px;">EBITDA</th>
-                                        <th style="padding:6px 8px;">Breakeven Target</th>
-                                        <th style="padding:6px 8px;">Safety Buffer</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Month</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Projected Revenue</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">COGS</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Gross Margin</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Fixed OpEx</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Adjusted Labor</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">EBITDA</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Breakeven Target</th>
+                                        <th style="padding:8px 12px; white-space:nowrap;">Safety Buffer</th>
                                     </tr>
                                 </thead>
                                 <tbody id="beTableBody">
@@ -2613,15 +2613,15 @@
                     const bufferBg = isSurplus ? 'rgba(34,197,94,0.06)' : 'rgba(239,68,68,0.08)';
 
                     tr.innerHTML = `
-                        <td style="padding:6px 8px; font-weight:700; color:var(--text-muted);" onclick="selectBeCell('A${m+2}', '=\"M${m}\"')">M${m}</td>
-                        <td style="padding:6px 8px; color:#FFF;" onclick="selectBeCell('B${m+2}', '=${rev}')">$${rev.toLocaleString()}</td>
-                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('C${m+2}', '=B${m+2}*${cogsRate.toFixed(3)}')">$${cogsVal.toLocaleString()}</td>
-                        <td style="padding:6px 8px; color:var(--text-secondary);" onclick="selectBeCell('D${m+2}', '=(B${m+2}-C${m+2})/B${m+2}')">${grossMarginPct.toFixed(1)}%</td>
-                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('E${m+2}', '=${fixedOpex}')">$${fixedOpex.toLocaleString()}</td>
-                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('F${m+2}', '=B${m+2}*${laborRate.toFixed(3)}')">$${laborVal.toLocaleString()}</td>
-                        <td style="padding:6px 8px; font-weight:700; color:${ebitda >= 0 ? '#4ADE80' : '#F87171'};" onclick="selectBeCell('G${m+2}', '=B${m+2}-C${m+2}-E${m+2}-F${m+2}')">$${ebitda.toLocaleString()}</td>
-                        <td style="padding:6px 8px; color:#FBBF24; font-weight:700;" onclick="selectBeCell('H${m+2}', '=${beTarget}')">$${beTarget.toLocaleString()}</td>
-                        <td style="padding:6px 8px; font-weight:700; color:${bufferColor}; background:${bufferBg};" onclick="selectBeCell('I${m+2}', '=B${m+2}-H${m+2}')">+$${safetyBuffer.toLocaleString()} (${safetyPct.toFixed(1)}%)</td>
+                        <td style="padding:8px 12px; font-weight:700; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('A${m+2}', '=\"M${m}\"')">M${m}</td>
+                        <td style="padding:8px 12px; color:#FFF; white-space:nowrap;" onclick="selectBeCell('B${m+2}', '=${rev}')">$${rev.toLocaleString()}</td>
+                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('C${m+2}', '=B${m+2}*${cogsRate.toFixed(3)}')">$${cogsVal.toLocaleString()}</td>
+                        <td style="padding:8px 12px; color:var(--text-secondary); white-space:nowrap;" onclick="selectBeCell('D${m+2}', '=(B${m+2}-C${m+2})/B${m+2}')">${grossMarginPct.toFixed(1)}%</td>
+                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('E${m+2}', '=${fixedOpex}')">$${fixedOpex.toLocaleString()}</td>
+                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('F${m+2}', '=B${m+2}*${laborRate.toFixed(3)}')">$${laborVal.toLocaleString()}</td>
+                        <td style="padding:8px 12px; font-weight:700; color:${ebitda >= 0 ? '#4ADE80' : '#F87171'}; white-space:nowrap;" onclick="selectBeCell('G${m+2}', '=B${m+2}-C${m+2}-E${m+2}-F${m+2}')">$${ebitda.toLocaleString()}</td>
+                        <td style="padding:8px 12px; color:#FBBF24; font-weight:700; white-space:nowrap;" onclick="selectBeCell('H${m+2}', '=${beTarget}')">$${beTarget.toLocaleString()}</td>
+                        <td style="padding:8px 12px; font-weight:700; color:${bufferColor}; background:${bufferBg}; white-space:nowrap;" onclick="selectBeCell('I${m+2}', '=B${m+2}-H${m+2}')">+$${safetyBuffer.toLocaleString()} (${safetyPct.toFixed(1)}%)</td>
                     `;
                     tbody.appendChild(tr);
                 }
