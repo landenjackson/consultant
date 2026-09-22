@@ -2529,6 +2529,33 @@
             showToast("Financial Control Room reset to standard baseline.", "↺");
         }
 
+        // Financial slider dynamic sync from memo text & attached metrics
+        function syncSlidersFromMemo(text) {
+            if (!text) return;
+            try {
+                // Matches currency numbers with either commas or periods
+                const grossMatch = text.match(/(?:Gross|Sales|Ventas|Revenus|Revenue)[^:\n]*:\s*[\$€£]?\s*([0-9.,]+)/i);
+                if (grossMatch) {
+                    const gross = parseFloat(grossMatch[1].replace(/,/g, ''));
+                    if (!isNaN(gross) && gross > 0) {
+                        const monthly = gross >= 5000 ? gross : gross * 30;
+                        beBaseline.monthlyRev = monthly;
+                        document.getElementById('simGrossRev')?.textContent = `$${Math.round(monthly).toLocaleString()}`;
+                        document.getElementById('scBaseVal')?.textContent = `$${Math.round(monthly).toLocaleString()}`;
+                    }
+                }
+                const primeMatch = text.match(/(?:Prime|COGS|Costos|Coûts|Food\s*Cost)[^:\n]*:\s*[\$€£]?\s*([0-9.,]+)/i);
+                if (primeMatch) {
+                    const prime = parseFloat(primeMatch[1].replace(/,/g, ''));
+                    if (!isNaN(prime) && prime > 0) {
+                        document.getElementById('simPrimeCost')?.textContent = `$${Math.round(prime).toLocaleString()}`;
+                    }
+                }
+            } catch (err) {
+                console.warn('Slider sync error:', err);
+            }
+        }
+
         // CONSUMER AUTOMATION: Scan uploaded documents/chat metrics and pre-calibrate sensitivity sliders
         function autoIngestFinancialsFromText(text) {
             if (!text) return;
