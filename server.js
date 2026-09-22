@@ -146,7 +146,44 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Parallel Fast Race between 3 Tier-1 Flash Models (Instant winner return, sub-5s, 4096 tokens to prevent cuts)
+  // MULTIMODAL INFERENCE ROUTING (VISION & DOCUMENTS)
+  if (hasImages) {
+    console.log(`[Executing Multimodal Vision Execution | ${imageObjs.length} Images Attached]`);
+    const visionModels = ['gemini-2.0-flash', 'gemini-3.7-flash'];
+    for (const vModel of visionModels) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeMyclawKey}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: vModel,
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 4096,
+            temperature: 0.2
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content || '';
+          if (text && text.trim().length > 0) {
+            console.log(`[Vision Success: ${vModel}] (${text.length} chars)`);
+            return { text, isFallback: false };
+          }
+        }
+      } catch (err) {
+        console.warn(`[Vision failed on ${vModel}]:`, err.message);
+      }
+    }
+  }
+
+  // TIER 1: Parallel Fast Race between Text Models (For text-only queries)
   if (activeMyclawKey) {
     const fetchModel = async (modelName, maxTokens = 4096) => {
       const controller = new AbortController();
