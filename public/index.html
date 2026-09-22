@@ -1803,78 +1803,118 @@
                     </div>
                 </div>
 
-                <!-- LIVE ARTIFACT DEMO PREVIEW (EXECUTIVE STRATEGY PREVIEW CARD WITH VISUAL PROOF) -->
-                <div style="background: rgba(12, 16, 23, 0.75); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 18px; margin: 16px 0; box-shadow: 0 12px 36px rgba(0,0,0,0.5);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO -->
+                <div id="breakevenStudio" style="background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 20px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
-                                <span class="telemetry-dot"></span> Visual Proof • Live Artifact Execution
+                                <span class="telemetry-dot"></span> Financial Control Room
                             </span>
-                            <span style="font-size:13px; font-weight:700; color:#FFFFFF;">90-Day Operational Turnaround & Unit Cash Engine</span>
+                            <span style="font-size:14px; font-weight:800; color:#FFFFFF;">Breakeven Sensitivity Studio (M0–M12)</span>
                         </div>
-                        <span style="font-size:11.5px; color:var(--text-muted);">Real-Time Execution • Client-Side Encrypted</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button class="btn-export" style="padding:4px 10px; font-size:11px;" onclick="resetBreakevenControls()">↺ Reset to Baseline</button>
+                            <span style="font-size:11.5px; color:var(--text-muted);">Real-Time SVG & Excel 365 Grid</span>
+                        </div>
                     </div>
 
-                    <!-- INTERACTIVE VISUAL PROOF DASHBOARD -->
-                    <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; margin-bottom:14px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
+                    <!-- 3 SYNCHRONIZED SENSITIVITY SLIDERS -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:16px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+                        <!-- SLIDER 1: RENT ADJUSTMENT -->
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
+                                <span style="color:var(--text-secondary);">🏢 Rent Adjustment ($)</span>
+                                <span id="beRentVal" style="color:var(--accent-glow); font-family:monospace;">+$0</span>
+                            </div>
+                            <input type="range" id="beRentSlider" min="-1000" max="2000" step="100" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                                <span>-$1,000</span><span>$0 Baseline</span><span>+$2,000</span>
+                            </div>
+                        </div>
+
+                        <!-- SLIDER 2: COGS INFLATION -->
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
+                                <span style="color:var(--text-secondary);">🥩 COGS Inflation / Margin (%)</span>
+                                <span id="beCogsVal" style="color:var(--accent-glow); font-family:monospace;">0.0%</span>
+                            </div>
+                            <input type="range" id="beCogsSlider" min="-5" max="10" step="0.5" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                                <span>-5.0%</span><span>0.0% Baseline</span><span>+10.0%</span>
+                            </div>
+                        </div>
+
+                        <!-- SLIDER 3: LABOR EFFICIENCY -->
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
+                                <span style="color:var(--text-secondary);">⏱️ Labor Efficiency Variance (%)</span>
+                                <span id="beLaborVal" style="color:var(--accent-glow); font-family:monospace;">0.0%</span>
+                            </div>
+                            <input type="range" id="beLaborSlider" min="-5" max="5" step="0.5" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                                <span>-5.0% (Gain)</span><span>0.0% Baseline</span><span>+5.0% (Drag)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE SVG CHART: MONTHLY REVENUE VS BREAKEVEN LINE -->
+                    <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:16px; margin-bottom:16px; position:relative; overflow:hidden;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">
-                                📊 Operational Telemetry & Yield Recovery Curve
+                                📈 Revenue Trajectory vs. Dynamic Breakeven Line (M0–M12)
                             </span>
-                            <span style="font-size:11px; color:var(--accent-glow); font-weight:600;">
-                                Verified Target Benchmark ($ / %)
+                            <span id="beCurrentSummaryBadge" style="font-size:12px; font-weight:800; color:var(--accent-glow); font-family:monospace; background:rgba(34,197,94,0.1); padding:3px 8px; border-radius:6px; border:1px solid var(--border-glow);">
+                                Breakeven: $14,400/mo
                             </span>
                         </div>
 
-                        <!-- MINI LIVE CSS BAR CHART VISUALIZER -->
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; align-items:flex-end; height:75px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:10px;">
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end;">
-                                <div style="font-size:9.5px; color:var(--text-muted); font-weight:700;">-$9.9k</div>
-                                <div style="width:100%; height:45%; background:rgba(239,68,68,0.35); border:1px solid #EF4444; border-radius:4px 4px 0 0;"></div>
-                                <div style="font-size:8.5px; color:var(--text-muted); white-space:nowrap;">Current Drag</div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end;">
-                                <div style="font-size:9.5px; color:var(--accent-glow); font-weight:700;">+$3.8k</div>
-                                <div style="width:100%; height:75%; background:rgba(34,197,94,0.35); border:1px solid #22C55E; border-radius:4px 4px 0 0;"></div>
-                                <div style="font-size:8.5px; color:var(--accent-glow); white-space:nowrap;">Daily Saved</div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end;">
-                                <div style="font-size:9.5px; color:#FFFFFF; font-weight:700;">62.0%</div>
-                                <div style="width:100%; height:60%; background:rgba(148,163,184,0.25); border:1px solid #94A3B8; border-radius:4px 4px 0 0;"></div>
-                                <div style="font-size:8.5px; color:var(--text-muted); white-space:nowrap;">Prime Floor</div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end;">
-                                <div style="font-size:9.5px; color:var(--accent-glow); font-weight:700;">+$347k</div>
-                                <div style="width:100%; height:95%; background:rgba(34,197,94,0.45); border:1px solid #4ADE80; border-radius:4px 4px 0 0;"></div>
-                                <div style="font-size:8.5px; color:var(--accent-glow); white-space:nowrap;">Annual Lift</div>
-                            </div>
-                        </div>
-
-                        <!-- METRIC SUMMARY TILES -->
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
-                            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:6px; padding:8px 10px;">
-                                <div style="font-size:9.5px; color:var(--text-muted); text-transform:uppercase;">Daily Gross Baseline</div>
-                                <div style="font-size:14px; font-weight:800; color:#FFFFFF;">$16,000.00 / day</div>
-                            </div>
-                            <div style="background:rgba(34,197,94,0.04); border:1px solid rgba(34,197,94,0.15); border-radius:6px; padding:8px 10px;">
-                                <div style="font-size:9.5px; color:var(--text-muted); text-transform:uppercase;">Target Margin Reclaimed</div>
-                                <div style="font-size:14px; font-weight:800; color:var(--accent-glow);">+$3,840.00 / day</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:6px; padding:8px 10px;">
-                                <div style="font-size:9.5px; color:var(--text-muted); text-transform:uppercase;">Breakeven Threshold</div>
-                                <div style="font-size:14px; font-weight:800; color:#FFFFFF;">33 Transactions / day</div>
-                            </div>
+                        <div style="width:100%; height:220px; position:relative;">
+                            <svg id="beSvgChart" viewBox="0 0 800 220" style="width:100%; height:100%; overflow:visible;">
+                                <!-- Gridlines & Bars rendered dynamically in JS -->
+                            </svg>
+                            <div id="beChartTooltip" style="position:absolute; display:none; background:#0D121B; border:1px solid var(--border-glow); padding:8px 12px; border-radius:8px; font-size:11.5px; color:#FFF; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.8); z-index:10;"></div>
                         </div>
                     </div>
 
-                    <!-- DELIVERABLE BADGES & 1-CLICK TEST -->
+                    <!-- MICROSOFT 365 EXCEL-STYLED DATA GRID -->
+                    <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; margin-bottom:14px;">
+                        <!-- SIMULATED EXCEL FORMULA BAR -->
+                        <div style="display:flex; align-items:center; gap:8px; background:#0B0F17; border:1px solid rgba(255,255,255,0.06); padding:6px 10px; border-radius:6px; margin-bottom:10px; font-family:monospace; font-size:12px;">
+                            <span id="beCellAddress" style="color:var(--text-muted); font-weight:700; min-width:32px;">B2</span>
+                            <span style="color:var(--text-muted);">fx</span>
+                            <span id="beFormulaText" style="color:#4ADE80; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">=Fixed_Overhead / (Contribution_Margin_Ratio)</span>
+                        </div>
+
+                        <!-- EXCEL DATA TABLE -->
+                        <div style="overflow-x:auto;">
+                            <table class="exec-table" style="width:100%; font-size:11.5px; border-collapse:collapse; font-family:monospace;">
+                                <thead>
+                                    <tr style="background:#0F141E; color:var(--text-muted); text-align:left;">
+                                        <th style="padding:6px 8px;">Month</th>
+                                        <th style="padding:6px 8px;">Projected Revenue</th>
+                                        <th style="padding:6px 8px;">COGS</th>
+                                        <th style="padding:6px 8px;">Gross Margin</th>
+                                        <th style="padding:6px 8px;">Fixed OpEx</th>
+                                        <th style="padding:6px 8px;">Adjusted Labor</th>
+                                        <th style="padding:6px 8px;">EBITDA</th>
+                                        <th style="padding:6px 8px;">Breakeven Target</th>
+                                        <th style="padding:6px 8px;">Safety Buffer</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="beTableBody">
+                                    <!-- Populated dynamically via recalcBreakevenStudio -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- EXPORT ACTIONS & CONTROLS -->
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); font-size:12px;">
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <span style="font-size:11px; color:var(--text-muted);">Institutional Outputs:</span>
-                            <span style="font-size:10.5px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:2px 7px; border-radius:4px; color:#FFFFFF;">📑 Excel (.xlsx)</span>
-                            <span style="font-size:10.5px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:2px 7px; border-radius:4px; color:#FFFFFF;">📝 Word (.doc)</span>
-                            <span style="font-size:10.5px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:2px 7px; border-radius:4px; color:#FFFFFF;">📄 1-Page Bank Teaser</span>
-                            <span style="font-size:10.5px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:2px 7px; border-radius:4px; color:var(--accent-glow);">🎙️ Audio Briefing</span>
+                            <span style="font-size:11px; color:var(--text-muted);">Export Active Model:</span>
+                            <button class="btn-export" onclick="exportBreakevenXLSX()" style="background:rgba(34,197,94,0.12); color:var(--accent-glow); border-color:var(--border-glow); font-weight:700;">
+                                📥 Export Active Model (.xlsx)
+                            </button>
                         </div>
                         <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="sendQuick('Run a live 90-day turnaround audit with forensic P&L unit economics, interactive pivot chart, and executive talking tracks.')">
                             Test Live Audit Now →
@@ -2417,9 +2457,243 @@
                 console.error("Quota display error:", e);
             }
         }
+        // BREAKEVEN SENSITIVITY STUDIO REACTIVE LOGIC
+        const beBaseline = {
+            monthlyRev: 35000,
+            rentBase: 4500,
+            laborBase: 10000,
+            otherOpex: 4140,
+            // Fixed Overhead = Rent (4500) + Fixed Baseline Labor (0 of variable) + Other OpEx (4140) = 8640
+            fixedOverheadBase: 8640,
+            cogsRatioBase: 0.30,
+            variableFeeRatio: 0.10,
+            // Contribution Margin Ratio = 1 - (0.30 + 0.10) = 0.60
+            cmrBase: 0.60
+        };
+
+        function resetBreakevenControls() {
+            document.getElementById('beRentSlider').value = 0;
+            document.getElementById('beCogsSlider').value = 0;
+            document.getElementById('beLaborSlider').value = 0;
+            recalcBreakevenStudio();
+        }
+
+        function recalcBreakevenStudio() {
+            const rentAdj = parseFloat(document.getElementById('beRentSlider')?.value || 0);
+            const cogsAdj = parseFloat(document.getElementById('beCogsSlider')?.value || 0) / 100;
+            const laborAdj = parseFloat(document.getElementById('beLaborSlider')?.value || 0) / 100;
+
+            // Update slider readout text
+            const rentValEl = document.getElementById('beRentVal');
+            const cogsValEl = document.getElementById('beCogsVal');
+            const laborValEl = document.getElementById('beLaborVal');
+            if (rentValEl) rentValEl.innerText = (rentAdj >= 0 ? '+$' : '-$') + Math.abs(rentAdj).toLocaleString();
+            if (cogsValEl) cogsValEl.innerText = (cogsAdj >= 0 ? '+' : '') + (cogsAdj * 100).toFixed(1) + '%';
+            if (laborValEl) laborValEl.innerText = (laborAdj >= 0 ? '+' : '') + (laborAdj * 100).toFixed(1) + '%';
+
+            // Mathematical calculation:
+            // Fixed Overhead = $8,640 + rentAdj
+            const fixedOverhead = beBaseline.fixedOverheadBase + rentAdj;
+            // Dynamic CMR = 0.60 - cogsAdj - laborAdj
+            const cmr = Math.max(0.10, beBaseline.cmrBase - cogsAdj - laborAdj);
+            const breakevenMonthly = fixedOverhead / cmr;
+
+            // Summary badge update
+            const badgeEl = document.getElementById('beCurrentSummaryBadge');
+            if (badgeEl) {
+                badgeEl.innerText = `Breakeven: $${Math.round(breakevenMonthly).toLocaleString()}/mo`;
+            }
+
+            // Generate Months 0 to 12 data
+            const monthsData = [];
+            const tbody = document.getElementById('beTableBody');
+            if (tbody) tbody.innerHTML = '';
+
+            // Growth multiplier starting at $35k M0 with ~1.5% MoM compound lift
+            for (let m = 0; m <= 12; m++) {
+                const rev = Math.round(beBaseline.monthlyRev * Math.pow(1.018, m));
+                const cogsRate = beBaseline.cogsRatioBase + cogsAdj;
+                const cogsVal = Math.round(rev * cogsRate);
+                const grossMarginPct = ((rev - cogsVal) / rev) * 100;
+                const fixedOpex = Math.round(beBaseline.rentBase + rentAdj + beBaseline.otherOpex);
+                const laborRate = (beBaseline.laborBase / beBaseline.monthlyRev) + laborAdj;
+                const laborVal = Math.round(rev * laborRate);
+                const ebitda = rev - cogsVal - fixedOpex - laborVal;
+                const beTarget = Math.round(breakevenMonthly);
+                const safetyBuffer = rev - beTarget;
+                const safetyPct = (safetyBuffer / rev) * 100;
+
+                monthsData.push({
+                    month: `M${m}`,
+                    rev,
+                    cogsVal,
+                    grossMarginPct,
+                    fixedOpex,
+                    laborVal,
+                    ebitda,
+                    beTarget,
+                    safetyBuffer,
+                    safetyPct
+                });
+
+                if (tbody) {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+                    tr.style.cursor = 'pointer';
+                    const isSurplus = safetyBuffer >= 0;
+                    const bufferColor = isSurplus ? '#4ADE80' : '#F87171';
+                    const bufferBg = isSurplus ? 'rgba(34,197,94,0.06)' : 'rgba(239,68,68,0.08)';
+
+                    tr.innerHTML = `
+                        <td style="padding:6px 8px; font-weight:700; color:var(--text-muted);" onclick="selectBeCell('A${m+2}', '=\"M${m}\"')">M${m}</td>
+                        <td style="padding:6px 8px; color:#FFF;" onclick="selectBeCell('B${m+2}', '=${rev}')">$${rev.toLocaleString()}</td>
+                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('C${m+2}', '=B${m+2}*${cogsRate.toFixed(3)}')">$${cogsVal.toLocaleString()}</td>
+                        <td style="padding:6px 8px; color:var(--text-secondary);" onclick="selectBeCell('D${m+2}', '=(B${m+2}-C${m+2})/B${m+2}')">${grossMarginPct.toFixed(1)}%</td>
+                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('E${m+2}', '=${fixedOpex}')">$${fixedOpex.toLocaleString()}</td>
+                        <td style="padding:6px 8px; color:var(--text-muted);" onclick="selectBeCell('F${m+2}', '=B${m+2}*${laborRate.toFixed(3)}')">$${laborVal.toLocaleString()}</td>
+                        <td style="padding:6px 8px; font-weight:700; color:${ebitda >= 0 ? '#4ADE80' : '#F87171'};" onclick="selectBeCell('G${m+2}', '=B${m+2}-C${m+2}-E${m+2}-F${m+2}')">$${ebitda.toLocaleString()}</td>
+                        <td style="padding:6px 8px; color:#FBBF24; font-weight:700;" onclick="selectBeCell('H${m+2}', '=${beTarget}')">$${beTarget.toLocaleString()}</td>
+                        <td style="padding:6px 8px; font-weight:700; color:${bufferColor}; background:${bufferBg};" onclick="selectBeCell('I${m+2}', '=B${m+2}-H${m+2}')">+$${safetyBuffer.toLocaleString()} (${safetyPct.toFixed(1)}%)</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            }
+
+            renderBreakevenSvg(monthsData, breakevenMonthly);
+            window._lastBreakevenData = monthsData;
+        }
+
+        function selectBeCell(addr, formula) {
+            const addrEl = document.getElementById('beCellAddress');
+            const formEl = document.getElementById('beFormulaText');
+            if (addrEl) addrEl.innerText = addr;
+            if (formEl) formEl.innerText = formula;
+        }
+
+        function renderBreakevenSvg(data, breakevenMonthly) {
+            const svg = document.getElementById('beSvgChart');
+            if (!svg) return;
+            const width = 800;
+            const height = 220;
+            const padLeft = 55;
+            const padRight = 85;
+            const padBottom = 30;
+            const padTop = 20;
+            const maxVal = 50000;
+
+            const chartW = width - padLeft - padRight;
+            const chartH = height - padTop - padBottom;
+
+            let html = '';
+
+            // Gridlines & Y-Axis Labels ($0, $15k, $30k, $45k)
+            const yTicks = [0, 15000, 30000, 45000];
+            yTicks.forEach(tick => {
+                const y = padTop + chartH - (tick / maxVal) * chartH;
+                html += `
+                    <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
+                    <text x="${padLeft - 8}" y="${y + 3.5}" fill="#64748B" font-size="9" font-family="monospace" text-anchor="end">$${(tick/1000)}k</text>
+                `;
+            });
+
+            // Revenue Bars & X-Axis
+            const barCount = data.length;
+            const stepW = chartW / barCount;
+            const barW = Math.min(26, stepW * 0.58);
+
+            data.forEach((d, i) => {
+                const x = padLeft + (i * stepW) + (stepW - barW) / 2;
+                const barH = (d.rev / maxVal) * chartH;
+                const y = padTop + chartH - barH;
+                const centerX = x + barW / 2;
+
+                html += `
+                    <defs>
+                        <linearGradient id="revGrad${i}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#4ADE80" />
+                            <stop offset="100%" stop-color="#166534" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="url(#revGrad${i})" opacity="0.85"
+                          onmousemove="showBeTooltip(event, '${d.month}', ${d.rev}, ${d.beTarget}, ${d.safetyBuffer}, ${d.safetyPct})"
+                          onmouseleave="hideBeTooltip()" style="cursor:pointer; transition:opacity 0.2s;" />
+                    <text x="${centerX}" y="${height - 10}" fill="#94A3B8" font-size="9" font-family="monospace" text-anchor="middle">${d.month}</text>
+                `;
+            });
+
+            // Dynamic Breakeven Line across M0-M12
+            const beY = Math.max(padTop, Math.min(height - padBottom, padTop + chartH - (breakevenMonthly / maxVal) * chartH));
+            html += `
+                <line x1="${padLeft}" y1="${beY}" x2="${width - padRight}" y2="${beY}" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4,4" style="transition:all 0.25s cubic-bezier(0.16,1,0.3,1);" />
+                <rect x="${width - padRight + 4}" y="${beY - 10}" width="80" height="20" rx="4" fill="#0D121B" stroke="#F59E0B" stroke-width="1" />
+                <text x="${width - padRight + 44}" y="${beY + 3.5}" fill="#FBBF24" font-size="8.5" font-family="monospace" font-weight="700" text-anchor="middle">BE: $${(breakevenMonthly/1000).toFixed(1)}k</text>
+            `;
+
+            svg.innerHTML = html;
+        }
+
+        function showBeTooltip(e, month, rev, be, buffer, pct) {
+            const tip = document.getElementById('beChartTooltip');
+            if (!tip) return;
+            const container = document.getElementById('breakevenStudio');
+            const rect = container.getBoundingClientRect();
+            tip.style.display = 'block';
+            tip.style.left = (e.clientX - rect.left + 14) + 'px';
+            tip.style.top = (e.clientY - rect.top - 20) + 'px';
+            const isSurplus = buffer >= 0;
+            tip.innerHTML = `
+                <div style="font-weight:800; color:#FFF; margin-bottom:4px;">${month} Trajectory</div>
+                <div>Projected Rev: <b style="color:#FFF;">$${rev.toLocaleString()}</b></div>
+                <div>Breakeven: <b style="color:#FBBF24;">$${be.toLocaleString()}</b></div>
+                <div>Safety Margin: <b style="color:${isSurplus ? '#4ADE80' : '#F87171'};">${isSurplus ? '+' : ''}$${buffer.toLocaleString()} (${pct.toFixed(1)}%)</b></div>
+                <div style="margin-top:4px; font-weight:700; color:${isSurplus ? '#4ADE80' : '#F87171'};">${isSurplus ? '🟢 SURPLUS: +$' + (buffer/1000).toFixed(1) + 'k' : '🔴 DEFICIT'}</div>
+            `;
+        }
+
+        function hideBeTooltip() {
+            const tip = document.getElementById('beChartTooltip');
+            if (tip) tip.style.display = 'none';
+        }
+
+        function exportBreakevenXLSX() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert("SheetJS library initializing. Please retry in a moment.");
+                    return;
+                }
+                const data = window._lastBreakevenData || [];
+                const wsData = [
+                    ["Month", "Projected Revenue ($)", "COGS ($)", "Gross Margin (%)", "Fixed OpEx ($)", "Adjusted Labor ($)", "EBITDA ($)", "Breakeven Target ($)", "Safety Buffer ($)"]
+                ];
+                data.forEach((d, i) => {
+                    const rowIdx = i + 2;
+                    wsData.push([
+                        d.month,
+                        d.rev,
+                        { f: `B${rowIdx}*0.3` },
+                        { f: `(B${rowIdx}-C${rowIdx})/B${rowIdx}` },
+                        d.fixedOpex,
+                        d.laborVal,
+                        { f: `B${rowIdx}-C${rowIdx}-E${rowIdx}-F${rowIdx}` },
+                        d.beTarget,
+                        { f: `B${rowIdx}-H${rowIdx}` }
+                    ]);
+                });
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, "Breakeven_Sensitivity_M0_M12");
+                XLSX.writeFile(wb, "Consultant_Studio_Breakeven_Sensitivity_Model.xlsx");
+                showToast("📥 Exported Breakeven Sensitivity Model (.xlsx)");
+            } catch(e) {
+                console.error("XLSX export error:", e);
+                alert("Export failed: " + e.message);
+            }
+        }
+
         updateQuotaDisplay();
         syncProfileUI();
         syncGeminiKeyUI();
+        setTimeout(recalcBreakevenStudio, 100);
 
         function openPricing() { document.getElementById('pricingModal').style.display = 'flex'; }
         function closePricing() { document.getElementById('pricingModal').style.display = 'none'; }
