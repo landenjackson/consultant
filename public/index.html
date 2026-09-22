@@ -4488,20 +4488,12 @@
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
             
-            // Clean, Institutional Loading Feed
+            // Clean, Institutional Animated Loading Indicator
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
-                <div class="subagent-hud" id="${hudId}">
-                    <div class="subagent-hud-header">
-                        <span class="subagent-badge"><span class="pulse-dot"></span> Analyzing Parameters</span>
-                        <span style="color:var(--accent-glow); font-size:11.5px; font-weight:700;">Processing...</span>
-                    </div>
-                    <div class="telemetry-feed">
-                        <div class="telemetry-line active" id="${hudId}_step1"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">⚡ Ingesting contextual inputs and primary data...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step2"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">📊 Identifying financial bottlenecks and operational drag...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step3"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">🛡️ Structuring quantitative remediation strategies...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step4"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">✨ Synthesizing executive recommendations and roadmap...</span></div>
-                    </div>
+                <div class="typing-indicator" id="${hudId}" style="display:flex; align-items:center; gap:8px; padding:12px 14px; background:rgba(34,197,94,0.06); border:1px solid var(--border-glow); border-radius:8px;">
+                    <span class="typing-dot pulse-dot"></span>
+                    <span class="typing-label" style="font-size:12.5px; color:var(--text-primary); font-weight:600;">Evaluating options and preparing strategic recommendations...</span>
                 </div>
             `;
             assistantRow.appendChild(assistantCard);
@@ -4590,8 +4582,8 @@
                 clearTimeout(t2);
                 clearTimeout(t3);
 
-                // Smooth exit transition for the Loading Telemetry card
-                const loadingHud = assistantCard.querySelector('.subagent-hud');
+                // Smooth exit transition for the Loading Indicator
+                const loadingHud = assistantCard.querySelector('.typing-indicator') || assistantCard.querySelector('.subagent-hud');
                 if (loadingHud) {
                     loadingHud.style.transition = 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
                     loadingHud.style.opacity = '0';
