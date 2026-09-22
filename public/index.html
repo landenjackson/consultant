@@ -406,7 +406,30 @@
             background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
         }
 
-        /* LIVE TELEMETRY CASH FLOW STAT STRIP */
+        /* VAULT CATEGORY FILTER CHIPS */
+        .vault-cat-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11.5px;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .vault-cat-chip:hover {
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .vault-cat-chip.active {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: var(--border-glow);
+            color: var(--accent-glow);
+        }
         .live-stat-strip {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2227,17 +2250,29 @@
             <div class="modal-header">
                 <div>
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🔒 Strategy & Research Vault</h2>
-                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Saved business models, job interview notes, and research workflows.</p>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Saved business models, turnaround blueprints, job interview notes, and research workflows.</p>
                 </div>
                 <button class="btn-modal-close" onclick="closeVaultModal()" title="Close">✕</button>
             </div>
 
-            <div id="vaultItemsContainer" style="display:flex; flex-direction:column; gap:10px; max-height:450px; overflow-y:auto;">
+            <!-- SEARCH & CATEGORY FILTER BAR -->
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                <input type="text" id="vaultSearchInput" class="dock-input" placeholder="🔍 Search saved artifacts by title, keyword, or metric..." style="width:100%; border-radius:8px; padding:8px 12px; font-size:12.5px; background:#07090D; border:1px solid var(--border);" oninput="filterVaultItems()">
+                <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11.5px;">
+                    <button class="vault-cat-chip active" onclick="setVaultCategory('all', this)">All Artifacts</button>
+                    <button class="vault-cat-chip" onclick="setVaultCategory('finance', this)">📊 Financial Models</button>
+                    <button class="vault-cat-chip" onclick="setVaultCategory('strategy', this)">📝 Strategy Memos</button>
+                    <button class="vault-cat-chip" onclick="setVaultCategory('turnaround', this)">🚦 Turnaround Plans</button>
+                    <button class="vault-cat-chip" onclick="setVaultCategory('career', this)">💼 Career & STAR</button>
+                </div>
+            </div>
+
+            <div id="vaultItemsContainer" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto;">
                 <!-- Dynamically populated from localStorage -->
             </div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
-                <span style="font-size:12px; color:var(--text-muted);">Encrypted in local browser storage.</span>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px; margin-top:10px;">
+                <span style="font-size:12px; color:var(--text-muted);">Encrypted in client-side storage with zero cloud retention.</span>
                 <button class="btn-export" onclick="clearVault()">Clear Vault</button>
             </div>
         </div>
@@ -3360,6 +3395,7 @@
         }
         function closeVaultModal() { document.getElementById('vaultModal').style.display = 'none'; }
 
+        function openSettings() { openSettingsModal(); }
         function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
 
@@ -3444,10 +3480,25 @@
         }
         updateVaultCount();
 
+        let activeVaultCategory = 'all';
+
+        function setVaultCategory(cat, btn) {
+            activeVaultCategory = cat;
+            document.querySelectorAll('.vault-cat-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderVaultItems();
+        }
+
+        function filterVaultItems() {
+            renderVaultItems();
+        }
+
         function renderVaultItems() {
             const container = document.getElementById('vaultItemsContainer');
             let vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
             if (!container) return;
+
+            const searchQuery = (document.getElementById('vaultSearchInput')?.value || '').toLowerCase().trim();
 
             // Retroactively sanitize any existing stored vault items that have leaked UI text
             let updated = false;
@@ -3465,20 +3516,52 @@
                 localStorage.setItem('consultant_vault', JSON.stringify(vault));
             }
 
-            if (vault.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13.5px;">Your vault is currently empty. Select <strong>[Save to Research Vault]</strong> on any generated output to preserve it for future reference.</div>`;
+            // Filter by Category and Search Keyword
+            let filteredVault = vault.filter(item => {
+                const t = (item.text || '').toLowerCase();
+                const title = (item.title || '').toLowerCase();
+                
+                // Category matching
+                let matchesCat = true;
+                if (activeVaultCategory === 'finance') {
+                    matchesCat = t.includes('p&l') || t.includes('margin') || t.includes('revenue') || t.includes('cogs') || t.includes('ebitda') || t.includes('cash');
+                } else if (activeVaultCategory === 'strategy') {
+                    matchesCat = t.includes('directive') || t.includes('memo') || t.includes('strategic') || t.includes('executive');
+                } else if (activeVaultCategory === 'turnaround') {
+                    matchesCat = t.includes('turnaround') || t.includes('30-day') || t.includes('checklist') || t.includes('timeline');
+                } else if (activeVaultCategory === 'career') {
+                    matchesCat = t.includes('resume') || t.includes('career') || t.includes('interview') || t.includes('star') || t.includes('pitch');
+                }
+
+                // Search query matching
+                let matchesQuery = true;
+                if (searchQuery) {
+                    matchesQuery = title.includes(searchQuery) || t.includes(searchQuery);
+                }
+
+                return matchesCat && matchesQuery;
+            });
+
+            if (filteredVault.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:32px 14px; color:var(--text-muted);">
+                        <div style="font-size:24px; margin-bottom:8px;">📂</div>
+                        <div style="font-size:13px; font-weight:600; color:#FFF;">No matching artifacts found</div>
+                        <div style="font-size:11.5px; margin-top:4px;">Save strategies from active chat or adjust filter keywords.</div>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = vault.map(item => `
-                <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-                    <div style="flex:1;">
-                        <div style="font-weight:700; color:#FFFFFF; font-size:13.5px; margin-bottom:3px;">${escapeHtml(item.title)}</div>
-                        <div style="font-size:11.5px; color:var(--text-muted);">${item.timestamp}</div>
+            container.innerHTML = filteredVault.map(item => `
+                <div style="background:#07090D; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div style="flex:1; cursor:pointer;" onclick="loadVaultItem('${item.id}')">
+                        <div style="font-size:13px; font-weight:700; color:#FFFFFF; margin-bottom:2px;">${escapeHtml(item.title)}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">${item.date || item.timestamp || 'Saved'} • ${(item.text || '').length} chars</div>
                     </div>
                     <div style="display:flex; gap:6px;">
-                        <button class="btn-export" style="padding:4px 8px; font-size:11px;" onclick="loadVaultItem('${item.id}')">View</button>
-                        <button class="btn-export" style="padding:4px 8px; font-size:11px; color:#F87171;" onclick="deleteVaultItem('${item.id}')">✕</button>
+                        <button class="btn-export" style="padding:4px 8px; font-size:11px;" onclick="loadVaultItem('${item.id}')">Open</button>
+                        <button class="btn-export" style="padding:4px 8px; font-size:11px; border-color:transparent; color:#EF4444;" onclick="deleteVaultItem('${item.id}')">✕</button>
                     </div>
                 </div>
             `).join('');
