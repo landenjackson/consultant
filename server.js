@@ -174,11 +174,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Ultra-Low-Cost Fast Speculative Race (Default: gemini-2.0-flash at $0.075/1M tokens + gpt-4o-mini, 900 tokens ceiling for sub-2s velocity)
+  // TIER 1: Ultra-Reliable Fast Speculative Race (25s Abort Window to prevent false fallback triggers)
   if (activeMyclawKey && !hasImages) {
-    const fetchModel = async (modelName, maxTokens = 900) => {
+    const fetchModel = async (modelName, maxTokens = 1500) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -191,7 +191,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.2
+            temperature: 0.25
           })
         });
         clearTimeout(timeoutId);
@@ -211,15 +211,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 900),
-        fetchModel('gpt-4o-mini', 900)
+        fetchModel('gemini-2.0-flash', 1500),
+        fetchModel('gemini-3.7-flash', 1500),
+        fetchModel('gpt-4o-mini', 1500)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
       console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 900);
+        const fallback = await fetchModel('gemini-2.0-flash', 1500);
         return { text: fallback.text, isFallback: false };
       } catch (fbErr) {
         console.error('[All server inference exhausted]:', fbErr.message);
@@ -365,9 +366,13 @@ III. SHOP-FLOOR WORKFLOW & VELOCITY SPECIFICATION
 • Throughput Target: [Quantifiable cycle time improvement]
 
 IV. 30-DAY EXECUTION TIMELINE & ACCOUNTABILITY
-1. Phase 1 (Days 1–7): [Concrete immediate baseline action]
-2. Phase 2 (Days 8–20): [Workflow & staging restructuring]
-3. Phase 3 (Days 21–30): [Yield verification & flow-through monitoring]
+• Days 1–3 (Frontline Calibration): [Immediate station/workflow adjustment] — Lead: [Frontline / Shift Lead]
+• Days 4–14 (Process Standardization): [Metric tracking, customer touchpoints, or menu/catalog optimization] — Lead: [General Manager / Ops Director]
+• Days 15–30 (Margin Review & Scaling): [Audit contribution lift and lock in standardized operating procedure] — Lead: [Owner / Executive Sponsor]
+
+V. OPERATOR SUMMARY
+[1 decisive, encouraging concluding sentence anchoring confidence in execution.]
+Status: Cleared for Production Execution • Consultant Studio
 
 ${jevSignals?.needsMath ? 'QUANTITATIVE RIGOR: Reconcile all calculations, percentages, and variance figures with exact arithmetic.' : ''}
 ${jevSignals?.urgency > 1.2 ? 'URGENCY PROTOCOL: Deliver the #1 highest-leverage decision and immediate stabilization steps with calm conviction.' : ''}
