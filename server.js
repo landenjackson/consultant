@@ -174,11 +174,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Parallel Fast Speculative Race (sub-4s instant completion across Flash models)
+  // TIER 1: Ultra-Low-Cost Fast Speculative Race (Default: gemini-2.0-flash at $0.075/1M tokens + gpt-4o-mini, 900 tokens ceiling for sub-2s velocity)
   if (activeMyclawKey && !hasImages) {
-    const fetchModel = async (modelName, maxTokens = 4096) => {
+    const fetchModel = async (modelName, maxTokens = 900) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -211,16 +211,15 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 4096),
-        fetchModel('gemini-3.7-flash', 4096),
-        fetchModel('gpt-4o-mini', 4096)
+        fetchModel('gemini-2.0-flash', 900),
+        fetchModel('gpt-4o-mini', 900)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
       console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 4096);
+        const fallback = await fetchModel('gemini-2.0-flash', 900);
         return { text: fallback.text, isFallback: false };
       } catch (fbErr) {
         console.error('[All server inference exhausted]:', fbErr.message);
@@ -301,12 +300,12 @@ Analysis generated under fallback resilience mode. Core findings for ${workspace
 📥 **Export-Ready Sign-off:**
 Diagnostic baseline established. Re-verify your API key in Workspace Display Settings if real-time reasoning does not refresh.`;
 
-    // Map 'assistant' -> 'model', limit history to the last 6 turns for fast edge latency
-    const recentMessages = messages.slice(-6);
+    // Limit history to the last 2 turns (trimmed to 150 chars) to strictly protect token budget and prevent context bloat
+    const recentMessages = messages.slice(-2);
     const conversationHistory = recentMessages.length > 1
       ? recentMessages.slice(0, -1).map(m => {
           const role = m.role === 'assistant' ? 'Consultant' : 'User';
-          const text = m.content ? m.content.slice(0, 500) : '';
+          const text = m.content ? m.content.slice(0, 150) : '';
           return `${role}: ${text}`;
         }).join('\n\n')
       : '';
