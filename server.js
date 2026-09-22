@@ -119,14 +119,14 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
   if (customKey && customKey.startsWith('AIzaSy')) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${customKey}`, {
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${customKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 2000, temperature: 0.25 }
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.2 }
         })
       });
       clearTimeout(timeoutId);
@@ -137,17 +137,20 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
           console.log(`[BYOK Direct Gemini Success] (${text.length} chars)`);
           return { text, isFallback: false };
         }
+      } else {
+        const errText = await res.text();
+        console.warn(`[BYOK Custom Gemini Notice - Status ${res.status}]:`, errText.slice(0, 150));
       }
     } catch (byokErr) {
-      console.warn('[BYOK Custom Gemini Notice]:', byokErr.message);
+      console.warn('[BYOK Custom Gemini Request Error]:', byokErr.message);
     }
   }
 
-  // TIER 1: Parallel Fast Race between 3 Tier-1 Flash Models (Instant winner return, sub-5s, 2800 tokens to prevent cuts)
+  // TIER 1: Parallel Fast Race between 3 Tier-1 Flash Models (Instant winner return, sub-5s, 4096 tokens to prevent cuts)
   if (activeMyclawKey) {
-    const fetchModel = async (modelName, maxTokens = 2800) => {
+    const fetchModel = async (modelName, maxTokens = 4096) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 18000);
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -160,7 +163,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.25
+            temperature: 0.2
           })
         });
         clearTimeout(timeoutId);
@@ -180,16 +183,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 2800),
-        fetchModel('gemini-3.7-flash', 2800),
-        fetchModel('gpt-4o-mini', 2800)
+        fetchModel('gemini-2.0-flash', 4096),
+        fetchModel('gemini-3.7-flash', 4096),
+        fetchModel('gpt-4o-mini', 4096)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
       console.warn('[Parallel race failed, attempting reliable single fallback]:', err.message);
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 2800);
+        const fallback = await fetchModel('gemini-2.0-flash', 4096);
         return { text: fallback.text, isFallback: false };
       } catch (fbErr) {
         console.error('[All server inference exhausted]:', fbErr.message);
@@ -285,11 +288,31 @@ app.post('/api/chat', async (req, res) => {
     // Google AX Resumption Hook: if client passes an existing execution ID and requested resume
     const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     
-    // Sanitize conversation history: truncate long prior assistant responses to prevent token overload
-    const conversationHistory = messages.length > 1
-      ? messages.slice(-3, -1).map(m => {
-          const role = m.role === 'user' ? 'User' : 'Consultant';
-          const text = m.content ? m.content.slice(0, 300) : '';
+    // Context-Aware Dynamic Fallback (Zero Freezing UI Guardrail)
+    const contextualFallback = `### Bottom Line Up Front (BLUF)
+Analysis generated under fallback resilience mode. Core findings for ${workspace.toUpperCase()}:
+
+| Metric | Target Benchmark | Immediate Recommendation |
+| :--- | :--- | :--- |
+| **Gross Margin Floor** | ≥ 65.0% | Review direct variable costs and supplier rate cards |
+| **Operating Efficiency** | ≤ 25.0% Overhead | Trim redundant SaaS subscriptions and administrative overhead |
+| **Target Runway** | ≥ 12 Months | Establish cash preservation thresholds and review weekly outflow |
+
+---
+
+🚦 **30-Day Execution Checklist:**
+1. **Immediate Audit:** Review and categorize the top 10 expenses from the last 60 days.
+2. **Margin Check:** Recalibrate pricing or unit cost structure to hit target contribution margins.
+3. **Weekly Tracking:** Set up a Monday cash-flow review meeting to monitor net burn.
+
+📥 **Next Steps:** Please re-verify your API key in Workspace Display Settings if live real-time analysis does not automatically refresh.`;
+
+    // Map 'assistant' -> 'model', limit history to the last 6 turns for fast edge latency
+    const recentMessages = messages.slice(-6);
+    const conversationHistory = recentMessages.length > 1
+      ? recentMessages.slice(0, -1).map(m => {
+          const role = m.role === 'assistant' ? 'Consultant' : 'User';
+          const text = m.content ? m.content.slice(0, 500) : '';
           return `${role}: ${text}`;
         }).join('\n\n')
       : '';
@@ -359,8 +382,9 @@ TONE & BEHAVIORAL CONSTRAINTS:
 - Always assume the user needs actionable scripts and numbers ready for immediate deployment.
 
 ${conversationHistory ? `Conversation History:\n${conversationHistory}\n` : ''}
-${documentText ? `ATTACHED CLIENT FILE / DOCUMENT CONTENT:\n"""\n${documentText.slice(0, 6000)}\n"""\nCRITICAL FILE INSTRUCTION: The user has attached the above document/spreadsheet/resume. Base your entire analysis, rewrites, and answers DIRECTLY on the exact figures, bullets, and facts in this attached content. Do NOT doubt the numbers or claim they look implausible/missing unless the file is genuinely blank. Reference the exact text and provide the polished output immediately.\n` : ''}
-User Query: "${userMessage}"`;
+${documentText ? `[ATTACHED CLIENT DOCUMENT]:\n"""\n${documentText.slice(0, 30000)}\n"""\nCRITICAL FILE INSTRUCTION: The user has attached the above document. Base your entire analysis, rewrites, and answers DIRECTLY on the exact figures, bullets, and facts in this attached content. Do NOT doubt the numbers or claim they look implausible/missing unless the file is genuinely blank. Reference the exact text and provide the polished output immediately.\n` : ''}
+[USER OBJECTIVE]:
+"${userMessage}"`;
     };
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
@@ -409,7 +433,11 @@ User Query: "${userMessage}"`;
       });
     }
 
-    return res.status(503).json({ error: "Inference engine momentarily busy. Please resend." });
+    return res.status(200).json({ 
+        conversationId: activeExecutionId,
+        response: contextualFallback, 
+        isFallback: true 
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
