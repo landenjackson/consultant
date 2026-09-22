@@ -554,11 +554,34 @@
         @keyframes chatCardEnter {
             0% {
                 opacity: 0;
-                transform: translateY(12px) scale(0.985);
+                transform: translateY(16px);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
+            }
+        }
+
+        /* STAGGERED TOP-TO-BOTTOM READING ENTRANCE */
+        .bubble-assistant .stream-content > * {
+            animation: staggerItemEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .bubble-assistant .stream-content > *:nth-child(1) { animation-delay: 0.03s; }
+        .bubble-assistant .stream-content > *:nth-child(2) { animation-delay: 0.08s; }
+        .bubble-assistant .stream-content > *:nth-child(3) { animation-delay: 0.14s; }
+        .bubble-assistant .stream-content > *:nth-child(4) { animation-delay: 0.20s; }
+        .bubble-assistant .stream-content > *:nth-child(5) { animation-delay: 0.26s; }
+        .bubble-assistant .stream-content > *:nth-child(n+6) { animation-delay: 0.32s; }
+
+        @keyframes staggerItemEnter {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -645,10 +668,19 @@
         }
 
         .bubble-assistant p {
-            margin-bottom: 12px;
-            color: #CBD5E1;
-            font-size: 14px;
-            line-height: 1.65;
+            margin-bottom: 14px;
+            color: #E2E8F0;
+            font-size: 14.5px;
+            line-height: 1.72;
+            letter-spacing: -0.01em;
+        }
+
+        .bubble-assistant h3, .bubble-assistant h2, .bubble-assistant h4 {
+            color: #FFFFFF;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            margin: 18px 0 8px 0;
+            letter-spacing: -0.015em;
         }
 
         .bubble-assistant strong {
@@ -656,15 +688,16 @@
             font-weight: 700;
         }
 
-        .bubble-assistant ul {
-            margin: 8px 0 14px 18px;
+        .bubble-assistant ul, .bubble-assistant ol {
+            margin: 8px 0 14px 20px;
             padding: 0;
         }
 
         .bubble-assistant li {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: #CBD5E1;
-            line-height: 1.6;
+            line-height: 1.68;
+            font-size: 14px;
         }
 
         /* EXECUTIVE SECTIONS INSIDE ADVISORY RESPONSES */
@@ -3914,15 +3947,21 @@
             window.speechSynthesis.speak(activeUtterance);
         }
 
-        /* 🪄 INSTANT CRISP 60FPS STREAMING & IMMEDIATE FORMATTED RENDERING */
+        /* 🪄 INSTANT CRISP 60FPS STREAMING & SMOOTH TOP-TO-BOTTOM RENDERING */
         function streamAssistantResponse(container, fullText, onComplete) {
             try {
-                // Instantly render complete formatted markdown so tables, charts and bullet points never get clipped
-                container.innerHTML = `<div class="stream-content" style="display:block; animation: chatCardEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;">${formatExecutiveResponse(fullText)}</div>`;
+                // Render complete formatted markdown with top-to-bottom staggered reading entrance
+                container.innerHTML = `<div class="stream-content" style="display:block;">${formatExecutiveResponse(fullText)}</div>`;
                 initializePendingCharts(container);
-                
+
                 const feed = document.getElementById('chatFeed');
-                if (feed) feed.scrollTop = feed.scrollHeight;
+                if (feed) {
+                    // Smooth auto-scroll pinning to comfortable reading position
+                    feed.scrollTo({
+                        top: container.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
                 if (onComplete) onComplete();
             } catch (err) {
                 console.error("Stream render error:", err);
