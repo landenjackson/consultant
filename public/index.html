@@ -2540,15 +2540,18 @@
                     if (!isNaN(gross) && gross > 0) {
                         const monthly = gross >= 5000 ? gross : gross * 30;
                         beBaseline.monthlyRev = monthly;
-                        document.getElementById('simGrossRev')?.textContent = `$${Math.round(monthly).toLocaleString()}`;
-                        document.getElementById('scBaseVal')?.textContent = `$${Math.round(monthly).toLocaleString()}`;
+                        const el1 = document.getElementById('simGrossRev');
+                        if (el1) el1.textContent = `$${Math.round(monthly).toLocaleString()}`;
+                        const el2 = document.getElementById('scBaseVal');
+                        if (el2) el2.textContent = `$${Math.round(monthly).toLocaleString()}`;
                     }
                 }
                 const primeMatch = text.match(/(?:Prime|COGS|Costos|Coûts|Food\s*Cost)[^:\n]*:\s*[\$€£]?\s*([0-9.,]+)/i);
                 if (primeMatch) {
                     const prime = parseFloat(primeMatch[1].replace(/,/g, ''));
                     if (!isNaN(prime) && prime > 0) {
-                        document.getElementById('simPrimeCost')?.textContent = `$${Math.round(prime).toLocaleString()}`;
+                        const el3 = document.getElementById('simPrimeCost');
+                        if (el3) el3.textContent = `$${Math.round(prime).toLocaleString()}`;
                     }
                 }
             } catch (err) {
