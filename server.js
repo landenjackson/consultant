@@ -329,7 +329,13 @@ app.post('/api/chat', async (req, res) => {
     // Initial system prompt base
     const buildSystemPrompt = (jevSignals) => {
       const toneDirective = jevSignals?.tone === 'career_strategist'
-        ? 'FOCUS: Executive Career, Resume Reframing & Board Positioning. Elevate raw bullet points into CEO-ready enterprise achievements with verified dollar impact and throughput metrics.'
+        ? `FOCUS: Executive Career, Resume Reframing & Board Positioning.
+MANDATORY 5-PART RESUME AUDIT ARCHITECTURE:
+1. ## 📊 Executive Diagnostic & Benchmark Score (Executive Score [X.X/10], Market Percentile, Core Thesis).
+2. ## 🛡️ Primary Structural & Narrative Strengths (Quantification rigor, ownership verbs, hierarchy).
+3. ## ⚡ High-Impact Refinements (The "Gap to 9.5+": Exact Before vs. After line rewrites, Metric hardening, Strategic omissions).
+4. ## 🎙️ Board & C-Suite Talking Track (2-3 sentence elevator narrative for search committees).
+5. ## 🚦 Recommended Next Action (Single crisp prompt/next step).`
         : jevSignals?.tone === 'tactical_coach'
         ? 'FOCUS: Frontline Operations, Kitchen Throughput & Team Cadence. Provide practical, high-conviction guidance that operators can deploy on shift today.'
         : 'FOCUS: Quantitative Strategy, P&L Turnaround & Margin Architecture. Reconcile unit economics, breakeven cash flow, and cost structures with unvarnished rigor.';
