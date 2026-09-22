@@ -4564,12 +4564,15 @@
                         reqHeaders['x-custom-gemini-key'] = customKey;
                     }
 
+                    let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
+
                     res = await fetch('/api/chat', {
                         method: 'POST',
                         headers: reqHeaders,
                         signal: controller.signal,
                         body: JSON.stringify({
                             messages,
+                            conversationId: currentConversationId,
                             workspace: selectedMode,
                             documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
                         })
@@ -4578,6 +4581,9 @@
 
                     if (res && res.ok) {
                         data = await res.json();
+                        if (data.conversationId) {
+                            localStorage.setItem('cs_last_conversation_id', data.conversationId);
+                        }
                     }
                 } catch (netErr) {
                     console.warn('[Client Request Notice]', netErr.message);
