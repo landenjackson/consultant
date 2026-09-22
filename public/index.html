@@ -3687,6 +3687,8 @@
                             reader.readAsDataURL(file);
                         });
                     } else {
+                        // Fallback binary / unsupported format warning
+                        showToast(`Notice: File format .${ext} ingested as plain text context.`, "📎");
                         currentFileText = await file.text();
                     }
 

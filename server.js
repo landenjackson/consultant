@@ -114,29 +114,35 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
   // If user provided a personal custom BYOK key from Google AI Studio
   if (customKey && customKey.startsWith('AIzaSy')) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${customKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 4096, temperature: 0.2 }
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (text && text.trim().length > 0) {
-          console.log(`[BYOK Direct Gemini Success] (${text.length} chars)`);
-          return { text, isFallback: false };
+    const directModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    for (const modelName of directModels) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
+          method: 'POST',
+          headers: {
+            'x-goog-api-key': customKey,
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 8192, temperature: 0.7 }
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text && text.trim().length > 0) {
+            console.log(`[BYOK Direct Gemini Success: ${modelName}] (${text.length} chars)`);
+            return { text, isFallback: false };
+          }
         }
+      } catch (byokErr) {
+        console.warn(`[BYOK Custom Gemini Notice - ${modelName}]:`, byokErr.message);
       }
-    } catch (byokErr) {
-      console.warn('[BYOK Custom Gemini Request Notice]:', byokErr.message);
     }
   }
 
