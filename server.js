@@ -121,13 +121,14 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2500) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      // Increase backend timeout bounds to prevent premature disconnects during long generations
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             'Authorization': `Bearer ${activeMyclawKey}`
           },
           signal: controller.signal,
@@ -142,7 +143,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
         if (res.ok) {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 100) {
+          if (text && text.trim().length > 50) {
             return { model: modelName, text };
           }
         }
@@ -178,7 +179,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
           headers: {
             'x-goog-api-key': activeGoogleKey,
             'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           },
           signal: controller.signal,
           body: JSON.stringify({
@@ -387,7 +388,6 @@ DIRECTIVES:
 - Never use robotic pleasantries ("I would be happy to help", "In today's fast-paced environment").
 
 [Active Workspace: ${workspace.toUpperCase()}]
-${conversationHistory ? `[Recent Context]:\n${conversationHistory}\n` : ''}
 ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
 Operator Prompt: ${userMessage}`;
     };
