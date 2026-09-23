@@ -121,12 +121,13 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Authorization': `Bearer ${activeMyclawKey}`
           },
           signal: controller.signal,
@@ -171,12 +172,13 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     for (const modelName of directModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
           method: 'POST',
           headers: {
             'x-goog-api-key': activeGoogleKey,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
           },
           signal: controller.signal,
           body: JSON.stringify({
