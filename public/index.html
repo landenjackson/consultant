@@ -2652,10 +2652,35 @@
             return CognitiveMemory.buildCognitiveContext();
         }
 
-        // UNIFIED MESSAGES REPOSITORY FOR MULTI-TURN THREAD CONTINUATION
+        // DETERMINISTIC CHAT ENGINE STATE MACHINE ('idle' | 'uploading' | 'streaming' | 'complete' | 'error')
+        let chatState = 'idle';
         let messages = [];
         let isGenerating = false;
         let uploadedDocText = "";
+
+        function setChatState(newState) {
+            chatState = newState;
+            isGenerating = (newState === 'uploading' || newState === 'streaming');
+            
+            const sendBtn = document.getElementById('sendBtn');
+            const userInput = document.getElementById('userInput');
+            
+            if (sendBtn) {
+                if (newState === 'streaming') {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = `<span>⟳ Analyzing...</span>`;
+                } else if (newState === 'uploading') {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = `<span>📎 Ingesting...</span>`;
+                } else {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = `<span>Execute Analysis</span>`;
+                }
+            }
+            if (userInput && (newState === 'streaming' || newState === 'uploading')) {
+                userInput.disabled = false; // keep accessible for review but prevent duplicate form submits
+            }
+        }
 
         function getMemoCount() {
             return parseInt(localStorage.getItem('consultant_memo_count') || '0', 10);
@@ -4783,10 +4808,12 @@
         }
 
         async function sendMessage() {
-            if (isGenerating) return;
+            if (chatState === 'streaming' || chatState === 'uploading') return;
             const input = document.getElementById('userInput');
             const text = input ? input.value.trim() : '';
             if (!text) return;
+
+            setChatState('streaming');
 
             const hero = document.getElementById('heroBanner');
             if (hero) hero.style.display = 'none';
@@ -4981,6 +5008,7 @@
                 }, 50);
 
             } catch (err) {
+                setChatState('error');
                 console.error("Chat Execution Error:", err);
                 const safePrompt = escapeHtml(text);
                 assistantCard.innerHTML = `
@@ -4999,8 +5027,7 @@
                     </div>
                 `;
             } finally {
-                isGenerating = false;
-                if (sendBtn) sendBtn.disabled = false;
+                setChatState('complete');
                 chatFeed.scrollTop = chatFeed.scrollHeight;
             }
         }
