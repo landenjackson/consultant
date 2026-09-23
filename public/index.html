@@ -2234,7 +2234,7 @@
                     <path d="M3 21v-5h5"></path>
                 </svg>
             </button>
-            <input type="text" id="userInput" class="dock-input" placeholder="Input a strategic objective, financial diagnostic query, or campaign parameter..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <textarea id="userInput" class="dock-input" rows="1" placeholder="Input a strategic objective, financial diagnostic query, or campaign parameter..." style="resize:none; padding:10px 14px; min-height:42px; max-height:140px; line-height:1.4;" onkeydown="handleInputKeydown(event)"></textarea>
             <button id="sendBtn" class="btn-send" onclick="sendMessage()">
                 <span>Execute Analysis</span>
             </button>
@@ -4674,6 +4674,18 @@
             } catch (err) {
                 console.error("PPTX export fallback to canvas:", err);
                 openInCanvas(btn);
+            }
+        }
+
+        function handleInputKeydown(e) {
+            if (e.key === 'Enter') {
+                if (e.shiftKey) {
+                    // Allow natural multiline newline
+                    return;
+                }
+                // Enter without shift executes
+                e.preventDefault();
+                sendMessage();
             }
         }
 
