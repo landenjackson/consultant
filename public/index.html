@@ -4703,20 +4703,8 @@
             // Safe Workspace & Mode Resolution
             const currentMode = (typeof selectedMode !== 'undefined' && selectedMode) ? selectedMode : (localStorage.getItem('cs_workspace') || 'general');
 
-            // Client-Side Session Cache Key
-            const cacheKey = `cs_cache_${currentMode}_${text.toLowerCase().trim()}`;
-            const cachedMemo = sessionStorage.getItem(cacheKey);
-
-            if (cachedMemo) {
-                clearTimeout(t1);
-                streamAssistantResponse(assistantCard, cachedMemo, () => {
-                    isGenerating = false;
-                    if (sendBtn) sendBtn.disabled = false;
-                });
-                return;
-            }
-
-            // Client-Side 30-Second Timeout with Instant Fallback
+            // Always request fresh real-time AI reasoning from server (No stale session caching)
+            // Client-Side 45-Second Timeout with Resilient Fallback
             let res = null;
             let data = null;
 
@@ -4772,13 +4760,8 @@
                     loadingHud.style.transform = 'translateY(-6px) scale(0.98)';
                 }
 
-                // If response was served via deterministic fallback due to server quota
-                const fallbackBanner = data.isFallback ? `
-                    <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#FBBF24; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                        <span>⚠️ Studio server quota reached. Displaying pre-computed strategic baseline. To restore real-time AI reasoning, enter your free Gemini API key in Settings.</span>
-                        <button class="btn-export" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.4); color:#FDE68A; padding:4px 10px; font-size:11px;" onclick="openSettingsModal()">⚙️ Open Settings</button>
-                    </div>
-                ` : '';
+                // If response was served via deterministic fallback, keep UI clean without confusing warning banners
+                const fallbackBanner = '';
 
                 // Save successful strategy to session cache for 0ms instant reload
                 try {
@@ -4793,12 +4776,6 @@
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 setTimeout(() => {
                     streamAssistantResponse(assistantCard, responseText, () => {
-                        if (fallbackBanner) {
-                            const bannerDiv = document.createElement('div');
-                            bannerDiv.innerHTML = fallbackBanner;
-                            assistantCard.insertBefore(bannerDiv.firstElementChild, assistantCard.firstChild);
-                        }
-
                         // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
                         const lowerText = (responseText + " " + text).toLowerCase();
                         const isFinancialOrOps = (lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$')) &&
