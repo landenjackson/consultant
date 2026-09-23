@@ -64,19 +64,30 @@
         }
     </script>
     <style>
-        /* EXECUTIVE ENTERPRISE POLISH & DESIGN REFINEMENT */
+        /* EXECUTIVE DARK OBSIDIAN DESIGN TOKENS */
         :root {
-            --bg: #07090D;
-            --card-bg: #0C1017;
-            --card-surface: #101520;
-            --border: #182030;
-            --border-hover: #222F45;
-            --accent: #22c55e;
-            --accent-glow: #4ade80;
-            --accent-dim: rgba(34, 197, 94, 0.12);
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
+            --bg-obsidian-root: #0B0D11;
+            --bg-obsidian-surface: #14171F;
+            --bg-obsidian-elevated: #1D222D;
+            --border-obsidian: #282E3D;
+            --text-obsidian-primary: #F3F4F8;
+            --text-obsidian-muted: #9BA3B5;
+            --accent-cyan: #38BDF8;
+            --accent-emerald: #10B981;
+
+            /* MAPPED TOKENS */
+            --bg: var(--bg-obsidian-root);
+            --bg-base: var(--bg-obsidian-root);
+            --card-bg: var(--bg-obsidian-surface);
+            --card-surface: var(--bg-obsidian-elevated);
+            --border: var(--border-obsidian);
+            --border-hover: #3E475C;
+            --accent: var(--accent-emerald);
+            --accent-glow: #34D399;
+            --accent-dim: rgba(16, 185, 129, 0.12);
+            --text-primary: var(--text-obsidian-primary);
+            --text-secondary: var(--text-obsidian-muted);
+            --text-muted: #6B7280;
             --danger: #EF4444;
 
             /* STRICT DESIGN TOKEN Z-INDEX HIERARCHY */
@@ -88,11 +99,11 @@
             --z-toast: 60;
         }
 
-        html, body {
+        html, body, #app-root {
             height: 100%;
-            min-height: 100%;
-            background-color: var(--bg-base);
-            color: var(--text-primary);
+            min-height: 100dvh;
+            background-color: var(--bg-obsidian-root) !important;
+            color: var(--text-obsidian-primary) !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             letter-spacing: -0.015em;
         }
@@ -101,8 +112,9 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background-color: var(--bg-obsidian-root) !important;
             background-image: 
-                radial-gradient(circle at 50% -20%, rgba(34, 197, 94, 0.06) 0%, transparent 60%),
+                radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.06) 0%, transparent 60%),
                 linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, transparent 100%);
         }
 
@@ -930,6 +942,36 @@
             display: none;
         }
 
+        /* SENSITIVITY RANGE SLIDERS (CYAN ACCENT & OBSIDIAN TRACKS) */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #282E3D;
+            border-radius: 6px;
+            outline: none;
+            margin: 8px 0;
+            accent-color: var(--accent-cyan, #38BDF8);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #38BDF8;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+            border: 2px solid #0B0D11;
+            transition: all 0.15s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+        }
+
         /* FLOATING TOAST NOTIFICATION */
         #executiveToast {
             position: fixed;
@@ -960,21 +1002,35 @@
         .dock-box {
             max-width: 940px;
             margin: 0 auto;
-            background: #0E121A;
-            border: 1px solid var(--border);
+            background: #14171F;
+            border: 1px solid #282E3D;
             border-radius: 14px;
             padding: 6px 12px;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .dock-box:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 14px 40px rgba(34, 197, 94, 0.18), 0 0 0 1px rgba(34, 197, 94, 0.25);
+            border-color: #38BDF8;
+            box-shadow: 0 14px 40px rgba(56, 189, 248, 0.18), 0 0 0 1px rgba(56, 189, 248, 0.25);
             transform: scale(1.002);
+        }
+
+        .dock-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #F3F4F8;
+            font-size: 13.5px;
+            font-family: inherit;
+        }
+
+        .dock-input::placeholder {
+            color: #6B7280;
         }
 
         .btn-send:active {
