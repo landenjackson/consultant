@@ -23,19 +23,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 });
 
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
+const DJEV_RUN_URL = process.env.DJEV_RUN_URL || 'https://api.typesafe.ai/v1/systemone';
 
-// TYPESAFE JEV SYSTEM ONE MULTI-PRIMITIVE EVALUATOR (~150ms DECISION ENGINE)
+// TYPESAFE JEV / DJEV-RUN SYSTEM ONE MULTI-PRIMITIVE EVALUATOR (~70-150ms DECISION ENGINE)
 const evaluateWithJev = async (userText) => {
-  if (!TYPESAFE_API_KEY) return null;
+  if (!TYPESAFE_API_KEY && !process.env.DJEV_RUN_URL) return null;
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch('https://api.typesafe.ai/v1/systemone', {
+    const headers = { 'Content-Type': 'application/json' };
+    if (TYPESAFE_API_KEY) {
+      headers['Authorization'] = `Bearer ${TYPESAFE_API_KEY}`;
+    }
+
+    const res = await fetch(DJEV_RUN_URL, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${TYPESAFE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
+      headers,
       signal: controller.signal,
       body: JSON.stringify({
         state: String(userText || '').slice(0, 1000),
@@ -80,7 +83,7 @@ const evaluateWithJev = async (userText) => {
       const urgencyScore = answers.urgency?.score || 0;
       const needsMath = (answers.needs_math?.noul || 0) > 0.45;
       const tone = answers.tone_archetype?.choice || 'peer_coo';
-      console.log(`[TypeSafe Jev Evaluator] Domain: ${intent} | Urgency: ${urgencyScore.toFixed(2)} | Math: ${needsMath} | Tone: ${tone}`);
+      console.log(`[TypeSafe Jev / djev-run Evaluator] Domain: ${intent} | Urgency: ${urgencyScore.toFixed(2)} | Math: ${needsMath} | Tone: ${tone}`);
       return {
         domain: intent,
         urgency: urgencyScore,
@@ -89,7 +92,7 @@ const evaluateWithJev = async (userText) => {
       };
     }
   } catch (err) {
-    console.error('[TypeSafe Jev Notice]:', err.message);
+    console.error('[TypeSafe Jev / djev-run Notice]:', err.message);
   }
   return null;
 };
