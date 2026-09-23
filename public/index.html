@@ -1869,8 +1869,8 @@
 
         <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
             <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin:8px 0 4px 6px;">Workspace Navigation</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="scrollToTop(); toggleSidebar(false);">
-                <span>🏠</span> <span>Strategy Studio</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="resetChatSession(); toggleSidebar(false);">
+                <span>🏠</span> <span>Strategy Studio (Reset / Home)</span>
             </button>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
                 <span>🏢</span> <span>Microsoft 365 Integration Hub</span>
@@ -2351,11 +2351,11 @@
 
     <!-- EXECUTIVE STRATEGY VAULT MODAL -->
     <div class="modal-overlay" id="vaultModal">
-        <div class="modal-card" style="max-width:680px; padding:32px;">
-            <div class="modal-header">
-                <div>
+        <div class="modal-card" style="max-width:680px; padding:32px; overflow:visible;">
+            <div class="modal-header" style="overflow:visible; height:auto;">
+                <div style="flex:1;">
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🔒 Strategy & Research Vault</h2>
-                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Saved business models, turnaround blueprints, job interview notes, and research workflows.</p>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:4px; white-space:normal; overflow:visible; line-height:1.5;">Saved business models, turnaround blueprints, job interview notes, and research workflows.</p>
                 </div>
                 <button class="btn-modal-close" onclick="closeVaultModal()" aria-label="Close" title="Close">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
