@@ -117,79 +117,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     });
   }
 
-  // TIER 1: If user or server provided a Google Gemini API Key (Direct free tier: 15 req/min, 0ms proxy overhead, sub-1.5s latency)
-  if (activeGoogleKey && activeGoogleKey.startsWith('AIzaSy')) {
-    const directModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
-    for (const modelName of directModels) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
-          method: 'POST',
-          headers: {
-            'x-goog-api-key': activeGoogleKey,
-            'Content-Type': 'application/json'
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 2500, temperature: 0.25 }
-          })
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (text && text.trim().length > 0) {
-            console.log(`[⚡ Direct Google AI Studio Instant Success: ${modelName}] (${text.length} chars)`);
-            return { text, isFallback: false };
-          }
-        }
-      } catch (byokErr) {
-        console.warn(`[Direct Google AI Studio Notice - ${modelName}]:`, byokErr.message);
-      }
-    }
-  }
-
-  // TIER 2: Multimodal Vision Execution (Gemini 3.7 Flash)
-  if (hasImages && activeMyclawKey) {
-    console.log(`[Executing Multimodal Vision via Gemini 3.7 Flash | ${imageObjs.length} Images Attached]`);
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
-      const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${activeMyclawKey}`
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: 'gemini-3.7-flash',
-          messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 2500,
-          temperature: 0.2
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.choices?.[0]?.message?.content || '';
-        if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-          console.log(`[Vision Success: gemini-3.7-flash] (${text.length} chars)`);
-          return { text, isFallback: false };
-        }
-      }
-    } catch (err) {
-      console.warn('[Vision request notice]:', err.message);
-    }
-  }
-
-  // TIER 3: Parallel Fast Speculative Race across Flash Gateway Models (Sub-2.5s response)
+  // TIER 1: Parallel Fast Speculative Race across Flash Gateway Models (Sub-2.5s response)
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -229,12 +161,40 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
-      console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
+      console.warn('[Parallel race notice]:', err.message);
+    }
+  }
+
+  // TIER 2: Direct Google AI Studio Fallback
+  if (activeGoogleKey && activeGoogleKey.startsWith('AIzaSy')) {
+    const directModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    for (const modelName of directModels) {
       try {
-        const fallback = await fetchModel('gemini-2.0-flash', 2200);
-        return { text: fallback.text, isFallback: false };
-      } catch (fbErr) {
-        console.error('[All server inference exhausted]:', fbErr.message);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
+          method: 'POST',
+          headers: {
+            'x-goog-api-key': activeGoogleKey,
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 2500, temperature: 0.25 }
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text && text.trim().length > 0) {
+            console.log(`[⚡ Direct Google AI Studio Instant Success: ${modelName}] (${text.length} chars)`);
+            return { text, isFallback: false };
+          }
+        }
+      } catch (byokErr) {
+        console.warn(`[Direct Google AI Studio Notice - ${modelName}]:`, byokErr.message);
       }
     }
   }
