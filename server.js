@@ -156,9 +156,10 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-2.0-flash', 2500),
-        fetchModel('gpt-4o-mini', 2500),
-        fetchModel('gemini-2.5-flash', 2500)
+        fetchModel('gemini-3.8-flash', 2500),
+        fetchModel('gemini-3-flash', 2500),
+        fetchModel('gpt-5.4-mini', 2500),
+        fetchModel('DeepSeek V4 Flash', 2500)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
