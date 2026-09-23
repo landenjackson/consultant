@@ -4722,8 +4722,8 @@
 
             try {
                 const controller = new AbortController();
-                // ⚠️ EXTEND TIMEOUT TO 30s to allow backend race and fallback to resolve without front-end choking
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                // ⚠️ EXTEND TIMEOUT TO 45s to ensure full, unabridged response generation completes cleanly
+                const timeoutId = setTimeout(() => controller.abort(), 45000);
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
 
                 const reqHeaders = { 'Content-Type': 'application/json' };
