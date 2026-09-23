@@ -3174,6 +3174,12 @@
             exportExcelXLSX(editor);
         }
 
+        function exportCanvasTeaser() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            exportExecutivePDF(editor);
+        }
+
         /* 1-CLICK PDF EXECUTIVE DELIVERABLE GENERATOR (CLEAN PRINT STYLES) */
         function exportExecutivePDF(btn) {
             try {
