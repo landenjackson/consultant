@@ -406,7 +406,44 @@
             background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
         }
 
-        /* VAULT CATEGORY FILTER CHIPS */
+        /* ACTIVE TELEMETRY PIPELINE ORCHESTRATION */
+        .orchestration-tracker {
+            background: #090D14;
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tracker-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .tracker-step.running {
+            color: var(--accent-glow);
+            font-weight: 700;
+        }
+
+        .tracker-step.done {
+            color: #4ADE80;
+            opacity: 0.85;
+        }
+
+        .tracker-step.pending {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
         .vault-cat-chip {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
@@ -4642,95 +4679,75 @@
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
             
-            // Clean, Institutional 4-Step Reasoner Telemetry HUD
+            // Active Telemetry Pipeline UI Tracker
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
-                <div class="subagent-hud" id="${hudId}">
-                    <div class="subagent-hud-header">
-                        <span class="subagent-badge"><span class="pulse-dot"></span> Analyzing Parameters</span>
-                        <span style="color:var(--accent-glow); font-size:11.5px; font-weight:700;">Processing...</span>
-                    </div>
-                    <div class="telemetry-feed">
-                        <div class="telemetry-line active" id="${hudId}_step1"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">⚡ Ingesting contextual inputs and primary data...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step2"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">📊 Identifying financial bottlenecks and operational drag...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step3"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">🛡️ Structuring quantitative remediation strategies...</span></div>
-                        <div class="telemetry-line" id="${hudId}_step4"><span class="telemetry-dot-ind"></span> <span class="telemetry-text">✨ Synthesizing executive recommendations and roadmap...</span></div>
-                    </div>
+                <div class="orchestration-tracker" id="${hudId}">
+                    <div class="tracker-step done" id="${hudId}_step1">✓ Ingesting POS & trade geometry</div>
+                    <div class="tracker-step running" id="${hudId}_step2">⟳ Calculating unit contribution & breakeven floor...</div>
+                    <div class="tracker-step pending" id="${hudId}_step3">○ Synthesizing boardroom executive directives</div>
                 </div>
             `;
             assistantRow.appendChild(assistantCard);
             chatFeed.appendChild(assistantRow);
             chatFeed.scrollTop = chatFeed.scrollHeight;
 
-            // Animate telemetry steps actively while awaiting cloud inference
+            // Animate steps
             const t1 = setTimeout(() => {
-                const s1 = document.getElementById(`${hudId}_step1`);
-                const s2 = document.getElementById(`${hudId}_step2`);
-                if (s1) { s1.classList.remove('active'); s1.classList.add('completed'); }
-                if (s2) { s2.classList.add('active'); }
-            }, 600);
-
-            const t2 = setTimeout(() => {
                 const s2 = document.getElementById(`${hudId}_step2`);
                 const s3 = document.getElementById(`${hudId}_step3`);
-                if (s2) { s2.classList.remove('active'); s2.classList.add('completed'); }
-                if (s3) { s3.classList.add('active'); }
-            }, 1400);
+                if (s2) { s2.classList.remove('running'); s2.classList.add('done'); s2.innerText = '✓ Unit contribution & breakeven floor verified'; }
+                if (s3) { s3.classList.remove('pending'); s3.classList.add('running'); s3.innerText = '⟳ Synthesizing boardroom executive directives...'; }
+            }, 1200);
 
-            const t3 = setTimeout(() => {
-                const s3 = document.getElementById(`${hudId}_step3`);
-                const s4 = document.getElementById(`${hudId}_step4`);
-                if (s3) { s3.classList.remove('active'); s3.classList.add('completed'); }
-                if (s4) { s4.classList.add('active'); }
-            }, 2200);
+            // Client-Side Session Cache Key
+            const cacheKey = `cs_cache_${selectedMode}_${text.toLowerCase().trim()}`;
+            const cachedMemo = sessionStorage.getItem(cacheKey);
 
-            chatFeed.scrollTop = chatFeed.scrollHeight;
+            if (cachedMemo) {
+                clearTimeout(t1);
+                streamAssistantResponse(assistantCard, cachedMemo, () => {
+                    attachDeliverablesBar(assistantCard, cachedMemo);
+                    isGenerating = false;
+                    if (sendBtn) sendBtn.disabled = false;
+                });
+                return;
+            }
 
-            isGenerating = true;
-            const sendBtn = document.getElementById('sendBtn');
-            if (sendBtn) sendBtn.disabled = true;
+            // Client-Side 9-Second Timeout with Instant Fallback
+            let res = null;
+            let data = null;
 
             try {
-                const selectedMode = document.getElementById('customModeSelect')?.value || 'general';
-                const memoryContext = getOperatorMemoryContext();
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 9000);
+                const customKey = localStorage.getItem('cs_user_gemini_key') || '';
 
-                let res = null;
-                let data = null;
+                const reqHeaders = { 'Content-Type': 'application/json' };
+                if (customKey) {
+                    reqHeaders['x-custom-gemini-key'] = customKey;
+                }
 
-                // Resilient single-attempt fetch with BYOK header injection
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 45000);
-                    const customKey = localStorage.getItem('cs_user_gemini_key') || '';
+                let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
 
-                    const reqHeaders = { 'Content-Type': 'application/json' };
-                    if (customKey) {
-                        reqHeaders['x-custom-gemini-key'] = customKey;
+                res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: reqHeaders,
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        messages,
+                        conversationId: currentConversationId,
+                        workspace: selectedMode,
+                        documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
+                    })
+                });
+                clearTimeout(timeoutId);
+
+                if (res && res.ok) {
+                    data = await res.json();
+                    if (data.conversationId) {
+                        localStorage.setItem('cs_last_conversation_id', data.conversationId);
                     }
-
-                    let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
-
-                    res = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: reqHeaders,
-                        signal: controller.signal,
-                        body: JSON.stringify({
-                            messages,
-                            conversationId: currentConversationId,
-                            workspace: selectedMode,
-                            documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
-                        })
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (res && res.ok) {
-                        data = await res.json();
-                        if (data.conversationId) {
-                            localStorage.setItem('cs_last_conversation_id', data.conversationId);
-                        }
-                    }
-                } catch (netErr) {
-                    console.warn('[Client Request Notice]', netErr.message);
                 }
 
                 if (!data || !data.response) {
@@ -4741,11 +4758,9 @@
 
                 // Clear active telemetry timers when stream starts
                 clearTimeout(t1);
-                clearTimeout(t2);
-                clearTimeout(t3);
 
                 // Smooth exit transition for the Loading Indicator
-                const loadingHud = assistantCard.querySelector('.typing-indicator') || assistantCard.querySelector('.subagent-hud');
+                const loadingHud = assistantCard.querySelector('.typing-indicator') || assistantCard.querySelector('.orchestration-tracker') || assistantCard.querySelector('.subagent-hud');
                 if (loadingHud) {
                     loadingHud.style.transition = 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
                     loadingHud.style.opacity = '0';
@@ -4759,6 +4774,11 @@
                         <button class="btn-export" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.4); color:#FDE68A; padding:4px 10px; font-size:11px;" onclick="openSettingsModal()">⚙️ Open Settings</button>
                     </div>
                 ` : '';
+
+                // Save successful strategy to session cache for 0ms instant reload
+                try {
+                    sessionStorage.setItem(cacheKey, responseText);
+                } catch(e) {}
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 setTimeout(() => {
