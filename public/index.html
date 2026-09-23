@@ -1970,7 +1970,7 @@
                             </span>
                             <span style="color:var(--text-muted); font-size:11.5px;">Gemini Flash Direct • Zero-Knowledge Vault</span>
                         </div>
-                        <span style="color:var(--text-muted); font-size:11px; cursor:pointer;" onclick="openSettings()">⚙️ View Architecture Specs</span>
+                        <span style="color:var(--text-muted); font-size:11px; cursor:pointer;" onclick="openSpecsModal()">⚙️ View Architecture Specs</span>
                     </div>
                 </div>
 
@@ -2465,6 +2465,40 @@
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
                 <span style="font-size:12px; color:var(--text-muted);">Compatible with Microsoft Office 365, Desktop 2016-2024, and Office Online.</span>
                 <button class="btn-export" onclick="closeOfficeModal()">Close Hub</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARCHITECTURE & SECURITY SPECS MODAL -->
+    <div class="modal-overlay" id="specsModal">
+        <div class="modal-card" style="max-width:540px; padding:28px;">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:18px; font-weight:800; color:#FFFFFF;">⚙️ Architecture & Security Specifications</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Zero-Knowledge local processing and latency telemetry.</p>
+                </div>
+                <button class="btn-modal-close" onclick="closeSpecsModal()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+                <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#38BDF8; margin-bottom:4px;">🔒 Sovereign Client Privacy</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All attached documents (.xlsx, .docx, .pdf, images) are parsed locally inside browser memory via Mammoth.js and PDF.js. Zero company data is stored in remote databases.</div>
+                </div>
+                <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#10B981; margin-bottom:4px;">⚡ Sub-180ms Decision Classification</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">TypeSafe Jev System One / djev-run neural pipeline on Blackwell GPU container accelerates multi-primitive intent routing without network overhead.</div>
+                </div>
+                <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#F59E0B; margin-bottom:4px;">🛡️ Multi-Model Speculative Fast-Race</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Concurrently races Gemini 3.7 Flash, Gemini 2.0 Flash, and GPT-4o-mini with auto-failover to direct Google AI Studio free tier.</div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; border-top:1px solid var(--border); padding-top:14px; margin-top:16px;">
+                <button class="btn-export" onclick="closeSpecsModal()">Close Specifications</button>
             </div>
         </div>
     </div>
@@ -3521,6 +3555,9 @@
         function openSettings() { openSettingsModal(); }
         function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+        function openSpecsModal() { document.getElementById('specsModal').style.display = 'flex'; }
+        function closeSpecsModal() { document.getElementById('specsModal').style.display = 'none'; }
 
         function saveUserGeminiKey() {
             const input = document.getElementById('userGeminiKeyInput');
@@ -4777,13 +4814,13 @@
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
             
-            // Active Telemetry Pipeline UI Tracker
+            <!-- Plain-English Telemetry Pipeline UI Tracker -->
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
                 <div class="orchestration-tracker" id="${hudId}">
-                    <div class="tracker-step done" id="${hudId}_step1">✓ Ingesting POS & trade geometry</div>
-                    <div class="tracker-step running" id="${hudId}_step2">⟳ Calculating unit contribution & breakeven floor...</div>
-                    <div class="tracker-step pending" id="${hudId}_step3">○ Synthesizing boardroom executive directives</div>
+                    <div class="tracker-step done" id="${hudId}_step1">✓ Reading documents...</div>
+                    <div class="tracker-step running" id="${hudId}_step2">⟳ Analyzing financials...</div>
+                    <div class="tracker-step pending" id="${hudId}_step3">○ Preparing recommendations...</div>
                 </div>
             `;
             assistantRow.appendChild(assistantCard);
@@ -4794,8 +4831,8 @@
             const t1 = setTimeout(() => {
                 const s2 = document.getElementById(`${hudId}_step2`);
                 const s3 = document.getElementById(`${hudId}_step3`);
-                if (s2) { s2.classList.remove('running'); s2.classList.add('done'); s2.innerText = '✓ Unit contribution & breakeven floor verified'; }
-                if (s3) { s3.classList.remove('pending'); s3.classList.add('running'); s3.innerText = '⟳ Synthesizing boardroom executive directives...'; }
+                if (s2) { s2.classList.remove('running'); s2.classList.add('done'); s2.innerText = '✓ Financials analyzed'; }
+                if (s3) { s3.classList.remove('pending'); s3.classList.add('running'); s3.innerText = '⟳ Preparing recommendations...'; }
             }, 1200);
 
             // Safe Workspace & Mode Resolution

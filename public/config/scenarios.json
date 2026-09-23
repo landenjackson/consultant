@@ -1,0 +1,88 @@
+{
+  "scenarios": [
+    {
+      "id": "profit-health-check",
+      "title": "Profit & Expense Health Check",
+      "badge": "Finance",
+      "icon": "📊",
+      "description": "Quickly pinpoint hidden costs, margin leaks, and profitability drivers.",
+      "prompt": "Audit our profit and expense health: Monthly revenue $60,000, $21,000 direct product costs, and $22,000 labor. Give me a clear breakdown of where we are losing money and 3 immediate steps to fix it.",
+      "suggestedPrompts": [
+        "Analyze my P&L for unexpected expense spikes",
+        "Find products with negative margins",
+        "Model 13-week cash waterfall"
+      ],
+      "exportOptions": ["xlsx", "pdf", "docx"]
+    },
+    {
+      "id": "market-reach",
+      "title": "Customer Territory & Market Reach",
+      "badge": "Growth",
+      "icon": "📍",
+      "description": "Capture nearby customer demand and increase sales volume without price discounting.",
+      "prompt": "Give me 3 non-discount growth campaigns to capture 5% more neighborhood foot traffic and boost average order volume.",
+      "suggestedPrompts": [
+        "Create high-converting neighborhood marketing hooks",
+        "Benchmark local competitor pricing",
+        "Draft a local customer acquisition plan"
+      ],
+      "exportOptions": ["docx", "pptx", "pdf"]
+    },
+    {
+      "id": "profit-calculator",
+      "title": "Interactive Profit & Loss Calculator",
+      "badge": "Operations",
+      "icon": "🧮",
+      "description": "Calculate daily breakeven targets and stress-test rent, labor, and product inflation.",
+      "prompt": "Model our daily operational breakeven: $4,500 monthly rent, 32% food cost, and 34% labor efficiency.",
+      "suggestedPrompts": [
+        "Calculate daily sales target to break even",
+        "Stress-test a 10% supplier price increase",
+        "Optimize labor schedule to protect profit margins"
+      ],
+      "exportOptions": ["xlsx", "pdf"]
+    },
+    {
+      "id": "losing-products-audit",
+      "title": "Products & Services Losing Money",
+      "badge": "Margins",
+      "icon": "🛑",
+      "description": "Identify unprofitable menu items or service packages diluting your bottom line.",
+      "prompt": "Audit our sales mix and identify items where rising supplier costs or labor preparation time make them unprofitable.",
+      "suggestedPrompts": [
+        "Find menu items with negative contribution margins",
+        "Recalibrate pricing without losing customer volume",
+        "Create pre-portioning guidelines to stop waste"
+      ],
+      "exportOptions": ["xlsx", "docx", "pdf"]
+    },
+    {
+      "id": "interview-answer-builder",
+      "title": "Interview & Leadership Answer Builder",
+      "badge": "Career",
+      "icon": "💼",
+      "description": "Turn your operations history and achievements into quantified, executive-level leadership answers.",
+      "prompt": "Reframe my operations experience into high-impact leadership answers showing how I cut $35,000 in food waste and shortened kitchen wait times by 90 seconds.",
+      "suggestedPrompts": [
+        "Score my resume bullets on a scale of 1-10",
+        "Draft a 30-second executive elevator pitch",
+        "Structure high-accountability job descriptions"
+      ],
+      "exportOptions": ["docx", "pdf"]
+    },
+    {
+      "id": "private-saved-reports",
+      "title": "Private Saved Reports (On Device)",
+      "badge": "Vault",
+      "icon": "🔒",
+      "description": "Access client financial models, strategy memos, and custom plans saved privately on your device.",
+      "prompt": "Show me my saved strategy artifacts, financial models, and turnaround plans.",
+      "suggestedPrompts": [
+        "Review saved turnaround blueprints",
+        "Export all saved models to Excel",
+        "Filter saved reports by category"
+      ],
+      "exportOptions": ["xlsx", "docx", "pdf"]
+    }
+  ]
+}
