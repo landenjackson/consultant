@@ -117,7 +117,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     });
   }
 
-  // TIER 1: Parallel Fast Speculative Race across Flash Gateway Models
+  // TIER 1: Parallel Fast Speculative Race across Proven Stable Models
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2500) => {
       const controller = new AbortController();
@@ -135,14 +135,14 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.2
+            temperature: 0.3
           })
         });
         clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 0) {
+          if (text && text.trim().length > 100) {
             return { model: modelName, text };
           }
         }
@@ -155,9 +155,9 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
 
     try {
       const winner = await Promise.any([
-        fetchModel('gemini-3.7-flash', 2500),
         fetchModel('gemini-2.0-flash', 2500),
-        fetchModel('gpt-4o-mini', 2500)
+        fetchModel('gpt-4o-mini', 2500),
+        fetchModel('gemini-2.5-flash', 2500)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
