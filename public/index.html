@@ -4719,7 +4719,8 @@
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 9000);
+                // ⚠️ EXTEND TIMEOUT TO 30s to allow backend race and fallback to resolve without front-end choking
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
 
                 const reqHeaders = { 'Content-Type': 'application/json' };
@@ -4778,6 +4779,11 @@
                 try {
                     sessionStorage.setItem(cacheKey, responseText);
                 } catch(e) {}
+
+                // Execute exit transition for loading HUD immediately before stream starts
+                if (loadingHud) {
+                    loadingHud.style.display = 'none';
+                }
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 setTimeout(() => {
