@@ -97,9 +97,11 @@ const evaluateWithJev = async (userText) => {
   return null;
 };
 
-// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (PARALLEL FAST SPECULATIVE RACE)
+// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (AUTO-FALLBACK TO DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
 const queryAI = async (prompt, imageObjs = [], customKey = null) => {
   const activeMyclawKey = process.env.MYCLAW_API_KEY;
+  const serverGoogleKey = process.env.GEMINI_API_KEY;
+  const activeGoogleKey = customKey || serverGoogleKey;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
 
   let contentPayload = prompt;
@@ -115,23 +117,23 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     });
   }
 
-  // If user provided a personal custom BYOK key from Google AI Studio
-  if (customKey && customKey.startsWith('AIzaSy')) {
+  // TIER 1: If user or server provided a Google Gemini API Key (Direct free tier: 15 req/min, 0ms proxy overhead, sub-1.5s latency)
+  if (activeGoogleKey && activeGoogleKey.startsWith('AIzaSy')) {
     const directModels = ['gemini-2.5-flash', 'gemini-2.0-flash'];
     for (const modelName of directModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
           method: 'POST',
           headers: {
-            'x-goog-api-key': customKey,
+            'x-goog-api-key': activeGoogleKey,
             'Content-Type': 'application/json'
           },
           signal: controller.signal,
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 8192, temperature: 0.7 }
+            generationConfig: { maxOutputTokens: 2500, temperature: 0.25 }
           })
         });
         clearTimeout(timeoutId);
@@ -139,22 +141,22 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
           if (text && text.trim().length > 0) {
-            console.log(`[BYOK Direct Gemini Success: ${modelName}] (${text.length} chars)`);
+            console.log(`[⚡ Direct Google AI Studio Instant Success: ${modelName}] (${text.length} chars)`);
             return { text, isFallback: false };
           }
         }
       } catch (byokErr) {
-        console.warn(`[BYOK Custom Gemini Notice - ${modelName}]:`, byokErr.message);
+        console.warn(`[Direct Google AI Studio Notice - ${modelName}]:`, byokErr.message);
       }
     }
   }
 
-  // MULTIMODAL INFERENCE ROUTING (VISION & IMAGES)
+  // TIER 2: Multimodal Vision Execution (Gemini 3.7 Flash)
   if (hasImages && activeMyclawKey) {
     console.log(`[Executing Multimodal Vision via Gemini 3.7 Flash | ${imageObjs.length} Images Attached]`);
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -165,7 +167,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
         body: JSON.stringify({
           model: 'gemini-3.7-flash',
           messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 4096,
+          max_tokens: 2500,
           temperature: 0.2
         })
       });
@@ -183,11 +185,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: OpenClaw 2026.9.5 Speculative Fast-Race (Generous 30s timeout so live LLM reasoning NEVER fails to fallback)
+  // TIER 3: Parallel Fast Speculative Race across Flash Gateway Models (Sub-2.5s response)
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -200,7 +202,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
             model: modelName,
             messages: [{ role: 'user', content: contentPayload }],
             max_tokens: maxTokens,
-            temperature: 0.25
+            temperature: 0.2
           })
         });
         clearTimeout(timeoutId);
@@ -224,10 +226,10 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
         fetchModel('gemini-2.5-flash', 2200),
         fetchModel('gpt-4o-mini', 2200)
       ]);
-      console.log(`[⚡ OpenClaw 2026.9.5 Fast Race Winner: ${winner.model}] (${winner.text.length} chars)`);
+      console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
     } catch (err) {
-      console.warn('[Parallel race failed, attempting single fast fallback]:', err.message);
+      console.warn('[Parallel race failed, attempting reliable fallback]:', err.message);
       try {
         const fallback = await fetchModel('gemini-2.0-flash', 2200);
         return { text: fallback.text, isFallback: false };
