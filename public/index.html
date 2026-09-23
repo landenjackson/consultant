@@ -4707,7 +4707,6 @@
             if (cachedMemo) {
                 clearTimeout(t1);
                 streamAssistantResponse(assistantCard, cachedMemo, () => {
-                    attachDeliverablesBar(assistantCard, cachedMemo);
                     isGenerating = false;
                     if (sendBtn) sendBtn.disabled = false;
                 });
@@ -4782,10 +4781,13 @@
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 setTimeout(() => {
-                    if (fallbackBanner) {
-                        assistantCard.innerHTML = fallbackBanner + assistantCard.innerHTML;
-                    }
                     streamAssistantResponse(assistantCard, responseText, () => {
+                        if (fallbackBanner) {
+                            const bannerDiv = document.createElement('div');
+                            bannerDiv.innerHTML = fallbackBanner;
+                            assistantCard.insertBefore(bannerDiv.firstElementChild, assistantCard.firstChild);
+                        }
+
                         // 1. CONTEXT-AWARE WHAT-IF SENSITIVITY SLIDER (ONLY FOR P&L, CASH FLOW, REVENUE & UNIT MATH)
                         const lowerText = (responseText + " " + text).toLowerCase();
                         const isFinancialOrOps = (lowerText.includes('cash') || lowerText.includes('p&l') || lowerText.includes('margin') || lowerText.includes('revenue') || lowerText.includes('cogs') || lowerText.includes('labor') || lowerText.includes('ticket') || lowerText.includes('sales') || lowerText.includes('cost') || lowerText.includes('dollar') || lowerText.includes('$')) &&
