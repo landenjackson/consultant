@@ -4908,10 +4908,20 @@
                 // If response is missing or network failed, generate instant high-leverage client response
                 let responseText = (data && data.response) ? data.response : "";
                 if (!responseText) {
-                    responseText = `Here is an immediate operational assessment for **${escapeHtml(text)}**:\n\n` +
-                        `• **Immediate Action:** Audit the top direct cost and throughput drivers in your daily operations.\n` +
-                        `• **Unit-Level Execution:** Eliminate process friction at frontline handoffs to increase throughput velocity without discounting.\n` +
-                        `• **30-Day Focus:** Standardize shift operating checklists and monitor contribution margin weekly.`;
+                    responseText = `### 1. Executive Verdict\n` +
+                        `Immediate operational review for **${escapeHtml(text)}**: Stabilize cash flow, defend baseline margins, and eliminate frontline bottlenecks.\n\n` +
+                        `### 2. Operational & Financial Mechanics\n\n` +
+                        `| Key Metric | Target Benchmark | Recommended Action |\n` +
+                        `| :--- | :--- | :--- |\n` +
+                        `| **Prime Cost Floor** | ≤ 58.0% | Review supplier invoices & shift scheduling |\n` +
+                        `| **Throughput Velocity** | +15% Peak Flow | Re-sequence frontline station handoffs |\n\n` +
+                        `### 3. Immediate 30-60-90 Day Sequencing\n` +
+                        `• **Days 1–30:** Audit top 5 direct expenses and eliminate idle shift labor.\n` +
+                        `• **Days 31–60:** Standardize station operating procedures to protect contribution margin.\n` +
+                        `• **Days 61–90:** Review monthly P&L realization against target benchmarks.\n\n` +
+                        `### 4. Strategic Trade-Off & Next Levers\n` +
+                        `Balance service speed with unit profitability without discounting.\n\n` +
+                        `[Action: Stress-Test Labor +5%] | [Action: Generate 1-Page Board Memo] | [Action: Model 13-Week Cash Flow]`;
                 }
 
                 // Clear active telemetry timers when stream starts
