@@ -4733,6 +4733,8 @@
 
                 let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
 
+                const memoryContext = localStorage.getItem('cs_strategic_memory') || '';
+
                 res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: reqHeaders,
