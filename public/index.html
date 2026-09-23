@@ -4700,8 +4700,11 @@
                 if (s3) { s3.classList.remove('pending'); s3.classList.add('running'); s3.innerText = '⟳ Synthesizing boardroom executive directives...'; }
             }, 1200);
 
+            // Safe Workspace & Mode Resolution
+            const currentMode = (typeof selectedMode !== 'undefined' && selectedMode) ? selectedMode : (localStorage.getItem('cs_workspace') || 'general');
+
             // Client-Side Session Cache Key
-            const cacheKey = `cs_cache_${selectedMode}_${text.toLowerCase().trim()}`;
+            const cacheKey = `cs_cache_${currentMode}_${text.toLowerCase().trim()}`;
             const cachedMemo = sessionStorage.getItem(cacheKey);
 
             if (cachedMemo) {
@@ -4713,7 +4716,7 @@
                 return;
             }
 
-            // Client-Side 9-Second Timeout with Instant Fallback
+            // Client-Side 30-Second Timeout with Instant Fallback
             let res = null;
             let data = null;
 
@@ -4737,7 +4740,7 @@
                     body: JSON.stringify({
                         messages,
                         conversationId: currentConversationId,
-                        workspace: selectedMode,
+                        workspace: currentMode,
                         documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
                     })
                 });
