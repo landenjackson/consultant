@@ -66,18 +66,26 @@
     <style>
         /* EXECUTIVE ENTERPRISE POLISH & DESIGN REFINEMENT */
         :root {
-            --bg-base: #07090D;
-            --bg-surface: #0C1017;
-            --bg-card: #101520;
-            --bg-card-hover: #151C2B;
+            --bg: #07090D;
+            --card-bg: #0C1017;
+            --card-surface: #101520;
             --border: #182030;
-            --border-glow: rgba(34, 197, 94, 0.35);
-            --accent: #22C55E;
-            --accent-glow: #4ADE80;
-            --accent-soft: rgba(34, 197, 94, 0.10);
+            --border-hover: #222F45;
+            --accent: #22c55e;
+            --accent-glow: #4ade80;
+            --accent-dim: rgba(34, 197, 94, 0.12);
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
             --text-muted: #64748B;
+            --danger: #EF4444;
+
+            /* STRICT DESIGN TOKEN Z-INDEX HIERARCHY */
+            --z-content: 1;
+            --z-header: 10;
+            --z-drawer: 30;
+            --z-backdrop: 40;
+            --z-modal: 50;
+            --z-toast: 60;
         }
 
         html, body {
@@ -891,23 +899,25 @@
         }
 
         .btn-modal-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
             cursor: pointer;
-            min-width: 44px;
-            min-height: 44px;
-            display: flex;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
             transition: all 0.2s ease;
+            padding: 0;
         }
 
         .btn-modal-close:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #FFFFFF;
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #EF4444;
+            transform: scale(1.05);
         }
 
         /* SLEEK HORIZONTAL CHIP SCROLLBARS */
@@ -937,7 +947,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            z-index: 999;
+            z-index: var(--z-toast, 60);
             opacity: 0;
             pointer-events: none;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1032,17 +1042,18 @@
             box-shadow: none;
         }
 
-        /* PRICING MODAL */
+        /* PRICING & CONFIG MODALS */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.88);
+            background: rgba(4, 6, 9, 0.88);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
+            z-index: var(--z-modal, 50);
             padding: 20px;
-            z-index: 100;
         }
 
         .modal-card {
@@ -1786,8 +1797,8 @@
 <body>
 
     <!-- SLIDE-OVER EXECUTIVE SIDEBAR (HAMBURGER MENU) -->
-    <div id="sidebarOverlay" class="modal-overlay" onclick="toggleSidebar(false)" style="z-index:90;"></div>
-    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:280px; background:#0D1118; border-right:1px solid var(--border); z-index:100; transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:24px 20px; box-shadow:10px 0 40px rgba(0,0,0,0.8);">
+    <div id="sidebarOverlay" class="modal-overlay" onclick="toggleSidebar(false)" style="z-index:var(--z-backdrop, 40);"></div>
+    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:280px; background:#0D1118; border-right:1px solid var(--border); z-index:var(--z-drawer, 45); transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:24px 20px; box-shadow:10px 0 40px rgba(0,0,0,0.8);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border);">
             <div style="display:flex; align-items:center; gap:10px;">
                 <div class="brand-logo" style="width:28px; height:28px;">
@@ -1799,7 +1810,9 @@
                 </div>
                 <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; color:#FFF;">Workspace Navigation</span>
             </div>
-            <button onclick="toggleSidebar(false)" style="background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+            <button class="btn-modal-close" onclick="toggleSidebar(false)" aria-label="Close" title="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
@@ -1919,7 +1932,10 @@
                             <span style="font-size:14px; font-weight:800; color:#FFFFFF;">Breakeven Sensitivity Studio (M0–M12)</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="btn-export" style="padding:4px 10px; font-size:11px;" onclick="resetBreakevenControls()">↺ Reset to Baseline</button>
+                            <button class="btn-export" style="padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:5px;" onclick="resetBreakevenControls()">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                <span>Reset to Baseline</span>
+                            </button>
                             <span style="font-size:11.5px; color:var(--text-muted);">Real-Time SVG & Excel 365 Grid</span>
                         </div>
                     </div>
@@ -2233,7 +2249,9 @@
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🛡️ Executive Protocol Access</h2>
                     <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Authenticate your secure workspace session.</p>
                 </div>
-                <button class="btn-modal-close" onclick="closeAuthModal()" title="Close">✕</button>
+                <button class="btn-modal-close" onclick="closeAuthModal()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <div style="margin: 18px 0 16px 0;">
@@ -2287,7 +2305,9 @@
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF;">🔒 Strategy & Research Vault</h2>
                     <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Saved business models, turnaround blueprints, job interview notes, and research workflows.</p>
                 </div>
-                <button class="btn-modal-close" onclick="closeVaultModal()" title="Close">✕</button>
+                <button class="btn-modal-close" onclick="closeVaultModal()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <!-- SEARCH & CATEGORY FILTER BAR -->
@@ -2323,7 +2343,9 @@
                     </h2>
                     <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Direct integration with Microsoft Word, Excel, PowerPoint, and OneDrive.</p>
                 </div>
-                <button class="btn-modal-close" onclick="closeOfficeModal()" title="Close">✕</button>
+                <button class="btn-modal-close" onclick="closeOfficeModal()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
@@ -2403,7 +2425,9 @@
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:18px; font-weight:800; color:#FFFFFF;">⚙️ Studio Settings</h2>
                     <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Customize viewport font sizing and display density.</p>
                 </div>
-                <button class="btn-modal-close" onclick="closeSettingsModal()" title="Close">✕</button>
+                <button class="btn-modal-close" onclick="closeSettingsModal()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:16px;">
@@ -2447,7 +2471,9 @@
                     <h2 style="font-family:'Plus Jakarta Sans'; font-size:22px; font-weight:800; color:#FFFFFF;">Institutional Intelligence Tiers</h2>
                     <p style="color:var(--text-secondary); font-size:13.5px; margin-top:3px;">Select your deployment tier. All plans include 30-day full platform evaluation.</p>
                 </div>
-                <button class="btn-modal-close" onclick="closePricing()" title="Close">✕</button>
+                <button class="btn-modal-close" onclick="closePricing()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
             <div class="pricing-grid">
                 <!-- STARTER $15.99 -->
