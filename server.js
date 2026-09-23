@@ -121,7 +121,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2200) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -155,8 +155,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     try {
       const winner = await Promise.any([
         fetchModel('gemini-2.0-flash', 2200),
-        fetchModel('gemini-2.5-flash', 2200),
-        fetchModel('gpt-4o-mini', 2200)
+        fetchModel('gpt-4o-mini', 2200),
+        fetchModel('gemini-2.5-flash', 2200)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
