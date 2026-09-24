@@ -4734,16 +4734,48 @@
             triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
         }
 
-        // 3. WORD EXPORT (OPENS DIRECTLY IN LIVE STRATEGY CANVAS FOR COPY/EDIT/EXPORT)
+        // 3. WORD EXPORT (.DOCX / HTML FORMATTED CLEAN DOCUMENT)
         function exportWordDoc(btn) {
-            showToast("Exporting Word Document...", "📝");
-            openInCanvas(btn);
+            try {
+                showToast("Generating Executive Brief (.docx)...", "📝");
+                const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+                const rawText = card ? (card.querySelector('.stream-content')?.innerText || card.innerText) : '';
+                const cleanText = getCleanStrategyText(rawText);
+
+                const htmlContent = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head><meta charset='utf-8'><title>Consultant Studio Executive Brief</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #1E293B; margin: 40px; }
+                        h1 { color: #0F172A; font-size: 22pt; border-bottom: 2pt solid #10B981; padding-bottom: 6pt; }
+                        h2 { color: #1E293B; font-size: 14pt; margin-top: 18pt; border-bottom: 1pt solid #E2E8F0; }
+                        p { font-size: 11pt; margin-bottom: 10pt; }
+                        table { width: 100%; border-collapse: collapse; margin: 16pt 0; }
+                        th { background: #0F172A; color: #FFF; padding: 8pt; font-size: 10pt; text-align: left; }
+                        td { border: 1pt solid #CBD5E1; padding: 7pt; font-size: 10pt; }
+                        .footer { margin-top: 30pt; font-size: 9pt; color: #64748B; border-top: 1pt solid #CBD5E1; padding-top: 8pt; }
+                    </style></head>
+                    <body>
+                        <h1>EXECUTIVE OPERATING BRIEF</h1>
+                        <p><strong>Prepared via:</strong> Consultant Studio Strategic Advisory &bull; <em>Confidential</em></p>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <hr style="border: none; border-top: 1px solid #CBD5E1; margin: 16pt 0;"/>
+                        <div>${formatExecutiveResponse(cleanText)}</div>
+                        <div class="footer">Confidential Operating Deliverable &bull; Consultant Studio &bull; www.consultant-studio.app</div>
+                    </body></html>
+                `;
+
+                const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+                triggerFileDownload(blob, `Consultant_Studio_Strategic_Brief_${Date.now()}.doc`);
+            } catch (err) {
+                console.error("Word export error:", err);
+                openInCanvas(btn);
+            }
         }
 
-        // 4. DECK EXPORT (DIRECT CANVAS MODAL / SLIDE PRESENTATION)
+        // 4. POWERPOINT DECK EXPORT (CLIENT-SIDE NATIVE PPTX GENERATION VIA PPTXGENJS)
         function exportPitchDeck(btn) {
-            showToast("Exporting Pitch Deck Presentation...", "📈");
-            openInCanvas(btn);
+            exportPowerPointDeck(btn);
         }
 
         // 4. POWERPOINT DECK EXPORT (CLIENT-SIDE NATIVE PPTX GENERATION VIA PPTXGENJS)
