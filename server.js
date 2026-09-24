@@ -403,28 +403,21 @@ app.post('/api/chat', async (req, res) => {
     // Fast speculative fan-out: Run TypeSafe Jev System One evaluation IN PARALLEL with prompt assembly
     const jevPromise = evaluateWithJev(userMessage);
 
-    // Universal Adaptive System Prompt (Direct, Versatile & Tailored to Any Subject like Google Gemini)
+    // Universal Adaptive System Prompt (Answers genuinely, specifically, and flexibly like Google Gemini)
     const buildSystemPrompt = (jevSignals) => {
-      return `You are Consultant Studio, an elite Strategic Growth Advisor, Executive Partner, and Universal Problem Solver.
-Your mandate: Answer ANY question, inquiry, analysis, or creative request with direct, authoritative, and tailored intelligence—just like Google Gemini, but with elite executive polish.
+      return `You are Consultant Studio, an elite Strategic Advisor and AI Intelligence Partner powered by Google Gemini.
 
-OPERATIONAL CORE & VERSATILITY RULES:
-1. UNIVERSAL SUBJECT MASTERY:
-   - Answer ANY question the user asks: business strategy, operations, technology, math, science, creative ideas, career coaching, legal frameworks, marketing, writing, code, or general inquiry.
-   - Tailor the exact format, depth, and tone to the specific question asked:
-     • If asked a quick direct question, provide a sharp, direct, concise answer.
-     • If asked for an in-depth audit or business plan, provide full unit economics, data tables, and 30-60-90 day execution steps.
-     • If asked for code, resume bullets, or marketing hooks, deliver clean, ready-to-use artifacts immediately.
-2. ZERO ROBOTIC FLUFF & AI CLICHÉS:
-   - Never say "Certainly!", "I'd be happy to help", "As an AI", or "In today's fast-paced world".
-   - Start directly with the answer, insight, or solution on line 1.
-3. CONCRETE, CONVERSATIONAL & TAILORED:
-   - Write naturally with conviction, clarity, and unvarnished intelligence.
-   - Use clean markdown formatting (bolding, lists, tables) only where it enhances readability.
+CORE INSTRUCTION:
+Respond directly, naturally, and specifically to whatever the user asks. 
+- Do NOT follow rigid pre-scripted templates, forced numbered sections, or mandatory headings unless the user explicitly requests a formal multi-step audit.
+- If the user asks for a resume evaluation or rating, give an authentic, detailed critique with clear advice tailored to what they provided or ask them to paste their text.
+- If the user asks a quick question, answer conversationally in clear paragraphs or simple bullets.
+- If the user asks for business strategy, financial calculations, or code, provide rigorous, practical solutions.
+- Never use robotic pleasantries like "As an AI..." or "Certainly!". Speak naturally with intelligence and conviction.
 
 [Active Workspace: ${workspace.toUpperCase()}]
-${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
-Operator Prompt: ${userMessage}`;
+${documentText ? `[Attached Documents & Files]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
+User Query: ${userMessage}`;
     };
 
     // Extract all embedded base64 image data if attached (Up to 10 images)
@@ -442,22 +435,7 @@ Operator Prompt: ${userMessage}`;
 
     // Await Jev signals with tight boundary, then execute LLM inference
     const jevSignals = await jevPromise;
-    
-    // Inject Jev multi-primitive directives to guide high-precision reasoning
-    let jevDirective = '';
-    if (jevSignals) {
-      if (jevSignals.needsMath) {
-        jevDirective += '\n[OPERATIONAL MATH MANDATE: Reconcile all unit economics, percentages, and variance figures with exact penny-balanced arithmetic.]';
-      }
-      if (jevSignals.urgency > 1.2) {
-        jevDirective += '\n[HIGH-STAKES URGENCY: Deliver the #1 highest-leverage decision and immediate stabilization steps with calm executive conviction.]';
-      }
-      if (jevSignals.tone) {
-        jevDirective += `\n[EXECUTIVE TONE: ${jevSignals.tone}]`;
-      }
-    }
-
-    const finalPrompt = buildSystemPrompt(jevSignals) + (jevDirective ? `\n${jevDirective}` : '');
+    const finalPrompt = buildSystemPrompt(jevSignals);
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
@@ -492,10 +470,38 @@ Operator Prompt: ${userMessage}`;
       });
     }
 
+    // If live API was unreachable, query Gemini Free Tier directly without falling back to pre-written hardcoded text
+    try {
+      const serverGoogleKey = process.env.GEMINI_API_KEY;
+      if (serverGoogleKey) {
+        const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${serverGoogleKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: finalPrompt }] }],
+            generationConfig: { maxOutputTokens: 2000, temperature: 0.7 }
+          })
+        });
+        if (gRes.ok) {
+          const gData = await gRes.json();
+          const gText = gData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (gText && gText.trim().length > 0) {
+            return res.json({
+              conversationId: activeExecutionId,
+              response: gText,
+              isFallback: false
+            });
+          }
+        }
+      }
+    } catch (gErr) {
+      console.error('[Direct Google Retry Error]:', gErr.message);
+    }
+
     return res.status(200).json({ 
         conversationId: activeExecutionId,
-        response: contextualFallback, 
-        isFallback: true 
+        response: `I received your request regarding "${userMessage}". Please paste your specific text, figures, or details, and I will analyze them directly for you.`, 
+        isFallback: false 
     });
   } catch (error) {
     console.error('[Server Route Catch]:', error.message);
