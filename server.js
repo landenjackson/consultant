@@ -117,7 +117,45 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     });
   }
 
-  // TIER 1: Parallel Fast Speculative Race across Proven Stable Models
+  // TIER 1: Multimodal Vision Execution (When images or photos are attached)
+  if (hasImages && activeMyclawKey) {
+    console.log(`[Executing Multimodal Vision | ${imageObjs.length} Images Attached]`);
+    const visionModels = ['gemini-2.0-flash', 'gpt-4o-mini', 'gemini-2.5-flash'];
+    for (const modelName of visionModels) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 35000);
+        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Authorization': `Bearer ${activeMyclawKey}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: modelName,
+            messages: [{ role: 'user', content: contentPayload }],
+            max_tokens: 2500,
+            temperature: 0.2
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content || '';
+          if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
+            console.log(`[Vision Success: ${modelName}] (${text.length} chars)`);
+            return { text, isFallback: false };
+          }
+        }
+      } catch (err) {
+        console.warn(`[Vision Notice - ${modelName}]:`, err.message);
+      }
+    }
+  }
+
+  // TIER 2: Parallel Fast Speculative Race across Proven Stable Models (Text & Ingested Document Mode)
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2500) => {
       const controller = new AbortController();
