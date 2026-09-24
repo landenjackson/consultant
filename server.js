@@ -444,7 +444,22 @@ Operator Prompt: ${userMessage}`;
 
     // Await Jev signals with tight boundary, then execute LLM inference
     const jevSignals = await jevPromise;
-    const finalPrompt = buildSystemPrompt(jevSignals);
+    
+    // Inject Jev multi-primitive directives to guide high-precision reasoning
+    let jevDirective = '';
+    if (jevSignals) {
+      if (jevSignals.needsMath) {
+        jevDirective += '\n[OPERATIONAL MATH MANDATE: Reconcile all unit economics, percentages, and variance figures with exact penny-balanced arithmetic.]';
+      }
+      if (jevSignals.urgency > 1.2) {
+        jevDirective += '\n[HIGH-STAKES URGENCY: Deliver the #1 highest-leverage decision and immediate stabilization steps with calm executive conviction.]';
+      }
+      if (jevSignals.tone) {
+        jevDirective += `\n[EXECUTIVE TONE: ${jevSignals.tone}]`;
+      }
+    }
+
+    const finalPrompt = buildSystemPrompt(jevSignals) + (jevDirective ? `\n${jevDirective}` : '');
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
