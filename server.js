@@ -155,8 +155,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Direct High-Reliability Model Execution (Direct Google AI Studio Free Tier + Fast Failover)
-  if (activeGoogleKey && activeGoogleKey.startsWith('AIzaSy')) {
+  // TIER 1: Direct High-Reliability Model Execution (Direct Google AI Studio / Vertex Key + Fast Failover)
+  if (activeGoogleKey) {
     const directModels = ['gemini-2.0-flash', 'gemini-1.5-flash'];
     for (const modelName of directModels) {
       try {
