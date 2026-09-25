@@ -155,12 +155,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 2: Parallel Fast Speculative Race across Proven Stable Models (Text & Ingested Document Mode)
+  // TIER 1: Fast Speculative Race across Proven Active Models
   if (activeMyclawKey && !hasImages) {
     const fetchModel = async (modelName, maxTokens = 2500) => {
       const controller = new AbortController();
-      // Increase backend timeout bounds to prevent premature disconnects during long generations
-      const timeoutId = setTimeout(() => controller.abort(), 35000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
@@ -196,8 +195,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
       const winner = await Promise.any([
         fetchModel('gpt-6-astra', 2500),
         fetchModel('gemini-2.0-flash', 2500),
-        fetchModel('gpt-4o-mini', 2500),
-        fetchModel('gemini-2.5-flash', 2500)
+        fetchModel('gemini-2.5-flash', 2500),
+        fetchModel('gpt-4o-mini', 2500)
       ]);
       console.log(`[⚡ Fast Race Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
