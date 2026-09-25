@@ -155,37 +155,44 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Direct High-Reliability Google AI Studio Execution (gemini-3.8-flash)
+  // TIER 1: Direct High-Reliability Google AI Studio Execution with Auto-Retry on 503 Spikes
   if (activeGoogleKey) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${activeGoogleKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
-        })
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (text && text.trim().length > 20) {
-          console.log(`[⚡ Direct Google AI Studio Instant Success: gemini-3.8-flash] (${text.length} chars)`);
-          return { text, isFallback: false };
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${activeGoogleKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text && text.trim().length > 20) {
+            console.log(`[⚡ Direct Google AI Studio Instant Success: gemini-3.8-flash (Attempt ${attempt})] (${text.length} chars)`);
+            return { text, isFallback: false };
+          }
+        } else if (res.status === 503 || res.status === 429) {
+          console.warn(`[Google AI Studio 503/429 Demand Spike - Backoff Retry ${attempt}/3]`);
+          await new Promise(r => setTimeout(r, 1200 * attempt));
+        } else {
+          const errData = await res.text();
+          console.warn(`[Direct Google AI Studio HTTP ${res.status}]:`, errData.slice(0, 150));
+          break;
         }
-      } else {
-        const errData = await res.text();
-        console.warn(`[Direct Google AI Studio HTTP ${res.status}]:`, errData.slice(0, 150));
+      } catch (byokErr) {
+        console.warn(`[Direct Google AI Studio Notice - Attempt ${attempt}]:`, byokErr.message);
+        await new Promise(r => setTimeout(r, 1000));
       }
-    } catch (byokErr) {
-      console.warn(`[Direct Google AI Studio Notice - gemini-3.8-flash]:`, byokErr.message);
     }
   }
 
