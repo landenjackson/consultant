@@ -155,40 +155,37 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Direct High-Reliability Model Execution (Google AI Studio gemini-3.8-flash)
+  // TIER 1: Direct High-Reliability Google AI Studio Execution (gemini-3.8-flash)
   if (activeGoogleKey) {
-    const directModels = ['gemini-3.8-flash'];
-    for (const modelName of directModels) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
-          })
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (text && text.trim().length > 20) {
-            console.log(`[⚡ Direct Google AI Studio Instant Success: ${modelName}] (${text.length} chars)`);
-            return { text, isFallback: false };
-          }
-        } else {
-          const errData = await res.text();
-          console.warn(`[Direct Google AI Studio HTTP ${res.status}]:`, errData.slice(0, 150));
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${activeGoogleKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (text && text.trim().length > 20) {
+          console.log(`[⚡ Direct Google AI Studio Instant Success: gemini-3.8-flash] (${text.length} chars)`);
+          return { text, isFallback: false };
         }
-      } catch (byokErr) {
-        console.warn(`[Direct Google AI Studio Notice - ${modelName}]:`, byokErr.message);
+      } else {
+        const errData = await res.text();
+        console.warn(`[Direct Google AI Studio HTTP ${res.status}]:`, errData.slice(0, 150));
       }
+    } catch (byokErr) {
+      console.warn(`[Direct Google AI Studio Notice - gemini-3.8-flash]:`, byokErr.message);
     }
   }
 
@@ -519,32 +516,31 @@ Operator Query: ${userMessage}`;
       });
     }
 
-    // If live API was unreachable, query Gemini Free Tier directly without falling back to pre-written hardcoded text
+    // If primary query failed, attempt one final direct Google AI Studio generation before returning a simple response
     try {
-      const serverGoogleKey = process.env.GEMINI_API_KEY;
       if (serverGoogleKey) {
-        const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${serverGoogleKey}`, {
+        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${serverGoogleKey}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: finalPrompt }] }],
-            generationConfig: { maxOutputTokens: 2000, temperature: 0.7 }
+            contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
+            generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
           })
         });
-        if (gRes.ok) {
-          const gData = await gRes.json();
-          const gText = gData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (gText && gText.trim().length > 0) {
+        if (directRes.ok) {
+          const directData = await directRes.json();
+          const directText = directData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (directText && directText.trim().length > 0) {
             return res.json({
               conversationId: activeExecutionId,
-              response: gText,
+              response: directText,
               isFallback: false
             });
           }
         }
       }
-    } catch (gErr) {
-      console.error('[Direct Google Retry Error]:', gErr.message);
+    } catch (finalErr) {
+      console.error('[Final Google Retry Error]:', finalErr.message);
     }
 
     return res.status(200).json({ 
