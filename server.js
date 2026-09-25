@@ -155,17 +155,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     }
   }
 
-  // TIER 1: Direct High-Reliability Model Execution (Direct Google AI Studio / Vertex Key + Fast Failover)
+  // TIER 1: Direct High-Reliability Model Execution (Google AI Studio gemini-3.8-flash)
   if (activeGoogleKey) {
-    const directModels = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    const directModels = ['gemini-3.8-flash'];
     for (const modelName of directModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`, {
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
           method: 'POST',
           headers: {
-            'x-goog-api-key': activeGoogleKey,
             'Content-Type': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           },
@@ -179,10 +178,13 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
         if (res.ok) {
           const data = await res.json();
           const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (text && text.trim().length > 50) {
+          if (text && text.trim().length > 20) {
             console.log(`[⚡ Direct Google AI Studio Instant Success: ${modelName}] (${text.length} chars)`);
             return { text, isFallback: false };
           }
+        } else {
+          const errData = await res.text();
+          console.warn(`[Direct Google AI Studio HTTP ${res.status}]:`, errData.slice(0, 150));
         }
       } catch (byokErr) {
         console.warn(`[Direct Google AI Studio Notice - ${modelName}]:`, byokErr.message);
