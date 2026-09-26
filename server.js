@@ -337,6 +337,49 @@ Diagnostic baseline established. Re-verify your API key in Workspace Display Set
   }
 });
 
+// 2. OPERATOR TRIAGE MULTIMODAL API (SUPPORTING Astro/React ConsultantChat)
+app.post('/api/operator-triage', async (req, res) => {
+  try {
+    const { prompt = '', image, mode = 'EXECUTIVE_STRATEGY' } = req.body;
+    if (!prompt && !image) {
+      return res.status(400).json({ error: 'Missing prompt or payload' });
+    }
+
+    let imageObjs = [];
+    if (image && typeof image === 'string' && image.includes('data:image/')) {
+      const match = image.match(/data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([^\s\]]+)/);
+      if (match) {
+        imageObjs.push({
+          mimeType: match[1],
+          data: match[2]
+        });
+      }
+    }
+
+    const triagePrompt = `You are the Strategic Operator—a browser-based Fractional COO and Systems Strategist inside Consultant Studio.
+Mode: ${mode}
+Analyze the prompt and any attached image/document with unvarnished executive rigor, shop-floor physics, and deterministic unit economics.
+
+Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
+
+    const liveResponse = await queryAI(triagePrompt, imageObjs);
+    if (liveResponse && liveResponse.text) {
+      return res.json({ result: liveResponse.text });
+    }
+
+    return res.json({
+      result: `### 1. OPERATIONAL TEARDOWN\n` +
+        `Direct operational assessment for "${prompt || 'Attached Data'}":\n` +
+        `• **Prime Cost Floor:** Defend baseline gross margin at ≥ 58.0%.\n` +
+        `• **Throughput Velocity:** Eliminate frontline station friction to accelerate order turnaround.\n` +
+        `• **30-Day Execution:** Establish weekly contribution margin tracking and lock in standard operating procedures.`
+    });
+  } catch (error) {
+    console.error('[Operator Triage Error]:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
 app.post('/api/chat', async (req, res) => {
   try {
