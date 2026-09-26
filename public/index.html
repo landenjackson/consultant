@@ -2427,21 +2427,6 @@
             </div>
 
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
-                <!-- WORD 365 -->
-                <div style="background:rgba(0,120,212,0.06); border:1px solid rgba(0,120,212,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px; color:#0078D4;">📝</span>
-                        <div>
-                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">Microsoft Word 365</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">Executive briefs & turnarounds</div>
-                        </div>
-                    </div>
-                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Export verified MSO-compliant memos formatted for corporate Word and Teams distribution.</p>
-                    <button class="btn-export" onclick="exportWordDoc(); closeOfficeModal();" style="border-color:#0078D4; color:#60A5FA; justify-content:center;">
-                        <span>📥</span> Export to Microsoft Word
-                    </button>
-                </div>
-
                 <!-- EXCEL 365 -->
                 <div style="background:rgba(16,124,65,0.06); border:1px solid rgba(16,124,65,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -2453,22 +2438,22 @@
                     </div>
                     <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Instant workbook generation with structured telemetry sheets and sensitivity matrices.</p>
                     <button class="btn-export" onclick="exportExcelXLSX(); closeOfficeModal();" style="border-color:#107C41; color:#4ADE80; justify-content:center;">
-                        <span>📥</span> Export to Microsoft Excel
+                        <span>📥</span> Export to Microsoft Excel (.xlsx)
                     </button>
                 </div>
 
-                <!-- POWERPOINT 365 -->
-                <div style="background:rgba(216,59,1,0.06); border:1px solid rgba(216,59,1,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+                <!-- PDF BRIEF -->
+                <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
                     <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px; color:#D83B01;">📊</span>
+                        <span style="font-size:24px; color:#F59E0B;">📑</span>
                         <div>
-                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">PowerPoint 365</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">Boardroom pitch decks</div>
+                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">PDF Executive Report</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Printable boardroom brief</div>
                         </div>
                     </div>
-                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Converts 90-day strategy milestones into presentation-ready executive slide decks.</p>
-                    <button class="btn-export" onclick="exportPitchDeck(); closeOfficeModal();" style="border-color:#D83B01; color:#FB923C; justify-content:center;">
-                        <span>📥</span> Export to PowerPoint Deck
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Clean, publication-ready PDF deliverable with formatted tables and metrics.</p>
+                    <button class="btn-export" onclick="exportExecutivePDF(); closeOfficeModal();" style="border-color:#F59E0B; color:#FBBF24; justify-content:center;">
+                        <span>📥</span> Export PDF Report
                     </button>
                 </div>
 
@@ -3803,10 +3788,8 @@
                 <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
                 <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
                 <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open Interactive Canvas</button>
-                <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Executive Report</button>
-                <button class="btn-export" onclick="exportExcelXLSX(this)">📊 Financial Model (.xlsx)</button>
-                <button class="btn-export" onclick="exportWordDoc(this)">📝 Executive Memo (.docx)</button>
-                <button class="btn-export" onclick="exportPitchDeck(this)">📈 Presentation Deck (.pptx)</button>
+                <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Report</button>
+                <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Financial Model (.xlsx)</button>
                 <button class="btn-export" onclick="saveToVault(this)">🔒 Save to Research Vault</button>
             `;
             card.appendChild(delivBar);
@@ -5058,10 +5041,8 @@
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
                             <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open Interactive Canvas</button>
-                            <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Executive Report</button>
-                            <button class="btn-export" onclick="exportExcelXLSX(this)">📊 Financial Model (.xlsx)</button>
-                            <button class="btn-export" onclick="exportWordDoc(this)">📝 Executive Memo (.docx)</button>
-                            <button class="btn-export" onclick="exportPitchDeck(this)">📈 Presentation Deck (.pptx)</button>
+                            <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Report</button>
+                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Financial Model (.xlsx)</button>
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save to Research Vault</button>
                         `;
                         assistantCard.appendChild(delivBar);
