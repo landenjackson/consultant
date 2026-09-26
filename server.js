@@ -169,7 +169,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
           },
           signal: controller.signal,
           body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            contents: [{ role: 'user', parts: [{ text: typeof contentPayload === 'string' ? contentPayload : prompt }] }],
             generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 }
           })
         });
@@ -191,8 +191,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     try {
       const winner = await Promise.any([
         fetchDirectGoogle('gemini-3.1-flash-lite', 2500),
-        fetchDirectGoogle('gemini-3.6-flash', 2500),
-        fetchDirectGoogle('gemini-flash-latest', 2500)
+        fetchDirectGoogle('gemini-flash-latest', 2500),
+        fetchDirectGoogle('gemini-3.1-flash-lite-preview', 2500)
       ]);
       console.log(`[⚡ Direct Google AI Studio Instant Winner: ${winner.model}] (${winner.text.length} chars)`);
       return { text: winner.text, isFallback: false };
