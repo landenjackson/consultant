@@ -585,6 +585,45 @@ Operator Query: ${userMessage}`;
   }
 });
 
+// 4. AUTOPILOT 24/7 BACKGROUND MONITORING & TELEMETRY DISPATCH (OPENCLAW v2026.9.6)
+app.post('/api/autopilot/triage', async (req, res) => {
+  try {
+    const { metrics = {}, businessName = 'Operations Unit' } = req.body;
+    const { revenue = 50000, cogs = 16000, labor = 17500, targetPrimeFloor = 55.0 } = metrics;
+
+    const primeCost = cogs + labor;
+    const primeCostPct = ((primeCost / revenue) * 100).toFixed(1);
+    const variance = (primeCostPct - targetPrimeFloor).toFixed(1);
+
+    const isLeak = primeCostPct > targetPrimeFloor;
+    const leakAmount = isLeak ? Math.round(((primeCostPct - targetPrimeFloor) / 100) * revenue) : 0;
+
+    const autopilotPayload = {
+      timestamp: new Date().toISOString(),
+      businessName,
+      status: isLeak ? 'ACTION_REQUIRED' : 'NOMINAL',
+      metrics: {
+        revenue,
+        cogs,
+        labor,
+        primeCost,
+        primeCostPct: parseFloat(primeCostPct),
+        targetPrimeFloor,
+        variancePct: parseFloat(variance),
+        monthlyLeakAmount: leakAmount,
+        annualizedRecapture: leakAmount * 12
+      },
+      autopilotDirective: isLeak 
+        ? `⚠️ Autopilot Margin Alert: Prime cost running at ${primeCostPct}% (+${variance}% over target). Recover $${leakAmount.toLocaleString()}/mo ($${(leakAmount * 12).toLocaleString()}/yr) by cutting shoulder labor and auditing food waste.`
+        : `✅ Autopilot Status: Prime cost running at ${primeCostPct}% within target floor (${targetPrimeFloor}%). Margins protected.`
+    };
+
+    return res.json(autopilotPayload);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // START SERVER
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Consultant Studio running on port ${PORT}`);
