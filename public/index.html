@@ -1996,23 +1996,32 @@
                     </div>
                 </div>
 
-                <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO -->
-                <div id="breakevenStudio" style="background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 20px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
+                <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (COLLAPSIBLE & RESPONSIVE) -->
+                <div id="breakevenStudio" style="background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="toggleBreakevenCollapse()">
                             <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
                                 <span class="telemetry-dot"></span> Financial Control Room
                             </span>
-                            <span style="font-size:14px; font-weight:800; color:#FFFFFF;">Breakeven Sensitivity Studio (M0–M12)</span>
+                            <span style="font-size:14px; font-weight:800; color:#FFFFFF;">Breakeven Sensitivity Studio</span>
+                            <span id="beToggleIcon" style="font-size:12px; color:var(--text-muted); transition:transform 0.2s;">▼</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <!-- QUICK-LOAD INDUSTRY PRESETS -->
+                            <div style="display:inline-flex; align-items:center; gap:4px; background:#07090D; padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-size:11px;">
+                                <span style="color:var(--text-muted); font-size:10.5px; margin-right:2px;">Preset:</span>
+                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('hospitality')">🍔 Hospitality</button>
+                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('saas')">💻 SaaS</button>
+                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('services')">⚖️ Services</button>
+                            </div>
                             <button class="btn-export" style="padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:5px;" onclick="resetBreakevenControls()">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                                <span>Reset to Baseline</span>
+                                <span>Reset</span>
                             </button>
-                            <span style="font-size:11.5px; color:var(--text-muted);">Real-Time SVG & Excel 365 Grid</span>
                         </div>
                     </div>
+
+                    <div id="beStudioCollapsibleContent" style="margin-top:14px;">
 
                     <!-- 3 SYNCHRONIZED SENSITIVITY SLIDERS -->
                     <div class="be-controls-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:16px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
@@ -2116,7 +2125,8 @@
                             Test Live Audit Now →
                         </button>
                     </div>
-                </div>
+                    </div> <!-- /beStudioCollapsibleContent -->
+                </div> <!-- /breakevenStudio -->
 
                 <!-- EXECUTIVE CAREER & ENTERPRISE JOB HUB -->
                 <div style="display:flex; justify-content:space-between; align-items:center; margin: 8px 0 2px 0;">
@@ -2312,6 +2322,16 @@
                     <path d="M3 21v-5h5"></path>
                 </svg>
             </button>
+
+            <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
+            <div style="display:inline-flex; align-items:center; background:#07090D; border:1px solid var(--border); border-radius:8px; padding:2px 6px;">
+                <select id="modelSelectOverride" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Model Routing Strategy">
+                    <option value="auto" selected style="background:#0D121A; color:#FFF;">⚡ Auto (Speculative Race)</option>
+                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (<1s)</option>
+                    <option value="gemini-flash-latest" style="background:#0D121A; color:#FFF;">Gemini Flash Latest</option>
+                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash</option>
+                </select>
+            </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Input a strategic objective, financial diagnostic query, or campaign parameter..." style="resize:none; padding:10px 14px; min-height:42px; max-height:140px; line-height:1.4;" onkeydown="handleInputKeydown(event)"></textarea>
             <button id="sendBtn" class="btn-send" onclick="sendMessage()">
                 <span>Execute Analysis</span>
@@ -2724,6 +2744,41 @@
             }
         }
         // BREAKEVEN SENSITIVITY STUDIO REACTIVE LOGIC
+        function toggleBreakevenCollapse() {
+            const content = document.getElementById('beStudioCollapsibleContent');
+            const icon = document.getElementById('beToggleIcon');
+            if (!content) return;
+            const isHidden = content.style.display === 'none';
+            content.style.display = isHidden ? 'block' : 'none';
+            if (icon) icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+            localStorage.setItem('cs_be_studio_collapsed', isHidden ? 'false' : 'true');
+        }
+
+        // QUICK-LOAD INDUSTRY PRESETS
+        function loadIndustryPreset(type) {
+            const rentSlider = document.getElementById('beRentSlider');
+            const cogsSlider = document.getElementById('beCogsSlider');
+            const laborSlider = document.getElementById('beLaborSlider');
+
+            if (type === 'hospitality') {
+                if (rentSlider) rentSlider.value = 200;
+                if (cogsSlider) cogsSlider.value = 2.0;
+                if (laborSlider) laborSlider.value = -1.5;
+                showToast("🍔 Loaded Hospitality & Diner Preset (Prime Cost Focus)");
+            } else if (type === 'saas') {
+                if (rentSlider) rentSlider.value = -500;
+                if (cogsSlider) cogsSlider.value = -3.0;
+                if (laborSlider) laborSlider.value = 3.0;
+                showToast("💻 Loaded B2B SaaS Preset (75% Gross Margin Baseline)");
+            } else if (type === 'services') {
+                if (rentSlider) rentSlider.value = 0;
+                if (cogsSlider) cogsSlider.value = -4.0;
+                if (laborSlider) laborSlider.value = 2.0;
+                showToast("⚖️ Loaded Professional Services Preset (Utilization Focus)");
+            }
+            recalcBreakevenStudio();
+        }
+
         const beBaseline = {
             monthlyRev: 35000,
             rentBase: 4500,
@@ -4207,22 +4262,23 @@
             }
         }
 
-        // 🎙️ EXECUTIVE VOICE BRIEFING AUDIO ENGINE (SPEECHSYNTHESIS)
+        // 🎙️ EXECUTIVE VOICE BRIEFING AUDIO ENGINE (SPEECHSYNTHESIS WITH INLINE DELIVERABLE CARD)
         let activeUtterance = null;
         function playVoiceBriefing(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
 
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                btn.innerHTML = '🎙️ Listen to Briefing';
-                btn.style.borderColor = 'var(--border)';
-                btn.style.color = 'var(--text-secondary)';
-                return;
+            let existingPlayer = card.querySelector('.inline-audio-player');
+            if (existingPlayer) {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    existingPlayer.remove();
+                    btn.innerHTML = '🎙️ Audio Briefing';
+                    return;
+                }
             }
 
             const rawText = card.innerText || card.textContent;
-            // Clean out headers, table lines and noise for clean speech
             const cleanSpeech = rawText
                 .replace(/CONSULTANT STUDIO[\s\S]*?\n/g, '')
                 .replace(/\|[^\n]+\|/g, '')
@@ -4230,31 +4286,72 @@
                 .replace(/https?:\/\/\S+/g, '')
                 .slice(0, 700);
 
-            activeUtterance = new SpeechSynthesisUtterance(cleanSpeech);
-            activeUtterance.rate = 1.05; // Crisp executive cadence
-            activeUtterance.pitch = 1.0;
+            if (!cleanSpeech) return;
 
-            const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Male') || v.name.includes('Google'))) || voices[0];
-            if (preferredVoice) activeUtterance.voice = preferredVoice;
+            const playerCard = document.createElement('div');
+            playerCard.className = 'inline-audio-player';
+            playerCard.style.cssText = 'background:#07090D; border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:10px 14px; margin:12px 0 6px 0; display:flex; flex-direction:column; gap:8px;';
+            playerCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="btn-audio-play" style="background:var(--accent); border:none; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:11px; color:#000; font-weight:bold;">▶</button>
+                        <span style="font-size:12px; font-weight:700; color:#FFF;">Executive Audio Briefing</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <button class="btn-speed" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:10px; color:var(--text-secondary); cursor:pointer;">1.0x</button>
+                        <button class="btn-speed" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:10px; color:var(--text-secondary); cursor:pointer;">1.25x</button>
+                        <button class="btn-speed" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:10px; color:var(--text-secondary); cursor:pointer;">1.5x</button>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; font-family:monospace; font-size:10.5px; color:var(--text-muted);">
+                    <span class="audio-elapsed">0:00</span>
+                    <input type="range" class="audio-progress" min="0" max="100" value="0" style="flex:1; accent-color:var(--accent); height:4px; cursor:pointer;">
+                    <span class="audio-total">0:45</span>
+                </div>
+            `;
 
-            btn.innerHTML = '⏹️ Stop Briefing';
-            btn.style.borderColor = 'var(--accent)';
-            btn.style.color = 'var(--accent-glow)';
+            card.insertBefore(playerCard, card.querySelector('.deliverables-bar'));
 
-            activeUtterance.onend = () => {
-                btn.innerHTML = '🎙️ Listen to Briefing';
-                btn.style.borderColor = 'var(--border)';
-                btn.style.color = 'var(--text-secondary)';
+            let currentRate = 1.0;
+            const startSpeech = (rate = 1.0) => {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(cleanSpeech);
+                utter.rate = rate;
+                utter.pitch = 1.0;
+                utter.onend = () => {
+                    const playBtn = playerCard.querySelector('.btn-audio-play');
+                    if (playBtn) playBtn.innerHTML = '▶';
+                    btn.innerHTML = '🎙️ Audio Briefing';
+                };
+                window.speechSynthesis.speak(utter);
+                activeUtterance = utter;
+                const playBtn = playerCard.querySelector('.btn-audio-play');
+                if (playBtn) playBtn.innerHTML = '⏸';
+                btn.innerHTML = '⏹️ Stop Audio';
             };
 
-            activeUtterance.onerror = () => {
-                btn.innerHTML = '🎙️ Listen to Briefing';
-                btn.style.borderColor = 'var(--border)';
-                btn.style.color = 'var(--text-secondary)';
+            playerCard.querySelector('.btn-audio-play').onclick = () => {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    playerCard.querySelector('.btn-audio-play').innerHTML = '▶';
+                    btn.innerHTML = '🎙️ Audio Briefing';
+                } else {
+                    startSpeech(currentRate);
+                }
             };
 
-            window.speechSynthesis.speak(activeUtterance);
+            playerCard.querySelectorAll('.btn-speed').forEach(sBtn => {
+                sBtn.onclick = () => {
+                    currentRate = parseFloat(sBtn.innerText);
+                    playerCard.querySelectorAll('.btn-speed').forEach(b => b.style.color = 'var(--text-secondary)');
+                    sBtn.style.color = 'var(--accent-glow)';
+                    if (window.speechSynthesis.speaking) {
+                        startSpeech(currentRate);
+                    }
+                };
+            });
+
+            startSpeech(1.0);
         }
 
         // 🪄 OpenClaw 2026.9.5 Instant 60FPS Streaming & Zero-Jank Auto-Scroll
@@ -4927,6 +5024,8 @@
 
                 const memoryContext = localStorage.getItem('cs_strategic_memory') || '';
 
+                const modelOverride = document.getElementById('modelSelectOverride')?.value || 'auto';
+
                 res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: reqHeaders,
@@ -4935,6 +5034,7 @@
                         messages,
                         conversationId: currentConversationId,
                         workspace: currentMode,
+                        model: modelOverride,
                         documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
                     })
                 });
@@ -5034,9 +5134,10 @@
                         `).join('');
                         assistantCard.appendChild(actionChips);
 
-                        // 3. Add Deliverables & Vault Bar
+                        // 3. Add Deliverables & Vault Bar + Model Telemetry Badge
                         const delivBar = document.createElement('div');
                         delivBar.className = 'deliverables-bar';
+                        const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.2s'})</span>` : '';
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
@@ -5044,6 +5145,7 @@
                             <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Report</button>
                             <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Financial Model (.xlsx)</button>
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save to Research Vault</button>
+                            ${modelBadge}
                         `;
                         assistantCard.appendChild(delivBar);
                         chatFeed.scrollTop = chatFeed.scrollHeight;
