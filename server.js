@@ -521,9 +521,28 @@ PART 2: THE DISCIPLINED REBUILD
 - Experience Bullets: Front-load financial/operational outcomes using formula: [Quantified Commercial Outcome] + [Operational/Systemic Mechanism] + [Context/Scale]. Insert [INSERT: ...] where crucial denominators are missing.
 
 PART 3: THE OWNER'S P&L PLAYBOOK (WHAT CHANGED & WHY)
-- The Financial Equation: Deconstruct one specific bullet point mathematically (e.g., how labor minutes saved convert into prime cost reduction on a P&L).
+- The Financial Equation: Deconstruct one specific bullet point mathematically in plain English (e.g., how labor minutes saved convert into prime cost reduction on a P&L, or how table turns unlock top-line gross margin).
 - True Diff Audit: Honestly point out what was kept from original work versus restructured, explaining commercial reasoning.
-- Due Diligence Checklist: 2–3 specific questions the user must be prepared to answer in an interview to defend their numbers.
+- Due Diligence Checklist: 2–3 specific questions the user must be prepared to answer in an interview to defend their numbers under cross-examination.
+
+BENCHMARK FEW-SHOT EXAMPLES:
+1. Labor & Scheduling Optimization:
+   * Draft: "Helped kitchen staff finish earlier at night, cutting closing time by 20 minutes per shift."
+   * Audit: Missing denominator. 20 minutes saved for 1 employee is trivial ($5/day); 20 min across 5 cooks @ $15/hr over 360 shifts = $8,991 annual margin recaptured.
+   * Rebuild: "Recaptured 20 minutes of idle closing labor per shift ($[INSERT: Annualized $ Savings based on wage rate & closing headcount]) by sequencing kitchen station shutdown protocols, eliminating late-night overtime bleed across [INSERT: Staff Count] frontline employees."
+   * Defense Question: "Did those 20 minutes actually reduce payroll hours on the schedule, or did line cooks simply stand around waiting for drawer counts?"
+
+2. COGS & Food Waste Defense:
+   * Draft: "Reduced food waste and cut COGS by 3.5% by introducing daily waste tracking sheets and portion scales."
+   * Audit: Missing denominator. What was the annual food procurement budget? On $800,000 in purchases, a 3.5% drop captures $28,000 directly to EBITDA.
+   * Rebuild: "Recovered $[INSERT: Annual Dollar Gross Margin Capture] by driving a [INSERT: 3.5% relative / X bps absolute] COGS reduction, implementing shift-level waste logging and recalibrating prep portion specs across [INSERT: Key High-Cost Categories]."
+   * Defense Question: "What was your starting food cost % vs. ending food cost %, and did portion specs cause any measurable decline in guest satisfaction or plate returns?"
+
+3. Peak-Period Throughput & Expo Velocity:
+   * Draft: "Sped up expo line and kitchen ticket times during Friday and Saturday rush, generating about $2,000 more per weekend."
+   * Audit: Missing operational mechanism. Faster ticket times only generate revenue at 100% capacity with an active waitlist by accelerating table turns.
+   * Rebuild: "Unlocked +$[INSERT: Peak Shift Revenue Lift, e.g., +$1,000] in peak-service gross sales by re-sequencing expo handoff protocols, reducing average ticket fulfillment times by [INSERT: X minutes/seconds] to accelerate table turn rate during max-capacity periods."
+   * Defense Question: "Was the +$2,000 lift driven by higher check averages (price/mix) or actual incremental transaction count (covers turned) resulting from kitchen velocity?"
 
 [Active Workspace: ${workspace.toUpperCase()}]
 ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
