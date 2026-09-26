@@ -90,40 +90,48 @@ const queryAI = async (prompt, imageObjs = [], customKey = null) => {
     });
   }
 
-  // TIER 1: Multimodal Vision Execution (When images or photos are attached)
-  if (hasImages && activeMyclawKey) {
-    console.log(`[Executing Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const visionModels = ['gemini-2.0-flash', 'gpt-4o-mini', 'gemini-2.5-flash'];
-    for (const modelName of visionModels) {
+  // TIER 1: Direct Multimodal Vision Execution (Google AI Studio gemini-3.1-flash-image / gemini-flash-latest)
+  if (hasImages && activeGoogleKey) {
+    console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
+    const directVisionModels = ['gemini-3.1-flash-image', 'gemini-flash-latest', 'gemini-3.8-flash'];
+    for (const modelName of directVisionModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 35000);
-        const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        
+        const contentsParts = [{ text: prompt }];
+        imageObjs.forEach(img => {
+          contentsParts.push({
+            inline_data: {
+              mime_type: img.mimeType || 'image/jpeg',
+              data: img.data
+            }
+          });
+        });
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-            'Authorization': `Bearer ${activeMyclawKey}`
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           },
           signal: controller.signal,
           body: JSON.stringify({
-            model: modelName,
-            messages: [{ role: 'user', content: contentPayload }],
-            max_tokens: 2500,
-            temperature: 0.2
+            contents: [{ role: 'user', parts: contentsParts }],
+            generationConfig: { maxOutputTokens: 2500, temperature: 0.2 }
           })
         });
         clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
-          const text = data.choices?.[0]?.message?.content || '';
-          if (text && text.trim().length > 0 && !text.includes('Model do not support image input')) {
-            console.log(`[Vision Success: ${modelName}] (${text.length} chars)`);
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text && text.trim().length > 20) {
+            console.log(`[⚡ Direct Google Vision Instant Success: ${modelName}] (${text.length} chars)`);
             return { text, isFallback: false };
           }
         }
       } catch (err) {
-        console.warn(`[Vision Notice - ${modelName}]:`, err.message);
+        console.warn(`[Direct Google Vision Notice - ${modelName}]:`, err.message);
       }
     }
   }
