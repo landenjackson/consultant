@@ -30,7 +30,7 @@ const evaluateWithJev = async (userText) => {
   if (!TYPESAFE_API_KEY && !process.env.DJEV_RUN_URL) return null;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const timeoutId = setTimeout(() => controller.abort(), 600); // 600ms hard ceiling to prevent any chat lag
     const headers = { 'Content-Type': 'application/json' };
     if (TYPESAFE_API_KEY) {
       headers['Authorization'] = `Bearer ${TYPESAFE_API_KEY}`;
@@ -53,24 +53,6 @@ const evaluateWithJev = async (userText) => {
               marketing: 'Customer acquisition, local search, catchment capture, non-discount hooks',
               operations: 'Throughput, kitchen logistics, team onboarding, standard operating procedures'
             }
-          },
-          urgency: {
-            type: 'scalar',
-            instructions: 'How urgent or high-stakes is this executive request?',
-            range: [0, 2]
-          },
-          needs_math: {
-            type: 'noul',
-            instructions: 'Does this task require explicit arithmetic, margin reconciliation, or financial math?'
-          },
-          tone_archetype: {
-            type: 'choice',
-            instructions: 'What consulting tone best serves this specific situation?',
-            criteria: {
-              peer_coo: 'Direct, unvarnished peer executive giving clear math and strategic trade-offs',
-              tactical_coach: 'Encouraging, grounded operator giving step-by-step frontline actions',
-              career_strategist: 'Sharp executive recruiter focusing on quantifiable business outcomes and credibility'
-            }
           }
         }
       })
@@ -80,19 +62,10 @@ const evaluateWithJev = async (userText) => {
       const data = await res.json();
       const answers = data.answers || {};
       const intent = answers.intent?.choice || 'operations';
-      const urgencyScore = answers.urgency?.score || 0;
-      const needsMath = (answers.needs_math?.noul || 0) > 0.45;
-      const tone = answers.tone_archetype?.choice || 'peer_coo';
-      console.log(`[TypeSafe Jev / djev-run Evaluator] Domain: ${intent} | Urgency: ${urgencyScore.toFixed(2)} | Math: ${needsMath} | Tone: ${tone}`);
-      return {
-        domain: intent,
-        urgency: urgencyScore,
-        needsMath,
-        tone
-      };
+      return { domain: intent };
     }
   } catch (err) {
-    console.error('[TypeSafe Jev / djev-run Notice]:', err.message);
+    // Non-blocking catch
   }
   return null;
 };
