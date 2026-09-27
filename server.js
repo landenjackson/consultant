@@ -98,7 +98,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     for (const modelName of directVisionModels) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const timeoutId = setTimeout(() => controller.abort(), 35000);
         
         const contentsParts = [{ text: prompt }];
         imageObjs.forEach(img => {
@@ -119,7 +119,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
           signal: controller.signal,
           body: JSON.stringify({
             contents: [{ role: 'user', parts: contentsParts }],
-            generationConfig: { maxOutputTokens: 2500, temperature: 0.2 }
+            generationConfig: { maxOutputTokens: 8192, temperature: 0.2 }
           })
         });
         clearTimeout(timeoutId);
@@ -140,9 +140,9 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
   // TIER 1: Direct Speculative Race across Ultra-Fast & Active Google AI Studio Models (Sub-1.5s Response)
   if (activeGoogleKey) {
-    const fetchDirectGoogle = async (modelName, maxTokens = 2500) => {
+    const fetchDirectGoogle = async (modelName, maxTokens = 8192) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
           method: 'POST',
@@ -172,11 +172,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      let targetModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-flash-lite-preview'];
+      let targetModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
       if (pinnedModel && pinnedModel !== 'auto') {
         targetModels = [pinnedModel];
       }
-      const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 2500)));
+      const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 8192)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Instant Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
       return { text: winner.text, isFallback: false, model: winner.model, latency: `${elapsed}s` };
@@ -187,9 +187,9 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
   // TIER 2: Active Production Gateway Models (gemini-2.0-flash, gpt-4o-mini)
   if (activeMyclawKey && !hasImages) {
-    const fetchModel = async (modelName, maxTokens = 2500) => {
+    const fetchModel = async (modelName, maxTokens = 8192) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       try {
         const res = await fetch('https://api.myclaw.ai/v1/chat/completions', {
           method: 'POST',
