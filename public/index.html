@@ -2347,11 +2347,10 @@
 
             <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
             <div style="display:inline-flex; align-items:center; background:#07090D; border:1px solid var(--border); border-radius:8px; padding:2px 6px;">
-                <select id="modelSelectOverride" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Model Routing Strategy">
-                    <option value="auto" selected style="background:#0D121A; color:#FFF;">⚡ Auto (Speculative Race)</option>
-                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (<1s)</option>
-                    <option value="gemini-flash-latest" style="background:#0D121A; color:#FFF;">Gemini Flash Latest</option>
-                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash</option>
+                <select id="modelSelectOverride" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Intelligence Engine">
+                    <option value="auto" selected style="background:#0D121A; color:#FFF;">⚡ Enterprise Auto (Fast Race)</option>
+                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash (High Reasoning)</option>
+                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
                 </select>
             </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Input a strategic objective, financial diagnostic query, or campaign parameter..." style="resize:none; padding:10px 14px; min-height:42px; max-height:140px; line-height:1.4;" onkeydown="handleInputKeydown(event)"></textarea>
