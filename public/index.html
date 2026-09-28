@@ -4738,29 +4738,59 @@
             openInCanvas(btn);
         }
 
-        // 2. EXCEL EXPORT (SEPARATES CLEAN KEY-VALUE METRICS & STRUCTURED 12-MONTH / P&L MULTI-COLUMN TABLES)
+        // 2. FINANCIAL STATEMENT EXCEL EXPORT (ACCOUNTING GRADE: P&L, BALANCE SHEET & UNIT ECONOMICS)
         function exportExcelXLSX(btn) {
-            showToast("Generating Clean Excel Model (.xlsx)...", "📊");
+            showToast("Generating Accounting-Grade Financial Model (.xlsx)...", "📊");
             const text = getTargetDocumentText(btn);
-            const mode = document.getElementById('customModeSelect')?.value || "Financial";
             
             try {
                 if (typeof XLSX !== 'undefined') {
                     const wb = XLSX.utils.book_new();
                     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                     
-                    const metricsAoa = [["Metric / Category (X)", "Value / Number (Y)"]];
-                    const tableRowsAoa = [];
-                    let inTableBlock = false;
+                    const statementAoa = [
+                        ["LINE ITEM / ACCOUNT", "AMOUNT / VALUE", "UNIT / NOTES"]
+                    ];
+                    const multiColTable = [];
 
+                    // Standard Financial Extract Regexes
+                    const financialKeys = [
+                        { key: "Gross Sales / Revenue", regex: /(?:Gross\s*Sales|Gross\s*Revenue|Top-?Line)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Discounts & Comps", regex: /(?:Discounts?|Comps?|Promotions?)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD (Contra)" },
+                        { key: "Net Sales", regex: /(?:Net\s*Sales|Net\s*Revenue)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Cost of Goods Sold (COGS)", regex: /(?:COGS|Food\s*&\s*Bev|Cost\s*of\s*Goods)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Gross Profit / Contribution", regex: /(?:Gross\s*Profit|Contribution\s*Margin)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Direct Operating Labor", regex: /(?:Labor|Payroll|Staffing)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Fixed Operating Expenses (OPEX)", regex: /(?:Fixed\s*Overhead|OPEX|Rent)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Operating Income (EBITDA)", regex: /(?:EBITDA|Operating\s*Income|Net\s*Cash)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD" },
+                        { key: "Sales Tax Collected", regex: /(?:Taxes?|Sales\s*Tax)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD (Liability)" },
+                        { key: "Tips & Gratuities Collected", regex: /(?:Tips?|Gratuities?)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD (Pass-Through)" },
+                        { key: "Completed Transaction Volume", regex: /(?:Transactions?|Tickets?|Covers?|Orders?)[\s\S]*?(\d+)/i, unit: "Count" },
+                        { key: "Average Check / Spend per Cover", regex: /(?:Average\s*Check|Avg\s*Ticket|Spend\s*per)[\s\S]*?[\$€£]?\s*([0-9,]+\.?[0-9]*)/i, unit: "USD / Cover" }
+                    ];
+
+                    const foundKeys = new Set();
+
+                    // Step 1: Scan for Standard Financial Accounts
+                    financialKeys.forEach(acc => {
+                        const match = text.match(acc.regex);
+                        if (match && match[1]) {
+                            const val = parseFloat(match[1].replace(/,/g, ''));
+                            if (!isNaN(val)) {
+                                statementAoa.push([acc.key, val, acc.unit]);
+                                foundKeys.add(acc.key);
+                            }
+                        }
+                    });
+
+                    // Step 2: Line-by-Line Parser for structured Tables & Bulleted Financial Facts
                     lines.forEach((line) => {
                         const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
                         if (!cleanLine || cleanLine.startsWith('---')) return;
 
-                        // Case 1: Markdown Table row (e.g. | Month | Sales | COGS | Labor | Profit |)
+                        // Markdown Table Parsing (Columns like Month, Revenue, COGS, Labor, Profit)
                         if (cleanLine.includes('|')) {
                             const cells = cleanLine.split('|').map(c => c.replace(/[\*_]/g, '').trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
-                            // Skip markdown separator row (|---|---|)
                             if (cells.length > 0 && !cells[0].includes('---')) {
                                 const parsedCells = cells.map(cell => {
                                     const numMatch = cell.match(/^[\$€£]?\s*([0-9.,]+)%?$/);
@@ -4770,79 +4800,65 @@
                                     }
                                     return cell;
                                 });
-                                tableRowsAoa.push(parsedCells);
+                                multiColTable.push(parsedCells);
                             }
                             return;
                         }
 
-                        // Case 2: Comma/Tab/Space-separated 12-Month line or multi-column data (e.g. Oct 2026 $68,500 $19,865 $19,180)
-                        const multiColMatch = cleanLine.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Q[1-4]|Full Year|Total)[\w\s\d]*[\$€£\d]/i);
-                        if (multiColMatch && (cleanLine.match(/[\$€£\d,]+/g) || []).length >= 3) {
-                            const tokens = cleanLine.split(/[\s\t,]+(?=[\$€£\d])/);
-                            const parsedTokens = tokens.map(tok => {
-                                const numMatch = tok.trim().match(/^[\$€£]?\s*([0-9.,]+)%?$/);
-                                if (numMatch) {
-                                    const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
-                                    return isNaN(rawNum) ? tok.trim() : rawNum;
-                                }
-                                return tok.trim();
-                            });
-                            tableRowsAoa.push(parsedTokens);
-                            return;
-                        }
-
-                        // Case 3: Standard Key-Value pair (e.g. Net Sales: $2,712.43)
+                        // Parse discrete Key-Value lines: Clean Label -> Isolated Number
                         if (cleanLine.includes(':')) {
-                            const [k, ...v] = cleanLine.split(':');
-                            const key = k.replace(/[\*_]/g, '').trim();
-                            const valStr = v.join(':').replace(/[\*_]/g, '').trim();
-                            
-                            // Check for pure number or currency
-                            const numMatch = valStr.match(/^[\$€£]?\s*([0-9.,]+)%?$/);
-                            if (numMatch) {
-                                const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
-                                metricsAoa.push([key, isNaN(rawNum) ? valStr : rawNum]);
-                            } else {
-                                metricsAoa.push([key, valStr]);
+                            const [rawK, ...rawV] = cleanLine.split(':');
+                            const label = rawK.replace(/[\*_]/g, '').trim();
+                            const valText = rawV.join(':').trim();
+
+                            // Extract the primary numeric value
+                            const numExtract = valText.match(/^[\$€£]?\s*([0-9,]+\.?[0-9]*)/);
+                            if (numExtract && numExtract[1] && !foundKeys.has(label) && label.length < 45) {
+                                const numVal = parseFloat(numExtract[1].replace(/,/g, ''));
+                                if (!isNaN(numVal)) {
+                                    // Extract any trailing explanation or unit
+                                    const notes = valText.replace(numExtract[0], '').replace(/^[\s\(\)\/]+/, '').slice(0, 40).trim();
+                                    statementAoa.push([label, numVal, notes || "USD"]);
+                                }
                             }
-                        } else if (!cleanLine.toLowerCase().includes('consultant studio') && !cleanLine.toLowerCase().includes('executive operator') && cleanLine.length < 80) {
-                            metricsAoa.push([cleanLine, ""]);
                         }
                     });
 
-                    // Sheet 1: Key Summary Metrics (Clean 2-Column X & Y)
-                    const ws1 = XLSX.utils.aoa_to_sheet(metricsAoa);
-                    ws1['!cols'] = [{ wch: 36 }, { wch: 45 }];
-                    XLSX.utils.book_append_sheet(wb, ws1, "Summary_Metrics");
+                    // Sheet 1: Income Statement / Unit Economic Statement
+                    const ws1 = XLSX.utils.aoa_to_sheet(statementAoa);
+                    ws1['!cols'] = [{ wch: 38 }, { wch: 18 }, { wch: 24 }];
+                    XLSX.utils.book_append_sheet(wb, ws1, "Income_Statement");
 
-                    // Sheet 2: Multi-Column Financial Model / P&L (if table rows exist)
-                    if (tableRowsAoa.length > 0) {
-                        const ws2 = XLSX.utils.aoa_to_sheet(tableRowsAoa);
-                        ws2['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
-                        XLSX.utils.book_append_sheet(wb, ws2, "12_Month_Model");
+                    // Sheet 2: Multi-Column Schedule (if monthly/quarterly breakdown exists)
+                    if (multiColTable.length > 0) {
+                        const ws2 = XLSX.utils.aoa_to_sheet(multiColTable);
+                        ws2['!cols'] = [{ wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+                        XLSX.utils.book_append_sheet(wb, ws2, "12_Month_Schedule");
                     }
                     
                     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    triggerFileDownload(blob, `${mode}_Financial_Model_${Date.now()}.xlsx`);
+                    triggerFileDownload(blob, `Financial_Statement_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
-                console.warn("SheetJS export error:", err);
+                console.warn("SheetJS financial statement export error:", err);
             }
 
-            // Universal Clean CSV Fallback
-            const rows = [["Category (X)", "Value (Y)"]];
+            // Universal CSV Fallback
+            const csvRows = [["LINE ITEM", "AMOUNT", "UNIT"]];
             text.split('\n').forEach((l) => {
                 const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                if (!cl || cl.startsWith('|')) return;
                 if (cl.includes(':')) {
                     const [k, ...v] = cl.split(':');
-                    rows.push([`"${k.replace(/[\*_"']/g, '').trim()}"`, `"${v.join(':').replace(/[\*_"']/g, '').trim()}"`]);
+                    const numM = v.join(':').match(/[\$€£]?\s*([0-9,]+\.?[0-9]*)/);
+                    if (numM) {
+                        csvRows.push([`"${k.replace(/[\*_"']/g, '').trim()}"`, numM[1].replace(/,/g, ''), `"USD"`]);
+                    }
                 }
             });
-            const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
-            triggerFileDownload(blob, `${mode}_Metrics_${Date.now()}.csv`);
+            const blob = new Blob([csvRows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
+            triggerFileDownload(blob, `Financial_Statement_${Date.now()}.csv`);
         }
 
         // 1. OPEN STRATEGY TEASER DIRECTLY IN CANVAS/VIEWER (ZERO FILE DOWNLOAD GLITCHES)
