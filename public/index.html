@@ -4738,60 +4738,100 @@
             openInCanvas(btn);
         }
 
-        // 2. EXCEL EXPORT (CLEAN 2-COLUMN X & Y FORMAT: CATEGORY = X, VALUE/NUMBER = Y)
+        // 2. EXCEL EXPORT (SEPARATES CLEAN KEY-VALUE METRICS & STRUCTURED 12-MONTH / P&L MULTI-COLUMN TABLES)
         function exportExcelXLSX(btn) {
-            showToast("Generating Clean Excel Model (X: Category, Y: Value)...", "📊");
+            showToast("Generating Clean Excel Model (.xlsx)...", "📊");
             const text = getTargetDocumentText(btn);
             const mode = document.getElementById('customModeSelect')?.value || "Financial";
             
             try {
                 if (typeof XLSX !== 'undefined') {
+                    const wb = XLSX.utils.book_new();
                     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    const aoa = [
-                        ["Category (X)", "Value / Metric (Y)"]
-                    ];
+                    
+                    const metricsAoa = [["Metric / Category (X)", "Value / Number (Y)"]];
+                    const tableRowsAoa = [];
+                    let inTableBlock = false;
 
                     lines.forEach((line) => {
                         const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                        if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
+                        if (!cleanLine || cleanLine.startsWith('---')) return;
 
+                        // Case 1: Markdown Table row (e.g. | Month | Sales | COGS | Labor | Profit |)
+                        if (cleanLine.includes('|')) {
+                            const cells = cleanLine.split('|').map(c => c.replace(/[\*_]/g, '').trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+                            // Skip markdown separator row (|---|---|)
+                            if (cells.length > 0 && !cells[0].includes('---')) {
+                                const parsedCells = cells.map(cell => {
+                                    const numMatch = cell.match(/^[\$€£]?\s*([0-9.,]+)%?$/);
+                                    if (numMatch) {
+                                        const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
+                                        return isNaN(rawNum) ? cell : rawNum;
+                                    }
+                                    return cell;
+                                });
+                                tableRowsAoa.push(parsedCells);
+                            }
+                            return;
+                        }
+
+                        // Case 2: Comma/Tab/Space-separated 12-Month line or multi-column data (e.g. Oct 2026 $68,500 $19,865 $19,180)
+                        const multiColMatch = cleanLine.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Q[1-4]|Full Year|Total)[\w\s\d]*[\$€£\d]/i);
+                        if (multiColMatch && (cleanLine.match(/[\$€£\d,]+/g) || []).length >= 3) {
+                            const tokens = cleanLine.split(/[\s\t,]+(?=[\$€£\d])/);
+                            const parsedTokens = tokens.map(tok => {
+                                const numMatch = tok.trim().match(/^[\$€£]?\s*([0-9.,]+)%?$/);
+                                if (numMatch) {
+                                    const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
+                                    return isNaN(rawNum) ? tok.trim() : rawNum;
+                                }
+                                return tok.trim();
+                            });
+                            tableRowsAoa.push(parsedTokens);
+                            return;
+                        }
+
+                        // Case 3: Standard Key-Value pair (e.g. Net Sales: $2,712.43)
                         if (cleanLine.includes(':')) {
                             const [k, ...v] = cleanLine.split(':');
                             const key = k.replace(/[\*_]/g, '').trim();
                             const valStr = v.join(':').replace(/[\*_]/g, '').trim();
                             
-                            // Check if value is a pure number or currency
+                            // Check for pure number or currency
                             const numMatch = valStr.match(/^[\$€£]?\s*([0-9.,]+)%?$/);
                             if (numMatch) {
                                 const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
-                                if (!isNaN(rawNum)) {
-                                    aoa.push([key, valStr.includes('%') ? `${rawNum}%` : rawNum]);
-                                } else {
-                                    aoa.push([key, valStr]);
-                                }
+                                metricsAoa.push([key, isNaN(rawNum) ? valStr : rawNum]);
                             } else {
-                                aoa.push([key, valStr]);
+                                metricsAoa.push([key, valStr]);
                             }
-                        } else if (!cleanLine.toLowerCase().includes('consultant studio') && !cleanLine.toLowerCase().includes('executive operator')) {
-                            aoa.push([cleanLine, ""]);
+                        } else if (!cleanLine.toLowerCase().includes('consultant studio') && !cleanLine.toLowerCase().includes('executive operator') && cleanLine.length < 80) {
+                            metricsAoa.push([cleanLine, ""]);
                         }
                     });
 
-                    const ws = XLSX.utils.aoa_to_sheet(aoa);
-                    ws['!cols'] = [{ wch: 38 }, { wch: 45 }];
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Financial_Data");
+                    // Sheet 1: Key Summary Metrics (Clean 2-Column X & Y)
+                    const ws1 = XLSX.utils.aoa_to_sheet(metricsAoa);
+                    ws1['!cols'] = [{ wch: 36 }, { wch: 45 }];
+                    XLSX.utils.book_append_sheet(wb, ws1, "Summary_Metrics");
+
+                    // Sheet 2: Multi-Column Financial Model / P&L (if table rows exist)
+                    if (tableRowsAoa.length > 0) {
+                        const ws2 = XLSX.utils.aoa_to_sheet(tableRowsAoa);
+                        ws2['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+                        XLSX.utils.book_append_sheet(wb, ws2, "12_Month_Model");
+                    }
                     
                     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    triggerFileDownload(blob, `${mode}_Metrics_${Date.now()}.xlsx`);
+                    triggerFileDownload(blob, `${mode}_Financial_Model_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
                 console.warn("SheetJS export error:", err);
             }
 
-            // Universal Clean 2-Column CSV Fallback
+            // Universal Clean CSV Fallback
             const rows = [["Category (X)", "Value (Y)"]];
             text.split('\n').forEach((l) => {
                 const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
