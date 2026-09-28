@@ -91,49 +91,52 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     });
   }
 
-  // TIER 1: Direct Multimodal Vision Execution (Google AI Studio gemini-3.1-flash-image / gemini-flash-latest)
+  // TIER 1: Direct Multimodal Vision Execution (Google AI Studio gemini-3.1-flash-lite / gemini-3.8-flash)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-3.1-flash-image', 'gemini-flash-latest', 'gemini-3.8-flash'];
+    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
     for (const modelName of directVisionModels) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 35000);
-        
-        const contentsParts = [{ text: prompt }];
-        imageObjs.forEach(img => {
-          contentsParts.push({
-            inline_data: {
-              mime_type: img.mimeType || 'image/jpeg',
-              data: img.data
-            }
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 35000);
+          
+          const contentsParts = [{ text: prompt }];
+          imageObjs.forEach(img => {
+            contentsParts.push({
+              inline_data: {
+                mime_type: img.mimeType || 'image/jpeg',
+                data: img.data
+              }
+            });
           });
-        });
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: contentsParts }],
-            generationConfig: { maxOutputTokens: 8192, temperature: 0.2 }
-          })
-        });
-        clearTimeout(timeoutId);
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (text && text.trim().length > 20) {
-            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-            console.log(`[⚡ Direct Google Vision Instant Success: ${modelName}] (${text.length} chars in ${elapsed}s)`);
-            return { text, isFallback: false, model: modelName, latency: `${elapsed}s` };
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: contentsParts }],
+              generationConfig: { maxOutputTokens: 4096, temperature: 0.2 }
+            })
+          });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            const data = await res.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (text && text.trim().length > 20) {
+              const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+              console.log(`[⚡ Direct Google Vision Success: ${modelName}] (${text.length} chars in ${elapsed}s)`);
+              return { text, isFallback: false, model: modelName, latency: `${elapsed}s` };
+            }
           }
+        } catch (err) {
+          console.warn(`[Direct Google Vision Notice - ${modelName} Attempt ${attempt}]:`, err.message);
+          if (attempt === 1) await new Promise(r => setTimeout(r, 600));
         }
-      } catch (err) {
-        console.warn(`[Direct Google Vision Notice - ${modelName}]:`, err.message);
       }
     }
   }
