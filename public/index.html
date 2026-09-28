@@ -4738,21 +4738,17 @@
             openInCanvas(btn);
         }
 
+        // 2. EXCEL EXPORT (CLEAN 2-COLUMN X & Y FORMAT: CATEGORY = X, VALUE/NUMBER = Y)
         function exportExcelXLSX(btn) {
-            showToast("Generating Excel Spreadsheet (.xlsx)...", "📊");
+            showToast("Generating Clean Excel Model (X: Category, Y: Value)...", "📊");
             const text = getTargetDocumentText(btn);
-            const mode = document.getElementById('customModeSelect')?.value || "Operations";
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
-
+            const mode = document.getElementById('customModeSelect')?.value || "Financial";
+            
             try {
                 if (typeof XLSX !== 'undefined') {
                     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                     const aoa = [
-                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
-                        ["Executive Operator", profile.name || "Executive Member", "Status: Cleared for Execution"],
-                        [],
-                        ["Metric / Category", "Strategic Directive / Baseline", "Target Benchmark / Lift"]
+                        ["Category (X)", "Value / Metric (Y)"]
                     ];
 
                     lines.forEach((line) => {
@@ -4760,42 +4756,53 @@
                         if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
 
                         if (cleanLine.includes(':')) {
-                            const [key, ...vals] = cleanLine.split(':');
-                            aoa.push([key.trim(), vals.join(':').trim(), "Target Benchmark"]);
-                        } else {
-                            aoa.push(["Directive", cleanLine, "Action Item"]);
+                            const [k, ...v] = cleanLine.split(':');
+                            const key = k.replace(/[\*_]/g, '').trim();
+                            const valStr = v.join(':').replace(/[\*_]/g, '').trim();
+                            
+                            // Check if value is a pure number or currency
+                            const numMatch = valStr.match(/^[\$€£]?\s*([0-9.,]+)%?$/);
+                            if (numMatch) {
+                                const rawNum = parseFloat(numMatch[1].replace(/,/g, ''));
+                                if (!isNaN(rawNum)) {
+                                    aoa.push([key, valStr.includes('%') ? `${rawNum}%` : rawNum]);
+                                } else {
+                                    aoa.push([key, valStr]);
+                                }
+                            } else {
+                                aoa.push([key, valStr]);
+                            }
+                        } else if (!cleanLine.toLowerCase().includes('consultant studio') && !cleanLine.toLowerCase().includes('executive operator')) {
+                            aoa.push([cleanLine, ""]);
                         }
                     });
 
                     const ws = XLSX.utils.aoa_to_sheet(aoa);
-                    ws['!cols'] = [{ wch: 32 }, { wch: 54 }, { wch: 28 }];
+                    ws['!cols'] = [{ wch: 38 }, { wch: 45 }];
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Executive_Strategy");
+                    XLSX.utils.book_append_sheet(wb, ws, "Financial_Data");
                     
-                    // Direct binary buffer generation with explicit openxml MIME type for iOS Excel app association
                     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    triggerFileDownload(blob, `${mode}_Model_${Date.now()}.xlsx`);
+                    triggerFileDownload(blob, `${mode}_Metrics_${Date.now()}.xlsx`);
                     return;
                 }
             } catch(err) {
-                console.warn("SheetJS export note:", err);
+                console.warn("SheetJS export error:", err);
             }
 
-            // Universal CSV Fallback
-            const rows = [["Category / Item", "Operational Directive", "Target Standard"]];
-            text.split('\n').forEach((l, idx) => {
+            // Universal Clean 2-Column CSV Fallback
+            const rows = [["Category (X)", "Value (Y)"]];
+            text.split('\n').forEach((l) => {
                 const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
                 if (!cl || cl.startsWith('|')) return;
                 if (cl.includes(':')) {
                     const [k, ...v] = cl.split(':');
-                    rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
-                } else {
-                    rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
+                    rows.push([`"${k.replace(/[\*_"']/g, '').trim()}"`, `"${v.join(':').replace(/[\*_"']/g, '').trim()}"`]);
                 }
             });
             const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
-            triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
+            triggerFileDownload(blob, `${mode}_Metrics_${Date.now()}.csv`);
         }
 
         // 1. OPEN STRATEGY TEASER DIRECTLY IN CANVAS/VIEWER (ZERO FILE DOWNLOAD GLITCHES)
@@ -4803,63 +4810,10 @@
             openInCanvas(btn);
         }
 
-        // 2. EXCEL EXPORT (OFFICIAL OPENXML APPLICATION MIME TYPE FOR DIRECT EXCEL APP ASSOCIATION)
-        function exportExcelXLSX(btn) {
-            const text = getTargetDocumentText(btn);
-            const mode = document.getElementById('customModeSelect')?.value || "Operations";
-            const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const profile = typeof getUserProfile === 'function' ? getUserProfile() : { name: 'Operator' };
-
-            try {
-                if (typeof XLSX !== 'undefined') {
-                    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                    const aoa = [
-                        ["CONSULTANT STUDIO // FINANCIAL & OPERATIONAL AUDIT", mode.toUpperCase(), timestamp],
-                        ["Executive Operator", profile.name || "Executive Member", "Status: Verified Institutional Grade"],
-                        [],
-                        ["Metric / Category", "Strategic Directive / Baseline", "Target Benchmark / Lift"]
-                    ];
-
-                    lines.forEach((line) => {
-                        const cleanLine = line.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                        if (!cleanLine || cleanLine.startsWith('---') || cleanLine.startsWith('|')) return;
-
-                        if (cleanLine.includes(':')) {
-                            const [key, ...vals] = cleanLine.split(':');
-                            aoa.push([key.trim(), vals.join(':').trim(), "Target Benchmark"]);
-                        } else {
-                            aoa.push(["Directive", cleanLine, "Action Item"]);
-                        }
-                    });
-
-                    const ws = XLSX.utils.aoa_to_sheet(aoa);
-                    ws['!cols'] = [{ wch: 32 }, { wch: 54 }, { wch: 28 }];
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Executive_Strategy");
-                    
-                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    triggerFileDownload(blob, `${mode}_Model_${Date.now()}.xlsx`);
-                    return;
-                }
-            } catch(err) {
-                console.warn("SheetJS export note:", err);
-            }
-
-            // Universal CSV Fallback
-            const rows = [["Category / Item", "Operational Directive", "Target Standard"]];
-            text.split('\n').forEach((l, idx) => {
-                const cl = l.replace(/^[•\*\-\#\>\s]+/, '').trim();
-                if (!cl || cl.startsWith('|')) return;
-                if (cl.includes(':')) {
-                    const [k, ...v] = cl.split(':');
-                    rows.push([`"${k.replace(/"/g, '""')}"`, `"${v.join(':').replace(/"/g, '""')}"`, `"Target"`]);
-                } else {
-                    rows.push([`"Point ${idx+1}"`, `"${cl.replace(/"/g, '""')}"`, `"Active"`]);
-                }
-            });
-            const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: 'text/csv;charset=utf-8;' });
-            triggerFileDownload(blob, `${mode}_Model_${Date.now()}.csv`);
+        function exportCanvasExcel() {
+            const editor = document.getElementById('canvasEditor');
+            const text = getTargetDocumentText(editor);
+            exportExcelXLSX(editor);
         }
 
         // 3. WORD EXPORT (.DOCX / HTML FORMATTED CLEAN DOCUMENT)
