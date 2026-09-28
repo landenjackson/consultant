@@ -173,8 +173,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      let targetModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-      if (pinnedModel && pinnedModel !== 'auto') {
+      let targetModels = ['gemini-3.1-flash-lite'];
+      if (pinnedModel && pinnedModel !== 'auto' && pinnedModel !== 'gemini-3.8-flash') {
         targetModels = [pinnedModel];
       }
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
