@@ -534,20 +534,28 @@ User Message: ${userMessage}`;
       }
     }
 
-    // Await Jev signals with tight boundary, then execute LLM inference
-    const jevSignals = await jevPromise;
-    const finalPrompt = buildSystemPrompt(jevSignals);
+    // Instant non-blocking launch: Start LLM inference immediately without blocking on Jev
+    const finalPrompt = buildSystemPrompt(null);
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
 
-    console.log(`[Executing Live Inference | Multimodal Images: ${imageObjs.length} | BYOK Key: ${!!customKey} | Pinned Model: ${model}]`);
+    console.log(`[Executing Instant Live Inference | Multimodal Images: ${imageObjs.length} | BYOK Key: ${!!customKey} | Pinned Model: ${model}]`);
     let liveResponse = null;
     try {
       liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model);
     } catch (qErr) {
       console.error('[Live Query Warning]:', qErr.message);
     }
+
+    // Capture Jev background signal non-blockingly if completed
+    let jevSignals = null;
+    try {
+      jevSignals = await Promise.race([
+        jevPromise,
+        new Promise(r => setTimeout(() => r(null), 50))
+      ]);
+    } catch (e) {}
 
     if (liveResponse && liveResponse.text) {
       // Checkpoint execution in AX execution log for instant resumption & telemetry auditing
