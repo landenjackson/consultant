@@ -94,12 +94,12 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
   // TIER 1: Direct Multimodal Vision Execution (Google AI Studio gemini-3.1-flash-lite)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
+    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
     for (const modelName of directVisionModels) {
-      for (let attempt = 1; attempt <= 3; attempt++) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 20000);
+          const timeoutId = setTimeout(() => controller.abort(), 25000);
           
           const contentsParts = [{ text: prompt }];
           imageObjs.forEach(img => {
@@ -132,10 +132,13 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
               console.log(`[⚡ Direct Google Vision Success: ${modelName}] (${text.length} chars in ${elapsed}s)`);
               return { text, isFallback: false, model: modelName, latency: `${elapsed}s` };
             }
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            console.warn(`[Vision HTTP ${res.status} - ${modelName}]:`, errData.error?.message || res.statusText);
           }
         } catch (err) {
           console.warn(`[Direct Google Vision Notice - ${modelName} Attempt ${attempt}]:`, err.message);
-          if (attempt < 3) await new Promise(r => setTimeout(r, 800));
+          if (attempt === 1) await new Promise(r => setTimeout(r, 600));
         }
       }
     }
@@ -522,21 +525,33 @@ ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.sl
 User Message: ${userMessage}`;
     };
 
-    // Extract all embedded base64 image data if attached (Up to 10 images)
+    // Extract all embedded base64 image data if attached (Supports large iPhone/Android camera photos)
     let imageObjs = [];
     if (documentText && documentText.includes('data:image/')) {
-      const regex = /data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([^\s\]]+)/g;
+      const regex = /data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([A-Za-z0-9+/=]+)/g;
       let match;
       while ((match = regex.exec(documentText)) !== null && imageObjs.length < 10) {
-        imageObjs.push({
-          mimeType: match[1],
-          data: match[2]
-        });
+        if (match[2] && match[2].length > 100) {
+          imageObjs.push({
+            mimeType: match[1],
+            data: match[2].replace(/[\s\r\n]+/g, '')
+          });
+        }
       }
     }
 
-    // Instant non-blocking launch: Start LLM inference immediately without blocking on Jev
-    const finalPrompt = buildSystemPrompt(null);
+    // Clean text payload (strip huge base64 strings so prompt doesn't blow token limits)
+    const cleanDocText = documentText.replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]');
+    
+    // Instant non-blocking launch: Start LLM inference immediately
+    const finalPrompt = `You are Consultant Studio, an elite Operating Partner and Systems Strategist.
+[TEMPORAL CONTEXT: ${new Date().toUTCString()}]
+Active Workspace: ${workspace.toUpperCase()}
+
+${cleanDocText ? `[Attached Context & Document]:\n${cleanDocText.slice(0, 8000)}\n` : ''}
+User Query: ${userMessage}
+
+Respond directly as an unvarnished Operating Partner analyzing this exact request and attached data. Read every number and line item from the attached receipt/image carefully.`;
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
