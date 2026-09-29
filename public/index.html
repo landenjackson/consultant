@@ -1980,8 +1980,8 @@
                         Grounded in empirical financial metrics—EBITDA expansion, unit economics, and contribution margins rather than subjective career advice. Audit unit profitability, engineer 1-page quantified executive resumes, master reverse due-diligence interview tracks, and export boardroom-ready deliverables.
                     </p>
 
-                    <!-- 3-WAY PRIMARY ACTION TRIAGE SELECTOR -->
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin: 18px 0 10px 0;">
+                    <!-- 4-WAY PRIMARY ACTION TRIAGE SELECTOR -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin: 18px 0 10px 0;">
                         <div class="mode-tile" onclick="sendQuick('Executive Positioning: Reframe my operations background into a quantified 1-page executive resume highlighting P&L ownership, prime cost recovery, and workflow automation.')" style="border-left: 3px solid #38BDF8;">
                             <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
                                 <span>📄</span> <span>Path A: Executive Positioning</span>
@@ -1999,6 +1999,12 @@
                                 <span>📊</span> <span>Path C: Financial Audit & Model</span>
                             </div>
                             <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">Breakeven sensitivity studio, unit contribution, and native .xlsx workbook export.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Executive Email & Deal Memo: Configure a high-stakes, professional email in my own authentic words. Guide me through an operational interrogation to establish the recipient, goal, leverage, and zero-fluff outcome.')" style="border-left: 3px solid #A855F7;">
+                            <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
+                                <span>📬</span> <span>Path D: Executive Email & Deals</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">High-stakes negotiation, warm executive pitches, vendor price defense, and 1-click clipboard copy.</div>
                         </div>
                     </div>
 
@@ -4713,23 +4719,31 @@
             return (clone.innerText || clone.textContent).trim();
         }
 
-        function copyCanvasText() {
-            const editor = document.getElementById('canvasEditor');
-            if (!editor) return;
-            const cleanText = getTargetDocumentText(editor);
-            navigator.clipboard.writeText(cleanText);
-
-            // Smooth non-blocking UI indicator
-            const titleEl = document.getElementById('canvasTitle');
-            if (titleEl) {
-                const origText = titleEl.innerText;
-                titleEl.innerText = "✓ Clean Text Copied";
-                titleEl.style.color = "var(--accent-glow)";
-                setTimeout(() => {
-                    titleEl.innerText = origText;
-                    titleEl.style.color = "#FFFFFF";
-                }, 1800);
+        // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER
+        function copyExecutiveEmail(btn) {
+            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            if (!card) return;
+            const text = getCleanStrategyText({ textContent: card.innerText });
+            
+            // Extract Subject and Body if formatted as an email
+            let emailText = text;
+            const subjectMatch = text.match(/(?:Subject|Re|Regarding):\s*([^\n]+)/i);
+            if (subjectMatch) {
+                emailText = text.slice(text.indexOf(subjectMatch[0]));
             }
+
+            navigator.clipboard.writeText(emailText).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '✓ Copied to Clipboard!';
+                btn.style.borderColor = '#10B981';
+                btn.style.color = '#34D399';
+                showToast('📋 Executive Email copied to clipboard!', '✓');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.style.borderColor = '#A855F7';
+                    btn.style.color = '#C084FC';
+                }, 2200);
+            });
         }
 
         function exportBankTeaser(btn) {
@@ -5168,6 +5182,7 @@
                         delivBar.className = 'deliverables-bar';
                         const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.2s'})</span>` : '';
                         delivBar.innerHTML = `
+                            <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Email / Memo</button>
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
                             <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open Interactive Canvas</button>
