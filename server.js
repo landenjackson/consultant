@@ -543,15 +543,19 @@ User Message: ${userMessage}`;
     // Clean text payload (strip huge base64 strings so prompt doesn't blow token limits)
     const cleanDocText = documentText.replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]');
     
-    // Instant non-blocking launch: Start LLM inference immediately
-    const finalPrompt = `You are Consultant Studio, an elite Operating Partner and Systems Strategist.
+    // Instant non-blocking launch: Start LLM inference immediately with full conversational instructions
+    const finalPrompt = `You are Consultant Studio, an elite Operating Partner, Systems Strategist, and Executive Deal Architect.
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
 Active Workspace: ${workspace.toUpperCase()}
 
-${cleanDocText ? `[Attached Context & Document]:\n${cleanDocText.slice(0, 8000)}\n` : ''}
-User Query: ${userMessage}
+COMMUNICATION & OPERATING STANDARDS:
+- Speak like a thoughtful, engaged operating partner with a clear point of view.
+- Lead with the bottom-line conclusion, then explain the important reasoning in 2–4 coherent paragraphs.
+- If an image (such as a POS report, receipt, schedule, or financial sheet) is attached, read every line item, dollar amount, cover count, and percentage directly from the image and provide a thorough operational breakdown.
+- Never repeat the prompt back. No generic fluff.
 
-Respond directly as an unvarnished Operating Partner analyzing this exact request and attached data. Read every number and line item from the attached receipt/image carefully.`;
+${cleanDocText ? `[Attached Context & Document]:\n${cleanDocText.slice(0, 8000)}\n` : ''}
+User Query: ${userMessage}`;
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
