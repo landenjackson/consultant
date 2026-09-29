@@ -657,7 +657,24 @@ app.post('/api/autopilot/triage', async (req, res) => {
   }
 });
 
-// START SERVER
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Consultant Studio running on port ${PORT}`);
+// START SERVER WITH OPENCLAW ENTERPRISE CRASH RESILIENCE & CLEAN SHUTDOWN
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Consultant Studio Enterprise Engine running on http://0.0.0.0:${PORT}]`);
+});
+
+// OpenClaw Enterprise Process Signal Governance
+process.on('SIGTERM', () => {
+  console.log('[SIGTERM received: Gracefully closing Consultant Studio HTTP server]');
+  server.close(() => {
+    console.log('[Consultant Studio process terminated cleanly]');
+    process.exit(0);
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[OpenClaw Governance - Uncaught Exception]:', err.message);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[OpenClaw Governance - Unhandled Rejection]:', reason);
 });
