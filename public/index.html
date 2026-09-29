@@ -4719,30 +4719,69 @@
             return (clone.innerText || clone.textContent).trim();
         }
 
-        // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER
+        // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER (PURIFIES EMAIL BODY ONLY)
         function copyExecutiveEmail(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
-            const text = getCleanStrategyText({ textContent: card.innerText });
-            
-            // Extract Subject and Body if formatted as an email
-            let emailText = text;
-            const subjectMatch = text.match(/(?:Subject|Re|Regarding):\s*([^\n]+)/i);
-            if (subjectMatch) {
-                emailText = text.slice(text.indexOf(subjectMatch[0]));
+            const text = (card.querySelector('.stream-content')?.innerText || card.innerText || "").trim();
+
+            let purifiedEmail = text;
+
+            // 1. Isolate starting from "Subject:" or "Hi / Dear / Hey / To:"
+            const startPatterns = [
+                /(?:Subject|Re|Regarding):\s*[^\n]+/i,
+                /(?:^|\n)(?:Hi|Dear|Hey|To)\s+[^,\n]+,/i
+            ];
+
+            for (const pat of startPatterns) {
+                const match = text.match(pat);
+                if (match && match.index !== undefined) {
+                    purifiedEmail = text.slice(match.index);
+                    break;
+                }
             }
 
-            navigator.clipboard.writeText(emailText).then(() => {
+            // 2. Cut off trailing AI commentary, operator interrogation, sensitivity sliders, and UI metadata
+            const stopPatterns = [
+                /\n\s*\*{3,}/,                                // ***
+                /\n\s*---/,                                   // ---
+                /\n\s*(?:Operator Interrogation|Interrogation Intake|Diagnostic Questions):/i,
+                /\n\s*Reply with your answers/i,
+                /\n\s*🪄\s*Dynamic What-If/i,
+                /\n\s*Dynamic What-If/i,
+                /\n\s*📈\s*Calculate/i,
+                /\n\s*📋\s*Copy Email/i,
+                /\n\s*🎙️\s*Audio Briefing/i,
+                /\n\s*⚡\s*gemini/i
+            ];
+
+            for (const stopPat of stopPatterns) {
+                const stopIdx = purifiedEmail.search(stopPat);
+                if (stopIdx !== -1) {
+                    purifiedEmail = purifiedEmail.slice(0, stopIdx).trim();
+                }
+            }
+
+            // 3. Clean trailing buttons, action tags, and markdown artifacts
+            purifiedEmail = purifiedEmail
+                .replace(/\[Action:[^\]]+\]/gi, '')
+                .replace(/`{3}[\w]*/g, '')
+                .trim();
+
+            navigator.clipboard.writeText(purifiedEmail).then(() => {
                 const orig = btn.innerHTML;
-                btn.innerHTML = '✓ Copied to Clipboard!';
+                btn.innerHTML = '✓ Copied Clean Email!';
                 btn.style.borderColor = '#10B981';
                 btn.style.color = '#34D399';
-                showToast('📋 Executive Email copied to clipboard!', '✓');
+                showToast('📋 Clean Email copied (prose & UI stripped)!', '✓');
                 setTimeout(() => {
                     btn.innerHTML = orig;
                     btn.style.borderColor = '#A855F7';
                     btn.style.color = '#C084FC';
                 }, 2200);
+            }).catch(e => {
+                console.warn("Clipboard copy fallback:", e);
+                navigator.clipboard.writeText(purifiedEmail);
             });
         }
 
