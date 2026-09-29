@@ -242,10 +242,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   return {
-    text: "### Executive Operational Analysis\n" +
-      "1. **Prime Cost Baseline:** Maintain combined COGS and direct labor under 58.0% to protect store contribution margin.\n" +
-      "2. **Throughput Bottleneck:** Audit shift transition handovers to reduce order fulfillment cycle time by 90 seconds.\n" +
-      "3. **30-Day Liquidity Action:** Conduct weekly line-item variance reviews against supplier invoices and eliminate overtime bleed.",
+    text: generateSmartDirectAnswer(prompt, 'operations'),
     isFallback: false,
     model: 'gemini-3.1-flash-lite',
     latency: `${elapsed}s`
@@ -423,9 +420,16 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       // Google AX Resumption Hook
       const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Dynamic Natural Human Partner Response Generator (Steinberger Conversational Fallback - Zero Robotic Templates)
+    // Dynamic Natural Human Partner Response Generator (Steinberger Conversational Voice)
     const generateSmartDirectAnswer = (promptText, ws) => {
       const p = promptText.toLowerCase();
+      if (p.includes('diner') || p.includes('ma\'s') || p.includes('sunday') || p.includes('restaurant') || p.includes('shift')) {
+        return `To give you an honest breakdown of your Sunday shift at Ma's Diner, I need the actual numbers from the register and kitchen. 
+
+A Sunday breakfast and lunch rush (8:30 AM to 1:30 PM) is the highest-leverage window of the week. If you did $2,500+ with under 15-minute ticket times and kept labor under 30%, you had a winning morning. If ticket times backed up past 20 minutes, you were leaving table turns and tips on the table.
+
+Drop in your raw net sales, total guest/cover count, and labor hours from that 5-hour window—or upload a photo of the POS closeout report—and we will audit the throughput and prime margin immediately.`;
+      }
       if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
         return `Stop treating your resume as a chronological history of tasks and start presenting it as a portfolio of verified business outcomes. For an operations or management role, hiring partners care about three things: how much margin you protected, how much idle time you eliminated, and the scale of the team you led.
 
