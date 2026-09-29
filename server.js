@@ -144,11 +144,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     }
   }
 
-  // TIER 1: Direct Speculative Race across Ultra-Fast & Active Google AI Studio Models (Sub-1.5s Response)
+  // TIER 1: Ultra-Resilient Speculative Race across Live Google Endpoints (Includes Fast Gemma-4-26B + Gemini 3.5 Fallback)
   if (activeGoogleKey) {
     const fetchDirectGoogle = async (modelName, maxTokens = 4096) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
           method: 'POST',
@@ -179,8 +179,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      // Race active fast models simultaneously with immediate failover
-      const targetModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
+      // Race active high-availability models: gemma-4-26b-a4b-it (1.5s live response), gemini-3.1-flash-lite, gemini-3.5-flash
+      const targetModels = ['gemma-4-26b-a4b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.8-flash'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
