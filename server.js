@@ -558,7 +558,7 @@ User Query: ${userMessage}`;
         domain: jevSignals?.domain || 'general',
         response: liveResponse.text,
         isFallback: liveResponse.isFallback || false,
-        model: liveResponse.model || 'gemini-flash-latest',
+        model: liveResponse.model || 'gemini-3.1-flash-lite',
         latency: liveResponse.latency || '1.5s'
       });
       if (axExecutionLog.size > 100) {
@@ -571,7 +571,7 @@ User Query: ${userMessage}`;
         response: liveResponse.text,
         domain: jevSignals?.domain || null,
         isFallback: liveResponse.isFallback || false,
-        model: liveResponse.model || 'gemini-flash-latest',
+        model: liveResponse.model || 'gemini-3.1-flash-lite',
         latency: liveResponse.latency || '1.5s',
         runtime: "ax_distributed_resilient_v1"
       });
