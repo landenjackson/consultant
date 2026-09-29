@@ -423,58 +423,28 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       // Google AX Resumption Hook
       const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Dynamic Context-Aware Intelligent Response Generator (Senior Operator Fallback)
+    // Dynamic Natural Human Partner Response Generator (Steinberger Conversational Fallback - Zero Robotic Templates)
     const generateSmartDirectAnswer = (promptText, ws) => {
       const p = promptText.toLowerCase();
       if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-        return `### 1. Executive Verdict\n` +
-          `Your operational profile demonstrates elite frontline capability, but recruiters evaluate commercial scale. When scored from 1 to 10, resumes that quantify hard dollar savings and throughput speed consistently achieve a **9/10** benchmark.\n\n` +
-          `### 2. Operational & Financial Mechanics\n\n` +
-          `| Metric Category | Signal Strength | Executive Calibration Target |\n` +
-          `| :--- | :--- | :--- |\n` +
-          `| **Direct Margin Ownership** | High | Frame exact dollar savings ($35k waste cut, $18k labor recaptured) |\n` +
-          `| **Throughput Velocity** | High | Link speed optimizations (-90s expo ticket time) to top-line lift (+$2.2k/shift) |\n` +
-          `| **Organizational Scale** | Moderate | Specify total unit ARR, seat count, and direct frontline headcount led |\n\n` +
-          `### 3. Immediate 30-60-90 Day Sequencing\n` +
-          `• **Days 1–30:** Reframe all bullet points around prime cost reduction and throughput velocity.\n` +
-          `• **Days 31–60:** Integrate tech stack credentials (Toast POS, 7shifts, Advanced Excel) to prove systems mastery.\n` +
-          `• **Days 61–90:** Target executive operations roles highlighting your dual frontline and automated software expertise.\n\n` +
-          `### 4. Strategic Trade-Off & Next Levers\n` +
-          `The core trade-off is **Specialist Depth vs. Multi-Unit Breadth.** Position your systems and automation skills as tools that multiply frontline team efficiency.\n\n` +
-          `[Action: Generate Master 1-Page Resume] | [Action: Practice 30-Second Pitch] | [Action: Structure Leadership STAR Bullets]`;
+        return `Stop treating your resume as a chronological history of tasks and start presenting it as a portfolio of verified business outcomes. For an operations or management role, hiring partners care about three things: how much margin you protected, how much idle time you eliminated, and the scale of the team you led.
+
+If you supervised shifts, don't write that you "scheduled staff and handled cash." Write that you optimized shift schedules against peak demand to cut labor variance, or that you implemented prep checklists that recaptured $15,000+ in annual food waste. Quantify every bullet with a real dollar or hour denominator.
+
+Pull your top three achievements from your last role and state the exact baseline you started with and the final number you hit. Once you provide those figures, we will build a clean, 1-page executive resume around them.`;
       }
-      if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation')) {
-        return `### 1. Executive Verdict\n` +
-          `Absorbing supplier price increases directly attacks your operating margin. You must defend your baseline through yield control and menu contribution re-indexing before passing price hikes to customers.\n\n` +
-          `### 2. Operational & Financial Mechanics\n\n` +
-          `| Cost Pillar | Immediate Intervention | Expected Margin Recovery |\n` +
-          `| :--- | :--- | :--- |\n` +
-          `| **Yield & Trim Waste** | Daily pre-portioning audits | +2.0% to 3.5% COGS |\n` +
-          `| **High-Velocity Menu Mix** | Pairings recalibration | +1.5% Contribution |\n` +
-          `| **Vendor Rate Matching** | Secondary supplier bids | -4.0% to -8.0% Inflation |\n\n` +
-          `### 3. Immediate 30-60-90 Day Sequencing\n` +
-          `• **Days 1–30:** Implement strict shift-level waste logs across top 5 high-cost proteins.\n` +
-          `• **Days 31–60:** Recalibrate recipe card yields and cross-train prep cooks on portion standards.\n` +
-          `• **Days 61–90:** Lock in secondary supplier backup agreements.\n\n` +
-          `### 4. Strategic Trade-Off & Next Levers\n` +
-          `The trade-off is **Menu Stability vs. Margin Defense.** Cut or substitute low-margin volatile ingredients immediately.\n\n` +
-          `[Action: Audit Top 5 Protein COGS] | [Action: Draft Supplier Negotiation Memo] | [Action: Recalibrate Menu Contribution]`;
+      if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
+        return `When supplier prices rise, passing the cost directly to your customers is the quickest way to kill repeat volume. Your first line of defense is always yield control and menu contribution re-indexing.
+
+You need to audit your top five high-cost ingredients immediately. Most operators lose 2% to 4% of their margin to unmeasured kitchen trim, over-portioning, or prep spoilage before food ever hits the grill. Tighten your prep sheets and require daily shift-level waste logging before renegotiating vendor rate cards.
+
+Pull your current food cost percentage and your top three protein costs. We will calculate your exact breakeven floor and model the margin recovery.`;
       }
-      return `### 1. Executive Verdict\n` +
-        `Operational efficiency requires isolating root-cause bottlenecks and defending contribution margins without relying on price discounting.\n\n` +
-        `### 2. Operational & Financial Mechanics\n\n` +
-        `| Focus Area | Baseline Standard | Target Objective |\n` +
-        `| :--- | :--- | :--- |\n` +
-        `| **Prime Cost Floor** | ≤ 58.0% | Food COGS + Frontline Labor |\n` +
-        `| **Throughput Turn Rate** | +15% Peak Velocity | Eliminate Station Bottlenecks |\n` +
-        `| **Cash Preservation** | ≥ 12 Months Runway | Weekly Net Outflow Audit |\n\n` +
-        `### 3. Immediate 30-60-90 Day Sequencing\n` +
-        `• **Days 1–30:** Audit primary cost and labor variables across daily operations.\n` +
-        `• **Days 31–60:** Eliminate station friction at shift handoffs to accelerate throughput velocity.\n` +
-        `• **Days 61–90:** Standardize shift operating procedures and review weekly profit margins.\n\n` +
-        `### 4. Strategic Trade-Off & Next Levers\n` +
-        `The primary decision is **Speed vs. Unit Margin.** Protect full-price realization across all sales channels.\n\n` +
-        `[Action: Stress-Test Labor +5%] | [Action: Generate 1-Page Board Memo] | [Action: Model 13-Week Cash Flow]`;
+      return `To fix this bottleneck, we need to look directly at the underlying unit economics rather than applying temporary surface patches. Real operational efficiency comes from identifying the single physical constraint that is slowing down your cash conversion cycle or daily throughput.
+
+Look at where your team or system spends the most uncompensated time each week. Whether it is inventory shrinkage, slow order handoffs, or administrative overhead, eliminating that single friction point will yield immediate margin relief.
+
+Tell me the exact figures or friction points you are seeing in your daily numbers, and we will break down the mathematical solution step by step.`;
     };
 
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
