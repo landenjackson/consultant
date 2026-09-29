@@ -145,7 +145,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
   if (activeGoogleKey) {
     const fetchDirectGoogle = async (modelName, maxTokens = 4096) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
           method: 'POST',
@@ -164,7 +164,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
           const data = await res.json();
           const candidate = data.candidates?.[0];
           const text = candidate?.content?.parts?.[0]?.text || '';
-          if (text && text.trim().length > 30) {
+          if (text && text.trim().length > 10) {
             return { model: modelName, text };
           }
         }
@@ -176,13 +176,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      let targetModels = ['gemini-3.1-flash-lite'];
-      if (pinnedModel && pinnedModel !== 'auto' && pinnedModel !== 'gemini-3.8-flash') {
-        targetModels = [pinnedModel];
-      }
+      // Race active fast models simultaneously with immediate failover
+      const targetModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`[⚡ Direct Google AI Studio Instant Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
+      console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
       return { text: winner.text, isFallback: false, model: winner.model, latency: `${elapsed}s` };
     } catch (gErr) {
       console.warn('[Direct Google Speculative Notice]:', gErr.message);
