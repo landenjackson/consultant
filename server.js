@@ -91,10 +91,10 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     });
   }
 
-  // TIER 1: Direct Multimodal Vision Execution (Google AI Studio gemini-3.1-flash-lite)
+  // TIER 1: Direct Multimodal Vision Execution (Google Gemini 4 Argon, Gemini 3.8, Gemini 3.1 Flash-Lite)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+    const directVisionModels = ['gemini-4-argon', 'gemini-4-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
     for (const modelName of directVisionModels) {
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
