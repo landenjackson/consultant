@@ -5115,12 +5115,6 @@
             openInCanvas(btn);
         }
 
-        function exportCanvasExcel() {
-            const editor = document.getElementById('canvasEditor');
-            const text = getTargetDocumentText(editor);
-            exportExcelXLSX(editor);
-        }
-
         // 3. WORD EXPORT (.DOCX / HTML FORMATTED CLEAN DOCUMENT)
         function exportWordDoc(btn) {
             try {
