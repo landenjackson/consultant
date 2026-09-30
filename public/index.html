@@ -2337,6 +2337,9 @@
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
             </button>
+            <button class="btn-icon" onclick="toggleLiveVoicePractice()" id="liveVoicePracticeBtn" title="Launch Interactive Live Voice Interview Practicer (Gemini Live Style)" style="background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.35); color:var(--accent);">
+                <span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>
+            </button>
             <button class="btn-icon" onclick="resetChatSession()" title="Start New Chat / Reset Session" style="color:var(--text-muted);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
@@ -4357,8 +4360,134 @@
         }
 
         // 🎙️ EXECUTIVE VOICE BRIEFING AUDIO ENGINE (SPEECHSYNTHESIS WITH INLINE DELIVERABLE CARD)
-        let activeUtterance = null;
-        function playVoiceBriefing(btn) {
+        // 🎙️ GEMINI LIVE STYLE INTERACTIVE VOICE INTERVIEW PRACTICER
+        let isVoicePracticeActive = false;
+        let speechRecognition = null;
+        let naturalVoice = null;
+
+        function initNaturalVoice() {
+            if (!window.speechSynthesis) return;
+            const voices = window.speechSynthesis.getVoices();
+            // Prioritize premium Siri / Samantha / Google US English / Natural neural voices
+            naturalVoice = voices.find(v => (v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Ava') || v.name.includes('Victoria')) && v.lang.startsWith('en')) 
+                        || voices.find(v => v.lang.startsWith('en-US')) 
+                        || voices[0];
+        }
+
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = initNaturalVoice;
+            initNaturalVoice();
+        }
+
+        function toggleLiveVoicePractice() {
+            if (isVoicePracticeActive) {
+                stopLiveVoicePractice();
+            } else {
+                startLiveVoicePractice();
+            }
+        }
+
+        function startLiveVoicePractice() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                showToast("Speech Recognition not supported in this browser. Please use Chrome or Safari.", "⚠️");
+                return;
+            }
+
+            isVoicePracticeActive = true;
+            const btn = document.getElementById('liveVoicePracticeBtn');
+            if (btn) {
+                btn.style.background = '#22C55E';
+                btn.style.color = '#000';
+                btn.innerHTML = '<span style="font-size:15px; font-weight:800;">⏹️</span>';
+                btn.title = 'Stop Live Interview Practice';
+            }
+
+            showToast("Live Interview Practice Activated. Speak your answer or ask the interviewer a question!", "🎙️");
+
+            // Initial voice greeting from Consultant Executive Interviewer
+            speakInterviewerResponse("Welcome to your executive interview simulation. I am your Lead Operating Partner today. Walk me through a critical operational turnaround where you defended margin or suppressed prime costs.", () => {
+                listenToCandidate();
+            });
+        }
+
+        function stopLiveVoicePractice() {
+            isVoicePracticeActive = false;
+            if (speechRecognition) {
+                try { speechRecognition.stop(); } catch(e){}
+            }
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            const btn = document.getElementById('liveVoicePracticeBtn');
+            if (btn) {
+                btn.style.background = 'rgba(34,197,94,0.12)';
+                btn.style.color = 'var(--accent)';
+                btn.innerHTML = '<span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>';
+                btn.title = 'Launch Interactive Live Voice Interview Practicer (Gemini Live Style)';
+            }
+            showToast("Live Interview Practice Ended.", "⏹️");
+        }
+
+        function listenToCandidate() {
+            if (!isVoicePracticeActive) return;
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) return;
+
+            speechRecognition = new SpeechRec();
+            speechRecognition.continuous = false;
+            speechRecognition.interimResults = false;
+            speechRecognition.lang = 'en-US';
+
+            speechRecognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (transcript && transcript.trim().length > 0) {
+                    const userInput = document.getElementById('userInput');
+                    if (userInput) userInput.value = `[Live Voice Interview Response]: ${transcript}`;
+                    sendMessage();
+                }
+            };
+
+            speechRecognition.onerror = (err) => {
+                console.warn("SpeechRec error:", err);
+                if (isVoicePracticeActive) {
+                    setTimeout(() => listenToCandidate(), 1000);
+                }
+            };
+
+            speechRecognition.onend = () => {
+                // Keep listening loop active if voice practice is toggled on
+            };
+
+            try {
+                speechRecognition.start();
+            } catch(e){}
+        }
+
+        function speakInterviewerResponse(text, onComplete) {
+            if (!window.speechSynthesis) {
+                if (onComplete) onComplete();
+                return;
+            }
+            window.speechSynthesis.cancel();
+            
+            const cleanText = text.replace(/[*_#`]/g, '').replace(/https?:\/\/\S+/g, '').slice(0, 450);
+            const utter = new SpeechSynthesisUtterance(cleanText);
+            
+            initNaturalVoice();
+            if (naturalVoice) utter.voice = naturalVoice;
+            utter.rate = 1.05; // Snappy, articulate executive cadence
+            utter.pitch = 1.02;
+
+            utter.onend = () => {
+                if (onComplete) onComplete();
+            };
+            utter.onerror = () => {
+                if (onComplete) onComplete();
+            };
+
+            window.speechSynthesis.speak(utter);
+        }
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
 
@@ -5203,7 +5332,12 @@
                     }
                 }
 
-                // If response is missing or network failed, generate instant high-leverage client response
+                // If live voice practice mode is active, speak back the answer aloud like Gemini Live
+                if (isVoicePracticeActive && responseText) {
+                    speakInterviewerResponse(responseText, () => {
+                        listenToCandidate(); // Auto-listen for next candidate response
+                    });
+                }
                 let responseText = (data && data.response) ? data.response : "";
                 if (!responseText) {
                     responseText = `### 1. Executive Verdict\n` +
