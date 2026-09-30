@@ -4464,27 +4464,54 @@
             } catch(e){}
         }
 
-        function speakInterviewerResponse(text, onComplete) {
+        async function speakInterviewerResponse(text, onComplete) {
+            const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 450);
+            
+            // 1. Try Native Google Gemini 3.8 Flash TTS Neural Voice Synthesis
+            try {
+                const customKey = localStorage.getItem('cs_user_gemini_key') || '';
+                const headers = { 'Content-Type': 'application/json' };
+                if (customKey) headers['x-custom-gemini-key'] = customKey;
+
+                const ttsRes = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        text: cleanText,
+                        speaker: 'Lumi',
+                        style: 'Style: Confident, articulate senior Operating Partner.'
+                    })
+                });
+
+                if (ttsRes.ok) {
+                    const ttsData = await ttsRes.json();
+                    if (ttsData.audioBase64) {
+                        const audio = new Audio(`data:${ttsData.mimeType};base64,${ttsData.audioBase64}`);
+                        audio.onended = () => { if (onComplete) onComplete(); };
+                        audio.onerror = () => { if (onComplete) onComplete(); };
+                        await audio.play();
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.warn('[Gemini 3.8 TTS API Notice - Falling back to WebSpeech]:', e);
+            }
+
+            // 2. Fallback to Browser Neural WebSpeechSynthesis (Siri/Samantha)
             if (!window.speechSynthesis) {
                 if (onComplete) onComplete();
                 return;
             }
             window.speechSynthesis.cancel();
             
-            const cleanText = text.replace(/[*_#`]/g, '').replace(/https?:\/\/\S+/g, '').slice(0, 450);
             const utter = new SpeechSynthesisUtterance(cleanText);
-            
             initNaturalVoice();
             if (naturalVoice) utter.voice = naturalVoice;
-            utter.rate = 1.05; // Snappy, articulate executive cadence
+            utter.rate = 1.05;
             utter.pitch = 1.02;
 
-            utter.onend = () => {
-                if (onComplete) onComplete();
-            };
-            utter.onerror = () => {
-                if (onComplete) onComplete();
-            };
+            utter.onend = () => { if (onComplete) onComplete(); };
+            utter.onerror = () => { if (onComplete) onComplete(); };
 
             window.speechSynthesis.speak(utter);
         }

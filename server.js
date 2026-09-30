@@ -410,6 +410,70 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   }
 });
 
+  // 2.5 NATIVE GOOGLE GEMINI 3.8 FLASH TTS NEURAL AUDIO SYNTHESIS ENDPOINT
+  app.post('/api/tts', async (req, res) => {
+    try {
+      const { text, speaker = 'Lumi', style = 'Style: Confident, articulate senior Operating Partner and executive interviewer.' } = req.body;
+      if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
+
+      const activeKey = req.headers['x-custom-gemini-key'] || serverGoogleKey;
+      if (!activeKey) return res.status(500).json({ error: 'No Google API key available' });
+
+      const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 500);
+
+      const payload = {
+        contents: [{
+          role: 'user',
+          parts: [
+            {
+              text: cleanText,
+              speech_metadata: {
+                speaker: 'Speaker 1',
+                style: style
+              }
+            }
+          ]
+        }],
+        generationConfig: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: speaker
+              }
+            }
+          }
+        }
+      };
+
+      const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-tts:generateContent?key=${activeKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!googleRes.ok) {
+        const errText = await googleRes.text();
+        return res.status(googleRes.status).json({ error: 'Google TTS API error', details: errText });
+      }
+
+      const data = await googleRes.json();
+      const part = data.candidates?.[0]?.content?.parts?.[0];
+      if (part && part.inlineData && part.inlineData.data) {
+        return res.json({
+          audioBase64: part.inlineData.data,
+          mimeType: part.inlineData.mimeType || 'audio/wav',
+          speaker: speaker
+        });
+      }
+
+      return res.status(500).json({ error: 'No audio returned in payload' });
+    } catch (err) {
+      console.error('[TTS API Error]:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
   app.post('/api/chat', async (req, res) => {
     try {
