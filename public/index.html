@@ -4488,6 +4488,8 @@
 
             window.speechSynthesis.speak(utter);
         }
+
+        function playVoiceBriefing(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
             if (!card) return;
 
