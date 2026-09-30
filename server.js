@@ -413,7 +413,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   // 2.5 NATIVE GOOGLE GEMINI 3.8 FLASH TTS NEURAL AUDIO SYNTHESIS ENDPOINT (WITH PCM-TO-WAV HEADER CONVERTER)
   app.post('/api/tts', async (req, res) => {
     try {
-      const { text, speaker = 'Lumi', style = 'Style: Confident, articulate senior Operating Partner and executive interviewer.' } = req.body;
+      const { text, speaker = 'Lumi' } = req.body;
       if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
 
       const activeKey = req.headers['x-custom-gemini-key'] || process.env.GEMINI_API_KEY;
@@ -424,31 +424,15 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       const payload = {
         contents: [{
           role: 'user',
-          parts: [
-            {
-              text: cleanText,
-              speech_metadata: {
-                speaker: 'Speaker 1',
-                style: style
-              }
-            }
-          ]
+          parts: [{ text: cleanText }]
         }],
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: {
-            multiSpeakerVoiceConfig: {
-              mode: 'CONVERSATIONAL',
-              speakerVoiceConfigs: [
-                {
-                  speaker: 'Speaker 1',
-                  voiceConfig: {
-                    prebuiltVoiceConfig: {
-                      voiceName: speaker
-                    }
-                  }
-                }
-              ]
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: speaker
+              }
             }
           }
         }
@@ -469,7 +453,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       const part = data.candidates?.[0]?.content?.parts?.[0];
       if (part && part.inlineData && part.inlineData.data) {
         let rawBuffer = Buffer.from(part.inlineData.data, 'base64');
-        let mime = part.inlineData.mimeType || 'audio/L16;rate=24000';
+        let mime = part.inlineData.mimeType || 'audio/wav';
 
         // If raw PCM L16 audio is returned, synthesize RIFF/WAVE header for standard browser audio playback
         if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
