@@ -25,12 +25,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
 const DJEV_RUN_URL = process.env.DJEV_RUN_URL || 'https://api.typesafe.ai/v1/systemone';
 
-// TYPESAFE JEV / DJEV-RUN SYSTEM ONE MULTI-PRIMITIVE EVALUATOR (~70-150ms DECISION ENGINE)
+// TYPESAFE JEV / SPARK-X2.5 / DJEV-RUN MULTI-PRIMITIVE EVALUATOR (~50-120ms DECISION ENGINE)
 const evaluateWithJev = async (userText) => {
   if (!TYPESAFE_API_KEY && !process.env.DJEV_RUN_URL) return null;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 600); // 600ms hard ceiling to prevent any chat lag
+    const timeoutId = setTimeout(() => controller.abort(), 450); // Sub-450ms hard ceiling for high-speed edge routing
     const headers = { 'Content-Type': 'application/json' };
     if (TYPESAFE_API_KEY) {
       headers['Authorization'] = `Bearer ${TYPESAFE_API_KEY}`;
@@ -42,7 +42,7 @@ const evaluateWithJev = async (userText) => {
       signal: controller.signal,
       body: JSON.stringify({
         state: String(userText || '').slice(0, 1000),
-        model: 'jev-latest',
+        model: 'spark-x2.5-4b',
         questions: {
           intent: {
             type: 'choice',
