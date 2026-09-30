@@ -2663,10 +2663,12 @@
     </div>
 
     <script>
-        // 🏛️ 4-TIER COGNITIVE STRATEGY MEMORY & KNOWLEDGE GRAPH ENGINE
+        // 🏛️ 4-TIER COGNITIVE STRATEGY MEMORY & PERSISTENT KNOWLEDGE GRAPH ENGINE
         const CognitiveMemory = {
             STORAGE_KEY: 'consultant_cognitive_graph',
-            
+            VAULT_KEY: 'consultant_vault',
+            USER_FACTS_KEY: 'consultant_persistent_facts',
+
             // Get raw cognitive memory state
             getState: function() {
                 try {
@@ -2676,8 +2678,8 @@
                 }
             },
 
-            // Record an operational breakthrough or verified metric into the cognitive graph
-            recordInsight: function(category, key, value) {
+            // Save durable operational facts (e.g. store names, ARR, target prime costs, key team roles)
+            saveFact: function(category, key, value) {
                 const state = this.getState();
                 state[category] = state[category] || {};
                 state[category][key] = {
@@ -2687,19 +2689,73 @@
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
             },
 
-            // Assemble a clean, unobtrusive operator context for AI inference
+            // Extract high-signal durable context across saved vaults and prior chats automatically
             buildCognitiveContext: function() {
-                const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
-                if (vault.length === 0) return '';
-                
-                let memoryPrompt = "\n[Operator Context - Prior Discussion Topics]:\n";
-                vault.slice(0, 3).forEach(v => {
-                    const snippet = v.title ? v.title.slice(0, 100) : '';
-                    memoryPrompt += `• Prior Topic: ${snippet}\n`;
-                });
-                return memoryPrompt;
+                let memoryContext = "";
+
+                // 1. Ingest from Saved Research Vault Items
+                const vault = JSON.parse(localStorage.getItem(this.VAULT_KEY) || '[]');
+                if (vault.length > 0) {
+                    memoryContext += "\n[Durable Operator Memory & Saved Knowledge Vault]:\n";
+                    vault.slice(0, 5).forEach((v, idx) => {
+                        const snippet = (v.text || v.title || '').replace(/\s+/g, ' ').slice(0, 300);
+                        memoryContext += `• Memo ${idx + 1} (${v.title || 'Saved Topic'}): ${snippet}\n`;
+                    });
+                }
+
+                // 2. Ingest from Structured Cognitive Graph Facts
+                const graph = this.getState();
+                const categories = Object.keys(graph);
+                if (categories.length > 0) {
+                    memoryContext += "\n[Verified Business Baseline & Core Figures]:\n";
+                    categories.forEach(cat => {
+                        const entries = Object.entries(graph[cat] || {});
+                        entries.forEach(([k, item]) => {
+                            memoryContext += `• ${cat.toUpperCase()} [${k}]: ${item.value}\n`;
+                        });
+                    });
+                }
+
+                // 3. Ingest active financial slider state
+                const rentVal = document.getElementById('beRentVal')?.innerText || '';
+                const cogsVal = document.getElementById('beCogsVal')?.innerText || '';
+                const laborVal = document.getElementById('beLaborVal')?.innerText || '';
+                if (rentVal || cogsVal || laborVal) {
+                    memoryContext += `\n[Active Breakeven Controls]: Rent: ${rentVal} | COGS Margin: ${cogsVal} | Labor Efficiency: ${laborVal}\n`;
+                }
+
+                return memoryContext.trim();
             }
         };
+
+        // AUTO-HARVEST PERSISTENT MEMORY FROM EVERY USER CHAT & UPLOAD
+        function autoHarvestMemoryFromText(rawText) {
+            if (!rawText || rawText.length < 15) return;
+            try {
+                // Auto-detect business names (e.g. Ma's Diner, Acme SaaS)
+                const bizMatch = rawText.match(/(?:at|for|managing|owner of|store|diner|company|restaurant)\s+([A-Z][A-Za-z0-9'\s]{2,25}(?:Diner|Bistreaux|Cafe|SaaS|LLC|Inc|Store|Kitchen|Bar)?)/);
+                if (bizMatch && bizMatch[1]) {
+                    CognitiveMemory.saveFact('business', 'entity_name', bizMatch[1].trim());
+                }
+
+                // Auto-detect revenue & volume
+                const revMatch = rawText.match(/(?:revenue|sales|volume|arr|mrr|doing|gross)[^:\n\$]*[\$€£]\s*([0-9,]+(?:\.[0-9]+)?(?:\s*[kKmMbB])?)/i);
+                if (revMatch && revMatch[1]) {
+                    CognitiveMemory.saveFact('financials', 'baseline_revenue', revMatch[1].trim());
+                }
+
+                // Auto-detect prime cost / COGS / labor metrics
+                const cogsMatch = rawText.match(/(?:cogs|food\s*waste|food\s*cost|inventory)[^:\n\d%]*([0-9.]+%|\$[0-9,]+)/i);
+                if (cogsMatch && cogsMatch[1]) {
+                    CognitiveMemory.saveFact('financials', 'cogs_metric', cogsMatch[1].trim());
+                }
+
+                const laborMatch = rawText.match(/(?:labor|payroll|staffing)[^:\n\d%]*([0-9.]+%|\$[0-9,]+)/i);
+                if (laborMatch && laborMatch[1]) {
+                    CognitiveMemory.saveFact('financials', 'labor_metric', laborMatch[1].trim());
+                }
+            } catch(e) {}
+        }
 
         // DYNAMIC OPERATOR MEMORY RETRIEVAL (STORES STRATEGIC CONSTRAINTS & RESUME/P&L CONTEXT)
         function getOperatorMemoryContext() {
@@ -5104,7 +5160,12 @@
 
                 let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
 
-                const memoryContext = localStorage.getItem('cs_strategic_memory') || '';
+                // 🧠 Dynamic Multi-Tier Persistent Memory Injection (Vault + Facts + Controls)
+                const memoryContext = getOperatorMemoryContext();
+
+                // Auto-harvest durable entities from user input and documents
+                autoHarvestMemoryFromText(text);
+                if (docToSend) autoHarvestMemoryFromText(docToSend);
 
                 const modelOverride = document.getElementById('modelSelectOverride')?.value || 'auto';
 
