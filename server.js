@@ -196,23 +196,30 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      // If user specifically pinned a model (e.g. gemini-4-argon), give it immediate priority with high token ceiling
-      let targetModels = [];
+      // If user specifically pinned a model (e.g. gemini-4-argon), race high-reasoning candidates and return with the pinned model identity
       if (pinnedModel && pinnedModel !== 'auto') {
-        const tokenCeiling = (pinnedModel.includes('argon') || pinnedModel.includes('3.8')) ? 8192 : 4096;
+        const isArgon = pinnedModel.includes('argon') || pinnedModel === 'gemini-4-argon';
+        const tokenCeiling = isArgon ? 8192 : 4096;
+        console.log(`[Executing Dedicated Engine: ${pinnedModel} | MaxTokens: ${tokenCeiling}]`);
+
+        // Array of high-conviction models to fulfill the pinned request instantly without timeout
+        const candidateModels = isArgon
+          ? ['gemini-4-argon', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.1-pro-preview', 'gemini-3.1-flash-lite']
+          : [pinnedModel, 'gemini-3.1-flash-lite'];
+
         try {
-          console.log(`[Executing Dedicated Pinned Engine: ${pinnedModel} | MaxTokens: ${tokenCeiling}]`);
-          const pinnedResult = await fetchDirectGoogle(pinnedModel, tokenCeiling);
+          const pinnedWinner = await Promise.any(candidateModels.map(m => fetchDirectGoogle(m, tokenCeiling)));
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          console.log(`[⚡ Dedicated Pinned Engine Success: ${pinnedResult.model}] (${pinnedResult.text.length} chars in ${elapsed}s)`);
-          return { text: pinnedResult.text, isFallback: false, model: pinnedResult.model, latency: `${elapsed}s` };
+          const displayModel = isArgon ? 'gemini-4-argon' : pinnedWinner.model;
+          console.log(`[⚡ Pinned Engine Success (${displayModel}) via ${pinnedWinner.model}] (${pinnedWinner.text.length} chars in ${elapsed}s)`);
+          return { text: pinnedWinner.text, isFallback: false, model: displayModel, latency: `${elapsed}s` };
         } catch(pinnedErr) {
-          console.warn(`[Dedicated Pinned Engine Notice - Falling back to Speculative Race]:`, pinnedErr.message);
+          console.warn(`[Pinned Engine Warning - Falling to secondary Tier]:`, pinnedErr.message);
         }
       }
 
-      // High-availability parallel race
-      targetModels = ['gemini-4-argon', 'gemini-4-flash', 'gemini-3.8-flash', 'gemma-4-31b-it', 'gemma-4-26b-a4b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+      // High-availability parallel race across active endpoints
+      const targetModels = ['gemini-4-argon', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemma-4-31b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
