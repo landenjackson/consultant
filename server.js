@@ -410,7 +410,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   }
 });
 
-  // 2.5 NATIVE GOOGLE GEMINI 3.8 FLASH TTS NEURAL AUDIO SYNTHESIS ENDPOINT
+  // 2.5 NATIVE GOOGLE GEMINI 3.8 FLASH TTS NEURAL AUDIO SYNTHESIS ENDPOINT (WITH PCM-TO-WAV HEADER CONVERTER)
   app.post('/api/tts', async (req, res) => {
     try {
       const { text, speaker = 'Lumi', style = 'Style: Confident, articulate senior Operating Partner and executive interviewer.' } = req.body;
@@ -437,10 +437,18 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: speaker
-              }
+            multiSpeakerVoiceConfig: {
+              mode: 'CONVERSATIONAL',
+              speakerVoiceConfigs: [
+                {
+                  speaker: 'Speaker 1',
+                  voiceConfig: {
+                    prebuiltVoiceConfig: {
+                      voiceName: speaker
+                    }
+                  }
+                }
+              ]
             }
           }
         }
@@ -460,9 +468,42 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       const data = await googleRes.json();
       const part = data.candidates?.[0]?.content?.parts?.[0];
       if (part && part.inlineData && part.inlineData.data) {
+        let rawBuffer = Buffer.from(part.inlineData.data, 'base64');
+        let mime = part.inlineData.mimeType || 'audio/L16;rate=24000';
+
+        // If raw PCM L16 audio is returned, synthesize RIFF/WAVE header for standard browser audio playback
+        if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
+          const sampleRate = 24000;
+          const bitsPerSample = 16;
+          const numChannels = 1;
+          const dataSize = rawBuffer.length;
+          const bytesPerSample = bitsPerSample / 8;
+          const blockAlign = numChannels * bytesPerSample;
+          const byteRate = sampleRate * blockAlign;
+          const chunkSize = 36 + dataSize;
+
+          const header = Buffer.alloc(44);
+          header.write('RIFF', 0);
+          header.writeUInt32LE(chunkSize, 4);
+          header.write('WAVE', 8);
+          header.write('fmt ', 12);
+          header.writeUInt32LE(16, 16); // Subchunk1Size
+          header.writeUInt16LE(1, 20);  // AudioFormat (PCM)
+          header.writeUInt16LE(numChannels, 22);
+          header.writeUInt32LE(sampleRate, 24);
+          header.writeUInt32LE(byteRate, 28);
+          header.writeUInt16LE(blockAlign, 32);
+          header.writeUInt16LE(bitsPerSample, 34);
+          header.write('data', 36);
+          header.writeUInt32LE(dataSize, 40);
+
+          rawBuffer = Buffer.concat([header, rawBuffer]);
+          mime = 'audio/wav';
+        }
+
         return res.json({
-          audioBase64: part.inlineData.data,
-          mimeType: part.inlineData.mimeType || 'audio/wav',
+          audioBase64: rawBuffer.toString('base64'),
+          mimeType: 'audio/wav',
           speaker: speaker
         });
       }
