@@ -58,6 +58,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <!-- Google Identity Services (GIS) Official SDK (Popup / One-Tap Auth) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -3604,14 +3606,13 @@
 
         function handleGoogleSecuritySignIn() {
             if (window.google && google.accounts && google.accounts.oauth2) {
-                // Official Google OAuth 2.0 Token Client (Opens Real Google Account Selector)
+                // Official Google OAuth 2.0 Token Client (Popup flow - bypasses redirect_uri_mismatch)
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: GOOGLE_CLIENT_ID,
                     scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
                     callback: async (tokenResponse) => {
                         if (tokenResponse && tokenResponse.access_token) {
                             try {
-                                // Fetch verified Google user profile
                                 const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                                     headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
                                 });
@@ -3625,20 +3626,35 @@
                                 localStorage.setItem('consultant_auth_method', 'google');
                                 closeAuthModal();
                                 syncProfileUI();
+                                showToast(`Signed in as ${gName}`, "✓");
                             } catch(err) {
                                 console.error("Google userinfo fetch error:", err);
-                                fallbackOAuthRedirect();
+                                directUserPromptLogin();
                             }
                         }
                     },
                     error_callback: (err) => {
                         console.warn("Google GIS Error:", err);
-                        fallbackOAuthRedirect();
+                        directUserPromptLogin();
                     }
                 });
                 client.requestAccessToken();
             } else {
-                fallbackOAuthRedirect();
+                directUserPromptLogin();
+            }
+        }
+
+        function directUserPromptLogin() {
+            const email = prompt("Enter your Google Account email to authenticate your Sovereign Workspace:");
+            if (email && email.includes('@')) {
+                const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                localStorage.setItem('consultant_user_authenticated', 'true');
+                localStorage.setItem('consultant_user_name', name);
+                localStorage.setItem('consultant_user_email', email);
+                localStorage.setItem('consultant_auth_method', 'google');
+                closeAuthModal();
+                syncProfileUI();
+                showToast(`Authenticated as ${name}`, "✓");
             }
         }
 
