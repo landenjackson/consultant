@@ -416,7 +416,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       const { text, speaker = 'Lumi', style = 'Style: Confident, articulate senior Operating Partner and executive interviewer.' } = req.body;
       if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
 
-      const activeKey = req.headers['x-custom-gemini-key'] || serverGoogleKey;
+      const activeKey = req.headers['x-custom-gemini-key'] || process.env.GEMINI_API_KEY;
       if (!activeKey) return res.status(500).json({ error: 'No Google API key available' });
 
       const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 500);
