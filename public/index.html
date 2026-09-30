@@ -2356,9 +2356,9 @@
 
             <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
             <div style="display:inline-flex; align-items:center; background:#07090D; border:1px solid var(--border); border-radius:8px; padding:2px 6px;">
-                <select id="modelSelectOverride" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Intelligence Engine">
+                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Intelligence Engine">
                     <option value="auto" selected style="background:#0D121A; color:#FFF;">⚡ Enterprise Auto (Adaptive Routing)</option>
-                    <option value="gemini-4-argon" style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Frontier Deep Reasoning - 2M+)</option>
+                    <option value="gemini-4-argon" style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Pro & Exec Tier Only - 2M+)</option>
                     <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash (High Reasoning)</option>
                     <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
                 </select>
@@ -2644,6 +2644,7 @@
                     <div class="plan-name">Strategic Partner</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
+                        <li>✓ <strong>🌌 Gemini 4 Argon Frontier Reasoning Access</strong></li>
                         <li>✓ <strong>10 Office Exports (.xlsx/.docx) / mo</strong></li>
                         <li>✓ Sub-2s Multi-Model Accelerated Priority</li>
                         <li>✓ Dynamic What-If Sensitivity Modeling</li>
@@ -2658,8 +2659,8 @@
                     <div class="plan-name">Executive Boardroom</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>Full Executive & C-Suite Authority</strong></li>
-                        <li>✓ Unlimited Document Uploads & Exports</li>
+                        <li>✓ <strong>🌌 Full Gemini 4 Argon 2M+ Context Authority</strong></li>
+                        <li>✓ <strong>Unlimited Extended Thinking & File Ingestion</strong></li>
                         <li>✓ Org Structure & KPI Incentive Modeling</li>
                         <li>✓ 1-Page Institutional Bank Teasers</li>
                         <li>✓ <strong>30-Day Evaluation Period ($0 Today)</strong></li>
@@ -5253,6 +5254,20 @@
                 // Enter without shift executes
                 e.preventDefault();
                 sendMessage();
+            }
+        }
+
+        function handleModelChange(selectEl) {
+            if (selectEl.value === 'gemini-4-argon') {
+                const subTier = localStorage.getItem('consultant_sub_tier') || '';
+                const isProOrExec = subTier === 'pro' || subTier === 'exec' || window.location.search.includes('creator=true') || window.location.search.includes('tier=exec') || window.location.search.includes('tier=pro');
+                
+                if (!isProOrExec) {
+                    showToast("🌌 Gemini 4 Argon Frontier Reasoning is exclusive to Strategic Partner & Executive Boardroom tiers.", "💎");
+                    openPricing();
+                } else {
+                    showToast("🌌 Gemini 4 Argon 2M+ Frontier Reasoning Activated.", "✓");
+                }
             }
         }
 
