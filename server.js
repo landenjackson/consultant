@@ -729,12 +729,13 @@ User Query: ${userMessage}`;
 
     if (liveResponse && liveResponse.text) {
       // Checkpoint execution in AX execution log for instant resumption & telemetry auditing
+      const detectedModel = liveResponse.model || (model !== 'auto' ? model : 'gemini-3.1-flash-lite');
       axExecutionLog.set(activeExecutionId, {
         timestamp: Date.now(),
         domain: jevSignals?.domain || 'general',
         response: liveResponse.text,
         isFallback: liveResponse.isFallback || false,
-        model: liveResponse.model || 'gemini-3.1-flash-lite',
+        model: detectedModel,
         latency: liveResponse.latency || '1.5s'
       });
       if (axExecutionLog.size > 100) {
@@ -747,7 +748,7 @@ User Query: ${userMessage}`;
         response: liveResponse.text,
         domain: jevSignals?.domain || null,
         isFallback: liveResponse.isFallback || false,
-        model: liveResponse.model || 'gemini-3.1-flash-lite',
+        model: detectedModel,
         latency: liveResponse.latency || '1.5s',
         runtime: "ax_distributed_resilient_v1"
       });
