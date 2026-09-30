@@ -2584,6 +2584,24 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:16px;">
+                <!-- VOICE ASSISTANT PERSONA & GENDER SETTINGS -->
+                <div>
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                        <span>🎙️</span> <span>Live Consultant Voice Persona:</span>
+                    </div>
+                    <p style="font-size:11.5px; color:var(--text-secondary); margin:0 0 8px 0; line-height:1.4;">
+                        Select your preferred conversational consultant voice for live strategic advisory, P&L walk-throughs, and auditory learning.
+                    </p>
+                    <div style="display:flex; gap:8px;">
+                        <button id="voiceGenderFemaleBtn" class="btn-export" onclick="setConsultantVoiceGender('female')" style="flex:1; justify-content:center; border-color:var(--accent); font-weight:700;">
+                            <span>👩‍💼 Executive Partner (Female / Lumi)</span>
+                        </button>
+                        <button id="voiceGenderMaleBtn" class="btn-export" onclick="setConsultantVoiceGender('male')" style="flex:1; justify-content:center; font-weight:700;">
+                            <span>👨‍💼 Senior Strategist (Male / Varo)</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div>
                     <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Reading Font Size:</div>
                     <div style="display:flex; gap:8px;">
@@ -4376,19 +4394,50 @@
             }
         }
 
-        // 🎙️ EXECUTIVE VOICE BRIEFING AUDIO ENGINE (SPEECHSYNTHESIS WITH INLINE DELIVERABLE CARD)
-        // 🎙️ GEMINI LIVE STYLE INTERACTIVE VOICE INTERVIEW PRACTICER
+        // 🎙️ EXECUTIVE LIVE CONSULTANT & AUDITORY LEARNING VOICE ENGINE
         let isVoicePracticeActive = false;
         let speechRecognition = null;
         let naturalVoice = null;
+        let consultantVoiceGender = localStorage.getItem('cs_voice_gender') || 'female';
+
+        function setConsultantVoiceGender(gender) {
+            consultantVoiceGender = gender;
+            localStorage.setItem('cs_voice_gender', gender);
+            
+            const fBtn = document.getElementById('voiceGenderFemaleBtn');
+            const mBtn = document.getElementById('voiceGenderMaleBtn');
+            if (fBtn && mBtn) {
+                if (gender === 'female') {
+                    fBtn.style.borderColor = 'var(--accent)';
+                    fBtn.style.color = '#FFF';
+                    mBtn.style.borderColor = 'var(--border)';
+                    mBtn.style.color = 'var(--text-secondary)';
+                } else {
+                    mBtn.style.borderColor = 'var(--accent)';
+                    mBtn.style.color = '#FFF';
+                    fBtn.style.borderColor = 'var(--border)';
+                    fBtn.style.color = 'var(--text-secondary)';
+                }
+            }
+            initNaturalVoice();
+            const label = gender === 'female' ? 'Executive Partner (Female / Lumi)' : 'Senior Strategist (Male / Varo)';
+            showToast(`Voice updated to ${label}`, "🎙️");
+        }
 
         function initNaturalVoice() {
             if (!window.speechSynthesis) return;
             const voices = window.speechSynthesis.getVoices();
-            // Prioritize premium Siri / Samantha / Google US English / Natural neural voices
-            naturalVoice = voices.find(v => (v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Ava') || v.name.includes('Victoria')) && v.lang.startsWith('en')) 
-                        || voices.find(v => v.lang.startsWith('en-US')) 
-                        || voices[0];
+            const isMale = (consultantVoiceGender === 'male');
+
+            if (isMale) {
+                naturalVoice = voices.find(v => (v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Fred') || v.name.includes('Male') || v.name.includes('Guy') || v.name.includes('Tom') || v.name.includes('Aaron') || v.name.includes('George')) && v.lang.startsWith('en'))
+                            || voices.find(v => v.lang.startsWith('en-US'))
+                            || voices[0];
+            } else {
+                naturalVoice = voices.find(v => (v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Ava') || v.name.includes('Victoria') || v.name.includes('Female')) && v.lang.startsWith('en')) 
+                            || voices.find(v => v.lang.startsWith('en-US')) 
+                            || voices[0];
+            }
         }
 
         if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -4417,13 +4466,13 @@
                 btn.style.background = '#22C55E';
                 btn.style.color = '#000';
                 btn.innerHTML = '<span style="font-size:15px; font-weight:800;">⏹️</span>';
-                btn.title = 'Stop Live Interview Practice';
+                btn.title = 'Stop Live Consultant Session';
             }
 
-            showToast("Live Interview Practice Activated. Speak your answer or ask the interviewer a question!", "🎙️");
+            showToast("Live Strategic Consultant Voice Activated. Ask any operational question or request advice!", "🎙️");
 
-            // Initial voice greeting from Consultant Executive Interviewer
-            speakInterviewerResponse("Welcome to your executive interview simulation. I am your Lead Operating Partner today. Walk me through a critical operational turnaround where you defended margin or suppressed prime costs.", () => {
+            // Initial voice greeting from Consultant Strategic Advisor
+            speakInterviewerResponse("Welcome to Consultant Studio. I am your Strategic Operating Partner. What operational bottleneck, P and L challenge, or turnaround move should we analyze today?", () => {
                 listenToCandidate();
             });
         }
@@ -4441,9 +4490,9 @@
                 btn.style.background = 'rgba(34,197,94,0.12)';
                 btn.style.color = 'var(--accent)';
                 btn.innerHTML = '<span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>';
-                btn.title = 'Launch Interactive Live Voice Interview Practicer (Gemini Live Style)';
+                btn.title = 'Launch Live Strategic Consultant Voice (Auditory Learning & Advisory)';
             }
-            showToast("Live Interview Practice Ended.", "⏹️");
+            showToast("Live Consultant Voice Session Ended.", "⏹️");
         }
 
         function listenToCandidate() {
@@ -4460,7 +4509,7 @@
                 const transcript = event.results[0][0].transcript;
                 if (transcript && transcript.trim().length > 0) {
                     const userInput = document.getElementById('userInput');
-                    if (userInput) userInput.value = `[Live Voice Interview Response]: ${transcript}`;
+                    if (userInput) userInput.value = `[Live Consultant Voice Inquiry]: ${transcript}`;
                     sendMessage();
                 }
             };
@@ -4503,8 +4552,8 @@
                     const utter = new SpeechSynthesisUtterance(cleanText);
                     initNaturalVoice();
                     if (naturalVoice) utter.voice = naturalVoice;
-                    utter.rate = 1.0;
-                    utter.pitch = 1.0;
+                    utter.rate = (consultantVoiceGender === 'male' ? 0.98 : 1.02);
+                    utter.pitch = (consultantVoiceGender === 'male' ? 0.95 : 1.05);
 
                     let hasFired = false;
                     const done = () => {
@@ -4523,18 +4572,19 @@
                 console.warn('[WebSpeech Error]:', e);
             }
 
-            // Backend Google Gemini 3.8 Flash Neural Audio Fallback
+            // Backend Google Gemini 3.8 Flash Neural Audio Fallback with Male/Female Profile
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
                 if (customKey) headers['x-custom-gemini-key'] = customKey;
+                const googleSpeaker = (consultantVoiceGender === 'male' ? 'Varo' : 'Lumi');
 
                 const ttsRes = await fetch('/api/tts', {
                     method: 'POST',
                     headers,
                     body: JSON.stringify({
                         text: cleanText,
-                        speaker: 'Lumi'
+                        speaker: googleSpeaker
                     })
                 });
 
