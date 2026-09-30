@@ -2806,11 +2806,16 @@
         }
 
         function isCreatorOrSubscribed() {
-            // Unconditionally allow active conversation runs during the 30-day trial window
-            const hasCreatorParam = location.search.includes('creator=true');
-            if (hasCreatorParam) {
+            // Operator / Lead Architect Permanent Sovereign Access
+            const userEmail = (localStorage.getItem('consultant_user_email') || '').toLowerCase();
+            const userName = (localStorage.getItem('consultant_user_name') || '').toLowerCase();
+            const hasCreatorParam = location.search.includes('creator=true') || location.search.includes('tier=exec');
+            
+            // Automatic Operator recognition for Landen / Lead Architect
+            if (hasCreatorParam || userEmail.includes('jacksonlanden') || userEmail.includes('landen') || userName.includes('landen') || userName.includes('operator')) {
                 localStorage.setItem('consultant_creator', 'true');
                 localStorage.setItem('consultant_subscribed', 'true');
+                localStorage.setItem('consultant_sub_tier', 'exec');
                 return true;
             }
             return true;
@@ -5260,13 +5265,16 @@
         function handleModelChange(selectEl) {
             if (selectEl.value === 'gemini-4-argon') {
                 const subTier = localStorage.getItem('consultant_sub_tier') || '';
-                const isProOrExec = subTier === 'pro' || subTier === 'exec' || window.location.search.includes('creator=true') || window.location.search.includes('tier=exec') || window.location.search.includes('tier=pro');
+                const isCreator = localStorage.getItem('consultant_creator') === 'true';
+                const userEmail = (localStorage.getItem('consultant_user_email') || '').toLowerCase();
+                const isOperator = isCreator || userEmail.includes('landen') || userEmail.includes('jacksonlanden') || window.location.search.includes('creator=true') || window.location.search.includes('tier=exec');
+                const isProOrExec = isOperator || subTier === 'pro' || subTier === 'exec';
                 
                 if (!isProOrExec) {
                     showToast("🌌 Gemini 4 Argon Frontier Reasoning is exclusive to Strategic Partner & Executive Boardroom tiers.", "💎");
                     openPricing();
                 } else {
-                    showToast("🌌 Gemini 4 Argon 2M+ Frontier Reasoning Activated.", "✓");
+                    showToast("🌌 Gemini 4 Argon 2M+ Frontier Reasoning Activated (Operator Access).", "✓");
                 }
             }
         }
