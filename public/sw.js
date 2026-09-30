@@ -1,11 +1,11 @@
-const CACHE_NAME = 'consultant-studio-v1';
+const CACHE_NAME = 'consultant-studio-v2026-argon';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.svg',
-  '/icon.svg',
-  '/brand/consultant_studio_official_icon.png'
+  '/favicon.ico',
+  '/brand/consultant_studio_official_icon.png',
+  '/brand/consultant_studio_official_icon.jpg'
 ];
 
 self.addEventListener('install', (e) => {
@@ -20,7 +20,11 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((k) => {
-          if (k !== CACHE_NAME) return caches.delete(k);
+          // Delete all older cached versions immediately
+          if (k !== CACHE_NAME) {
+            console.log('[ServiceWorker] Purging stale cache:', k);
+            return caches.delete(k);
+          }
         })
       );
     })
@@ -28,11 +32,24 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
+// Network-first strategy for index.html and app assets to guarantee latest launch version
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  if (e.request.url.includes('/api/')) return; // Never cache API routes
+
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      return cached || fetch(e.request).catch(() => caches.match('/'));
-    })
+    fetch(e.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, responseClone);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(e.request).then((cached) => cached || caches.match('/'));
+      })
   );
 });
