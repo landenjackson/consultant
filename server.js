@@ -91,56 +91,59 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     });
   }
 
-  // TIER 1: Direct Multimodal Vision Execution (Google Gemini 4 Argon, Gemini 3.8, Gemini 3.1 Flash-Lite)
+  // TIER 1: Direct Multimodal Vision Execution (Parallel Race across Gemini 4 Argon, 3.1 Flash-Lite, 3.8 Flash)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-4-argon', 'gemini-4-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
-    for (const modelName of directVisionModels) {
-      for (let attempt = 1; attempt <= 2; attempt++) {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 25000);
-          
-          const contentsParts = [{ text: prompt }];
-          imageObjs.forEach(img => {
-            contentsParts.push({
-              inline_data: {
-                mime_type: img.mimeType || 'image/jpeg',
-                data: img.data
-              }
-            });
-          });
-
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-            },
-            signal: controller.signal,
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts: contentsParts }],
-              generationConfig: { maxOutputTokens: 4096, temperature: 0.2 }
-            })
-          });
-          clearTimeout(timeoutId);
-          if (res.ok) {
-            const data = await res.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            if (text && text.trim().length > 20) {
-              const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-              console.log(`[⚡ Direct Google Vision Success: ${modelName}] (${text.length} chars in ${elapsed}s)`);
-              return { text, isFallback: false, model: modelName, latency: `${elapsed}s` };
+    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-4-flash', 'gemini-4-argon'];
+    
+    const fetchVisionGoogle = async (modelName) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s fast vision race cap
+      try {
+        const contentsParts = [{ text: prompt }];
+        imageObjs.forEach(img => {
+          contentsParts.push({
+            inline_data: {
+              mime_type: img.mimeType || 'image/jpeg',
+              data: img.data
             }
-          } else {
-            const errData = await res.json().catch(() => ({}));
-            console.warn(`[Vision HTTP ${res.status} - ${modelName}]:`, errData.error?.message || res.statusText);
+          });
+        });
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeGoogleKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: contentsParts }],
+            generationConfig: { maxOutputTokens: 4096, temperature: 0.2 }
+          })
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text && text.trim().length > 20) {
+            return { model: modelName, text };
           }
-        } catch (err) {
-          console.warn(`[Direct Google Vision Notice - ${modelName} Attempt ${attempt}]:`, err.message);
-          if (attempt === 1) await new Promise(r => setTimeout(r, 600));
         }
+        throw new Error(`${modelName} status ${res.status}`);
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
       }
+    };
+
+    try {
+      const winner = await Promise.any(directVisionModels.map(m => fetchVisionGoogle(m)));
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      console.log(`[⚡ Direct Google Vision Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
+      return { text: winner.text, isFallback: false, model: winner.model, latency: `${elapsed}s` };
+    } catch (vErr) {
+      console.warn('[Direct Google Vision Race Notice]:', vErr.message);
     }
   }
 
