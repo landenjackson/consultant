@@ -204,7 +204,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
         // Array of high-conviction models to fulfill the pinned request instantly without timeout
         const candidateModels = isArgon
-          ? ['gemini-4-argon', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.1-pro-preview', 'gemini-3.1-flash-lite']
+          ? ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon']
           : [pinnedModel, 'gemini-3.1-flash-lite'];
 
         try {
@@ -219,7 +219,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       }
 
       // High-availability parallel race across active endpoints
-      const targetModels = ['gemini-4-argon', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemma-4-31b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+      const targetModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
