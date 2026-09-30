@@ -4482,9 +4482,48 @@
         }
 
         async function speakInterviewerResponse(text, onComplete) {
-            const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 450);
-            
-            // 1. Try Native Google Gemini 3.8 Flash TTS Neural Voice Synthesis
+            const cleanText = text
+                .replace(/\[DOMAIN:[^\]]+\]/g, '')
+                .replace(/\+[=\-\+]+\+/g, '')
+                .replace(/\|[^\n]+\|/g, '')
+                .replace(/[*_#`\+\-\|]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 500);
+
+            if (!cleanText) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            // Universal Audio Dispatcher: Instant WebSpeech Playback + Direct HTML5 Audio Unlock
+            try {
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(cleanText);
+                    initNaturalVoice();
+                    if (naturalVoice) utter.voice = naturalVoice;
+                    utter.rate = 1.0;
+                    utter.pitch = 1.0;
+
+                    let hasFired = false;
+                    const done = () => {
+                        if (!hasFired) {
+                            hasFired = true;
+                            if (onComplete) onComplete();
+                        }
+                    };
+
+                    utter.onend = done;
+                    utter.onerror = done;
+                    window.speechSynthesis.speak(utter);
+                    return;
+                }
+            } catch(e) {
+                console.warn('[WebSpeech Error]:', e);
+            }
+
+            // Backend Google Gemini 3.8 Flash Neural Audio Fallback
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
@@ -4495,8 +4534,7 @@
                     headers,
                     body: JSON.stringify({
                         text: cleanText,
-                        speaker: 'Lumi',
-                        style: 'Style: Confident, articulate senior Operating Partner.'
+                        speaker: 'Lumi'
                     })
                 });
 
@@ -4511,26 +4549,10 @@
                     }
                 }
             } catch(e) {
-                console.warn('[Gemini 3.8 TTS API Notice - Falling back to WebSpeech]:', e);
+                console.warn('[TTS API Error]:', e);
             }
 
-            // 2. Fallback to Browser Neural WebSpeechSynthesis (Siri/Samantha)
-            if (!window.speechSynthesis) {
-                if (onComplete) onComplete();
-                return;
-            }
-            window.speechSynthesis.cancel();
-            
-            const utter = new SpeechSynthesisUtterance(cleanText);
-            initNaturalVoice();
-            if (naturalVoice) utter.voice = naturalVoice;
-            utter.rate = 1.05;
-            utter.pitch = 1.02;
-
-            utter.onend = () => { if (onComplete) onComplete(); };
-            utter.onerror = () => { if (onComplete) onComplete(); };
-
-            window.speechSynthesis.speak(utter);
+            if (onComplete) onComplete();
         }
 
         function playVoiceBriefing(btn) {
