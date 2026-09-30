@@ -1,9 +1,11 @@
-const CACHE_NAME = 'consultant-studio-v2026-argon';
+const CACHE_NAME = 'consultant-studio-v2026-argon-final';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
+  '/brand/icon-192.png',
+  '/brand/icon-512.png',
   '/brand/consultant_studio_official_icon.png',
   '/brand/consultant_studio_official_icon.jpg'
 ];
@@ -20,7 +22,6 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((k) => {
-          // Delete all older cached versions immediately
           if (k !== CACHE_NAME) {
             console.log('[ServiceWorker] Purging stale cache:', k);
             return caches.delete(k);
@@ -32,13 +33,13 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Network-first strategy for index.html and app assets to guarantee latest launch version
+// Always bypass cache for live HTML and API routes
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  if (e.request.url.includes('/api/')) return; // Never cache API routes
+  if (e.request.url.includes('/api/')) return;
 
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseClone = networkResponse.clone();
