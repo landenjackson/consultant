@@ -1527,105 +1527,124 @@
             font-size: var(--base-font-size, 14.5px);
         }
 
-        /* COMPACT MOBILE OPTIMIZATION — CLEAN VERTICAL EDITORIAL FLOW */
+        /* COMPACT MOBILE OPTIMIZATION — CLEAN UNIFIED VERTICAL FLOW */
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden;
                 overflow-y: auto;
-                font-size: 14px;
+                font-size: 13.5px;
             }
 
-            main {
-                padding: 10px 8px 140px;
-                gap: 10px;
-                width: 100%;
-                box-sizing: border-box;
+            .workspace-stage {
+                height: calc(100vh - 52px) !important;
             }
 
-            .chat-container {
-                width: 100%;
-                max-width: 100%;
-                padding: 0;
-                box-sizing: border-box;
+            #chatFeed {
+                padding: 10px 10px 95px !important;
+                gap: 10px !important;
+                max-width: 100% !important;
+            }
+
+            .hero-banner-card {
+                padding: 14px 12px !important;
+                border-radius: 12px !important;
+                margin-bottom: 6px !important;
+            }
+
+            #welcomeHeading {
+                font-size: 18px !important;
+                line-height: 1.25 !important;
+                margin-bottom: 6px !important;
+            }
+
+            #welcomeSubtext {
+                font-size: 12px !important;
+                line-height: 1.5 !important;
+            }
+
+            /* 4-WAY PRIMARY ACTION TILES (2x2 GRID ON MOBILE) */
+            .mode-tile {
+                padding: 10px 12px !important;
+                border-radius: 8px !important;
             }
 
             /* Responsive Financial Control Room on Mobile */
             #breakevenStudio {
                 padding: 12px 10px !important;
-                margin: 10px 0 !important;
+                margin: 8px 0 !important;
                 border-radius: 10px !important;
             }
 
             #breakevenStudio .be-controls-grid {
                 grid-template-columns: 1fr !important;
-                gap: 10px !important;
-                padding: 10px !important;
+                gap: 8px !important;
+                padding: 8px !important;
             }
 
             #breakevenStudio .be-chart-wrap {
-                height: 190px !important;
-                padding: 10px !important;
+                height: 180px !important;
+                padding: 8px !important;
             }
 
             .bubble-assistant {
-                padding: 14px 12px;
-                border-radius: 10px;
-                font-size: 13.5px;
-                line-height: 1.55;
-                width: 100%;
+                padding: 12px 10px !important;
+                border-radius: 10px !important;
+                font-size: 13px !important;
+                line-height: 1.55 !important;
+                width: 100% !important;
                 box-sizing: border-box;
             }
 
             .bubble-user {
-                padding: 8px 12px;
-                font-size: 13px;
-                max-width: 92%;
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+                max-width: 90% !important;
             }
 
             .dock-container {
-                padding: 6px 12px max(12px, env(safe-area-inset-bottom, 12px)) 12px !important;
+                padding: 4px 8px max(8px, env(safe-area-inset-bottom, 8px)) 8px !important;
                 background: linear-gradient(180deg, rgba(8, 10, 13, 0) 0%, rgba(8, 10, 13, 0.98) 25%, #080A0D 100%) !important;
             }
 
             .dock-box {
-                border-radius: 12px !important;
-                padding: 6px 10px !important;
-                gap: 8px !important;
+                border-radius: 10px !important;
+                padding: 4px 6px !important;
+                gap: 6px !important;
                 flex-wrap: nowrap !important;
                 align-items: center !important;
             }
 
             .dock-input {
-                font-size: 13.5px !important;
-                padding: 8px 10px !important;
-                min-height: 38px !important;
+                font-size: 13px !important;
+                padding: 6px 8px !important;
+                min-height: 36px !important;
                 flex: 1 1 auto !important;
-                min-width: 90px !important;
+                min-width: 70px !important;
             }
 
             .btn-send {
-                padding: 8px 12px !important;
-                font-size: 11.5px !important;
-                border-radius: 8px !important;
+                padding: 6px 10px !important;
+                font-size: 11px !important;
+                border-radius: 6px !important;
                 white-space: nowrap !important;
                 flex-shrink: 0 !important;
             }
 
             .btn-icon {
-                padding: 5px !important;
-                width: 32px !important;
-                height: 32px !important;
+                padding: 4px !important;
+                width: 28px !important;
+                height: 28px !important;
                 flex-shrink: 0 !important;
             }
 
             #modelSelectWrap {
                 display: inline-flex !important;
-                max-width: 110px !important;
+                max-width: 95px !important;
             }
 
             #modelSelectOverride {
-                font-size: 9.5px !important;
-                max-width: 100px !important;
+                font-size: 9px !important;
+                max-width: 85px !important;
             }
         }
                 padding: 18px 16px;
