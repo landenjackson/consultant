@@ -14,6 +14,43 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+// Stripe Webhook Raw Parser (Requires unparsed raw body for cryptographic signature verification)
+app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret || !sig) {
+    console.warn('[Stripe Webhook Warning]: STRIPE_WEBHOOK_SECRET or stripe-signature missing.');
+    return res.status(400).json({ error: 'Webhook secret or signature missing' });
+  }
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error('[Stripe Webhook Signature Verification Failed]:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object;
+      console.log(`[Stripe Verified]: Checkout completed for customer ${session.customer || session.id}`);
+      break;
+    }
+    case 'customer.subscription.updated':
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object;
+      console.log(`[Stripe Verified]: Subscription event ${event.type} for ${subscription.id}`);
+      break;
+    }
+    default:
+      console.log(`[Stripe Verified Unhandled Event]: ${event.type}`);
+  }
+
+  res.json({ received: true });
+});
+
 app.use(express.json({ limit: '10mb' }));
 
 // Set No-Cache Headers on HTML/SW to prevent laptops & mobile browsers from caching stale builds

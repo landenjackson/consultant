@@ -65,6 +65,8 @@
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <!-- Google Identity Services (GIS) Official SDK (Popup / One-Tap Auth) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Telegram Mini App Official SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -3645,6 +3647,11 @@
                     .replace(/🖨️\s*Print \/ PDF/gi, '')
                     .replace(/Interactive Telemetry/gi, '')
                     .replace(/🪄 Stress-Test Model:[^\n]+/gi, '')
+                    // Artifact Cleanser: Strip raw markdown hashes and tokens from pure clipboard copy
+                    .replace(/^#{1,6}\s+/gm, '')
+                    .replace(/\*\*(.*?)\*\*/g, '$1')
+                    .replace(/\*(.*?)\*/g, '$1')
+                    .replace(/^>\s+/gm, '')
                     .replace(/\n{3,}/g, '\n\n')
                     .trim();
             }
@@ -6117,6 +6124,23 @@
 
         // Boot and automatically render Breakeven Studio Charts & Tables on page ready
         window.addEventListener('DOMContentLoaded', () => {
+            // Telegram Mini App & Viewport Initialization
+            if (window.Telegram && window.Telegram.WebApp) {
+                try {
+                    window.Telegram.WebApp.ready();
+                    window.Telegram.WebApp.expand();
+                    if (window.Telegram.WebApp.setHeaderColor) {
+                        window.Telegram.WebApp.setHeaderColor('#0B0E14');
+                    }
+                    if (window.Telegram.WebApp.setBackgroundColor) {
+                        window.Telegram.WebApp.setBackgroundColor('#080A0F');
+                    }
+                    console.log('[Telegram Mini App Initialized & Expanded]');
+                } catch (tgErr) {
+                    console.warn('[Telegram WebApp Setup]', tgErr);
+                }
+            }
+
             initSplitTextAnimation();
             if (typeof recalcBreakevenStudio === 'function') {
                 recalcBreakevenStudio();
