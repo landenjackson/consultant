@@ -4439,6 +4439,12 @@
         let naturalVoice = null;
         let consultantVoiceGender = localStorage.getItem('cs_voice_gender') || 'female';
 
+        // 🎙️ BULLETPROOF LIVE VOICE CONSULTANT ENGINE (UNIVERSAL WEB + MOBILE MIC DICTATION)
+        let isVoicePracticeActive = false;
+        let speechRecognition = null;
+        let naturalVoice = null;
+        let consultantVoiceGender = localStorage.getItem('cs_voice_gender') || 'female';
+
         function setConsultantVoiceGender(gender) {
             consultantVoiceGender = gender;
             localStorage.setItem('cs_voice_gender', gender);
@@ -4469,12 +4475,10 @@
             const isMale = (consultantVoiceGender === 'male');
 
             if (isMale) {
-                // Prioritize grounded, deep, mature executive voices (e.g. Daniel, Tom, Oliver, Alex)
                 naturalVoice = voices.find(v => (v.name.includes('Daniel') || v.name.includes('Tom') || v.name.includes('Oliver') || v.name.includes('Alex') || v.name.includes('Guy')) && v.lang.startsWith('en'))
                             || voices.find(v => v.lang.startsWith('en-US') && !v.name.includes('Zira') && !v.name.includes('Samantha'))
                             || voices[0];
             } else {
-                // Prioritize warm, polished, natural executive consultant voices (e.g. Victoria, Ava, Serena, Allison)
                 naturalVoice = voices.find(v => (v.name.includes('Victoria') || v.name.includes('Ava') || v.name.includes('Serena') || v.name.includes('Allison') || v.name.includes('Natural')) && v.lang.startsWith('en'))
                             || voices.find(v => v.name.includes('Samantha') || v.name.includes('Google US English')) 
                             || voices[0];
@@ -4487,18 +4491,22 @@
         }
 
         function toggleLiveVoicePractice() {
-            if (isVoicePracticeActive) {
-                stopLiveVoicePractice();
-            } else {
-                startLiveVoicePractice();
+            try {
+                unlockMobileAudio();
+                if (isVoicePracticeActive) {
+                    stopLiveVoicePractice();
+                } else {
+                    startLiveVoicePractice();
+                }
+            } catch(e) {
+                console.error('[Voice Toggle Error]:', e);
             }
         }
 
         function startLiveVoicePractice() {
             unlockMobileAudio();
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-
             isVoicePracticeActive = true;
+            
             const btn = document.getElementById('liveVoicePracticeBtn');
             if (btn) {
                 btn.style.background = '#22C55E';
@@ -4507,26 +4515,24 @@
                 btn.title = 'Stop Live Consultant Session';
             }
 
-            if (!SpeechRec) {
-                showToast("Live Voice Consultant active (Auditory Speech Mode).", "🎙️");
-                speakInterviewerResponse("Welcome to Consultant Studio. I am your Strategic Operating Partner. What operational move or financial challenge should we analyze?");
-                return;
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            showToast("🎙️ Live Consultant Voice Activated. Listening to your voice...", "🎙️");
+
+            // Direct spoken feedback immediately + start microphone listening
+            speakInterviewerResponse("I am listening. What operational challenge or numbers should we analyze?");
+            
+            if (SpeechRec) {
+                setTimeout(() => {
+                    if (isVoicePracticeActive) listenToCandidate();
+                }, 400);
             }
-
-            showToast("Live Strategic Consultant Voice Activated. Ask any operational question!", "🎙️");
-
-            // Direct spoken introduction with seamless transition to microphone listening
-            speakInterviewerResponse("Welcome to Consultant Studio. I am your Strategic Operating Partner. What operational bottleneck, P and L challenge, or turnaround move should we analyze today?", () => {
-                if (isVoicePracticeActive) {
-                    listenToCandidate();
-                }
-            });
         }
 
         function stopLiveVoicePractice() {
             isVoicePracticeActive = false;
             if (speechRecognition) {
-                try { speechRecognition.stop(); } catch(e){}
+                try { speechRecognition.abort(); } catch(e){}
+                speechRecognition = null;
             }
             if (window.speechSynthesis) {
                 window.speechSynthesis.cancel();
@@ -4538,7 +4544,7 @@
                 btn.innerHTML = '<span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>';
                 btn.title = 'Launch Live Strategic Consultant Voice (Auditory Learning & Advisory)';
             }
-            showToast("Live Consultant Voice Session Ended.", "⏹️");
+            showToast("Live Consultant Voice Ended.", "⏹️");
         }
 
         function listenToCandidate() {
@@ -4546,56 +4552,65 @@
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRec) return;
 
-            speechRecognition = new SpeechRec();
-            speechRecognition.continuous = false;
-            speechRecognition.interimResults = true; // Show live interim transcript
-            speechRecognition.lang = 'en-US';
-
-            let finalTranscript = '';
-            let debounceTimer = null;
-
-            speechRecognition.onresult = (event) => {
-                let interim = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interim += event.results[i][0].transcript;
-                    }
-                }
-
-                const currentText = finalTranscript || interim;
-                const userInput = document.getElementById('userInput');
-                if (userInput && currentText) {
-                    userInput.value = currentText;
-                }
-
-                // 1.5s speech debounce to prevent premature cutoff on mobile
-                if (debounceTimer) clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    if (finalTranscript && finalTranscript.trim().length > 0) {
-                        try { speechRecognition.stop(); } catch(e){}
-                        sendMessage();
-                    }
-                }, 1500);
-            };
-
-            speechRecognition.onerror = (err) => {
-                console.warn("SpeechRec error:", err);
-                if (isVoicePracticeActive && err.error !== 'aborted') {
-                    setTimeout(() => listenToCandidate(), 1000);
-                }
-            };
-
-            speechRecognition.onend = () => {
-                if (isVoicePracticeActive && finalTranscript && finalTranscript.trim().length > 0) {
-                    sendMessage();
-                }
-            };
-
             try {
+                if (speechRecognition) {
+                    try { speechRecognition.abort(); } catch(e){}
+                }
+
+                speechRecognition = new SpeechRec();
+                speechRecognition.continuous = false;
+                speechRecognition.interimResults = true;
+                speechRecognition.lang = 'en-US';
+
+                let recognizedText = '';
+                let debounceTimer = null;
+
+                speechRecognition.onresult = (event) => {
+                    let interim = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            recognizedText += event.results[i][0].transcript;
+                        } else {
+                            interim += event.results[i][0].transcript;
+                        }
+                    }
+
+                    const fullSpoken = (recognizedText || interim).trim();
+                    const userInput = document.getElementById('userInput');
+                    if (userInput && fullSpoken) {
+                        userInput.value = fullSpoken;
+                    }
+
+                    if (debounceTimer) clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        if (fullSpoken && fullSpoken.length > 2) {
+                            try { speechRecognition.stop(); } catch(e){}
+                            sendMessage();
+                        }
+                    }, 1200);
+                };
+
+                speechRecognition.onerror = (err) => {
+                    console.warn('[Speech Recognition Event]:', err.error);
+                    if (isVoicePracticeActive && err.error !== 'aborted') {
+                        setTimeout(() => {
+                            if (isVoicePracticeActive) listenToCandidate();
+                        }, 800);
+                    }
+                };
+
+                speechRecognition.onend = () => {
+                    if (isVoicePracticeActive && !recognizedText) {
+                        setTimeout(() => {
+                            if (isVoicePracticeActive) listenToCandidate();
+                        }, 500);
+                    }
+                };
+
                 speechRecognition.start();
-            } catch(e){}
+            } catch(err) {
+                console.warn('[Speech Recognition Start Exception]:', err);
+            }
         }
 
         // 100% RELIABLE LOCAL WEBSPEECH / TTS DISPATCHER (ZERO CREDIT / ZERO SERVER API LOCKOUT)
