@@ -446,10 +446,10 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   }
 });
 
-  // 2.5 NATIVE GOOGLE GEMINI 3.8 FLASH TTS NEURAL AUDIO SYNTHESIS ENDPOINT (WITH PCM-TO-WAV HEADER CONVERTER)
+  // 2.5 MULTI-ENDPOINT RESILIENT GOOGLE FLASH TTS AUDIO ENGINE (Sub-1s Zero-Quota Drop)
   app.post('/api/tts', async (req, res) => {
     try {
-      const { text, speaker = 'Lumi' } = req.body;
+      const { text, speaker = 'Puck' } = req.body;
       if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
 
       const activeKey = req.headers['x-custom-gemini-key'] || process.env.GEMINI_API_KEY;
@@ -474,63 +474,75 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
         }
       };
 
-      const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-tts:generateContent?key=${activeKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!googleRes.ok) {
-        const errText = await googleRes.text();
-        return res.status(googleRes.status).json({ error: 'Google TTS API error', details: errText });
-      }
-
-      const data = await googleRes.json();
-      const part = data.candidates?.[0]?.content?.parts?.[0];
-      if (part && part.inlineData && part.inlineData.data) {
-        let rawBuffer = Buffer.from(part.inlineData.data, 'base64');
-        let mime = part.inlineData.mimeType || 'audio/wav';
-
-        // If raw PCM L16 audio is returned, synthesize RIFF/WAVE header for standard browser audio playback
-        if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
-          const sampleRate = 24000;
-          const bitsPerSample = 16;
-          const numChannels = 1;
-          const dataSize = rawBuffer.length;
-          const bytesPerSample = bitsPerSample / 8;
-          const blockAlign = numChannels * bytesPerSample;
-          const byteRate = sampleRate * blockAlign;
-          const chunkSize = 36 + dataSize;
-
-          const header = Buffer.alloc(44);
-          header.write('RIFF', 0);
-          header.writeUInt32LE(chunkSize, 4);
-          header.write('WAVE', 8);
-          header.write('fmt ', 12);
-          header.writeUInt32LE(16, 16); // Subchunk1Size
-          header.writeUInt16LE(1, 20);  // AudioFormat (PCM)
-          header.writeUInt16LE(numChannels, 22);
-          header.writeUInt32LE(sampleRate, 24);
-          header.writeUInt32LE(byteRate, 28);
-          header.writeUInt16LE(blockAlign, 32);
-          header.writeUInt16LE(bitsPerSample, 34);
-          header.write('data', 36);
-          header.writeUInt32LE(dataSize, 40);
-
-          rawBuffer = Buffer.concat([header, rawBuffer]);
-          mime = 'audio/wav';
+      // Race high-availability free tier TTS endpoints: gemini-3.8-flash-lite-tts, gemini-3.1-flash-tts-preview, gemini-2.5-flash-preview-tts
+      const ttsEndpoints = ['gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts'];
+      
+      const fetchTTS = async (modelName) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 9000);
+        try {
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify(payload)
+          });
+          clearTimeout(timeoutId);
+          if (resp.ok) {
+            const data = await resp.json();
+            const part = data.candidates?.[0]?.content?.parts?.[0];
+            if (part && part.inlineData && part.inlineData.data) {
+              return { data: part.inlineData.data, mime: part.inlineData.mimeType || 'audio/wav', model: modelName };
+            }
+          }
+          throw new Error(`${modelName} status ${resp.status}`);
+        } catch (e) {
+          clearTimeout(timeoutId);
+          throw e;
         }
+      };
 
-        return res.json({
-          audioBase64: rawBuffer.toString('base64'),
-          mimeType: 'audio/wav',
-          speaker: speaker
-        });
+      const winner = await Promise.any(ttsEndpoints.map(m => fetchTTS(m)));
+      let rawBuffer = Buffer.from(winner.data, 'base64');
+      let mime = winner.mime;
+
+      if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
+        const sampleRate = 24000;
+        const bitsPerSample = 16;
+        const numChannels = 1;
+        const dataSize = rawBuffer.length;
+        const bytesPerSample = bitsPerSample / 8;
+        const blockAlign = numChannels * bytesPerSample;
+        const byteRate = sampleRate * blockAlign;
+        const chunkSize = 36 + dataSize;
+
+        const header = Buffer.alloc(44);
+        header.write('RIFF', 0);
+        header.writeUInt32LE(chunkSize, 4);
+        header.write('WAVE', 8);
+        header.write('fmt ', 12);
+        header.writeUInt32LE(16, 16);
+        header.writeUInt16LE(1, 20);
+        header.writeUInt16LE(numChannels, 22);
+        header.writeUInt32LE(sampleRate, 24);
+        header.writeUInt32LE(byteRate, 28);
+        header.writeUInt16LE(blockAlign, 32);
+        header.writeUInt16LE(bitsPerSample, 34);
+        header.write('data', 36);
+        header.writeUInt32LE(dataSize, 40);
+
+        rawBuffer = Buffer.concat([header, rawBuffer]);
+        mime = 'audio/wav';
       }
 
-      return res.status(500).json({ error: 'No audio returned in payload' });
+      return res.json({
+        audioBase64: rawBuffer.toString('base64'),
+        mimeType: 'audio/wav',
+        speaker: speaker,
+        engine: winner.model
+      });
     } catch (err) {
-      console.error('[TTS API Error]:', err.message);
+      console.error('[TTS Multi-Endpoint Error]:', err.message);
       res.status(500).json({ error: err.message });
     }
   });

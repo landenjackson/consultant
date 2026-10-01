@@ -4634,30 +4634,31 @@
                 }
             };
 
-            // 1. Primary: Direct Client-Side Neural WebSpeech (Runs 100% locally on phone, $0 cost, zero API quota blocks)
-            if (window.speechSynthesis) {
-                try {
-                    window.speechSynthesis.cancel();
-                    const utter = new SpeechSynthesisUtterance(cleanText);
-                    initNaturalVoice();
-                    if (naturalVoice) utter.voice = naturalVoice;
-                    utter.rate = (consultantVoiceGender === 'male' ? 0.98 : 1.02);
-                    utter.pitch = (consultantVoiceGender === 'male' ? 0.95 : 1.05);
+        // 100% RELIABLE DUAL-PIPELINE GOOGLE FLASH NEURAL AUDIO + WEBSPEECH ENGINE
+        async function speakInterviewerResponse(text, onComplete) {
+            const cleanText = text
+                .replace(/\[DOMAIN:[^\]]+\]/g, '')
+                .replace(/\+[=\-\+]+\+/g, '')
+                .replace(/\|[^\n]+\|/g, '')
+                .replace(/[*_#`\+\-\|]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 450);
 
-                    utter.onend = finish;
-                    utter.onerror = (e) => {
-                        console.warn('[Local Speech Error]:', e);
-                        finish();
-                    };
-
-                    window.speechSynthesis.speak(utter);
-                    return;
-                } catch(err) {
-                    console.warn('[WebSpeech Synthesis Exception]:', err);
-                }
+            if (!cleanText) {
+                if (onComplete) onComplete();
+                return;
             }
 
-            // 2. Fallback: Backend Google Gemini 3.8 Flash TTS
+            let completed = false;
+            const finish = () => {
+                if (!completed) {
+                    completed = true;
+                    if (onComplete) onComplete();
+                }
+            };
+
+            // 1. Primary: High-fidelity Google Gemini 3.8 Flash-Lite Neural Studio Audio (Plays through Phone/Car Bluetooth)
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
@@ -4676,15 +4677,41 @@
                         const audio = new Audio(`data:${ttsData.mimeType};base64,${ttsData.audioBase64}`);
                         audio.onended = finish;
                         audio.onerror = finish;
-                        await audio.play();
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(err => {
+                                console.warn('[Audio Play Promise Catch]:', err);
+                                fallbackWebSpeech(cleanText, finish);
+                            });
+                        }
                         return;
                     }
                 }
             } catch(e) {
-                console.warn('[TTS API Fallback Notice]:', e);
+                console.warn('[Google TTS Notice - Switching to Local Engine]:', e);
             }
 
+            // 2. Secondary: Direct Local WebSpeech Synthesis
+            fallbackWebSpeech(cleanText, finish);
+        }
+
+        function fallbackWebSpeech(text, finish) {
+            if (window.speechSynthesis) {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(text);
+                    initNaturalVoice();
+                    if (naturalVoice) utter.voice = naturalVoice;
+                    utter.rate = (consultantVoiceGender === 'male' ? 0.98 : 1.02);
+                    utter.pitch = (consultantVoiceGender === 'male' ? 0.95 : 1.05);
+                    utter.onend = finish;
+                    utter.onerror = finish;
+                    window.speechSynthesis.speak(utter);
+                    return;
+                } catch(e){}
+            }
             finish();
+        }
         }
 
         function playVoiceBriefing(btn) {
