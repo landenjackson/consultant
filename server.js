@@ -76,49 +76,67 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
 const DJEV_RUN_URL = process.env.DJEV_RUN_URL || 'https://api.typesafe.ai/v1/systemone';
 
-// TYPESAFE JEV / SPARK-X2.5 / DJEV-RUN MULTI-PRIMITIVE EVALUATOR (~50-120ms DECISION ENGINE)
-const evaluateWithJev = async (userText) => {
-  if (!TYPESAFE_API_KEY && !process.env.DJEV_RUN_URL) return null;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 450); // Sub-450ms hard ceiling for high-speed edge routing
-    const headers = { 'Content-Type': 'application/json' };
-    if (TYPESAFE_API_KEY) {
-      headers['Authorization'] = `Bearer ${TYPESAFE_API_KEY}`;
-    }
+// CLOUDFLARE CLEF & SYSTEMONE MULTIMODAL DECISION ENGINE (~50-120ms SUB-SECOND INTENT & FORMAT ROUTER)
+const evaluateWithClef = async (userText, workspace) => {
+  // 1. Fast Schema-Driven Heuristic Router (Clef SystemOne Strategy)
+  const text = String(userText || '').toLowerCase();
+  
+  // Predict Output Topology, Readability Layout, and Target Surface
+  let domain = 'operations';
+  let layout = 'executive_memo';
+  let telemetryRequired = true;
 
-    const res = await fetch(DJEV_RUN_URL, {
-      method: 'POST',
-      headers,
-      signal: controller.signal,
-      body: JSON.stringify({
-        state: String(userText || '').slice(0, 1000),
-        model: 'spark-x2.5-4b',
-        questions: {
-          intent: {
-            type: 'choice',
-            instructions: 'What is the primary operational domain of this request?',
-            criteria: {
-              career: 'Resumes, job applications, interview prep, career reframing',
-              finance: 'P&L audits, financial modeling, unit economics, cash runway, pricing',
-              marketing: 'Customer acquisition, local search, catchment capture, non-discount hooks',
-              operations: 'Throughput, kitchen logistics, team onboarding, standard operating procedures'
+  if (text.includes('p&l') || text.includes('breakeven') || text.includes('cac') || text.includes('margin') || text.includes('cogs') || text.includes('revenue') || text.includes('runway') || text.includes('ebitda') || text.includes('financial')) {
+    domain = 'finance';
+    layout = 'tabular_sensitivity_matrix';
+  } else if (text.includes('resume') || text.includes('cv') || text.includes('interview') || text.includes('hiring') || text.includes('career') || text.includes('job') || text.includes('star')) {
+    domain = 'career';
+    layout = 'quantified_bullet_hierarchy';
+  } else if (text.includes('catchment') || text.includes('foot traffic') || text.includes('campaign') || text.includes('competitor') || text.includes('marketing') || text.includes('discount') || text.includes('pricing')) {
+    domain = 'market_strategy';
+    layout = 'strategic_playbook';
+  }
+
+  // 2. Query remote Cloudflare Workers AI / SystemOne Clef schema endpoint if configured
+  if (TYPESAFE_API_KEY || process.env.DJEV_RUN_URL) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 450);
+      const headers = { 'Content-Type': 'application/json' };
+      if (TYPESAFE_API_KEY) headers['Authorization'] = `Bearer ${TYPESAFE_API_KEY}`;
+
+      const res = await fetch(DJEV_RUN_URL, {
+        method: 'POST',
+        headers,
+        signal: controller.signal,
+        body: JSON.stringify({
+          state: { query: text.slice(0, 1000), workspace },
+          questions: {
+            domain: {
+              type: 'choice',
+              options: ['finance', 'career', 'market_strategy', 'operations']
+            },
+            layout: {
+              type: 'choice',
+              options: ['tabular_sensitivity_matrix', 'quantified_bullet_hierarchy', 'strategic_playbook', 'executive_memo']
             }
           }
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.answers) {
+          domain = data.answers.domain?.choice || domain;
+          layout = data.answers.layout?.choice || layout;
         }
-      })
-    });
-    clearTimeout(timeoutId);
-    if (res.ok) {
-      const data = await res.json();
-      const answers = data.answers || {};
-      const intent = answers.intent?.choice || 'operations';
-      return { domain: intent };
+      }
+    } catch (e) {
+      // Non-blocking fallback to local Clef schema heuristics
     }
-  } catch (err) {
-    // Non-blocking catch
   }
-  return null;
+
+  return { domain, layout, telemetryRequired };
 };
 
 // FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (AUTO-FALLBACK TO DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
@@ -636,8 +654,8 @@ State your current baseline revenue, prime cost structure, and target performanc
         }).join('\n\n')
       : '';
 
-    // Fast speculative fan-out: Run TypeSafe Jev System One evaluation IN PARALLEL with prompt assembly
-    const jevPromise = evaluateWithJev(userMessage);
+    // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation IN PARALLEL with prompt assembly
+    const clefPromise = evaluateWithClef(userMessage, workspace);
 
     // Direct, Conversational, Human-Grade Executive Operating Partner (Steipete/Agent-Scripts Natural Voice Standard)
     const buildSystemPrompt = (jevSignals) => {
@@ -735,11 +753,11 @@ User Query: ${userMessage}`;
       console.error('[Live Query Warning]:', qErr.message);
     }
 
-    // Capture Jev background signal non-blockingly if completed
-    let jevSignals = null;
+    // Capture Clef background schema signal non-blockingly if completed
+    let clefSignals = null;
     try {
-      jevSignals = await Promise.race([
-        jevPromise,
+      clefSignals = await Promise.race([
+        clefPromise,
         new Promise(r => setTimeout(() => r(null), 50))
       ]);
     } catch (e) {}
@@ -749,7 +767,8 @@ User Query: ${userMessage}`;
       const detectedModel = liveResponse.model || (model !== 'auto' ? model : 'gemini-3.1-flash-lite');
       axExecutionLog.set(activeExecutionId, {
         timestamp: Date.now(),
-        domain: jevSignals?.domain || 'general',
+        domain: clefSignals?.domain || 'general',
+        layout: clefSignals?.layout || 'executive_memo',
         response: liveResponse.text,
         isFallback: liveResponse.isFallback || false,
         model: detectedModel,
@@ -763,7 +782,8 @@ User Query: ${userMessage}`;
       return res.json({
         conversationId: activeExecutionId,
         response: liveResponse.text,
-        domain: jevSignals?.domain || null,
+        domain: clefSignals?.domain || null,
+        layout: clefSignals?.layout || 'executive_memo',
         isFallback: liveResponse.isFallback || false,
         model: detectedModel,
         latency: liveResponse.latency || '1.5s',

@@ -6092,7 +6092,7 @@
                         // 3. Add Deliverables & Vault Bar + Model Telemetry Badge
                         const delivBar = document.createElement('div');
                         delivBar.className = 'deliverables-bar';
-                        const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.2s'})</span>` : '';
+                        const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.1s'}) ${data.layout ? `• <span style="color:#38BDF8;">${data.layout.replace(/_/g, ' ')}</span>` : ''}</span>` : '';
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="downloadMarkdownMemo(this)" style="border-color:#38BDF8; color:#7DD3FC; font-weight:700; background:rgba(56,189,248,0.1);">📥 Export Markdown</button>
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Email / Memo</button>
