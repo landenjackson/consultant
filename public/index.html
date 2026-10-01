@@ -2103,89 +2103,115 @@
         </main>
     </div>
 
-    <!-- SLIDE-OVER EXECUTIVE SIDEBAR (HAMBURGER MENU) -->
+    <!-- SLIDE-OVER EXECUTIVE COMMAND CENTER & MODULE SELECTOR -->
     <div id="sidebarOverlay" class="modal-overlay" onclick="toggleSidebar(false)" style="z-index:900;"></div>
-    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:290px; max-width:85vw; background:#14171F; border-right:1px solid #282E3D; z-index:950; transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:24px 20px; box-shadow:15px 0 50px rgba(0,0,0,0.9);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:310px; max-width:88vw; background:#0B0E14; border-right:1px solid rgba(255,255,255,0.08); z-index:950; transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:20px 16px; box-shadow:20px 0 60px rgba(0,0,0,0.9); overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08);">
             <div style="display:flex; align-items:center; gap:10px;">
                 <div class="brand-logo" style="width:30px; height:30px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
                     <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; border-radius:8px; object-fit:cover;">
                 </div>
-                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; color:#FFF;">Consultant Studio</span>
+                <div>
+                    <div style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14.5px; color:#FFF;">Consultant Studio</div>
+                    <div style="font-size:10px; font-weight:700; color:var(--accent-glow); text-transform:uppercase; letter-spacing:0.04em;">Executive AI Hub</div>
+                </div>
             </div>
             <button class="btn-modal-close" onclick="toggleSidebar(false)" aria-label="Close" title="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
-            <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin:8px 0 4px 6px;">Workspace Navigation</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="resetChatSession(); toggleSidebar(false);">
-                <span>🏠</span> <span>Strategy Studio (Reset / Home)</span>
+        <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:6px 0 2px 6px;">Strategic Modules</div>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('00 // Command Center Overview: Run an active intelligence audit across our enterprise P&L, customer concentration, and liquidity risk matrix.'); toggleSidebar(false);">
+                <span style="color:var(--accent-glow); font-weight:700;">00 //</span> <span>Command Center</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
-                <span>🏢</span> <span>Microsoft 365 Integration Hub</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('01 // Trade Area Geometry: Model foot traffic catchment, localized pricing power, and commercial density optimization.'); toggleSidebar(false);">
+                <span style="color:#38BDF8; font-weight:700;">01 //</span> <span>Trade Area Geometry</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
-                <span>🔒</span> <span>Encrypted Research Vault</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('02 // Trust & Copy Audit: Perform a forensic funnel scan, copy integrity audit, and Trust Alignment index.'); toggleSidebar(false);">
+                <span style="color:#A78BFA; font-weight:700;">02 //</span> <span>Trust & Copy Audit</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
-                <span>💎</span> <span>Enterprise Tiers & Licensing</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('03 // Unit Economics Engine: Calculate CAC payback velocity, gross margin floors, and 12-month EBITDA trajectory.'); toggleSidebar(false);">
+                <span style="color:#22C55E; font-weight:700;">03 //</span> <span>Unit Economics</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openSettingsModal(); toggleSidebar(false);">
-                <span>⚙️</span> <span>Workspace Display Settings</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('04 // Campaign Strategy: Design a zero-discount narrative campaign, premium service tiering, and basket size expansion.'); toggleSidebar(false);">
+                <span style="color:#F59E0B; font-weight:700;">04 //</span> <span>Campaign Strategy</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('05 // Competitor Recon: Map competitor vulnerability vectors, price spread architecture, and differentiation moats.'); toggleSidebar(false);">
+                <span style="color:#EC4899; font-weight:700;">05 //</span> <span>Competitor Recon</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="openVaultModal(); toggleSidebar(false);">
+                <span style="color:#60A5FA; font-weight:700;">06 //</span> <span>Engagement Vault</span>
             </button>
 
-            <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin:16px 0 4px 6px;">Quick Research Scenarios</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="sendQuick('Draft a 90-day company turnaround report with executive summary and KPI targets.'); toggleSidebar(false);">
-                <span>📑</span> <span>Company Strategy Report</span>
+            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:14px 0 2px 6px;">Workspace Integrations</div>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="openOfficeModal(); toggleSidebar(false);">
+                <span>🏢</span> <span>Microsoft 365 Suite</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="sendQuick('Structure high-accountability job descriptions and incentive compensation for an Operations Manager.'); toggleSidebar(false);">
-                <span>👥</span> <span>Job Descriptions & KPIs</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="openPricing(); toggleSidebar(false);">
+                <span>💎</span> <span>Enterprise Licensing</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="sendQuick('Audit our commercial operations: $24,000/day revenue with 58% prime cost drag.'); toggleSidebar(false);">
-                <span>📊</span> <span>Daily P&L Cash Audit</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px;" onclick="openSettingsModal(); toggleSidebar(false);">
+                <span>⚙️</span> <span>Display & Engine</span>
             </button>
         </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:14px; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-size:11.5px; color:var(--text-muted);">Active Operator Profile:</div>
-            <div id="sidebarUserName" style="font-size:13px; font-weight:700; color:var(--accent-glow);">Guest Operator</div>
-            <button id="authTriggerBtn" class="btn-export" style="padding:6px 10px; font-size:11.5px; justify-content:center; margin-top:2px;" onclick="openAuthModal(); toggleSidebar(false);">
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; color:var(--text-muted);">Active Operator Profile:</div>
+            <div id="sidebarUserName" style="font-size:12.5px; font-weight:700; color:var(--accent-glow);">Guest Operator</div>
+            <button id="authTriggerBtn" class="btn-export" style="padding:6px 10px; font-size:11px; justify-content:center;" onclick="openAuthModal(); toggleSidebar(false);">
                 <span>🔑</span> <span id="authBtnText">Sign In / Switch Profile</span>
             </button>
         </div>
     </aside>
 
-    <!-- TOP HEADER -->
-    <header style="justify-content:center; position:relative;">
-        <!-- LEFT HAMBURGER MENU BUTTON (3 LINES) -->
-        <button class="btn-icon btn-icon-drawer" onclick="toggleSidebar(true)" title="Open Navigation Menu" style="position:absolute; left:16px; padding:6px; color:#FFFFFF; z-index:10;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
-
-        <!-- CLEAN CENTERED TITLE & DIAMOND LOGO (SCROLL TO TOP ON CLICK) -->
-        <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:8px;">
-            <div class="brand-logo" style="width:32px; height:32px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
-                <img src="/brand/consultant_studio_official_icon.jpg" alt="Consultant Studio Logo" style="width:100%; height:100%; border-radius:8px; object-fit:cover;">
+    <!-- TOP HEADER WITH GLOBAL TELEMETRY & MULTI-CLIENT PROJECT SWITCHER -->
+    <header style="justify-content:space-between; position:relative; padding:0 16px; background:#0B0E14; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <!-- LEFT: DRAWER & CLIENT SWITCHER -->
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn-icon btn-icon-drawer" onclick="toggleSidebar(true)" title="Open Command Center Menu" style="padding:6px; color:#FFFFFF;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+                <div class="brand-logo" style="width:28px; height:28px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
+                    <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">
+                </div>
+                <span class="brand-text" style="font-family:'Plus Jakarta Sans'; font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF;">Consultant Studio</span>
             </div>
-            <span class="brand-text" style="font-family:'Plus Jakarta Sans'; font-size:16px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF;">Consultant Studio</span>
         </div>
 
-        <!-- RIGHT "NEW SESSION / RESET CHAT" BUTTON -->
-        <button class="btn-icon btn-reset-header" onclick="resetChatSession()" title="Start New Chat Session" style="position:absolute; right:16px; padding:6px 10px; display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; color:var(--text-secondary); font-size:11.5px; font-weight:600; cursor:pointer; z-index:10;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                <path d="M21 3v5h-5"></path>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                <path d="M3 21v-5h5"></path>
-            </svg>
-            <span class="reset-chat-text">New Chat</span>
-        </button>
+        <!-- CENTER: ACTIVE PROJECT & TELEMETRY RIBBON -->
+        <div id="globalTelemetryRibbon" style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:3px 10px; border-radius:20px;">
+            <span class="telemetry-dot"></span>
+            <span style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Client:</span>
+            <select id="activeClientSelector" onchange="switchActiveClient(this.value)" style="background:transparent; border:none; color:var(--accent-glow); font-size:11.5px; font-weight:700; outline:none; cursor:pointer;">
+                <option value="default" style="background:#0E131C; color:#FFF;">Company Alpha (Core Baseline)</option>
+                <option value="retail" style="background:#0E131C; color:#FFF;">Acme Retail & Franchise Growth</option>
+                <option value="b2b" style="background:#0E131C; color:#FFF;">Enterprise B2B SaaS Scale</option>
+            </select>
+            <span style="color:rgba(255,255,255,0.15);">|</span>
+            <button onclick="openAssumptionDrawer()" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Configure Baseline Financial Assumptions">
+                <span>⚙️ Assumptions Gate</span>
+            </button>
+        </div>
+
+        <!-- RIGHT: NEW ENGAGEMENT / RESET -->
+        <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn-icon" onclick="resetChatSession()" title="Reset Active Command Canvas" style="padding:5px 8px; display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-secondary); font-size:11px; font-weight:600; cursor:pointer;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                </svg>
+                <span class="reset-chat-text">New Run</span>
+            </button>
+        </div>
     </header>
 
     <!-- MAIN SPLIT WORKSPACE ARENA -->
@@ -2210,31 +2236,43 @@
                         Grounded in empirical unit economics, prime cost containment, and forensic financial modeling. Audit unit profitability, engineer 1-page quantified executive resumes, stress-test 13-week cash runway, and export boardroom-ready deliverables with 100% client-side privacy.
                     </p>
 
-                    <!-- 4-WAY PRIMARY ACTION TRIAGE SELECTOR -->
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin: 18px 0 10px 0;">
-                        <div class="mode-tile" onclick="sendQuick('Executive Positioning: Reframe my operations background into a quantified 1-page executive resume highlighting P&L ownership, prime cost recovery, and workflow automation.')" style="border-left: 3px solid #38BDF8;">
-                            <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
-                                <span>📄</span> <span>Path A: Executive Positioning</span>
+                    <!-- 6-WAY INSTITUTIONAL STRATEGIC COMMAND HUB SELECTOR -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin: 18px 0 10px 0;">
+                        <div class="mode-tile" onclick="sendQuick('01 // Trade Area Geometry: Model foot traffic catchment, localized pricing power, and commercial density optimization.')" style="border-left: 3px solid #38BDF8;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
+                                <span style="color:#38BDF8;">01 //</span> <span>Trade Area Geometry</span>
                             </div>
-                            <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">Quantified enterprise value, P&L ownership, and .docx / PDF master resume reframe.</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Catchment modeling, foot-traffic conversion, and neighborhood capture geometry.</div>
                         </div>
-                        <div class="mode-tile" onclick="sendQuick('Strategic Interview Prep: Prepare a consultative interview strategy, reverse due-diligence questions, and 30-60-90 day board execution plan.')" style="border-left: 3px solid #10B981;">
-                            <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
-                                <span>💼</span> <span>Path B: Interview & Case Prep</span>
+                        <div class="mode-tile" onclick="sendQuick('02 // Trust & Copy Audit: Perform a forensic funnel scan, copy integrity audit, and Trust Alignment index.')" style="border-left: 3px solid #A78BFA;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
+                                <span style="color:#A78BFA;">02 //</span> <span>Trust & Copy Audit</span>
                             </div>
-                            <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">STAR narrative frameworks, reverse employer due-diligence, and 30/60/90 board plans.</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Funnel friction analysis, copy integrity, and Trust Alignment Index validation.</div>
                         </div>
-                        <div class="mode-tile" onclick="sendQuick('Financial Audit: Audit our unit economics and prime costs: calculate breakeven targets and export the 12-month financial model.')" style="border-left: 3px solid #F59E0B;">
-                            <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
-                                <span>📊</span> <span>Path C: Financial Audit & Model</span>
+                        <div class="mode-tile" onclick="sendQuick('03 // Unit Economics Engine: Calculate CAC payback velocity, gross margin floors, and 12-month EBITDA trajectory.')" style="border-left: 3px solid #22C55E;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
+                                <span style="color:#22C55E;">03 //</span> <span>Unit Economics Engine</span>
                             </div>
-                            <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">Breakeven sensitivity studio, unit contribution, and native .xlsx workbook export.</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">SaaS/retail tiers, blended CAC, LTV:CAC, payback velocity, and NRR modeling.</div>
                         </div>
-                        <div class="mode-tile" onclick="sendQuick('Executive Email & Deal Memo: Configure a high-stakes, professional email in my own authentic words. Guide me through an operational interrogation to establish the recipient, goal, leverage, and zero-fluff outcome.')" style="border-left: 3px solid #A855F7;">
-                            <div style="font-size:13.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
-                                <span>📬</span> <span>Path D: Executive Email & Deals</span>
+                        <div class="mode-tile" onclick="sendQuick('04 // Campaign Strategy: Design a zero-discount narrative campaign, premium service tiering, and basket size expansion.')" style="border-left: 3px solid #F59E0B;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
+                                <span style="color:#F59E0B;">04 //</span> <span>Campaign Strategy</span>
                             </div>
-                            <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">High-stakes negotiation, warm executive pitches, vendor price defense, and 1-click clipboard copy.</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Zero-discount launches, narrative framing, and margin-defending basket expansion.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('05 // Competitor Recon: Map competitor vulnerability vectors, price spread architecture, and differentiation moats.')" style="border-left: 3px solid #EC4899;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
+                                <span style="color:#EC4899;">05 //</span> <span>Competitor Recon</span>
+                            </div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Moat engineering, pricing spreads, and structural differentiation indexing.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Executive Positioning: Reframe operational background into a quantified 1-page executive resume highlighting P&L ownership, prime cost recovery, and workflow automation.')" style="border-left: 3px solid #60A5FA;">
+                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px;">
+                                <span>📄</span> <span>Executive Placement & P&L</span>
+                            </div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Quantified enterprise value, P&L ownership, and .docx / PDF master deliverable.</div>
                         </div>
                     </div>
 
@@ -2596,6 +2634,71 @@
                     <polyline points="5 12 12 5 19 12"></polyline>
                 </svg>
             </button>
+        </div>
+    </div>
+
+    <!-- HUMAN-IN-THE-LOOP ASSUMPTION OVERRIDE GATE MODAL -->
+    <div class="modal-overlay" id="assumptionModal">
+        <div class="modal-card" style="max-width:540px; padding:28px; background:radial-gradient(circle at 50% 0%, rgba(34,197,94,0.12) 0%, #0B0E14 70%); border:1px solid rgba(34,197,94,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.9), 0 0 40px rgba(34,197,94,0.15);">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:20px;">⚙️</span>
+                    <div>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:17px; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em;">
+                            Human-in-the-Loop Assumption Gate
+                        </h2>
+                        <p style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Override enterprise baselines injected into downstream strategic models.</p>
+                    </div>
+                </div>
+                <button class="btn-modal-close" onclick="closeAssumptionDrawer()" aria-label="Close" title="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Entity Name</label>
+                        <input id="gateEntityName" type="text" value="Company Alpha" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Business Model</label>
+                        <select id="gateBusinessModel" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px;">
+                            <option value="B2B SaaS">B2B SaaS</option>
+                            <option value="Direct-to-Consumer">Direct-to-Consumer / E-Com</option>
+                            <option value="Hospitality & Retail" selected>Hospitality & Retail</option>
+                            <option value="Professional Services">Professional Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Target CAC ($)</label>
+                        <input id="gateTargetCAC" type="number" value="38" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Gross Margin (%)</label>
+                        <input id="gateGrossMargin" type="number" value="68" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px;">
+                    </div>
+                    <div>
+                        <label style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Cash Runway (Mo)</label>
+                        <input id="gateCashRunway" type="number" value="14" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Strategic Focus & Constraint</label>
+                    <textarea id="gateFocusConstraint" rows="2" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; color:#FFF; font-size:12.5px; box-sizing:border-box; margin-top:4px; resize:none;">Protect prime gross margin above 65%; defend against price-cutting and scale unit economics.</textarea>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                    <button class="btn-export" onclick="closeAssumptionDrawer()" style="padding:8px 14px; font-size:12px;">Cancel</button>
+                    <button class="btn-export" onclick="saveAssumptionOverrides()" style="padding:8px 18px; font-size:12px; font-weight:800; background:var(--accent); color:#000; border:none; border-radius:8px;">
+                        <span>✓ Apply to Strategic Context</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -4023,6 +4126,48 @@
             document.getElementById('vaultModal').style.display = 'flex';
         }
         function closeVaultModal() { document.getElementById('vaultModal').style.display = 'none'; }
+
+        function openAssumptionDrawer() {
+            loadAssumptionOverrides();
+            document.getElementById('assumptionModal').style.display = 'flex';
+        }
+
+        function closeAssumptionDrawer() {
+            document.getElementById('assumptionModal').style.display = 'none';
+        }
+
+        function loadAssumptionOverrides() {
+            const client = document.getElementById('activeClientSelector')?.value || 'default';
+            const profile = JSON.parse(localStorage.getItem(`cs_client_${client}`) || '{}');
+            if (document.getElementById('gateEntityName')) document.getElementById('gateEntityName').value = profile.entityName || (client === 'default' ? 'Company Alpha' : client === 'retail' ? 'Acme Retail' : 'B2B SaaS Growth');
+            if (document.getElementById('gateBusinessModel')) document.getElementById('gateBusinessModel').value = profile.businessModel || 'Hospitality & Retail';
+            if (document.getElementById('gateTargetCAC')) document.getElementById('gateTargetCAC').value = profile.targetCAC || 38;
+            if (document.getElementById('gateGrossMargin')) document.getElementById('gateGrossMargin').value = profile.grossMargin || 68;
+            if (document.getElementById('gateCashRunway')) document.getElementById('gateCashRunway').value = profile.cashRunway || 14;
+            if (document.getElementById('gateFocusConstraint')) document.getElementById('gateFocusConstraint').value = profile.focusConstraint || 'Protect prime gross margin above 65%; defend against price-cutting and scale unit economics.';
+        }
+
+        function saveAssumptionOverrides() {
+            const client = document.getElementById('activeClientSelector')?.value || 'default';
+            const profile = {
+                entityName: document.getElementById('gateEntityName')?.value || 'Company Alpha',
+                businessModel: document.getElementById('gateBusinessModel')?.value || 'Hospitality & Retail',
+                targetCAC: document.getElementById('gateTargetCAC')?.value || 38,
+                grossMargin: document.getElementById('gateGrossMargin')?.value || 68,
+                cashRunway: document.getElementById('gateCashRunway')?.value || 14,
+                focusConstraint: document.getElementById('gateFocusConstraint')?.value || ''
+            };
+            localStorage.setItem(`cs_client_${client}`, JSON.stringify(profile));
+            closeAssumptionDrawer();
+            showToast(`Assumptions applied to ${profile.entityName}`, "⚙️");
+        }
+
+        function switchActiveClient(clientKey) {
+            loadAssumptionOverrides();
+            const profile = JSON.parse(localStorage.getItem(`cs_client_${clientKey}`) || '{}');
+            const name = profile.entityName || (clientKey === 'default' ? 'Company Alpha' : clientKey === 'retail' ? 'Acme Retail' : 'B2B SaaS Growth');
+            showToast(`Active Client: ${name}`, "🏢");
+        }
 
         function openSettings() { openSettingsModal(); }
         function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
@@ -5800,8 +5945,20 @@
 
                 let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
 
-                // 🧠 Dynamic Multi-Tier Persistent Memory Injection (Vault + Facts + Controls)
-                const memoryContext = getOperatorMemoryContext();
+                // 🧠 Dynamic Multi-Tier Persistent Memory Injection (Vault + Facts + Controls + Client Assumptions)
+                let memoryContext = getOperatorMemoryContext();
+                
+                // Inject Active Client Baseline from Human Assumption Gate
+                const activeClientKey = document.getElementById('activeClientSelector')?.value || 'default';
+                const clientProfile = JSON.parse(localStorage.getItem(`cs_client_${activeClientKey}`) || '{}');
+                const entityName = clientProfile.entityName || (activeClientKey === 'default' ? 'Company Alpha' : activeClientKey === 'retail' ? 'Acme Retail' : 'B2B SaaS Growth');
+                const entityModel = clientProfile.businessModel || 'Hospitality & Retail';
+                const targetCAC = clientProfile.targetCAC || '38';
+                const grossMargin = clientProfile.grossMargin || '68';
+                const runway = clientProfile.cashRunway || '14';
+                const constraint = clientProfile.focusConstraint || 'Defend gross margin & scale unit economics.';
+
+                memoryContext += `\n[ACTIVE CLIENT BASELINE ASSUMPTIONS]\nEntity: ${entityName} | Model: ${entityModel} | Target CAC: $${targetCAC} | Gross Margin: ${grossMargin}% | Runway: ${runway} Months\nStrategic Focus: ${constraint}\n`;
 
                 // Auto-harvest durable entities from user input and documents
                 autoHarvestMemoryFromText(text);
