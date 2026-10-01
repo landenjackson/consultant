@@ -5031,14 +5031,18 @@
 
         // 100% RELIABLE DUAL-PIPELINE GOOGLE FLASH NEURAL AUDIO + WEBSPEECH ENGINE
         async function speakInterviewerResponse(text, onComplete) {
+            // Clean markdown syntax, math formulas, brackets, and telemetry tags so audio speaks naturally
             const cleanText = text
+                .replace(/\[[A-Z0-9_\s\/\-\&]+\]\s*[:=]\s*([^\n\r]+)/g, '$1')
                 .replace(/\[DOMAIN:[^\]]+\]/g, '')
                 .replace(/\+[=\-\+]+\+/g, '')
                 .replace(/\|[^\n]+\|/g, '')
+                .replace(/^#{1,6}\s+/gm, '')
                 .replace(/[*_#`\+\-\|]/g, ' ')
+                .replace(/<[^>]+>/g, '')
                 .replace(/\s+/g, ' ')
                 .trim()
-                .slice(0, 450);
+                .slice(0, 300);
 
             if (!cleanText) {
                 if (onComplete) onComplete();
@@ -5053,7 +5057,7 @@
                 }
             };
 
-            // 1. Primary: High-fidelity Google Gemini 3.8 Flash-Lite Neural Studio Audio (Plays through Phone/Car Bluetooth)
+            // 1. Primary: High-fidelity Google Gemini Neural Audio Stream
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
@@ -5077,12 +5081,12 @@
                         };
                         audio.onerror = () => {
                             activeAudioElement = null;
-                            finish();
+                            fallbackWebSpeech(cleanText, finish);
                         };
                         const playPromise = audio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch(err => {
-                                console.warn('[Audio Play Promise Catch]:', err);
+                                console.warn('[Audio Play Autoplay Blocked]:', err);
                                 activeAudioElement = null;
                                 fallbackWebSpeech(cleanText, finish);
                             });
@@ -5091,7 +5095,7 @@
                     }
                 }
             } catch(e) {
-                console.warn('[Google TTS Notice - Switching to Local Engine]:', e);
+                console.warn('[Google TTS Fallback to WebSpeech]:', e);
             }
 
             // 2. Secondary: Direct Local WebSpeech Synthesis
@@ -5105,13 +5109,15 @@
                     const utter = new SpeechSynthesisUtterance(text);
                     initNaturalVoice();
                     if (naturalVoice) utter.voice = naturalVoice;
-                    utter.rate = (consultantVoiceGender === 'male' ? 0.98 : 1.02);
+                    utter.rate = 1.02;
                     utter.pitch = (consultantVoiceGender === 'male' ? 0.95 : 1.05);
-                    utter.onend = finish;
-                    utter.onerror = finish;
+                    utter.onend = () => finish();
+                    utter.onerror = () => finish();
                     window.speechSynthesis.speak(utter);
                     return;
-                } catch(e){}
+                } catch(e) {
+                    console.warn('[WebSpeech Error]:', e);
+                }
             }
             finish();
         }
