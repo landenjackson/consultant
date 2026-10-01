@@ -332,12 +332,12 @@
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 20px 20px 140px;
-            max-width: 940px;
+            padding: 16px 16px 110px;
+            max-width: 860px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 14px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -895,14 +895,14 @@
             transform: translateY(-1px);
         }
 
-        /* FIXED BOTTOM INPUT DOCK WITH MOBILE SAFE AREA INSET */
+        /* FIXED BOTTOM INPUT DOCK WITH COMPACT EXECUTIVE PADDING */
         .dock-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 12px 20px max(16px, env(safe-area-inset-bottom, 16px)) 20px;
-            background: linear-gradient(180deg, rgba(8, 10, 13, 0) 0%, rgba(8, 10, 13, 0.94) 30%, #080A0D 100%);
+            padding: 8px 16px max(12px, env(safe-area-inset-bottom, 12px)) 16px;
+            background: linear-gradient(180deg, rgba(8, 10, 13, 0) 0%, rgba(8, 10, 13, 0.96) 25%, #080A0D 100%);
             z-index: 20;
         }
 
