@@ -4598,6 +4598,7 @@
             } catch(e){}
         }
 
+        // 100% RELIABLE LOCAL WEBSPEECH / TTS DISPATCHER (ZERO CREDIT / ZERO SERVER API LOCKOUT)
         async function speakInterviewerResponse(text, onComplete) {
             const cleanText = text
                 .replace(/\[DOMAIN:[^\]]+\]/g, '')
@@ -4606,16 +4607,24 @@
                 .replace(/[*_#`\+\-\|]/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim()
-                .slice(0, 500);
+                .slice(0, 450);
 
             if (!cleanText) {
                 if (onComplete) onComplete();
                 return;
             }
 
-            // Universal Audio Dispatcher: Instant WebSpeech Playback + Direct HTML5 Audio Unlock
-            try {
-                if (window.speechSynthesis) {
+            let completed = false;
+            const finish = () => {
+                if (!completed) {
+                    completed = true;
+                    if (onComplete) onComplete();
+                }
+            };
+
+            // 1. Primary: Direct Client-Side Neural WebSpeech (Runs 100% locally on phone, $0 cost, zero API quota blocks)
+            if (window.speechSynthesis) {
+                try {
                     window.speechSynthesis.cancel();
                     const utter = new SpeechSynthesisUtterance(cleanText);
                     initNaturalVoice();
@@ -4623,24 +4632,20 @@
                     utter.rate = (consultantVoiceGender === 'male' ? 0.98 : 1.02);
                     utter.pitch = (consultantVoiceGender === 'male' ? 0.95 : 1.05);
 
-                    let hasFired = false;
-                    const done = () => {
-                        if (!hasFired) {
-                            hasFired = true;
-                            if (onComplete) onComplete();
-                        }
+                    utter.onend = finish;
+                    utter.onerror = (e) => {
+                        console.warn('[Local Speech Error]:', e);
+                        finish();
                     };
 
-                    utter.onend = done;
-                    utter.onerror = done;
                     window.speechSynthesis.speak(utter);
                     return;
+                } catch(err) {
+                    console.warn('[WebSpeech Synthesis Exception]:', err);
                 }
-            } catch(e) {
-                console.warn('[WebSpeech Error]:', e);
             }
 
-            // Backend Google Gemini 3.8 Flash Neural Audio Fallback with Aoede (Female) / Fenrir (Male) Profiles
+            // 2. Fallback: Backend Google Gemini 3.8 Flash TTS
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
@@ -4650,27 +4655,24 @@
                 const ttsRes = await fetch('/api/tts', {
                     method: 'POST',
                     headers,
-                    body: JSON.stringify({
-                        text: cleanText,
-                        speaker: googleSpeaker
-                    })
+                    body: JSON.stringify({ text: cleanText, speaker: googleSpeaker })
                 });
 
                 if (ttsRes.ok) {
                     const ttsData = await ttsRes.json();
                     if (ttsData.audioBase64) {
                         const audio = new Audio(`data:${ttsData.mimeType};base64,${ttsData.audioBase64}`);
-                        audio.onended = () => { if (onComplete) onComplete(); };
-                        audio.onerror = () => { if (onComplete) onComplete(); };
+                        audio.onended = finish;
+                        audio.onerror = finish;
                         await audio.play();
                         return;
                     }
                 }
             } catch(e) {
-                console.warn('[TTS API Error]:', e);
+                console.warn('[TTS API Fallback Notice]:', e);
             }
 
-            if (onComplete) onComplete();
+            finish();
         }
 
         function playVoiceBriefing(btn) {
