@@ -4435,9 +4435,6 @@
             window.addEventListener('touchstart', unlockMobileAudio, { once: true, passive: true });
             window.addEventListener('click', unlockMobileAudio, { once: true, passive: true });
         }
-        let speechRecognition = null;
-        let naturalVoice = null;
-        let consultantVoiceGender = localStorage.getItem('cs_voice_gender') || 'female';
 
         // 🎙️ BULLETPROOF LIVE VOICE CONSULTANT ENGINE (UNIVERSAL WEB + MOBILE MIC DICTATION)
         let isVoicePracticeActive = false;
