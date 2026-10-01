@@ -4544,6 +4544,25 @@
             showToast("Live Consultant Voice Ended.", "⏹️");
         }
 
+        // FULL-DUPLEX LIVE CONVERSATIONAL INTERRUPT & INTERVIEW LISTEN ENGINE
+        let activeAudioElement = null;
+
+        function interruptConsultantSpeech() {
+            // Instantly cut off consultant audio if user starts speaking
+            if (activeAudioElement) {
+                try {
+                    activeAudioElement.pause();
+                    activeAudioElement.currentTime = 0;
+                    activeAudioElement = null;
+                } catch(e){}
+            }
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                try {
+                    window.speechSynthesis.cancel();
+                } catch(e){}
+            }
+        }
+
         function listenToCandidate() {
             if (!isVoicePracticeActive) return;
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -4555,7 +4574,7 @@
                 }
 
                 speechRecognition = new SpeechRec();
-                speechRecognition.continuous = false;
+                speechRecognition.continuous = true;  // Keep listening open full-duplex like Gemini Live
                 speechRecognition.interimResults = true;
                 speechRecognition.lang = 'en-US';
 
@@ -4566,13 +4585,19 @@
                     let interim = '';
                     for (let i = event.resultIndex; i < event.results.length; ++i) {
                         if (event.results[i].isFinal) {
-                            recognizedText += event.results[i][0].transcript;
+                            recognizedText += event.results[i][0].transcript + ' ';
                         } else {
                             interim += event.results[i][0].transcript;
                         }
                     }
 
                     const fullSpoken = (recognizedText || interim).trim();
+
+                    // If user starts speaking while consultant is talking, barge-in / interrupt immediately
+                    if (fullSpoken.length > 2) {
+                        interruptConsultantSpeech();
+                    }
+
                     const userInput = document.getElementById('userInput');
                     if (userInput && fullSpoken) {
                         userInput.value = fullSpoken;
@@ -4584,7 +4609,7 @@
                             try { speechRecognition.stop(); } catch(e){}
                             sendMessage();
                         }
-                    }, 1200);
+                    }, 1400); // 1.4s natural pause before sending answer
                 };
 
                 speechRecognition.onerror = (err) => {
@@ -4592,7 +4617,7 @@
                     if (isVoicePracticeActive && err.error !== 'aborted') {
                         setTimeout(() => {
                             if (isVoicePracticeActive) listenToCandidate();
-                        }, 800);
+                        }, 600);
                     }
                 };
 
@@ -4600,7 +4625,7 @@
                     if (isVoicePracticeActive && !recognizedText) {
                         setTimeout(() => {
                             if (isVoicePracticeActive) listenToCandidate();
-                        }, 500);
+                        }, 400);
                     }
                 };
 
@@ -4651,12 +4676,20 @@
                     const ttsData = await ttsRes.json();
                     if (ttsData.audioBase64) {
                         const audio = new Audio(`data:${ttsData.mimeType};base64,${ttsData.audioBase64}`);
-                        audio.onended = finish;
-                        audio.onerror = finish;
+                        activeAudioElement = audio;
+                        audio.onended = () => {
+                            activeAudioElement = null;
+                            finish();
+                        };
+                        audio.onerror = () => {
+                            activeAudioElement = null;
+                            finish();
+                        };
                         const playPromise = audio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch(err => {
                                 console.warn('[Audio Play Promise Catch]:', err);
+                                activeAudioElement = null;
                                 fallbackWebSpeech(cleanText, finish);
                             });
                         }
