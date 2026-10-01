@@ -2594,10 +2594,10 @@
                     </p>
                     <div style="display:flex; gap:8px;">
                         <button id="voiceGenderFemaleBtn" class="btn-export" onclick="setConsultantVoiceGender('female')" style="flex:1; justify-content:center; border-color:var(--accent); font-weight:700;">
-                            <span>👩‍💼 Executive Partner (Female / Lumi)</span>
+                            <span>👩‍💼 Lead Operating Partner (Warm & Direct / Aoede)</span>
                         </button>
                         <button id="voiceGenderMaleBtn" class="btn-export" onclick="setConsultantVoiceGender('male')" style="flex:1; justify-content:center; font-weight:700;">
-                            <span>👨‍💼 Senior Strategist (Male / Varo)</span>
+                            <span>👨‍💼 Executive Strategist (Authoritative / Fenrir)</span>
                         </button>
                     </div>
                 </div>
@@ -4420,7 +4420,7 @@
                 }
             }
             initNaturalVoice();
-            const label = gender === 'female' ? 'Executive Partner (Female / Lumi)' : 'Senior Strategist (Male / Varo)';
+            const label = gender === 'female' ? 'Lead Operating Partner (Aoede)' : 'Executive Strategist (Fenrir)';
             showToast(`Voice updated to ${label}`, "🎙️");
         }
 
@@ -4430,12 +4430,14 @@
             const isMale = (consultantVoiceGender === 'male');
 
             if (isMale) {
-                naturalVoice = voices.find(v => (v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Fred') || v.name.includes('Male') || v.name.includes('Guy') || v.name.includes('Tom') || v.name.includes('Aaron') || v.name.includes('George')) && v.lang.startsWith('en'))
-                            || voices.find(v => v.lang.startsWith('en-US'))
+                // Prioritize grounded, deep, mature executive voices (e.g. Daniel, Tom, Oliver, Alex)
+                naturalVoice = voices.find(v => (v.name.includes('Daniel') || v.name.includes('Tom') || v.name.includes('Oliver') || v.name.includes('Alex') || v.name.includes('Guy')) && v.lang.startsWith('en'))
+                            || voices.find(v => v.lang.startsWith('en-US') && !v.name.includes('Zira') && !v.name.includes('Samantha'))
                             || voices[0];
             } else {
-                naturalVoice = voices.find(v => (v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Google US English') || v.name.includes('Natural') || v.name.includes('Ava') || v.name.includes('Victoria') || v.name.includes('Female')) && v.lang.startsWith('en')) 
-                            || voices.find(v => v.lang.startsWith('en-US')) 
+                // Prioritize warm, polished, natural executive consultant voices (e.g. Victoria, Ava, Serena, Allison)
+                naturalVoice = voices.find(v => (v.name.includes('Victoria') || v.name.includes('Ava') || v.name.includes('Serena') || v.name.includes('Allison') || v.name.includes('Natural')) && v.lang.startsWith('en'))
+                            || voices.find(v => v.name.includes('Samantha') || v.name.includes('Google US English')) 
                             || voices[0];
             }
         }
@@ -4594,12 +4596,12 @@
                 console.warn('[WebSpeech Error]:', e);
             }
 
-            // Backend Google Gemini 3.8 Flash Neural Audio Fallback with Male/Female Profile
+            // Backend Google Gemini 3.8 Flash Neural Audio Fallback with Aoede (Female) / Fenrir (Male) Profiles
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
                 if (customKey) headers['x-custom-gemini-key'] = customKey;
-                const googleSpeaker = (consultantVoiceGender === 'male' ? 'Varo' : 'Lumi');
+                const googleSpeaker = (consultantVoiceGender === 'male' ? 'Fenrir' : 'Aoede');
 
                 const ttsRes = await fetch('/api/tts', {
                     method: 'POST',
