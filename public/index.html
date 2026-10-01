@@ -4394,8 +4394,47 @@
             }
         }
 
-        // 🎙️ EXECUTIVE LIVE CONSULTANT & AUDITORY LEARNING VOICE ENGINE
-        let isVoicePracticeActive = false;
+        // Global Audio Context & Unlocker for Mobile Safari / Chrome
+        let globalAudioCtx = null;
+        let silentAudioUnlocked = false;
+
+        function unlockMobileAudio() {
+            if (!silentAudioUnlocked) {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        globalAudioCtx = new AudioContext();
+                        if (globalAudioCtx.state === 'suspended') {
+                            globalAudioCtx.resume();
+                        }
+                        // Play 0.01s silent oscillator to lift mobile iOS/Android audio restriction
+                        const osc = globalAudioCtx.createOscillator();
+                        const gain = globalAudioCtx.createGain();
+                        gain.gain.value = 0.001;
+                        osc.connect(gain);
+                        gain.connect(globalAudioCtx.destination);
+                        osc.start(0);
+                        osc.stop(0.02);
+                        silentAudioUnlocked = true;
+                    }
+                } catch(e){}
+            }
+
+            if (window.speechSynthesis) {
+                try {
+                    // Pre-warm SpeechSynthesis on first touch
+                    window.speechSynthesis.resume();
+                    const dummyUtter = new SpeechSynthesisUtterance('');
+                    window.speechSynthesis.speak(dummyUtter);
+                } catch(e){}
+            }
+        }
+
+        // Attach touch unlock to entire page
+        if (typeof window !== 'undefined') {
+            window.addEventListener('touchstart', unlockMobileAudio, { once: true, passive: true });
+            window.addEventListener('click', unlockMobileAudio, { once: true, passive: true });
+        }
         let speechRecognition = null;
         let naturalVoice = null;
         let consultantVoiceGender = localStorage.getItem('cs_voice_gender') || 'female';
