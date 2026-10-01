@@ -2196,6 +2196,19 @@
         </div>
 
         <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+            <!-- CLIENT / PROJECT BASELINE PROFILE SWITCHER -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:10px; margin-bottom:8px;">
+                <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Active Client Profile</span>
+                    <button onclick="openAssumptionDrawer(); toggleSidebar(false);" style="background:transparent; border:none; color:var(--accent-glow); font-size:10px; font-weight:700; cursor:pointer;">⚙️ Edit</button>
+                </div>
+                <select id="activeClientSelector" onchange="switchActiveClient(this.value)" style="width:100%; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:6px 8px; color:var(--accent-glow); font-size:12px; font-weight:700; outline:none; cursor:pointer;">
+                    <option value="default" style="background:#0E131C; color:#FFF;">Company Alpha (Core Baseline)</option>
+                    <option value="retail" style="background:#0E131C; color:#FFF;">Acme Retail & Franchise Growth</option>
+                    <option value="b2b" style="background:#0E131C; color:#FFF;">Enterprise B2B SaaS Scale</option>
+                </select>
+            </div>
+
             <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:6px 0 2px 6px;">Strategic Modules</div>
             <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('00 // Command Center Overview: Run an active intelligence audit across our enterprise P&L, customer concentration, and liquidity risk matrix.'); toggleSidebar(false);">
                 <span style="color:var(--accent-glow); font-weight:700;">00 //</span> <span>Command Center</span>
@@ -2240,48 +2253,35 @@
         </div>
     </aside>
 
-    <!-- TOP HEADER WITH GLOBAL TELEMETRY & MULTI-CLIENT PROJECT SWITCHER -->
-    <header style="justify-content:space-between; position:relative; padding:0 12px; background:#0B0E14; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:8px; height:54px;">
-        <!-- LEFT: DRAWER & BRAND LOGO -->
-        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-            <button class="btn-icon btn-icon-drawer" onclick="toggleSidebar(true)" title="Open Command Center Menu" style="padding:6px; color:#FFFFFF; flex-shrink:0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                <div class="brand-logo" style="width:26px; height:26px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden; flex-shrink:0;">
-                    <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">
-                </div>
-                <span class="brand-text header-title-text" style="font-family:'Plus Jakarta Sans'; font-size:14px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF; white-space:nowrap;">Consultant Studio</span>
+    <!-- TOP HEADER -->
+    <header style="justify-content:space-between; position:relative; padding:0 16px; background:#0B0E14; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; height:54px;">
+        <!-- LEFT: DRAWER MENU -->
+        <button class="btn-icon btn-icon-drawer" onclick="toggleSidebar(true)" title="Open Menu" style="padding:6px; color:#FFFFFF; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <!-- CENTER: CLEAN BRAND LOGO & TITLE -->
+        <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+            <div class="brand-logo" style="width:28px; height:28px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
+                <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">
             </div>
+            <span class="brand-text" style="font-family:'Plus Jakarta Sans'; font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF;">Consultant Studio</span>
         </div>
 
-        <!-- RIGHT: CLIENT SWITCHER & CONTROLS -->
-        <div style="display:flex; align-items:center; gap:6px; flex-shrink:1; min-width:0; justify-content:flex-end;">
-            <div id="globalTelemetryRibbon" style="display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:16px; flex-shrink:1; min-width:0;">
-                <span class="telemetry-dot" style="flex-shrink:0;"></span>
-                <select id="activeClientSelector" onchange="switchActiveClient(this.value)" style="background:transparent; border:none; color:var(--accent-glow); font-size:11px; font-weight:700; outline:none; cursor:pointer; max-width:120px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">
-                    <option value="default" style="background:#0E131C; color:#FFF;">Company Alpha</option>
-                    <option value="retail" style="background:#0E131C; color:#FFF;">Acme Retail</option>
-                    <option value="b2b" style="background:#0E131C; color:#FFF;">B2B SaaS</option>
-                </select>
-                <button onclick="openAssumptionDrawer()" class="header-gate-btn" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:2px; padding:0 2px; flex-shrink:0;" title="Configure Baseline Financial Assumptions">
-                    <span>⚙️</span><span class="header-gate-text">Gate</span>
-                </button>
-            </div>
-
-            <button class="btn-icon header-reset-btn" onclick="resetChatSession()" title="Reset Active Command Canvas" style="padding:4px 6px; display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-secondary); font-size:11px; font-weight:600; cursor:pointer; flex-shrink:0;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                    <path d="M21 3v5h-5"></path>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                    <path d="M3 21v-5h5"></path>
-                </svg>
-            </button>
-        </div>
+        <!-- RIGHT: NEW CHAT BUTTON -->
+        <button class="btn-icon header-reset-btn" onclick="resetChatSession()" title="Start New Strategy Session" style="padding:6px 10px; display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-secondary); font-size:12px; font-weight:600; cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M21 3v5h-5"></path>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M3 21v-5h5"></path>
+            </svg>
+            <span class="reset-chat-text">New Chat</span>
+        </button>
     </header>
 
     <!-- MAIN SPLIT WORKSPACE ARENA -->
