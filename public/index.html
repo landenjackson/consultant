@@ -4495,11 +4495,8 @@
         }
 
         function startLiveVoicePractice() {
+            unlockMobileAudio();
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRec) {
-                showToast("Speech Recognition not supported in this browser. Please use Chrome or Safari.", "⚠️");
-                return;
-            }
 
             isVoicePracticeActive = true;
             const btn = document.getElementById('liveVoicePracticeBtn');
@@ -4510,11 +4507,19 @@
                 btn.title = 'Stop Live Consultant Session';
             }
 
-            showToast("Live Strategic Consultant Voice Activated. Ask any operational question or request advice!", "🎙️");
+            if (!SpeechRec) {
+                showToast("Live Voice Consultant active (Auditory Speech Mode).", "🎙️");
+                speakInterviewerResponse("Welcome to Consultant Studio. I am your Strategic Operating Partner. What operational move or financial challenge should we analyze?");
+                return;
+            }
 
-            // Initial voice greeting from Consultant Strategic Advisor
+            showToast("Live Strategic Consultant Voice Activated. Ask any operational question!", "🎙️");
+
+            // Direct spoken introduction with seamless transition to microphone listening
             speakInterviewerResponse("Welcome to Consultant Studio. I am your Strategic Operating Partner. What operational bottleneck, P and L challenge, or turnaround move should we analyze today?", () => {
-                listenToCandidate();
+                if (isVoicePracticeActive) {
+                    listenToCandidate();
+                }
             });
         }
 
