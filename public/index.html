@@ -78,19 +78,20 @@
             --bg-obsidian-root: #080A0F;
             --bg-obsidian-surface: #0E131C;
             --bg-obsidian-elevated: #151C28;
-            --border-obsidian: rgba(255, 255, 255, 0.08);
-            --border-obsidian-hover: rgba(34, 197, 94, 0.35);
+            --border-obsidian: rgba(255, 255, 255, 0.12);
+            --border-obsidian-hover: rgba(34, 197, 94, 0.45);
             --text-obsidian-primary: #F8FAFC;
-            --text-obsidian-muted: #94A3B8;
+            --text-obsidian-muted: #CBD5E1;
+            --text-obsidian-sub: #94A3B8;
             --accent-cyan: #38BDF8;
             --accent-emerald: #22C55E;
             --accent-glow: #4ADE80;
-            --accent-dim: rgba(34, 197, 94, 0.1);
+            --accent-dim: rgba(34, 197, 94, 0.12);
             --accent-gradient: linear-gradient(135deg, #22C55E 0%, #10B981 50%, #059669 100%);
-            --luxury-glass: rgba(14, 19, 28, 0.72);
-            --luxury-glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --luxury-glass: rgba(14, 19, 28, 0.78);
+            --luxury-glass-border: 1px solid rgba(255, 255, 255, 0.12);
 
-            /* MAPPED TOKENS */
+            /* MAPPED TOKENS (HIGH ACCESSIBILITY CONTRAST PASS) */
             --bg: var(--bg-obsidian-root);
             --bg-base: var(--bg-obsidian-root);
             --card-bg: var(--bg-obsidian-surface);
@@ -100,7 +101,7 @@
             --accent: var(--accent-emerald);
             --text-primary: var(--text-obsidian-primary);
             --text-secondary: var(--text-obsidian-muted);
-            --text-muted: #64748B;
+            --text-muted: var(--text-obsidian-sub);
             --danger: #F43F5E;
 
             /* STRICT DESIGN TOKEN Z-INDEX HIERARCHY */
@@ -2123,7 +2124,7 @@
                     <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
                 </div>
                 <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:#FFF; letter-spacing:-0.02em;">Consultant Studio</span>
-                <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">GEMINI 4 ARGON</span>
+                <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">FRONTIER INTELLIGENCE</span>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
                 <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 14px; border-color:rgba(255,255,255,0.15); color:#FFF;">Sign In</button>
@@ -2560,9 +2561,9 @@
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid var(--border); border-radius:8px; padding:2px 6px; flex-shrink:0;">
                 <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:var(--text-secondary); font-size:11px; font-weight:600; outline:none; cursor:pointer;" title="Select Intelligence Engine">
                     <option value="auto" selected style="background:#0D121A; color:#FFF;">⚡ Enterprise Auto (Adaptive Routing)</option>
-                    <option value="gemini-4-argon" style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Pro & Exec Tier Only - 2M+)</option>
-                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash (High Reasoning)</option>
-                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
+                    <option value="gemini-4-argon" style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Frontier Strategic Reasoning Engine</option>
+                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Consultant Studio High Reasoning</option>
+                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Consultant Studio Core Engine (Sub-1s)</option>
                 </select>
             </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Objective, metric, or P&L query..." onkeydown="handleInputKeydown(event)"></textarea>
@@ -2651,7 +2652,7 @@
                     <div>
                         <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em; display:flex; align-items:center; gap:6px;">
                             <span>Consultant Studio</span>
-                            <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">GEMINI 4 ARGON</span>
+                            <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">FRONTIER INTELLIGENCE</span>
                         </h2>
                         <p style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Sovereign Strategic Intelligence & Quantitative Operations Room</p>
                     </div>
@@ -2682,13 +2683,14 @@
 
             <!-- EMAIL & OPERATOR CREDENTIAL INPUTS -->
             <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
+                <div id="authErrorMsg" style="display:none; color:#F87171; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600;"></div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Executive / Operator Name:</label>
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Executive / Operator Name: <span style="color:#F87171;">*</span></label>
                     <input type="text" id="authNameInput" class="dock-input" placeholder="e.g. Landen Jackson" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Corporate / Operator Email:</label>
-                    <input type="email" id="authEmailInput" class="dock-input" placeholder="name@company.com or operator@consultant-studio.app" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Corporate / Operator Email: <span style="color:#F87171;">*</span></label>
+                    <input type="email" id="authEmailInput" class="dock-input" placeholder="name@company.com" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
                     <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Practice / Business Name (Optional):</label>
@@ -2700,7 +2702,7 @@
                 <button class="btn-export" style="border-color:transparent; color:var(--text-muted); font-size:12px;" onclick="handleSignOut()">Sign Out / Reset</button>
                 <div style="display:flex; gap:8px;">
                     <button class="btn-export" onclick="closeAuthModal()">Skip for Now</button>
-                    <button class="btn-export" style="background:var(--accent); color:#000; font-weight:800; border:none; padding:9px 18px; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.3);" onclick="saveUserProfile()">Authorize Workspace</button>
+                    <button id="authSubmitBtn" class="btn-export" style="background:var(--accent); color:#000; font-weight:800; border:none; padding:9px 18px; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="saveUserProfile()">Authorize Workspace</button>
                 </div>
             </div>
         </div>
@@ -2942,7 +2944,7 @@
                     <div class="plan-name">Strategic Partner</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Gemini 4 Argon Frontier Reasoning Access</strong></li>
+                        <li>✓ <strong>🌌 Frontier Strategic Reasoning Engine Access</strong></li>
                         <li>✓ <strong>Unlimited Document & Data Uploads (.docx/.pdf/.xlsx)</strong></li>
                         <li>✓ <strong>Unlimited Office Exports (.xlsx/.docx) / mo</strong></li>
                         <li>✓ Sub-2s Multi-Model Accelerated Priority</li>
@@ -2958,7 +2960,7 @@
                     <div class="plan-name">Executive Boardroom</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Full Gemini 4 Argon 2M+ Context Authority</strong></li>
+                        <li>✓ <strong>🌌 Frontier Strategic Reasoning 2M+ Context Authority</strong></li>
                         <li>✓ <strong>Unlimited Document & Data Uploads (.docx/.pdf/.xlsx)</strong></li>
                         <li>✓ <strong>Unlimited Extended Thinking & File Ingestion</strong></li>
                         <li>✓ Org Structure & KPI Incentive Modeling</li>
@@ -4047,23 +4049,66 @@
         }
 
         function saveUserProfile() {
-            const name = (document.getElementById('authNameInput')?.value || '').trim();
-            const email = (document.getElementById('authEmailInput')?.value || '').trim();
-            const company = (document.getElementById('authCompanyInput')?.value || '').trim();
+            const nameInput = document.getElementById('authNameInput');
+            const emailInput = document.getElementById('authEmailInput');
+            const companyInput = document.getElementById('authCompanyInput');
+            const errorMsg = document.getElementById('authErrorMsg');
+            const submitBtn = document.getElementById('authSubmitBtn');
 
-            if (name || email) {
-                const displayName = name || (email ? email.split('@')[0].replace(/[._]/g, ' ') : 'Executive Operator');
+            const name = (nameInput?.value || '').trim();
+            const email = (emailInput?.value || '').trim();
+            const company = (companyInput?.value || '').trim();
+
+            // Client-side validation: Both Name and valid Work Email required
+            if (!name || !email) {
+                if (errorMsg) {
+                    errorMsg.innerText = "Please provide both your Executive Name and Corporate Email.";
+                    errorMsg.style.display = "block";
+                }
+                if (!name && nameInput) nameInput.style.borderColor = "#F87171";
+                if (!email && emailInput) emailInput.style.borderColor = "#F87171";
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                if (errorMsg) {
+                    errorMsg.innerText = "Please enter a valid corporate/work email format.";
+                    errorMsg.style.display = "block";
+                }
+                if (emailInput) emailInput.style.borderColor = "#F87171";
+                return;
+            }
+
+            // Reset error styles and show spinner state
+            if (errorMsg) errorMsg.style.display = "none";
+            if (nameInput) nameInput.style.borderColor = "var(--border)";
+            if (emailInput) emailInput.style.borderColor = "var(--border)";
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span>⏳</span> <span>Authorizing...</span>`;
+            }
+
+            setTimeout(() => {
+                const displayName = name;
                 localStorage.setItem('consultant_user_name', displayName);
-                if (email) localStorage.setItem('consultant_user_email', email);
+                localStorage.setItem('consultant_user_email', email);
                 localStorage.setItem('consultant_user_authenticated', 'true');
                 localStorage.setItem('consultant_auth_method', 'email');
+                if (company) {
+                    localStorage.setItem('consultant_user_company', company);
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `Authorize Workspace`;
+                }
+
                 showToast(`Workspace Authorized for ${displayName}`, "🛡️");
-            }
-            if (company) {
-                localStorage.setItem('consultant_user_company', company);
-            }
-            closeAuthModal();
-            syncProfileUI();
+                closeAuthModal();
+                syncProfileUI();
+            }, 400);
         }
 
         function openVaultModal() {
@@ -4380,6 +4425,14 @@
         }
 
         async function checkout(planId, amount, tier) {
+            const userEmail = localStorage.getItem('consultant_user_email');
+            if (!userEmail) {
+                showToast("Please authenticate your corporate email before deploying billing.", "🔑");
+                closePricing();
+                openAuthModal();
+                return;
+            }
+
             try {
                 const btn = event?.target;
                 if (btn) btn.innerText = "Connecting Stripe...";
@@ -4387,7 +4440,7 @@
                 const res = await fetch('/create-checkout-session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ planId, amount, tier })
+                    body: JSON.stringify({ planId, amount, tier, customerEmail: userEmail })
                 });
                 const data = await res.json();
                 if (data.url) {

@@ -331,10 +331,10 @@ const axExecutionLog = new Map();
 // 1. DYNAMIC STRIPE CHECKOUT SESSIONS
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { planId = 'pro', tier = 'Pro Operator', amount = 3999 } = req.body;
+    const { planId = 'pro', tier = 'Pro Operator', amount = 3999, customerEmail = null } = req.body;
     const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://www.consultant-studio.app');
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionPayload = {
       payment_method_types: ['card'],
       line_items: [{
         price_data: {
@@ -354,8 +354,13 @@ app.post('/create-checkout-session', async (req, res) => {
       },
       success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
       cancel_url: `${origin}/?canceled=true`
-    });
+    };
 
+    if (customerEmail) {
+      sessionPayload.customer_email = customerEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionPayload);
     res.json({ id: session.id, url: session.url });
   } catch (error) {
     res.status(500).json({ error: error.message });
