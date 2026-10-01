@@ -2196,48 +2196,22 @@
             </button>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
-            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:6px 0 2px 6px;">Strategic Modules</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('00 // Command Center Overview: Run an active intelligence audit across our enterprise P&L, customer concentration, and liquidity risk matrix.'); toggleSidebar(false);">
-                <span style="color:var(--accent-glow); font-weight:700;">00 //</span> <span>Command Center</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('01 // Trade Area Geometry: Model foot traffic catchment, localized pricing power, and commercial density optimization.'); toggleSidebar(false);">
-                <span style="color:#38BDF8; font-weight:700;">01 //</span> <span>Trade Area Geometry</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('02 // Trust & Copy Audit: Perform a forensic funnel scan, copy integrity audit, and Trust Alignment index.'); toggleSidebar(false);">
-                <span style="color:#A78BFA; font-weight:700;">02 //</span> <span>Trust & Copy Audit</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('03 // Unit Economics Engine: Calculate CAC payback velocity, gross margin floors, and 12-month EBITDA trajectory.'); toggleSidebar(false);">
-                <span style="color:#22C55E; font-weight:700;">03 //</span> <span>Unit Economics</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('04 // Campaign Strategy: Design a zero-discount narrative campaign, premium service tiering, and basket size expansion.'); toggleSidebar(false);">
-                <span style="color:#F59E0B; font-weight:700;">04 //</span> <span>Campaign Strategy</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('05 // Competitor Recon: Map competitor vulnerability vectors, price spread architecture, and differentiation moats.'); toggleSidebar(false);">
-                <span style="color:#EC4899; font-weight:700;">05 //</span> <span>Competitor Recon</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('06 // Executive Resume & File Polish: Audit my attached file/resume. Reframe all bullet points into quantified enterprise value ($ saved, margin protected, throughput lift, team headcount) with 1-page Word (.docx) & PDF export.'); toggleSidebar(false);">
-                <span style="color:#60A5FA; font-weight:700;">06 //</span> <span>Resume & File Polish</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="sendQuick('07 // Job Interview & Case Prep: Audit my attached background/resume against executive hiring standards. Formulate high-conviction STAR narrative tracks, reverse employer due-diligence questions, and 30-60-90 day board execution roadmaps.'); toggleSidebar(false);">
-                <span style="color:#10B981; font-weight:700;">07 //</span> <span>Job Interview Prep</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:8px 12px; border-radius:8px; font-size:12px; font-family:monospace;" onclick="openVaultModal(); toggleSidebar(false);">
-                <span style="color:#CBD5E1; font-weight:700;">08 //</span> <span>Engagement Vault</span>
-            </button>
-
-            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:16px 0 4px 6px;">Settings</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:9px 12px; border-radius:8px; font-size:12.5px;" onclick="openPricing(); toggleSidebar(false);">
+        <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+            <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:4px 0 2px 6px;">Settings & Workspace</div>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
                 <span>💳</span> <span>Subscriptions & Free Trial</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:9px 12px; border-radius:8px; font-size:12.5px;" onclick="openAuthModal(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
                 <span>👤</span> <span>Account Info & Profile</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:9px 12px; border-radius:8px; font-size:12.5px;" onclick="openSettingsModal(); toggleSidebar(false);">
-                <span>⚙️</span> <span>Display, Voice & API Settings</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
+                <span>🔒</span> <span>Strategy & Research Vault</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:9px 12px; border-radius:8px; font-size:12.5px;" onclick="openOfficeModal(); toggleSidebar(false);">
-                <span>🏢</span> <span>Microsoft 365 Integration</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openSettingsModal(); toggleSidebar(false);">
+                <span>⚙️</span> <span>Display, Voice & Engine Settings</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
+                <span>🏢</span> <span>Microsoft 365 & Office Integrations</span>
             </button>
         </div>
 
