@@ -602,35 +602,26 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       // Google AX Resumption Hook
       const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Dynamic Natural Human Partner Response Generator (Steinberger Conversational Voice)
+    // Dynamic Natural Human Partner Response Generator (Institutional Executive Voice)
     const generateSmartDirectAnswer = (promptText, ws) => {
       const p = promptText.toLowerCase();
-      if (p.includes('diner') || p.includes('ma\'s') || p.includes('sunday') || p.includes('restaurant') || p.includes('shift')) {
-        return `To give you an honest breakdown of your Sunday shift at Ma's Diner, I need the actual numbers from the register and kitchen. 
-
-A Sunday breakfast and lunch rush (8:30 AM to 1:30 PM) is the highest-leverage window of the week. If you did $2,500+ with under 15-minute ticket times and kept labor under 30%, you had a winning morning. If ticket times backed up past 20 minutes, you were leaving table turns and tips on the table.
-
-Drop in your raw net sales, total guest/cover count, and labor hours from that 5-hour window—or upload a photo of the POS closeout report—and we will audit the throughput and prime margin immediately.`;
-      }
       if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-        return `Stop treating your resume as a chronological history of tasks and start presenting it as a portfolio of verified business outcomes. For an operations or management role, hiring partners care about three things: how much margin you protected, how much idle time you eliminated, and the scale of the team you led.
+        return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
 
-If you supervised shifts, don't write that you "scheduled staff and handled cash." Write that you optimized shift schedules against peak demand to cut labor variance, or that you implemented prep checklists that recaptured $15,000+ in annual food waste. Quantify every bullet with a real dollar or hour denominator.
+Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
 
-Pull your top three achievements from your last role and state the exact baseline you started with and the final number you hit. Once you provide those figures, we will build a clean, 1-page executive resume around them.`;
+Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
       }
       if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
-        return `When supplier prices rise, passing the cost directly to your customers is the quickest way to kill repeat volume. Your first line of defense is always yield control and menu contribution re-indexing.
+        return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
 
-You need to audit your top five high-cost ingredients immediately. Most operators lose 2% to 4% of their margin to unmeasured kitchen trim, over-portioning, or prep spoilage before food ever hits the grill. Tighten your prep sheets and require daily shift-level waste logging before renegotiating vendor rate cards.
+Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards. 
 
-Pull your current food cost percentage and your top three protein costs. We will calculate your exact breakeven floor and model the margin recovery.`;
+Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
       }
-      return `To fix this bottleneck, we need to look directly at the underlying unit economics rather than applying temporary surface patches. Real operational efficiency comes from identifying the single physical constraint that is slowing down your cash conversion cycle or daily throughput.
+      return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
 
-Look at where your team or system spends the most uncompensated time each week. Whether it is inventory shrinkage, slow order handoffs, or administrative overhead, eliminating that single friction point will yield immediate margin relief.
-
-Tell me the exact figures or friction points you are seeing in your daily numbers, and we will break down the mathematical solution step by step.`;
+State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
     };
 
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
