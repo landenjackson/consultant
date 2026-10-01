@@ -4610,30 +4610,6 @@
             }
         }
 
-        // 100% RELIABLE LOCAL WEBSPEECH / TTS DISPATCHER (ZERO CREDIT / ZERO SERVER API LOCKOUT)
-        async function speakInterviewerResponse(text, onComplete) {
-            const cleanText = text
-                .replace(/\[DOMAIN:[^\]]+\]/g, '')
-                .replace(/\+[=\-\+]+\+/g, '')
-                .replace(/\|[^\n]+\|/g, '')
-                .replace(/[*_#`\+\-\|]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim()
-                .slice(0, 450);
-
-            if (!cleanText) {
-                if (onComplete) onComplete();
-                return;
-            }
-
-            let completed = false;
-            const finish = () => {
-                if (!completed) {
-                    completed = true;
-                    if (onComplete) onComplete();
-                }
-            };
-
         // 100% RELIABLE DUAL-PIPELINE GOOGLE FLASH NEURAL AUDIO + WEBSPEECH ENGINE
         async function speakInterviewerResponse(text, onComplete) {
             const cleanText = text
@@ -4711,7 +4687,6 @@
                 } catch(e){}
             }
             finish();
-        }
         }
 
         function playVoiceBriefing(btn) {
