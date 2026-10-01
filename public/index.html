@@ -5270,6 +5270,11 @@
                 } catch(e) { return ''; }
             });
 
+            // Convert Institutional Quantitative Telemetry Syntax [METRIC] = [VALUE] into Emerald Telemetry Badges
+            clean = clean.replace(/\[([A-Z0-9_\s\/\-\&]+)\]\s*[:=]\s*([^\n\r]+)/g, (match, metric, value) => {
+                return `<div class="telemetry-pill-strip" style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:6px; margin:4px 4px 4px 0; font-family:monospace; font-size:12px;"><span style="color:var(--text-muted); font-weight:700;">${metric.trim()}</span><span style="color:rgba(255,255,255,0.2);">:</span><span style="color:var(--accent-glow); font-weight:800;">${value.trim()}</span></div>`;
+            });
+
             // Use marked.js for industry-standard markdown parsing (clean paragraphs, lists, bolding)
             let parsedHtml = '';
             if (typeof marked !== 'undefined' && marked.parse) {
@@ -5547,6 +5552,23 @@
             const deliv = clone.querySelector('.deliverables-bar');
             if (deliv) deliv.remove();
             return (clone.innerText || clone.textContent).trim();
+        }
+
+        // 1-CLICK DEDICATED MARKDOWN MEMORANDUM EXPORTER
+        function downloadMarkdownMemo(btn) {
+            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            if (!card) return;
+            const text = (card.querySelector('.stream-content')?.innerText || card.innerText || "").trim();
+            const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Executive_Memorandum_${new Date().toISOString().slice(0,10)}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Downloaded Markdown Memorandum (.md)!", "📥");
         }
 
         // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER (PURIFIES EMAIL BODY ONLY)
@@ -6074,6 +6096,7 @@
                         delivBar.className = 'deliverables-bar';
                         const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.2s'})</span>` : '';
                         delivBar.innerHTML = `
+                            <button class="btn-export" onclick="downloadMarkdownMemo(this)" style="border-color:#38BDF8; color:#7DD3FC; font-weight:700; background:rgba(56,189,248,0.1);">📥 Export Markdown</button>
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Email / Memo</button>
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
