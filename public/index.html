@@ -1983,10 +1983,10 @@
                         <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini Flash Direct • Zero-Knowledge Architecture</span>
                     </div>
                     <h1 id="welcomeHeading" style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
-                        Consultant Studio: Executive Strategy & Career Architecture OS
+                        Turn Operating Acumen into Boardroom Certainty
                     </h1>
                     <p id="welcomeSubtext" style="color:var(--text-secondary); font-size:14px; line-height:1.6; max-width:840px;">
-                        Grounded in empirical financial metrics—EBITDA expansion, unit economics, and contribution margins rather than subjective career advice. Audit unit profitability, engineer 1-page quantified executive resumes, master reverse due-diligence interview tracks, and export boardroom-ready deliverables.
+                        Grounded in empirical unit economics, prime cost containment, and forensic financial modeling. Audit unit profitability, engineer 1-page quantified executive resumes, stress-test 13-week cash runway, and export boardroom-ready deliverables with 100% client-side privacy.
                     </p>
 
                     <!-- 4-WAY PRIMARY ACTION TRIAGE SELECTOR -->
@@ -4502,27 +4502,49 @@
 
             speechRecognition = new SpeechRec();
             speechRecognition.continuous = false;
-            speechRecognition.interimResults = false;
+            speechRecognition.interimResults = true; // Show live interim transcript
             speechRecognition.lang = 'en-US';
 
+            let finalTranscript = '';
+            let debounceTimer = null;
+
             speechRecognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                if (transcript && transcript.trim().length > 0) {
-                    const userInput = document.getElementById('userInput');
-                    if (userInput) userInput.value = `[Live Consultant Voice Inquiry]: ${transcript}`;
-                    sendMessage();
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
                 }
+
+                const currentText = finalTranscript || interim;
+                const userInput = document.getElementById('userInput');
+                if (userInput && currentText) {
+                    userInput.value = currentText;
+                }
+
+                // 1.5s speech debounce to prevent premature cutoff on mobile
+                if (debounceTimer) clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    if (finalTranscript && finalTranscript.trim().length > 0) {
+                        try { speechRecognition.stop(); } catch(e){}
+                        sendMessage();
+                    }
+                }, 1500);
             };
 
             speechRecognition.onerror = (err) => {
                 console.warn("SpeechRec error:", err);
-                if (isVoicePracticeActive) {
+                if (isVoicePracticeActive && err.error !== 'aborted') {
                     setTimeout(() => listenToCandidate(), 1000);
                 }
             };
 
             speechRecognition.onend = () => {
-                // Keep listening loop active if voice practice is toggled on
+                if (isVoicePracticeActive && finalTranscript && finalTranscript.trim().length > 0) {
+                    sendMessage();
+                }
             };
 
             try {
