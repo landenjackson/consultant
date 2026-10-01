@@ -1602,16 +1602,24 @@
             }
 
             .dock-container {
-                padding: 4px 8px max(8px, env(safe-area-inset-bottom, 8px)) 8px !important;
+                padding: 4px 6px max(8px, env(safe-area-inset-bottom, 8px)) 6px !important;
                 background: linear-gradient(180deg, rgba(8, 10, 13, 0) 0%, rgba(8, 10, 13, 0.98) 25%, #080A0D 100%) !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .dock-box {
                 border-radius: 10px !important;
                 padding: 4px 6px !important;
-                gap: 6px !important;
+                gap: 4px !important;
+                display: flex !important;
                 flex-wrap: nowrap !important;
                 align-items: center !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .dock-input {
@@ -1619,7 +1627,9 @@
                 padding: 6px 8px !important;
                 min-height: 36px !important;
                 flex: 1 1 auto !important;
-                min-width: 70px !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .btn-send {
@@ -1628,10 +1638,14 @@
                 border-radius: 6px !important;
                 white-space: nowrap !important;
                 flex-shrink: 0 !important;
+                min-width: fit-content !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             .btn-icon {
-                padding: 4px !important;
+                padding: 3px !important;
                 width: 28px !important;
                 height: 28px !important;
                 flex-shrink: 0 !important;
@@ -1639,12 +1653,14 @@
 
             #modelSelectWrap {
                 display: inline-flex !important;
-                max-width: 95px !important;
+                max-width: 82px !important;
+                flex-shrink: 0 !important;
+                padding: 2px 4px !important;
             }
 
             #modelSelectOverride {
-                font-size: 9px !important;
-                max-width: 85px !important;
+                font-size: 8.5px !important;
+                max-width: 74px !important;
             }
         }
                 padding: 18px 16px;
@@ -2459,9 +2475,9 @@
                     <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
                 </select>
             </div>
-            <textarea id="userInput" class="dock-input" rows="1" placeholder="Input a strategic objective, financial diagnostic query, or campaign parameter..." style="resize:none; padding:10px 14px; min-height:42px; max-height:140px; line-height:1.4;" onkeydown="handleInputKeydown(event)"></textarea>
+            <textarea id="userInput" class="dock-input" rows="1" placeholder="Objective, metric, or P&L query..." style="resize:none; padding:8px 10px; min-height:38px; max-height:140px; line-height:1.4;" onkeydown="handleInputKeydown(event)"></textarea>
             <button id="sendBtn" class="btn-send" onclick="sendMessage()">
-                <span>Execute Analysis</span>
+                <span>Execute</span>
             </button>
         </div>
     </div>
