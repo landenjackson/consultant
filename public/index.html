@@ -2272,15 +2272,15 @@
             <span class="brand-text" style="font-family:'Plus Jakarta Sans'; font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF;">Consultant Studio</span>
         </div>
 
-        <!-- RIGHT: NEW CHAT BUTTON -->
-        <button class="btn-icon header-reset-btn" onclick="resetChatSession()" title="Start New Strategy Session" style="padding:6px 10px; display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-secondary); font-size:12px; font-weight:600; cursor:pointer;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                <path d="M21 3v5h-5"></path>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                <path d="M3 21v-5h5"></path>
+        <!-- RIGHT: COUNTER-CLOCKWISE ARROW RESET BUTTON -->
+        <button class="btn-icon header-reset-btn" onclick="resetChatSession()" title="Reset / New Session" style="padding:6px 10px; display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-secondary); font-size:12px; font-weight:600; cursor:pointer;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M21 21v-5h-5"></path>
             </svg>
-            <span class="reset-chat-text">New Chat</span>
+            <span class="reset-chat-text">Reset</span>
         </button>
     </header>
 
@@ -2344,17 +2344,6 @@
                             </div>
                             <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Quantified enterprise value, P&L ownership, and .docx / PDF master deliverable.</div>
                         </div>
-                    </div>
-
-                    <!-- CONSOLIDATED UNDERSTATED SYSTEM STATUS STRIP -->
-                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); font-size:12px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="display:inline-flex; align-items:center; gap:5px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:3px 8px; border-radius:6px; color:var(--accent-glow); font-weight:700; font-size:11.5px;">
-                                <span class="telemetry-dot"></span> System Engine Active
-                            </span>
-                            <span style="color:var(--text-muted); font-size:11.5px;">Gemini Flash Direct • Zero-Knowledge Vault</span>
-                        </div>
-                        <span style="color:var(--text-muted); font-size:11px; cursor:pointer;" onclick="openSpecsModal()">⚙️ View Architecture Specs</span>
                     </div>
                 </div>
 
