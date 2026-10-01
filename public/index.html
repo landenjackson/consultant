@@ -1882,6 +1882,72 @@
 </head>
 <body>
 
+    <!-- 🏛️ FULL-SCREEN INTRODUCTION & GATEWAY LANDING FOR NEW VISITORS -->
+    <div id="landingPortal" style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:2000; background:#07090D; display:none; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+        <!-- LUXURY AMBIENT GLOW -->
+        <div style="position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:600px; height:400px; background:radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(7,9,13,0) 70%); pointer-events:none;"></div>
+
+        <!-- TOP MINIMAL NAV -->
+        <header style="padding:16px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); position:relative; z-index:10; background:rgba(7,9,13,0.85); backdrop-filter:blur(12px);">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:34px; height:34px; border-radius:8px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); box-shadow:0 0 12px rgba(34,197,94,0.25);">
+                    <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:#FFF; letter-spacing:-0.02em;">Consultant Studio</span>
+                <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">GEMINI 4 ARGON</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 14px; border-color:rgba(255,255,255,0.15); color:#FFF;">Sign In</button>
+                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:12px; font-weight:800; padding:7px 16px; background:var(--accent); color:#000; border:none; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.35);">Start 30-Day Free Trial</button>
+            </div>
+        </header>
+
+        <!-- HERO INTRODUCTION SECTION -->
+        <main style="flex:1; max-width:960px; margin:0 auto; padding:48px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:4px 12px; border-radius:20px; margin-bottom:20px;">
+                <span class="telemetry-dot"></span>
+                <span style="font-size:11.5px; font-weight:700; color:var(--accent-glow); letter-spacing:0.02em;">SOVEREIGN STRATEGIC INTELLIGENCE • ZERO CLOUD PERSISTENCE</span>
+            </div>
+
+            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(28px, 5vw, 44px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:16px; max-width:820px;">
+                Turn Operational Acumen into Boardroom Certainty
+            </h1>
+
+            <p style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.65; max-width:720px; margin-bottom:32px;">
+                An institutional-grade strategic operating partner for founders, C-suite executives, and private equity sponsors. Model forensic P&Ls, engineer 1-page executive resumes, stress-test 13-week liquidity, and practice live strategic voice sessions with zero external data leaks.
+            </p>
+
+            <!-- CALL TO ACTIONS -->
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-bottom:48px;">
+                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:15px; font-weight:800; padding:14px 28px; background:var(--accent); color:#000; border:none; border-radius:10px; box-shadow:0 10px 30px rgba(34,197,94,0.4); cursor:pointer;">
+                    <span>Deploy Workspace (30 Days Free) →</span>
+                </button>
+                <button class="btn-export" onclick="openAuthModal()" style="font-size:15px; font-weight:700; padding:14px 24px; background:#101520; border-color:rgba(255,255,255,0.18); color:#FFF; border-radius:10px; cursor:pointer;">
+                    <span>Sign In via Google or Email</span>
+                </button>
+            </div>
+
+            <!-- 3 VALUE PILLARS -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; width:100%; text-align:left;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
+                    <div style="font-size:22px; margin-bottom:10px;">📊</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Forensic P&L & Cash Modeling</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Audit prime cost floors, breakeven thresholds, and 12-month EBITDA flow-through with 1-click Excel (.xlsx) downloads.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
+                    <div style="font-size:22px; margin-bottom:10px;">🎙️</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Live Auditory Consultant</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Full-duplex conversational voice advisory with male and female personas for hands-free strategy sessions.</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
+                    <div style="font-size:22px; margin-bottom:10px;">🛡️</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Sovereign Zero-Cloud Privacy</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">All files, workbooks, and sensitive figures process 100% in browser memory with zero database persistence.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <!-- SLIDE-OVER EXECUTIVE SIDEBAR (HAMBURGER MENU) -->
     <div id="sidebarOverlay" class="modal-overlay" onclick="toggleSidebar(false)" style="z-index:900;"></div>
     <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:290px; max-width:85vw; background:#14171F; border-right:1px solid #282E3D; z-index:950; transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:24px 20px; box-shadow:15px 0 50px rgba(0,0,0,0.9);">
@@ -3605,16 +3671,26 @@
         }
 
         function syncProfileUI() {
-            const hasCreatorParam = location.search.includes('creator=true');
+            const hasCreatorParam = location.search.includes('creator=true') || location.search.includes('tier=exec');
             if (hasCreatorParam) {
                 localStorage.setItem('consultant_creator', 'true');
                 localStorage.setItem('consultant_subscribed', 'true');
+                localStorage.setItem('consultant_sub_tier', 'exec');
             }
 
             const isCreatorSaved = localStorage.getItem('consultant_creator') === 'true';
             const isCreator = hasCreatorParam || isCreatorSaved;
 
             let profile = getUserProfile();
+            const isAuthenticated = localStorage.getItem('consultant_user_authenticated') === 'true';
+            const portal = document.getElementById('landingPortal');
+
+            // Show introductory landing page for unauthenticated new visitors
+            if (!isAuthenticated && !isCreator && !location.search.includes('pwa=true')) {
+                if (portal) portal.style.display = 'flex';
+            } else {
+                if (portal) portal.style.display = 'none';
+            }
 
             const welcomeH1 = document.getElementById('welcomeHeading');
             const welcomeSub = document.getElementById('welcomeSubtext');
@@ -3627,11 +3703,22 @@
                 if (sidebarName) sidebarName.innerText = profile.name + (isCreator ? ' (Creator)' : '');
                 if (authBtnText) authBtnText.innerText = 'Switch Profile';
             } else {
-                if (welcomeH1) welcomeH1.innerText = 'Welcome to Consultant Studio.';
-                if (welcomeSub) welcomeSub.innerText = 'Your Strategic Intelligence Studio and Operations Room. Audit unit economics, polish executive resumes, prepare interview talking tracks, or draft 90-day board deliverables with zero robotic filler.';
+                if (welcomeH1) welcomeH1.innerText = 'Turn Operating Acumen into Boardroom Certainty';
+                if (welcomeSub) welcomeSub.innerText = 'Grounded in empirical unit economics, prime cost containment, and forensic financial modeling. Audit unit profitability, engineer 1-page quantified executive resumes, stress-test 13-week cash runway, and export boardroom-ready deliverables.';
                 if (sidebarName) sidebarName.innerText = 'Guest Operator';
                 if (authBtnText) authBtnText.innerText = 'Sign In / Profile';
             }
+        }
+
+        function enterStudioWithTrial() {
+            const portal = document.getElementById('landingPortal');
+            if (portal) portal.style.display = 'none';
+            localStorage.setItem('consultant_user_authenticated', 'true');
+            // Route new users to the subscription tier modal first for 30-day free trial selection
+            setTimeout(() => {
+                openPricing();
+                showToast("Select your deployment tier to activate your 30-day free trial ($0 today)!", "💎");
+            }, 300);
         }
 
         function openAuthModal() {
