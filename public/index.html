@@ -1644,22 +1644,34 @@
             font-size: var(--base-font-size, 14.5px);
         }
 
+        /* GLOBAL MOBILE OVERFLOW-X PREVENTION */
+        html, body {
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+            position: relative;
+        }
+
         /* COMPACT MOBILE OPTIMIZATION — CLEAN UNIFIED VERTICAL FLOW */
         @media (max-width: 768px) {
-            body {
-                overflow-x: hidden;
+            html, body {
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
                 overflow-y: auto;
                 font-size: 13.5px;
             }
 
             .workspace-stage {
                 height: calc(100vh - 52px) !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
             }
 
             #chatFeed {
                 padding: 10px 10px 95px !important;
                 gap: 10px !important;
-                max-width: 100% !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
             }
 
             .hero-banner-card {
@@ -2420,140 +2432,20 @@
                     </div> <!-- /beStudioCollapsibleContent -->
                 </div> <!-- /breakevenStudio -->
 
-                <!-- EXECUTIVE CAREER & ENTERPRISE JOB HUB -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin: 8px 0 2px 0;">
-                    <span style="font-family:'Plus Jakarta Sans'; font-size:13px; font-weight:800; color:#FFFFFF; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:6px;">
-                        <span>💼</span> Executive Career & Enterprise Job Hub
-                    </span>
-                    <span style="font-size:11.5px; color:var(--accent-glow); font-weight:600;">1-Click Launch</span>
-                </div>
-
-                <!-- 6 PRACTICAL REAL-WORLD MISSION TILES (INCLUDES TREND-RADAR HUBS) -->
-                <div class="custom-modes-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                    <!-- MISSION 1: RESUME & CAREER VALUE CREATION -->
-                    <div class="mode-tile" onclick="sendQuick('Reframe my resume bullets from task duties into quantified enterprise value: calculate capital saved, revenue paced, and throughput velocity with 1-click Word and PDF export.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">📑</span>
-                            <span>Executive Positioning & Resume Reframe</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Transforms operational responsibilities into quantified enterprise value, EBITDA expansion, and SLA benchmarks with native .docx export.
-                        </div>
-                        <div class="mode-tile-cta">Transform Resume →</div>
-                    </div>
-
-                    <!-- MISSION 2: INTERVIEW BRIEFING & TALKING TRACKS -->
-                    <div class="mode-tile" onclick="sendQuick('I have a job interview coming up. Build my consultative interview talking track, objection handling, and executive agenda-setter questions.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">🎙️</span>
-                            <span>Executive Interview Strategy & Narrative Tracks</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Formulates high-conviction STAR frameworks, consultative diagnostic questions, and targeted inquiries for board and C-suite evaluations.
-                        </div>
-                        <div class="mode-tile-cta">Generate Talking Tracks →</div>
-                    </div>
-
-                    <!-- MISSION 3: TRADE AREA CAPTURE & MARGIN OPTIMIZATION -->
-                    <div class="mode-tile" onclick="sendQuick('Design a hyper-local customer catchment strategy that increases weekday foot traffic by 20% while defending 100% full-price margins with zero discounting.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">🎯</span>
-                            <span>Trade Area Capture & Margin Optimization</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Architects premium customer capture models and trade-area expansion strategies while safeguarding gross margin integrity.
-                        </div>
-                        <div class="mode-tile-cta">Model Catchment Strategy →</div>
-                    </div>
-
-                    <!-- MISSION 4: EXECUTIVE CASE BRIEFS -->
-                    <div class="mode-tile" onclick="sendQuick('Draft a 1-page executive proof-of-execution case brief with challenge, quantitative turnaround metric, and financial ROI.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">📄</span>
-                            <span>Executive Proof-of-Execution Case Briefs</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Synthesizes key initiatives and quantitative outcomes into concise, high-impact 1-page briefs for board reviews.
-                        </div>
-                        <div class="mode-tile-cta">Build Case Brief →</div>
-                    </div>
-
-                    <!-- MISSION 5: STRATEGIC AUDIT & TURNAROUND ROADMAP -->
-                    <div class="mode-tile" onclick="sendQuick('Run a forensic 90-day turnaround audit with operational risk matrix, debt service coverage, and weekly cash milestones.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">🛡️</span>
-                            <span>Strategic Audit & Turnaround Roadmap</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Generates board-level executive summaries, operational risk assessments, and structured 90-day turnaround milestones.
-                        </div>
-                        <div class="mode-tile-cta">Draft Strategic Audit →</div>
-                    </div>
-
-                    <!-- MISSION 6: ORGANIC SEARCH & LOCAL CAPTURE -->
-                    <div class="mode-tile" onclick="sendQuick('Perform a local catchment and Google Business Profile SEO audit with keyword intent, review flywheel design, and competitor pricing checks.')">
-                        <div class="mode-tile-header">
-                            <span style="font-size:16px;">🌐</span>
-                            <span>Organic Search & Local Market Capture</span>
-                        </div>
-                        <div class="mode-tile-desc">
-                            Evaluates organic search dominance, regional keyword intent, and non-paid customer acquisition channels.
-                        </div>
-                        <div class="mode-tile-cta">Audit Local Capture →</div>
+                <!-- 3. TRUST, COMPLIANCE & LEGAL FOOTER BLOCK -->
+                <div style="text-align:center; padding: 20px 14px; margin-top:24px; background: rgba(7, 9, 13, 0.8); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;">
+                    <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0; line-height:1.6;">
+                        🔒 <strong>Client-Side Sovereign Privacy:</strong> All client data, financial metrics, and workbooks remain securely processed within local browser memory with zero persistent cloud leaks.
+                    </p>
+                    <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:16px; font-size:11.5px; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
+                        <span>© <span id="currentCopyrightYear">2026</span> Consultant Studio</span>
+                        <a href="/privacy.html" style="color:var(--text-secondary); text-decoration:none;">Privacy Policy</a>
+                        <span>•</span>
+                        <a href="/terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
+                        <span>•</span>
+                        <a href="mailto:support@consultant-studio.app" style="color:var(--accent-glow); text-decoration:none;">Executive Support</a>
                     </div>
                 </div>
-
-                <!-- 3. STATIC FEATURES INDEXING DIRECTORY (PLACED BELOW THE FOLD FOR CONTENT DEPTH & BOT CRAWLING) -->
-                <section id="platform-capabilities-directory" style="margin-top: 40px; padding: 28px 0 16px 0; border-top: 1px solid rgba(255, 255, 255, 0.06);">
-                    <div style="font-family:'Plus Jakarta Sans'; font-size:14px; font-weight:800; color:#FFFFFF; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
-                        <span>🏛️</span> Comprehensive Platform Capabilities & Architecture
-                    </div>
-                    
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                        <article style="background:rgba(12, 16, 23, 0.6); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:16px;">
-                            <h3 style="font-family:'Plus Jakarta Sans'; font-size:13px; font-weight:700; color:var(--accent-glow); margin-bottom:6px;">Document Ingestion & X-Ray Synthesis</h3>
-                            <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin:0;">
-                                Ingest raw PDF reports, Word documents, and financial spreadsheets into clinical, board-level strategic intelligence in seconds—eliminating generic chatbot summaries.
-                            </p>
-                        </article>
-
-                        <article style="background:rgba(12, 16, 23, 0.6); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:16px;">
-                            <h3 style="font-family:'Plus Jakarta Sans'; font-size:13px; font-weight:700; color:var(--accent-glow); margin-bottom:6px;">STAR Method Interview Prep Tools</h3>
-                            <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin:0;">
-                                Generate high-conviction responses mapped to strategic challenges. Formulate consultative discovery frameworks and targeted operational questions for hiring directors.
-                            </p>
-                        </article>
-
-                        <article style="background:rgba(12, 16, 23, 0.6); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:16px;">
-                            <h3 style="font-family:'Plus Jakarta Sans'; font-size:13px; font-weight:700; color:var(--accent-glow); margin-bottom:6px;">90-Day Turnaround & Repurposing Engine</h3>
-                            <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin:0;">
-                                Instantly convert raw operational data into 90-day turnaround milestones, executive board summaries, Excel spreadsheets, and 1-page bank teasers ready for stakeholder delivery.
-                            </p>
-                        </article>
-
-                        <article style="background:rgba(12, 16, 23, 0.6); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:16px;">
-                            <h3 style="font-family:'Plus Jakarta Sans'; font-size:13px; font-weight:700; color:var(--accent-glow); margin-bottom:6px;">Forensic P&L & Sensitivity Modeling</h3>
-                            <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin:0;">
-                                Model unit breakeven economics, prime cost drag, and interactive 60fps What-If sensitivity sliders to test revenue expansion scenarios in real time.
-                            </p>
-                        </article>
-                    </div>
-
-                    <!-- 4. TRUST, COMPLIANCE & LEGAL FOOTER BLOCK -->
-                    <div style="text-align:center; padding: 20px 14px; background: rgba(7, 9, 13, 0.8); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px;">
-                        <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0; line-height:1.6;">
-                            🔒 <strong>Client-Side Document Architecture:</strong> Files and saved workspace records remain securely encrypted within your local browser storage. Prompts are analyzed in-memory via TLS 1.3 encryption with zero persistent cloud database storage.
-                        </p>
-                        <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:16px; font-size:11.5px; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
-                            <span>© <span id="currentCopyrightYear">2026</span> Consultant Studio</span>
-                            <a href="/privacy.html" style="color:var(--text-secondary); text-decoration:none;">Privacy Policy</a>
-                            <span>•</span>
-                            <a href="/terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
-                            <span>•</span>
-                            <a href="mailto:support@consultant-studio.app" style="color:var(--accent-glow); text-decoration:none;">Support: support@consultant-studio.app</a>
-                        </div>
-                    </div>
-                </section>
             </div>
         </main>
 
