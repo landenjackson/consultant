@@ -50,7 +50,7 @@ Unlike conversational consumer AI chatbots that produce generic text, Consultant
 * **Frontend:** A static PWA served from `public/`, with local browser storage for the strategy vault and workspace profile.
 * **Inference:** The Express server calls Google directly when a `GEMINI_API_KEY` is configured, with optional gateway integrations; without available providers, chat uses a local fallback.
 * **Billing:** Stripe Checkout and webhook endpoints are implemented in `server.js`; configure the Stripe secrets before enabling live billing.
-* **Deployment:** This repository starts an Express server with `npm start`. No Cloudflare Pages/Workers deployment configuration is included here.
+* **Deployment:** Cloudflare proxies traffic to the Express origin; this app is not a static Pages deployment because its chat, billing, and voice APIs run in Express. A successful push to `main` runs CI and then fast-forwards the Ubuntu origin at `/home/ubuntu/consultant`, reinstalls production dependencies, reloads its PM2 process, and checks the local HTTP health endpoint.
 
 ---
 
@@ -82,6 +82,17 @@ MYCLAW_API_KEY="your_fallback_gateway_key"
 STRIPE_SECRET_KEY="your_stripe_secret_key"
 STRIPE_WEBHOOK_SECRET="your_stripe_webhook_secret"
 ```
+
+### Production deployment
+
+The GitHub Actions workflow deploys only after CI passes on `main`. To enable the origin update, add these repository Actions secrets under **Settings → Secrets and variables → Actions**:
+
+* `DEPLOY_HOST`: SSH hostname or IP for the Ubuntu origin.
+* `DEPLOY_USER`: SSH account permitted to update the checkout and reload the PM2 app.
+* `DEPLOY_PRIVATE_KEY`: private key for that account.
+* `DEPLOY_KNOWN_HOSTS`: pinned SSH host-key line(s) for the origin; do not replace host-key checking with an unverified `ssh-keyscan`.
+
+The origin must have the repository checked out on a clean `main` branch at `/home/ubuntu/consultant`, Git access to this repository, Node.js 24, npm, curl, and the existing PM2 process `consultant-studio` listening on port 3000. If deployment secrets are absent, CI succeeds and production deployment is explicitly skipped; partially configured secrets fail the deployment job. No Cloudflare API token is required because Cloudflare remains the DNS/proxy layer and the app runs on the existing Express origin.
 
 ### Run Locally
 

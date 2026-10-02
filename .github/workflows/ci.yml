@@ -35,3 +35,81 @@ jobs:
 
       - name: Health Check Notification
         run: echo "Consultant Studio syntax checks passed."
+
+  deploy-production:
+    name: Deploy Express origin behind Cloudflare
+    runs-on: ubuntu-latest
+    needs: verify-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: consultant-studio-production-deploy
+      cancel-in-progress: false
+
+    steps:
+      - name: Check deployment secrets
+        id: deployment
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [[ -z "$DEPLOY_HOST" && -z "$DEPLOY_USER" && -z "$DEPLOY_PRIVATE_KEY" && -z "$DEPLOY_KNOWN_HOSTS" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Production deploy skipped. Configure the deployment secrets documented in README.md."
+            exit 0
+          fi
+
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PRIVATE_KEY DEPLOY_KNOWN_HOSTS; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing required deployment secret: $name"
+              exit 1
+            fi
+          done
+
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+
+      - name: Fast-forward origin and restart Consultant Studio
+        if: steps.deployment.outputs.configured == 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+          ssh -i "$HOME/.ssh/id_ed25519" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -se' <<'REMOTE'
+          set -euo pipefail
+          cd /home/ubuntu/consultant
+          test "$(git branch --show-current)" = "main"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin main
+          git merge --ff-only FETCH_HEAD
+          npm ci --omit=dev
+          /home/ubuntu/.local/lib/node_modules/pm2/bin/pm2 reload consultant-studio --update-env
+
+          for attempt in {1..15}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Consultant Studio did not become healthy after deployment." >&2
+          exit 1
+          REMOTE
+
+      - name: Report skipped deployment
+        if: steps.deployment.outputs.configured == 'false'
+        run: echo "No production host credentials are configured; deployment was not attempted."
