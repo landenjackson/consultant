@@ -76,6 +76,27 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
 const DJEV_RUN_URL = process.env.DJEV_RUN_URL || 'https://api.typesafe.ai/v1/systemone';
 
+const generateSmartDirectAnswer = (promptText, ws) => {
+  const p = promptText.toLowerCase();
+  if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
+    return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
+
+Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
+
+Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
+  }
+  if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
+    return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
+
+Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards.
+
+Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
+  }
+  return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
+
+State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
+};
+
 // CLOUDFLARE CLEF & SYSTEMONE MULTIMODAL DECISION ENGINE (~50-120ms SUB-SECOND INTENT & FORMAT ROUTER)
 const evaluateWithClef = async (userText, workspace) => {
   // 1. Fast Schema-Driven Heuristic Router (Clef SystemOne Strategy)
@@ -619,28 +640,6 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
 
       // Google AX Resumption Hook
       const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-
-    // Dynamic Natural Human Partner Response Generator (Institutional Executive Voice)
-    const generateSmartDirectAnswer = (promptText, ws) => {
-      const p = promptText.toLowerCase();
-      if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-        return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
-
-Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
-
-Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
-      }
-      if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
-        return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
-
-Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards. 
-
-Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
-      }
-      return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
-
-State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
-    };
 
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
 

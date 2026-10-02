@@ -38,35 +38,28 @@ Unlike conversational consumer AI chatbots that produce generic text, Consultant
 ```
 [ Client Browser / PWA ]
           │
-          └──> Google AI Studio App (https://consultant-studio.ai.studio/)
+          └──> Static assets served from public/
                      │
                      ▼
-          [ Encrypted Cloudflare Tunnel ]
-                     │
-                     ▼
-          [ Node.js / Express Gateway (PM2) ]
-                ├──> Apify & Tavily AI (Real-time Market Reconnaissance)
-                ├──> Google Generative AI (Gemini 3.8 Flash API)
-                ├──> Universal Office Engine (Word, Excel .xlsx, PPT .pptx, PDF)
-                └──> Stripe Billing (Starter, Pro, Executive)
+          [ Node.js 24 / Express (server.js) ]
+                ├──> Google Generative Language API (when configured)
+                ├──> Optional MyClaw / Typesafe gateways
+                └──> Stripe Checkout and webhook (when configured)
 ```
 
-* **Frontend:** Plus Jakarta Sans & Inter typography, Linear-grade Obsidian dark styling (`#090A0C`), Luminous Emerald detailing (`#22C55E`), responsive mobile drawer, and offline telemetry vault.
-* **Serverless Edge:** Cloudflare Pages Functions + Cloudflare Workers with automated global SSL and edge asset caching.
-* **Inference Pipeline:** Dual-tier failover orchestrating direct Google AI Studio API endpoints with sub-second latency.
-* **Integrations:**
-  * **Google Workspace:** 1-Click export to editable Google Docs with official Operator Sign-Off blocks.
-  * **Stripe Checkout:** Automated recurring subscriptions with self-serve billing and 7-day free trials.
-  * **Tavily AI:** Live real-time market data extraction.
+* **Frontend:** A static PWA served from `public/`, with local browser storage for the strategy vault and workspace profile.
+* **Inference:** The Express server calls Google directly when a `GEMINI_API_KEY` is configured, with optional gateway integrations; without available providers, chat uses a local fallback.
+* **Billing:** Stripe Checkout and webhook endpoints are implemented in `server.js`; configure the Stripe secrets before enabling live billing.
+* **Deployment:** This repository starts an Express server with `npm start`. No Cloudflare Pages/Workers deployment configuration is included here.
 
 ---
 
 ## 🚀 Quick Start & Local Setup
 
 ### Prerequisites
-* Node.js v20+ / v22+
-* Google AI Studio API Key (`GEMINI_API_KEY`)
-* Tavily Search API Key (`TAVILY_API_KEY`)
+* Node.js v24 (matches the `engines` declaration in `package.json`)
+* A Google AI Studio API key (`GEMINI_API_KEY`) for live AI responses. Without it, chat uses a local fallback.
+* Stripe credentials are only needed to use billing.
 
 ### Installation
 
@@ -78,16 +71,16 @@ cd consultant
 # Install dependencies
 npm install
 
-# Create environment configuration
-cp .env.example .env
+# Create a .env file for the integrations you plan to use
 ```
 
-Configure `.env`:
+Configure `.env` as needed:
 ```env
 PORT=3000
 GEMINI_API_KEY="your_google_ai_studio_api_key"
-TAVILY_API_KEY="your_tavily_search_api_key"
 MYCLAW_API_KEY="your_fallback_gateway_key"
+STRIPE_SECRET_KEY="your_stripe_secret_key"
+STRIPE_WEBHOOK_SECRET="your_stripe_webhook_secret"
 ```
 
 ### Run Locally

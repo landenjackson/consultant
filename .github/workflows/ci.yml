@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Verify Dependencies & Syntax
         run: |
@@ -29,13 +29,9 @@ jobs:
 
       - name: Security & Syntax Lint Check
         run: |
-          node -e "
-            console.log('✓ Checking server entry points...');
-            import('./server.js').catch(err => {
-              // Server starts listening on import, which is normal
-              console.log('✓ Server syntax confirmed valid.');
-            });
-          "
+          node --check server.js
+          node --check public/sw.js
+          node --check public/office_export.js
 
       - name: Health Check Notification
-        run: echo "Consultant Studio production build verified and green."
+        run: echo "Consultant Studio syntax checks passed."
