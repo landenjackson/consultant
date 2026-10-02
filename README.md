@@ -38,35 +38,28 @@ Unlike conversational consumer AI chatbots that produce generic text, Consultant
 ```
 [ Client Browser / PWA ]
           │
-          └──> Google AI Studio App (https://consultant-studio.ai.studio/)
+          └──> Static assets served from public/
                      │
                      ▼
-          [ Encrypted Cloudflare Tunnel ]
-                     │
-                     ▼
-          [ Node.js / Express Gateway (PM2) ]
-                ├──> Apify & Tavily AI (Real-time Market Reconnaissance)
-                ├──> Google Generative AI (Gemini 3.8 Flash API)
-                ├──> Universal Office Engine (Word, Excel .xlsx, PPT .pptx, PDF)
-                └──> Stripe Billing (Starter, Pro, Executive)
+          [ Node.js 24 / Express (server.js) ]
+                ├──> Google Generative Language API (when configured)
+                ├──> Optional MyClaw / Typesafe gateways
+                └──> Stripe Checkout and webhook (when configured)
 ```
 
-* **Frontend:** Plus Jakarta Sans & Inter typography, Linear-grade Obsidian dark styling (`#090A0C`), Luminous Emerald detailing (`#22C55E`), responsive mobile drawer, and offline telemetry vault.
-* **Serverless Edge:** Cloudflare Pages Functions + Cloudflare Workers with automated global SSL and edge asset caching.
-* **Inference Pipeline:** Dual-tier failover orchestrating direct Google AI Studio API endpoints with sub-second latency.
-* **Integrations:**
-  * **Google Workspace:** 1-Click export to editable Google Docs with official Operator Sign-Off blocks.
-  * **Stripe Checkout:** Automated recurring subscriptions with self-serve billing and 7-day free trials.
-  * **Tavily AI:** Live real-time market data extraction.
+* **Frontend:** A static PWA served from `public/`, with local browser storage for the strategy vault and workspace profile.
+* **Inference:** The Express server calls Google directly when a `GEMINI_API_KEY` is configured, with optional gateway integrations; without available providers, chat uses a local fallback.
+* **Billing:** Stripe Checkout and webhook endpoints are implemented in `server.js`; configure the Stripe secrets before enabling live billing.
+* **Deployment:** Cloudflare proxies traffic to the Express origin; this app is not a static Pages deployment because its chat, billing, and voice APIs run in Express. A successful push to `main` runs CI and then fast-forwards the Ubuntu origin at `/home/ubuntu/consultant`, reinstalls production dependencies, reloads its PM2 process, and checks the local HTTP health endpoint.
 
 ---
 
 ## 🚀 Quick Start & Local Setup
 
 ### Prerequisites
-* Node.js v20+ / v22+
-* Google AI Studio API Key (`GEMINI_API_KEY`)
-* Tavily Search API Key (`TAVILY_API_KEY`)
+* Node.js v24 (matches the `engines` declaration in `package.json`)
+* A Google AI Studio API key (`GEMINI_API_KEY`) for live AI responses. Without it, chat uses a local fallback.
+* Stripe credentials are only needed to use billing.
 
 ### Installation
 
@@ -78,17 +71,28 @@ cd consultant
 # Install dependencies
 npm install
 
-# Create environment configuration
-cp .env.example .env
+# Create a .env file for the integrations you plan to use
 ```
 
-Configure `.env`:
+Configure `.env` as needed:
 ```env
 PORT=3000
 GEMINI_API_KEY="your_google_ai_studio_api_key"
-TAVILY_API_KEY="your_tavily_search_api_key"
 MYCLAW_API_KEY="your_fallback_gateway_key"
+STRIPE_SECRET_KEY="your_stripe_secret_key"
+STRIPE_WEBHOOK_SECRET="your_stripe_webhook_secret"
 ```
+
+### Production deployment
+
+The GitHub Actions workflow deploys only after CI passes on `main`. To enable the origin update, add these repository Actions secrets under **Settings → Secrets and variables → Actions**:
+
+* `DEPLOY_HOST`: SSH hostname or IP for the Ubuntu origin.
+* `DEPLOY_USER`: SSH account permitted to update the checkout and reload the PM2 app.
+* `DEPLOY_PRIVATE_KEY`: private key for that account.
+* `DEPLOY_KNOWN_HOSTS`: pinned SSH host-key line(s) for the origin; do not replace host-key checking with an unverified `ssh-keyscan`.
+
+The origin must have the repository checked out on a clean `main` branch at `/home/ubuntu/consultant`, Git access to this repository, Node.js 24, npm, curl, and the existing PM2 process `consultant-studio` listening on port 3000. If deployment secrets are absent, CI succeeds and production deployment is explicitly skipped; partially configured secrets fail the deployment job. No Cloudflare API token is required because Cloudflare remains the DNS/proxy layer and the app runs on the existing Express origin.
 
 ### Run Locally
 
