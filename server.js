@@ -139,9 +139,10 @@ const evaluateWithClef = async (userText, workspace) => {
   return { domain, layout, telemetryRequired };
 };
 
-// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (AUTO-FALLBACK TO DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
+// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (OPENROUTER GEMINI 4 ARGON + DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
 const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto') => {
   const activeMyclawKey = process.env.MYCLAW_API_KEY;
+  const activeOpenRouterKey = process.env.OPENROUTER_API_KEY;
   const serverGoogleKey = process.env.GEMINI_API_KEY;
   const activeGoogleKey = customKey || serverGoogleKey;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
@@ -158,6 +159,49 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         });
       }
     });
+  }
+
+  // TIER 0: OpenRouter Direct Execution for Gemini 4 Argon (and Fallback)
+  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('argon') || pinnedModel === 'gemini-4-argon';
+  if (activeOpenRouterKey && isArgonRequest) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    try {
+      const orModel = 'google/gemini-4-argon';
+      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} | Images: ${imageObjs.length}]`);
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeOpenRouterKey}`,
+          'HTTP-Referer': 'https://www.consultant-studio.app',
+          'X-Title': 'Consultant Studio'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: orModel,
+          messages: [{ role: 'user', content: contentPayload }],
+          max_tokens: 8192,
+          temperature: 0.25
+        })
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || '';
+        if (text && text.trim().length > 10) {
+          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+          console.log(`[⚡ OpenRouter Gemini 4 Argon Winner] (${text.length} chars in ${elapsed}s)`);
+          return { text, isFallback: false, model: 'gemini-4-argon', latency: `${elapsed}s` };
+        }
+      } else {
+        const errBody = await res.text().catch(() => '');
+        console.warn(`[OpenRouter Notice]: status ${res.status} ${errBody.slice(0, 160)}`);
+      }
+    } catch (orErr) {
+      clearTimeout(timeoutId);
+      console.warn('[OpenRouter Execution Notice]:', orErr.message);
+    }
   }
 
   // TIER 1: Direct Multimodal Vision Execution (Parallel Race across Gemini 4 Argon, 3.1 Flash-Lite, 3.8 Flash)
