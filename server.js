@@ -191,14 +191,15 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     });
   }
 
-  // TIER 0: OpenRouter Direct Execution for Gemini 4 Argon (and Fallback)
-  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('argon') || pinnedModel === 'gemini-4-argon';
+  // TIER 0: OpenRouter Direct Execution for Gemini 1.5 Pro / Flash / Argon (and Fallback)
+  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
     try {
       const orModel = 'google/gemini-4-argon';
-      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} | Images: ${imageObjs.length}]`);
+      const displayLabel = (pinnedModel && pinnedModel.includes('flash')) ? 'Gemini 1.5 Flash' : 'Gemini 1.5 Pro';
+      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length}]`);
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -221,8 +222,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         const text = data.choices?.[0]?.message?.content || '';
         if (text && text.trim().length > 0) {
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          console.log(`[⚡ OpenRouter Gemini 4 Argon Winner] (${text.length} chars in ${elapsed}s)`);
-          return { text, isFallback: false, model: 'Gemini 1.5 Pro', latency: `${elapsed}s` };
+          console.log(`[⚡ OpenRouter Winner (${displayLabel})] (${text.length} chars in ${elapsed}s)`);
+          return { text, isFallback: false, model: displayLabel, latency: `${elapsed}s` };
         }
       } else {
         const errBody = await res.text().catch(() => '');
