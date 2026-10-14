@@ -1158,6 +1158,92 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* 2026+ TACTILE RANGE SLIDERS & FINANCIAL MATRIX STYLING */
+        .tactile-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            outline: none;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+            transition: background 0.2s ease;
+        }
+        .tactile-range:hover {
+            background: rgba(56, 189, 248, 0.18);
+        }
+        .tactile-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #10B981;
+            border: 2px solid #F8FAFC;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.65);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .tactile-range::-webkit-slider-thumb:hover {
+            transform: scale(1.16);
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.85);
+            background: #38BDF8;
+        }
+        .exec-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.018);
+        }
+        .exec-table tbody tr:hover {
+            background: rgba(56, 189, 248, 0.06);
+        }
+        .matrix-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        /* FLOATING PERSISTENT AUDIO STATUS PILL */
+        .voice-dock-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #4ADE80;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 14px rgba(0,0,0,0.4);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+        }
+        .voice-dock-pill:hover {
+            background: rgba(16, 185, 129, 0.22);
+            border-color: #38BDF8;
+            color: #F8FAFC;
+            transform: translateY(-1px);
+        }
+        .mini-wave-bar {
+            width: 2.5px;
+            height: 10px;
+            background: currentColor;
+            border-radius: 2px;
+            display: inline-block;
+            animation: waveBounce 1.1s infinite ease-in-out;
+        }
+        .mini-wave-bar:nth-child(2) { animation-delay: 0.18s; height: 14px; }
+        .mini-wave-bar:nth-child(3) { animation-delay: 0.36s; height: 8px; }
+        @keyframes waveBounce {
+            0%, 100% { transform: scaleY(0.55); opacity: 0.7; }
+            50% { transform: scaleY(1.15); opacity: 1; }
+        }
+
         .dock-box {
             max-width: 940px;
             margin: 0 auto;
@@ -2404,22 +2490,22 @@
                 </div>
 
                 <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (HIDDEN IN PERSONAL MODE, SHOWN IN BUSINESS MODE) -->
-                <div id="breakevenStudio" style="display:none; background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                <div id="breakevenStudio" style="display:none; background: rgba(9, 13, 22, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 45px rgba(0,0,0,0.65);">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                         <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="toggleBreakevenCollapse()">
-                            <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
-                                <span class="telemetry-dot"></span> Financial Control Room
+                            <span style="font-size:11px; background:rgba(16,185,129,0.12); color:#4ADE80; padding:4px 10px; border-radius:6px; font-weight:700; border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:0.04em;">
+                                <span class="telemetry-dot"></span> Financial Control Matrix
                             </span>
-                            <span style="font-size:14px; font-weight:800; color:#FFFFFF;">Breakeven Sensitivity Studio</span>
+                            <span style="font-size:14.5px; font-weight:800; color:#F8FAFC; letter-spacing:-0.01em;">Breakeven Sensitivity Studio</span>
                             <span id="beToggleIcon" style="font-size:12px; color:var(--text-muted); transition:transform 0.2s;">▼</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <!-- QUICK-LOAD INDUSTRY PRESETS -->
-                            <div style="display:inline-flex; align-items:center; gap:4px; background:#07090D; padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-size:11px;">
-                                <span style="color:var(--text-muted); font-size:10.5px; margin-right:2px;">Preset:</span>
-                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('hospitality')">🍔 Hospitality</button>
-                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('saas')">💻 SaaS</button>
-                                <button type="button" class="btn-export" style="padding:2px 6px; font-size:10.5px;" onclick="loadIndustryPreset('services')">⚖️ Services</button>
+                            <!-- QUICK-LOAD INDUSTRY PRESETS (CLEAN TEXT PILLS, NO EMOJI CLUTTER) -->
+                            <div style="display:inline-flex; align-items:center; gap:4px; background:#090D16; padding:3px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); font-size:11px;">
+                                <span style="color:var(--text-muted); font-size:10.5px; margin-right:4px; font-weight:600;">Sector Profile:</span>
+                                <button type="button" class="btn-export" style="padding:3px 8px; font-size:10.5px;" onclick="loadIndustryPreset('hospitality')">Hospitality</button>
+                                <button type="button" class="btn-export" style="padding:3px 8px; font-size:10.5px;" onclick="loadIndustryPreset('saas')">SaaS</button>
+                                <button type="button" class="btn-export" style="padding:3px 8px; font-size:10.5px;" onclick="loadIndustryPreset('services')">Services</button>
                             </div>
                             <button class="btn-export" style="padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:5px;" onclick="resetBreakevenControls()">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -2428,52 +2514,52 @@
                         </div>
                     </div>
 
-                    <div id="beStudioCollapsibleContent" style="margin-top:14px;">
+                    <div id="beStudioCollapsibleContent" style="margin-top:16px;">
 
-                    <!-- 3 SYNCHRONIZED SENSITIVITY SLIDERS -->
-                    <div class="be-controls-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:16px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+                    <!-- 3 SYNCHRONIZED TACTILE SENSITIVITY SLIDERS -->
+                    <div class="be-controls-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:16px; background:#090D16; padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);">
                         <!-- SLIDER 1: RENT ADJUSTMENT -->
                         <div>
-                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
-                                <span style="color:var(--text-secondary);">🏢 Rent Adjustment ($)</span>
-                                <span id="beRentVal" style="color:var(--accent-glow); font-family:monospace;">+$0</span>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+                                <span style="color:#CBD5E1; letter-spacing:0.01em;">Rent Adjustment ($)</span>
+                                <span id="beRentVal" style="color:#4ADE80; font-family:monospace; background:rgba(16,185,129,0.1); padding:1px 6px; border-radius:4px;">+$0</span>
                             </div>
-                            <input type="range" id="beRentSlider" min="-1000" max="2000" step="100" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
-                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                            <input type="range" class="tactile-range" id="beRentSlider" min="-1000" max="2000" step="100" value="0" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:5px; font-family:monospace;">
                                 <span>-$1,000</span><span>$0 Baseline</span><span>+$2,000</span>
                             </div>
                         </div>
 
-                        <!-- SLIDER 2: COGS INFLATION -->
+                        <!-- SLIDER 2: COGS MARGIN VARIANCE -->
                         <div>
-                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
-                                <span style="color:var(--text-secondary);">💵 COGS Inflation / Margin (%)</span>
-                                <span id="beCogsVal" style="color:var(--accent-glow); font-family:monospace;">0.0%</span>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+                                <span style="color:#CBD5E1; letter-spacing:0.01em;">COGS Margin Variance (%)</span>
+                                <span id="beCogsVal" style="color:#4ADE80; font-family:monospace; background:rgba(16,185,129,0.1); padding:1px 6px; border-radius:4px;">0.0%</span>
                             </div>
-                            <input type="range" id="beCogsSlider" min="-5" max="10" step="0.5" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
-                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                            <input type="range" class="tactile-range" id="beCogsSlider" min="-5" max="10" step="0.5" value="0" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:5px; font-family:monospace;">
                                 <span>-5.0%</span><span>0.0% Baseline</span><span>+10.0%</span>
                             </div>
                         </div>
 
                         <!-- SLIDER 3: LABOR EFFICIENCY -->
                         <div>
-                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
-                                <span style="color:var(--text-secondary);">⏱️ Labor Efficiency Variance (%)</span>
-                                <span id="beLaborVal" style="color:var(--accent-glow); font-family:monospace;">0.0%</span>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+                                <span style="color:#CBD5E1; letter-spacing:0.01em;">Labor Efficiency Variance (%)</span>
+                                <span id="beLaborVal" style="color:#4ADE80; font-family:monospace; background:rgba(16,185,129,0.1); padding:1px 6px; border-radius:4px;">0.0%</span>
                             </div>
-                            <input type="range" id="beLaborSlider" min="-5" max="5" step="0.5" value="0" style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="recalcBreakevenStudio()">
-                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:2px;">
+                            <input type="range" class="tactile-range" id="beLaborSlider" min="-5" max="5" step="0.5" value="0" oninput="recalcBreakevenStudio()">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:5px; font-family:monospace;">
                                 <span>-5.0% (Gain)</span><span>0.0% Baseline</span><span>+5.0% (Drag)</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- INTERACTIVE SVG CHART: MONTHLY REVENUE VS BREAKEVEN LINE -->
-                    <div class="be-chart-wrap" style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:16px; margin-bottom:16px; position:relative; overflow:hidden;">
+                    <div class="be-chart-wrap" style="background:#090D16; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; margin-bottom:16px; position:relative; overflow:hidden;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">
-                                📈 Revenue Trajectory vs. Dynamic Breakeven Line (M0–M12)
+                            <span style="font-size:11px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.06em;">
+                                Revenue Trajectory vs. Dynamic Breakeven Threshold (M0–M12)
                             </span>
                             <span id="beCurrentSummaryBadge" style="font-size:12px; font-weight:800; color:var(--accent-glow); font-family:monospace; background:rgba(34,197,94,0.1); padding:3px 8px; border-radius:6px; border:1px solid var(--border-glow);">
                                 Breakeven: $14,400/mo
@@ -2488,29 +2574,29 @@
                         </div>
                     </div>
 
-                    <!-- MICROSOFT 365 EXCEL-STYLED DATA GRID -->
-                    <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px; margin-bottom:14px;">
-                        <!-- SIMULATED EXCEL FORMULA BAR -->
-                        <div style="display:flex; align-items:center; gap:8px; background:#0B0F17; border:1px solid rgba(255,255,255,0.06); padding:6px 10px; border-radius:6px; margin-bottom:10px; font-family:monospace; font-size:12px;">
-                            <span id="beCellAddress" style="color:var(--text-muted); font-weight:700; min-width:32px;">B2</span>
+                    <!-- RESPONSIVE FINANCIAL MATRIX WITH STICKY HEADERS, ZEBRA STRIPING, SPARKLINES & STATUS PILLS -->
+                    <div style="background:#090D16; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-bottom:14px;">
+                        <!-- FORMULA BAR -->
+                        <div style="display:flex; align-items:center; gap:8px; background:#0F172A; border:1px solid rgba(255,255,255,0.08); padding:6px 10px; border-radius:6px; margin-bottom:10px; font-family:monospace; font-size:12px;">
+                            <span id="beCellAddress" style="color:#38BDF8; font-weight:700; min-width:32px;">B2</span>
                             <span style="color:var(--text-muted);">fx</span>
                             <span id="beFormulaText" style="color:#4ADE80; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">=Fixed_Overhead / (Contribution_Margin_Ratio)</span>
                         </div>
 
-                        <!-- EXCEL DATA TABLE -->
-                        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;">
-                            <table class="exec-table" style="min-width:780px; width:100%; font-size:11.5px; border-collapse:collapse; font-family:monospace; white-space:nowrap;">
-                                <thead>
-                                    <tr style="background:#0F141E; color:var(--text-muted); text-align:left;">
-                                        <th style="padding:8px 12px; white-space:nowrap;">Month</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Projected Revenue</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">COGS</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Gross Margin</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Fixed OpEx</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Adjusted Labor</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">EBITDA</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Breakeven Target</th>
-                                        <th style="padding:8px 12px; white-space:nowrap;">Safety Buffer</th>
+                        <!-- FINANCIAL MATRIX TABLE -->
+                        <div style="overflow-x:auto; max-height:340px; overflow-y:auto; -webkit-overflow-scrolling:touch; width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                            <table class="exec-table" style="min-width:820px; width:100%; font-size:11.5px; border-collapse:collapse; font-family:monospace; white-space:nowrap;">
+                                <thead style="position:sticky; top:0; z-index:5;">
+                                    <tr style="background:#0F172A; color:#94A3B8; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);">
+                                        <th style="padding:10px 12px; white-space:nowrap;">Month</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Projected Revenue</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">COGS</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Gross Margin</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Fixed OpEx</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Labor</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">EBITDA</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Breakeven</th>
+                                        <th style="padding:10px 12px; white-space:nowrap;">Runway Buffer & Trend</th>
                                     </tr>
                                 </thead>
                                 <tbody id="beTableBody">
@@ -2601,8 +2687,13 @@
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
             </button>
-            <button class="btn-icon" onclick="toggleLiveVoicePractice()" id="liveVoicePracticeBtn" title="Launch Interactive Live Voice Interview Practicer (Gemini Live Style)" style="background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.35); color:var(--accent);">
-                <span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>
+            <button type="button" class="voice-dock-pill" onclick="openLiveVoiceRoom()" id="liveVoicePracticeBtn" title="Open Immersive Live Voice Studio Room">
+                <span style="display:inline-flex; align-items:center; gap:2px;">
+                    <span class="mini-wave-bar"></span>
+                    <span class="mini-wave-bar"></span>
+                    <span class="mini-wave-bar"></span>
+                </span>
+                <span id="liveVoicePillLabel" style="font-size:11px;">Live Room</span>
             </button>
             <button class="btn-icon" onclick="resetChatSession()" title="Start New Chat / Reset Session" style="color:var(--text-muted);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2629,6 +2720,93 @@
                     <polyline points="5 12 12 5 19 12"></polyline>
                 </svg>
             </button>
+        </div>
+    </div>
+
+    <!-- IMMERSIVE LIVE VOICE STUDIO ROOM OVERLAY (PERSISTS ACROSS BUSINESS & PERSONAL TABS) -->
+    <div class="modal-overlay" id="liveVoiceRoomModal" style="z-index:2600; background:rgba(6, 9, 15, 0.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);">
+        <div class="modal-card" style="max-width:760px; width:100%; background:radial-gradient(circle at 50% 0%, rgba(16,185,129,0.14) 0%, #090D16 68%); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:24px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.1), 0 30px 80px rgba(0,0,0,0.9);">
+            <!-- TOP HUD: LATENCY BADGE, PERSONA TOGGLE (AOEDE / FENRIR), MIC SELECTOR & CLOSE -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span id="liveRoomStateBadge" style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; background:rgba(16,185,129,0.15); color:#4ADE80; border:1px solid rgba(16,185,129,0.35); font-family:monospace;">
+                        <span class="telemetry-dot"></span> <span id="liveRoomStateText">READY</span>
+                    </span>
+                    <span id="liveRoomLatencyBadge" style="font-size:11px; font-family:monospace; color:#38BDF8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); padding:3px 8px; border-radius:6px; font-weight:700;">
+                        Latency: 142ms
+                    </span>
+                </div>
+
+                <!-- PERSONA PILL TOGGLE: AOEDE vs FENRIR -->
+                <div style="display:inline-flex; background:#05080F; border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:3px; gap:3px;">
+                    <button type="button" id="livePersonaAoedeBtn" onclick="setLiveRoomPersona('female')" style="padding:5px 12px; border-radius:999px; border:none; font-size:11.5px; font-weight:700; cursor:pointer; background:#10B981; color:#04130B; transition:all 0.2s;">
+                        Aoede (Warm & Direct)
+                    </button>
+                    <button type="button" id="livePersonaFenrirBtn" onclick="setLiveRoomPersona('male')" style="padding:5px 12px; border-radius:999px; border:none; font-size:11.5px; font-weight:700; cursor:pointer; background:transparent; color:#94A3B8; transition:all 0.2s;">
+                        Fenrir (Executive)
+                    </button>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" class="btn-export" style="font-size:11px; padding:5px 10px;" onclick="minimizeLiveVoiceRoom()" title="Keep voice stream active while switching tabs">Minimize</button>
+                    <button type="button" class="btn-modal-close" onclick="closeLiveVoiceRoomAndStop()" aria-label="Close Live Room" title="End Session (Esc)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AUDIO INPUT DEVICE DROPDOWN & NOISE GATE THRESHOLD METER -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; background:#060911; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:8px 12px;">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:200px;">
+                    <span style="font-size:11px; color:#94A3B8; font-weight:600; white-space:nowrap;">Audio Input:</span>
+                    <select id="liveAudioDeviceSelect" style="flex:1; background:#0F172A; color:#F8FAFC; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; font-size:11.5px; outline:none;">
+                        <option value="default">Default System Microphone</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; min-width:210px;">
+                    <span style="font-size:11px; color:#94A3B8; font-weight:600;">Noise Gate:</span>
+                    <div style="width:90px; height:6px; background:#0F172A; border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
+                        <div id="liveNoiseGateMeter" style="width:12%; height:100%; background:linear-gradient(90deg, #10B981, #38BDF8); transition:width 0.08s linear;"></div>
+                    </div>
+                    <span id="liveDbReadout" style="font-size:10.5px; font-family:monospace; color:#64748B; min-width:42px;">-48 dB</span>
+                </div>
+            </div>
+
+            <!-- CENTERPIECE: REACTIVE WEB AUDIO API ORB & MULTI-BAR FREQUENCY VISUALIZER -->
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:10px 0;">
+                <canvas id="liveVoiceCanvas" width="640" height="170" style="width:100%; max-width:640px; height:170px; border-radius:14px; background:radial-gradient(circle at 50% 50%, rgba(16,185,129,0.08) 0%, rgba(9,13,22,0.95) 75%); border:1px solid rgba(255,255,255,0.06);"></canvas>
+            </div>
+
+            <!-- CONVERSATIONAL CANVAS: REAL-TIME TRANSCRIPTION FEED -->
+            <div id="liveRoomTranscriptFeed" style="background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; max-height:150px; min-height:92px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; font-size:13px; line-height:1.5;">
+                <div style="color:#94A3B8; font-size:12px;">
+                    Click the microphone below or press <kbd style="background:#0F172A; border:1px solid rgba(255,255,255,0.15); padding:1px 6px; border-radius:4px; font-family:monospace; color:#F8FAFC;">Space</kbd> to speak with your consultant in real time. Press <kbd style="background:#0F172A; border:1px solid rgba(255,255,255,0.15); padding:1px 6px; border-radius:4px; font-family:monospace; color:#F8FAFC;">Esc</kbd> to interrupt or cut in.
+                </div>
+            </div>
+
+            <!-- TACTILE CENTRAL CONTROLS & KEYBOARD SHORTCUT HINTS -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-top:6px;">
+                <button type="button" class="btn-export" onclick="copyLiveTranscript()" style="font-size:11.5px; padding:7px 12px;">
+                    Copy Transcript
+                </button>
+
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <button type="button" id="liveRoomCentralMicBtn" onclick="toggleLiveVoicePractice()" style="width:56px; height:56px; border-radius:50%; border:2px solid #F8FAFC; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#04130B; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 0 28px rgba(16,185,129,0.55); transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1);" title="Mute / Unmute Microphone (Spacebar)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-export" onclick="interruptConsultantSpeech()" style="font-size:11.5px; padding:8px 13px; border-color:rgba(244,63,94,0.4); color:#FDA4AF; background:rgba(244,63,94,0.1);">
+                        Interrupt / Cut In (Esc)
+                    </button>
+                </div>
+
+                <span style="font-size:11px; color:#64748B; font-family:monospace;">
+                    Space: Talk • Esc: Cut In
+                </span>
+            </div>
         </div>
     </div>
 
@@ -3333,18 +3511,29 @@
                     tr.style.cursor = 'pointer';
                     const isSurplus = safetyBuffer >= 0;
                     const bufferColor = isSurplus ? '#4ADE80' : '#F87171';
-                    const bufferBg = isSurplus ? 'rgba(34,197,94,0.06)' : 'rgba(239,68,68,0.08)';
+                    const pillBg = isSurplus ? 'rgba(16,185,129,0.14)' : 'rgba(244,63,94,0.14)';
+                    const pillBorder = isSurplus ? 'rgba(16,185,129,0.35)' : 'rgba(244,63,94,0.35)';
+                    const barPct = Math.min(100, Math.max(8, Math.round((rev / 50000) * 100)));
 
                     tr.innerHTML = `
-                        <td style="padding:8px 12px; font-weight:700; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('A${m+2}', '=\"M${m}\"')">M${m}</td>
-                        <td style="padding:8px 12px; color:#FFF; white-space:nowrap;" onclick="selectBeCell('B${m+2}', '=${rev}')">$${rev.toLocaleString()}</td>
-                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('C${m+2}', '=B${m+2}*${cogsRate.toFixed(3)}')">$${cogsVal.toLocaleString()}</td>
-                        <td style="padding:8px 12px; color:var(--text-secondary); white-space:nowrap;" onclick="selectBeCell('D${m+2}', '=(B${m+2}-C${m+2})/B${m+2}')">${grossMarginPct.toFixed(1)}%</td>
-                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('E${m+2}', '=${fixedOpex}')">$${fixedOpex.toLocaleString()}</td>
-                        <td style="padding:8px 12px; color:var(--text-muted); white-space:nowrap;" onclick="selectBeCell('F${m+2}', '=B${m+2}*${laborRate.toFixed(3)}')">$${laborVal.toLocaleString()}</td>
-                        <td style="padding:8px 12px; font-weight:700; color:${ebitda >= 0 ? '#4ADE80' : '#F87171'}; white-space:nowrap;" onclick="selectBeCell('G${m+2}', '=B${m+2}-C${m+2}-E${m+2}-F${m+2}')">$${ebitda.toLocaleString()}</td>
-                        <td style="padding:8px 12px; color:#FBBF24; font-weight:700; white-space:nowrap;" onclick="selectBeCell('H${m+2}', '=${beTarget}')">$${beTarget.toLocaleString()}</td>
-                        <td style="padding:8px 12px; font-weight:700; color:${bufferColor}; background:${bufferBg}; white-space:nowrap;" onclick="selectBeCell('I${m+2}', '=B${m+2}-H${m+2}')">+$${safetyBuffer.toLocaleString()} (${safetyPct.toFixed(1)}%)</td>
+                        <td style="padding:9px 12px; font-weight:700; color:#94A3B8; white-space:nowrap;" onclick="selectBeCell('A${m+2}', '=\"M${m}\"')">M${m}</td>
+                        <td style="padding:9px 12px; color:#F8FAFC; white-space:nowrap;" onclick="selectBeCell('B${m+2}', '=${rev}')">$${rev.toLocaleString()}</td>
+                        <td style="padding:9px 12px; color:#94A3B8; white-space:nowrap;" onclick="selectBeCell('C${m+2}', '=B${m+2}*${cogsRate.toFixed(3)}')">$${cogsVal.toLocaleString()}</td>
+                        <td style="padding:9px 12px; color:#CBD5E1; white-space:nowrap;" onclick="selectBeCell('D${m+2}', '=(B${m+2}-C${m+2})/B${m+2}')">${grossMarginPct.toFixed(1)}%</td>
+                        <td style="padding:9px 12px; color:#94A3B8; white-space:nowrap;" onclick="selectBeCell('E${m+2}', '=${fixedOpex}')">$${fixedOpex.toLocaleString()}</td>
+                        <td style="padding:9px 12px; color:#94A3B8; white-space:nowrap;" onclick="selectBeCell('F${m+2}', '=B${m+2}*${laborRate.toFixed(3)}')">$${laborVal.toLocaleString()}</td>
+                        <td style="padding:9px 12px; font-weight:700; color:${ebitda >= 0 ? '#4ADE80' : '#F87171'}; white-space:nowrap;" onclick="selectBeCell('G${m+2}', '=B${m+2}-C${m+2}-E${m+2}-F${m+2}')">${ebitda >= 0 ? '+' : ''}$${ebitda.toLocaleString()}</td>
+                        <td style="padding:9px 12px; color:#38BDF8; font-weight:700; white-space:nowrap;" onclick="selectBeCell('H${m+2}', '=${beTarget}')">$${beTarget.toLocaleString()}</td>
+                        <td style="padding:9px 12px; white-space:nowrap;" onclick="selectBeCell('I${m+2}', '=B${m+2}-H${m+2}')">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="matrix-status-pill" style="color:${bufferColor}; background:${pillBg}; border:1px solid ${pillBorder};">
+                                    ${isSurplus ? '+' : ''}$${safetyBuffer.toLocaleString()} (${safetyPct.toFixed(1)}%)
+                                </span>
+                                <div style="width:48px; height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${barPct}%; height:100%; background:${bufferColor};"></div>
+                                </div>
+                            </div>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 }
@@ -5144,23 +5333,208 @@
             }
         }
 
+        // IMMERSIVE LIVE VOICE STUDIO ROOM & WEB AUDIO API VISUALIZER ENGINE
+        let liveAudioCtx = null;
+        let liveAnalyser = null;
+        let liveMicStream = null;
+        let liveAnimFrame = null;
+
+        async function populateLiveAudioDevices() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const mics = devices.filter(d => d.kind === 'audioinput');
+                const sel = document.getElementById('liveAudioDeviceSelect');
+                if (sel && mics.length > 0) {
+                    sel.innerHTML = mics.map((m, i) => `<option value="${m.deviceId}">${escapeHtml(m.label || 'Microphone ' + (i + 1))}</option>`).join('');
+                }
+            } catch (e) {}
+        }
+
+        async function initLiveAudioVisualizer() {
+            const canvas = document.getElementById('liveVoiceCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            if (!liveAudioCtx && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const deviceId = document.getElementById('liveAudioDeviceSelect')?.value;
+                    const constraints = { audio: deviceId && deviceId !== 'default' ? { deviceId: { exact: deviceId } } : true };
+                    liveMicStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    liveAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const source = liveAudioCtx.createMediaStreamSource(liveMicStream);
+                    liveAnalyser = liveAudioCtx.createAnalyser();
+                    liveAnalyser.fftSize = 128;
+                    source.connect(liveAnalyser);
+                    populateLiveAudioDevices();
+                } catch (e) {
+                    console.warn('[Web Audio Mic Visualizer Fallback]:', e);
+                }
+            }
+
+            const bufferLength = liveAnalyser ? liveAnalyser.frequencyBinCount : 48;
+            const dataArray = new Uint8Array(bufferLength);
+            let phase = 0;
+
+            function drawFrame() {
+                if (document.getElementById('liveVoiceRoomModal')?.style.display !== 'flex') {
+                    liveAnimFrame = null;
+                    return;
+                }
+                liveAnimFrame = requestAnimationFrame(drawFrame);
+                phase += 0.045;
+
+                let avgEnergy = 12;
+                if (liveAnalyser && isVoicePracticeActive) {
+                    liveAnalyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    avgEnergy = sum / bufferLength;
+                } else if (activeAudioElement || (window.speechSynthesis && window.speechSynthesis.speaking)) {
+                    avgEnergy = 45 + Math.sin(phase * 3) * 25;
+                }
+
+                // Update Noise Gate & dB Readout
+                const gateMeter = document.getElementById('liveNoiseGateMeter');
+                const dbReadout = document.getElementById('liveDbReadout');
+                const pct = Math.min(100, Math.max(6, Math.round((avgEnergy / 140) * 100)));
+                if (gateMeter) gateMeter.style.width = `${pct}%`;
+                if (dbReadout) {
+                    const db = Math.round(-60 + (pct * 0.52));
+                    dbReadout.innerText = `${db} dB`;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const isAgentSpeaking = Boolean(activeAudioElement || (window.speechSynthesis && window.speechSynthesis.speaking));
+                const primaryColor = isAgentSpeaking ? '#38BDF8' : (isVoicePracticeActive ? '#10B981' : '#64748B');
+
+                // Central Reactive Fluid Orb
+                const orbRadius = 26 + (avgEnergy * 0.22) + Math.sin(phase) * 3;
+                const grad = ctx.createRadialGradient(cx, cy, 4, cx, cy, orbRadius * 1.9);
+                grad.addColorStop(0, isAgentSpeaking ? 'rgba(56, 189, 248, 0.9)' : 'rgba(16, 185, 129, 0.9)');
+                grad.addColorStop(0.55, isAgentSpeaking ? 'rgba(56, 189, 248, 0.25)' : 'rgba(16, 185, 129, 0.25)');
+                grad.addColorStop(1, 'rgba(9, 13, 22, 0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, orbRadius * 1.9, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Symmetric Multi-Bar Frequency Visualizer
+                const barCount = 36;
+                const barSpacing = 12;
+                const totalW = barCount * barSpacing;
+                const startX = cx - totalW / 2;
+                ctx.fillStyle = primaryColor;
+
+                for (let i = 0; i < barCount; i++) {
+                    const distFromCenter = Math.abs(i - barCount / 2) / (barCount / 2);
+                    const rawVal = liveAnalyser && isVoicePracticeActive ? dataArray[i % bufferLength] : (Math.sin(phase + i * 0.35) + 1) * (isAgentSpeaking ? 38 : 10);
+                    const h = Math.max(4, (1 - distFromCenter * 0.65) * (rawVal * 0.55 + 6));
+                    const x = startX + i * barSpacing;
+                    const y = cy - h / 2;
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, 5, h, 3);
+                    ctx.fill();
+                }
+            }
+
+            if (!liveAnimFrame) drawFrame();
+        }
+
+        function appendLiveRoomTranscript(role, text) {
+            const feed = document.getElementById('liveRoomTranscriptFeed');
+            if (!feed || !text) return;
+            const row = document.createElement('div');
+            row.style.cssText = 'padding:6px 10px; border-radius:8px; background:' + (role === 'user' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)') + '; border:1px solid ' + (role === 'user' ? 'rgba(16,185,129,0.25)' : 'rgba(56,189,248,0.25)') + ';';
+            row.innerHTML = `<strong style="color:${role === 'user' ? '#4ADE80' : '#38BDF8'}; font-size:11px; text-transform:uppercase; margin-right:6px;">${role === 'user' ? 'You' : (consultantVoiceGender === 'male' ? 'Fenrir' : 'Aoede')}:</strong><span style="color:#F8FAFC; font-size:12.5px;">${escapeHtml(text.slice(0, 320))}</span>`;
+            feed.appendChild(row);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        function setLiveRoomPersona(gender) {
+            setConsultantVoiceGender(gender);
+            const aBtn = document.getElementById('livePersonaAoedeBtn');
+            const fBtn = document.getElementById('livePersonaFenrirBtn');
+            if (aBtn && fBtn) {
+                aBtn.style.background = gender === 'female' ? '#10B981' : 'transparent';
+                aBtn.style.color = gender === 'female' ? '#04130B' : '#94A3B8';
+                fBtn.style.background = gender === 'male' ? '#38BDF8' : 'transparent';
+                fBtn.style.color = gender === 'male' ? '#04130B' : '#94A3B8';
+            }
+        }
+
+        function openLiveVoiceRoom() {
+            const modal = document.getElementById('liveVoiceRoomModal');
+            if (modal) modal.style.display = 'flex';
+            initLiveAudioVisualizer();
+            if (!isVoicePracticeActive) {
+                startLiveVoicePractice();
+            }
+        }
+
+        function minimizeLiveVoiceRoom() {
+            const modal = document.getElementById('liveVoiceRoomModal');
+            if (modal) modal.style.display = 'none';
+            showToast("Live Voice Room minimized—audio stream remains active across tabs.", "🎙️");
+        }
+
+        function closeLiveVoiceRoomAndStop() {
+            const modal = document.getElementById('liveVoiceRoomModal');
+            if (modal) modal.style.display = 'none';
+            if (isVoicePracticeActive) stopLiveVoicePractice();
+            if (liveMicStream) {
+                liveMicStream.getTracks().forEach(t => t.stop());
+                liveMicStream = null;
+                liveAudioCtx = null;
+                liveAnalyser = null;
+            }
+        }
+
+        function copyLiveTranscript() {
+            const feed = document.getElementById('liveRoomTranscriptFeed');
+            if (!feed) return;
+            navigator.clipboard.writeText(feed.innerText || '');
+            showToast("Live Room transcript copied to clipboard!", "📋");
+        }
+
+        // Keyboard shortcuts inside Live Voice Room: Spacebar (Toggle Mic) / Esc (Interrupt or Close)
+        window.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('liveVoiceRoomModal');
+            if (!modal || modal.style.display !== 'flex') return;
+            const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleLiveVoicePractice();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                interruptConsultantSpeech();
+            }
+        });
+
         function startLiveVoicePractice() {
             unlockMobileAudio();
             isVoicePracticeActive = true;
             
-            const btn = document.getElementById('liveVoicePracticeBtn');
-            if (btn) {
-                btn.style.background = '#22C55E';
-                btn.style.color = '#000';
-                btn.innerHTML = '<span style="font-size:15px; font-weight:800;">⏹️</span>';
-                btn.title = 'Stop Live Consultant Session';
+            const pillLabel = document.getElementById('liveVoicePillLabel');
+            if (pillLabel) pillLabel.innerText = 'Live Active';
+            const stateTxt = document.getElementById('liveRoomStateText');
+            if (stateTxt) stateTxt.innerText = 'LISTENING';
+            const centralBtn = document.getElementById('liveRoomCentralMicBtn');
+            if (centralBtn) {
+                centralBtn.style.background = 'linear-gradient(135deg, #10B981 0%, #38BDF8 100%)';
+                centralBtn.style.boxShadow = '0 0 36px rgba(56, 189, 248, 0.8)';
             }
 
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            showToast("🎙️ Live Consultant Voice Activated. Listening to your voice...", "🎙️");
+            initLiveAudioVisualizer();
 
-            // Direct spoken feedback immediately + start microphone listening
-            speakInterviewerResponse("I am listening. What operational challenge or numbers should we analyze?");
+            // Direct spoken greeting + start microphone listening
+            const greeting = "Live Studio connected. What decision or numbers are we modeling today?";
+            appendLiveRoomTranscript('assistant', greeting);
+            speakInterviewerResponse(greeting);
             
             if (SpeechRec) {
                 setTimeout(() => {
@@ -5178,14 +5552,16 @@
             if (window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
-            const btn = document.getElementById('liveVoicePracticeBtn');
-            if (btn) {
-                btn.style.background = 'rgba(34,197,94,0.12)';
-                btn.style.color = 'var(--accent)';
-                btn.innerHTML = '<span style="font-size:15px; display:inline-block; animation:pulse 2s infinite;">🎙️</span>';
-                btn.title = 'Launch Live Strategic Consultant Voice (Auditory Learning & Advisory)';
+            const pillLabel = document.getElementById('liveVoicePillLabel');
+            if (pillLabel) pillLabel.innerText = 'Live Room';
+            const stateTxt = document.getElementById('liveRoomStateText');
+            if (stateTxt) stateTxt.innerText = 'MUTED';
+            const centralBtn = document.getElementById('liveRoomCentralMicBtn');
+            if (centralBtn) {
+                centralBtn.style.background = '#1E293B';
+                centralBtn.style.boxShadow = 'none';
             }
-            showToast("Live Consultant Voice Ended.", "⏹️");
+            showToast("Microphone Muted.", "⏹️");
         }
 
         // FULL-DUPLEX LIVE CONVERSATIONAL INTERRUPT & INTERVIEW LISTEN ENGINE
@@ -5251,6 +5627,7 @@
                     debounceTimer = setTimeout(() => {
                         if (fullSpoken && fullSpoken.length > 2) {
                             try { speechRecognition.stop(); } catch(e){}
+                            appendLiveRoomTranscript('user', fullSpoken);
                             sendMessage();
                         }
                     }, 1400); // 1.4s natural pause before sending answer
@@ -6240,6 +6617,7 @@
 
                 // If live voice consultant mode is active, speak back the answer aloud and loop listening
                 if (isVoicePracticeActive && responseText) {
+                    appendLiveRoomTranscript('assistant', responseText);
                     speakInterviewerResponse(responseText, () => {
                         if (isVoicePracticeActive) {
                             listenToCandidate(); // Auto-listen for next user spoken question
