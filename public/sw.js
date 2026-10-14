@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-argon';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-life-consultant';
 const ASSETS = [
   '/',
   '/index.html',

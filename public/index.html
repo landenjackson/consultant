@@ -2261,76 +2261,43 @@
             <!-- UPLIFTING HERO BANNER -->
             <div id="heroBanner">
                 <div class="hero-banner-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <img src="/brand/consultant_studio_official_icon.jpg" alt="Icon" style="width:20px; height:20px; border-radius:5px; object-fit:cover; display:inline-block;">
-                            <span class="status-tag">Institutional Strategy & Executive Placement</span>
-                            <span style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Turn Operational Acumen into Quantified Outcomes</span>
+                            <span id="heroStatusTag" class="status-tag">Everyday Life, Career & Money Consultant</span>
+                            <span id="heroSubBadge" style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Clear Numbers & Real-World Decisions</span>
                         </div>
-                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini Flash Direct • Zero-Knowledge Architecture</span>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 4 Argon • 100% Private</span>
                     </div>
+
+                    <!-- DUAL-MODE TOGGLE: PERSONAL LIFE & CAREER vs. BUSINESS & OPERATIONS -->
+                    <div style="display:inline-flex; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:4px; gap:4px; margin-bottom:16px;">
+                        <button type="button" id="modeBtnLife" onclick="switchConsultantMode('personal')" style="padding:7px 14px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:var(--accent); color:#000; transition:all 0.2s;">
+                            🏠 Personal Life, Career & Money
+                        </button>
+                        <button type="button" id="modeBtnBusiness" onclick="switchConsultantMode('business')" style="padding:7px 14px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary); transition:all 0.2s;">
+                            🏢 Business & Operations
+                        </button>
+                    </div>
+
                     <h1 id="welcomeHeading" style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
-                        Turn Operating Acumen into Boardroom Certainty
+                        Your Personal Consultant for Everyday Decisions
                     </h1>
-                    <p id="welcomeSubtext" style="color:var(--text-secondary); font-size:14px; line-height:1.6; max-width:840px;">
-                        Grounded in empirical unit economics, prime cost containment, and forensic financial modeling. Audit unit profitability, engineer 1-page quantified executive resumes, stress-test 13-week cash runway, and export boardroom-ready deliverables with 100% client-side privacy.
+                    <p id="welcomeSubtext" style="color:var(--text-secondary); font-size:14px; line-height:1.6; max-width:840px; margin-bottom:14px;">
+                        Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.
                     </p>
 
-                    <!-- 8-WAY INSTITUTIONAL STRATEGIC COMMAND HUB SELECTOR -->
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin: 18px 0 10px 0;">
-                        <div class="mode-tile" onclick="sendQuick('01 // Trade Area Geometry: Model foot traffic catchment, localized pricing power, and commercial density optimization.')" style="border-left: 3px solid #38BDF8;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#38BDF8;">01 //</span> <span>Trade Area Geometry</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Catchment modeling, foot-traffic conversion, and neighborhood capture geometry.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('02 // Trust & Copy Audit: Perform a forensic funnel scan, copy integrity audit, and Trust Alignment index.')" style="border-left: 3px solid #A78BFA;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#A78BFA;">02 //</span> <span>Trust & Copy Audit</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Funnel friction analysis, copy integrity, and Trust Alignment Index validation.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('03 // Unit Economics Engine: Calculate CAC payback velocity, gross margin floors, and 12-month EBITDA trajectory.')" style="border-left: 3px solid #22C55E;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#22C55E;">03 //</span> <span>Unit Economics Engine</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">SaaS/retail tiers, blended CAC, LTV:CAC, payback velocity, and NRR modeling.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('04 // Campaign Strategy: Design a zero-discount narrative campaign, premium service tiering, and basket size expansion.')" style="border-left: 3px solid #F59E0B;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#F59E0B;">04 //</span> <span>Campaign Strategy</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Zero-discount launches, narrative framing, and margin-defending basket expansion.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('05 // Competitor Recon: Map competitor vulnerability vectors, price spread architecture, and differentiation moats.')" style="border-left: 3px solid #EC4899;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#EC4899;">05 //</span> <span>Competitor Recon</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Moat engineering, pricing spreads, and structural differentiation indexing.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('06 // Executive Resume & File Polish: Audit my attached file/resume. Reframe all bullet points into quantified enterprise value ($ saved, margin protected, throughput lift, team headcount) with 1-page Word (.docx) & PDF export.')" style="border-left: 3px solid #60A5FA;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#60A5FA;">06 //</span> <span>Resume & File Polish</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Reframe attached files into quantified enterprise value and 1-page executive formatting.</div>
-                        </div>
-                        <div class="mode-tile" onclick="sendQuick('07 // Job Interview & Case Prep: Audit my attached background/resume against executive hiring standards. Formulate high-conviction STAR narrative tracks, reverse employer due-diligence questions, and 30-60-90 day board execution roadmaps.')" style="border-left: 3px solid #10B981;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#10B981;">07 //</span> <span>Job Interview & Case Prep</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">STAR frameworks, objection defense, reverse due-diligence, and 30/60/90-day board roadmaps.</div>
-                        </div>
-                        <div class="mode-tile" onclick="openVaultModal()" style="border-left: 3px solid #CBD5E1;">
-                            <div style="font-size:13px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px; font-family:monospace;">
-                                <span style="color:#CBD5E1;">08 //</span> <span>Research & Strategy Vault</span>
-                            </div>
-                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Access and review your saved client models, sensitivity sheets, and board memos.</div>
-                        </div>
+                    <!-- SIMPLE CONVERSATIONAL STARTER CHIPS (NO JARGON TILES) -->
+                    <div id="starterChipsWrap" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('I want to move out on my own. Help me figure out how much rent I can actually afford and what I need saved up before signing a lease.')">🏠 Moving out & rent budget</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me fix my finances. Here is roughly what I make and what I spend—show me where my money is leaking and a realistic plan to get ahead.')">💸 Fix my money & budget</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me land a good job. I can attach my resume or tell you my background—help me polish it and prep for interviews.')">💼 Get a job & polish my resume</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me weigh a major life decision between two options—break down the real pros, cons, costs, and long-term impact.')">⚖️ Weigh a big life decision</button>
                     </div>
                 </div>
 
-                <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (COLLAPSIBLE & RESPONSIVE) -->
-                <div id="breakevenStudio" style="background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (HIDDEN IN PERSONAL MODE, SHOWN IN BUSINESS MODE) -->
+                <div id="breakevenStudio" style="display:none; background: rgba(12, 16, 23, 0.85); border: 1px solid var(--border-glow); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                         <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="toggleBreakevenCollapse()">
                             <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
@@ -2548,7 +2515,7 @@
                     <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
                 </select>
             </div>
-            <textarea id="userInput" class="dock-input" rows="1" placeholder="Objective, metric, or P&L query..." onkeydown="handleInputKeydown(event)"></textarea>
+            <textarea id="userInput" class="dock-input" rows="1" placeholder="Ask anything—moving out, landing a job, fixing your budget, or weighing a decision..." onkeydown="handleInputKeydown(event)"></textarea>
             <button id="sendBtn" class="btn-send" onclick="sendMessage()" title="Execute Analysis">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -4459,7 +4426,64 @@
             if (input) {
                 input.value = text;
                 input.focus();
-                showToast("Scenario loaded. Customize parameters or click Execute.", "⚡");
+                showToast("Prompt loaded—customize with your details or hit Send!", "⚡");
+            }
+        }
+
+        function switchConsultantMode(mode) {
+            const isPersonal = (mode !== 'business');
+            window.selectedMode = isPersonal ? 'personal' : 'business';
+            localStorage.setItem('cs_workspace', window.selectedMode);
+
+            const btnLife = document.getElementById('modeBtnLife');
+            const btnBiz = document.getElementById('modeBtnBusiness');
+            const heading = document.getElementById('welcomeHeading');
+            const subtext = document.getElementById('welcomeSubtext');
+            const statusTag = document.getElementById('heroStatusTag');
+            const subBadge = document.getElementById('heroSubBadge');
+            const chipsWrap = document.getElementById('starterChipsWrap');
+            const beStudio = document.getElementById('breakevenStudio');
+            const input = document.getElementById('userInput');
+
+            if (btnLife && btnBiz) {
+                btnLife.style.background = isPersonal ? 'var(--accent)' : 'transparent';
+                btnLife.style.color = isPersonal ? '#000' : 'var(--text-secondary)';
+                btnBiz.style.background = !isPersonal ? 'var(--accent)' : 'transparent';
+                btnBiz.style.color = !isPersonal ? '#000' : 'var(--text-secondary)';
+            }
+
+            if (isPersonal) {
+                if (statusTag) statusTag.innerText = 'Everyday Life, Career & Money Consultant';
+                if (subBadge) subBadge.innerText = '• Clear Numbers & Real-World Decisions';
+                if (heading) heading.innerText = 'Your Personal Consultant for Everyday Decisions';
+                if (subtext) subtext.innerText = "Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.";
+                if (input) input.placeholder = 'Ask anything—moving out, landing a job, fixing your budget, or weighing a decision...';
+                if (beStudio) beStudio.style.display = 'none';
+                if (chipsWrap) {
+                    chipsWrap.innerHTML = `
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('I want to move out on my own. Help me figure out how much rent I can actually afford and what I need saved up before signing a lease.')">🏠 Moving out & rent budget</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me fix my finances. Here is roughly what I make and what I spend—show me where my money is leaking and a realistic plan to get ahead.')">💸 Fix my money & budget</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me land a good job. I can attach my resume or tell you my background—help me polish it and prep for interviews.')">💼 Get a job & polish my resume</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me weigh a major life decision between two options—break down the real pros, cons, costs, and long-term impact.')">⚖️ Weigh a big life decision</button>
+                    `;
+                }
+            } else {
+                if (statusTag) statusTag.innerText = 'Business & Operations Consultant';
+                if (subBadge) subBadge.innerText = '• Practical Numbers & Profitability';
+                if (heading) heading.innerText = 'Practical Strategy for Your Business & Operations';
+                if (subtext) subtext.innerText = 'Cut through corporate noise. Audit your margins, fix cost leaks, price your services right, and build clear action plans with real numbers.';
+                if (input) input.placeholder = 'Ask about pricing, margins, costs, hiring, or business strategy...';
+                if (beStudio) {
+                    beStudio.style.display = 'block';
+                    if (typeof recalcBreakevenStudio === 'function') recalcBreakevenStudio();
+                }
+                if (chipsWrap) {
+                    chipsWrap.innerHTML = `
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me audit my business costs and margins—show me where I am losing money and how to fix it.')">📊 Audit costs & margins</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me price my product or service so I stay profitable without losing customers.')">🏷️ Pricing & profitability</button>
+                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me streamline daily operations and build a simple checklist for my team.')">⚙️ Fix daily operations</button>
+                    `;
+                }
             }
         }
 
