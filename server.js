@@ -222,7 +222,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         if (text && text.trim().length > 0) {
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
           console.log(`[⚡ OpenRouter Gemini 4 Argon Winner] (${text.length} chars in ${elapsed}s)`);
-          return { text, isFallback: false, model: 'gemini-4-argon', latency: `${elapsed}s` };
+          return { text, isFallback: false, model: 'Gemini 1.5 Pro', latency: `${elapsed}s` };
         }
       } else {
         const errBody = await res.text().catch(() => '');
@@ -325,21 +325,20 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      // If user specifically pinned a model (e.g. gemini-4-argon), race high-reasoning candidates and return with the pinned model identity
       if (pinnedModel && pinnedModel !== 'auto') {
-        const isArgon = pinnedModel.includes('argon') || pinnedModel === 'gemini-4-argon';
-        const tokenCeiling = isArgon ? 8192 : 4096;
+        const isPro = pinnedModel.includes('pro') || pinnedModel.includes('argon');
+        const tokenCeiling = isPro ? 8192 : 4096;
         console.log(`[Executing Dedicated Engine: ${pinnedModel} | MaxTokens: ${tokenCeiling}]`);
 
         // Array of high-conviction models to fulfill the pinned request instantly without timeout
-        const candidateModels = isArgon
-          ? ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash', 'gemini-3.5-flash']
-          : [pinnedModel, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite'];
+        const candidateModels = isPro
+          ? ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite']
+          : ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
 
         try {
           const pinnedWinner = await Promise.any(candidateModels.map(m => fetchDirectGoogle(m, tokenCeiling)));
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          const displayModel = isArgon ? 'gemini-4-argon' : pinnedWinner.model;
+          const displayModel = isPro ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash';
           console.log(`[⚡ Pinned Engine Success (${displayModel}) via ${pinnedWinner.model}] (${pinnedWinner.text.length} chars in ${elapsed}s)`);
           return { text: pinnedWinner.text, isFallback: false, model: displayModel, latency: `${elapsed}s` };
         } catch(pinnedErr) {
@@ -348,11 +347,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       }
 
       // High-availability parallel race across active endpoints
-      const targetModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash', 'gemini-3.5-flash'];
+      const targetModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
-      return { text: winner.text, isFallback: false, model: winner.model, latency: `${elapsed}s` };
+      return { text: winner.text, isFallback: false, model: 'Gemini 1.5 Flash', latency: `${elapsed}s` };
     } catch (gErr) {
       console.warn('[Direct Google Speculative Notice]:', gErr.message);
     }
@@ -767,7 +766,7 @@ User Message: ${userMessage}`;
 
     // Dynamic, Practical Life, Career, Money & Business Decision Consultant Instruction
     const isBusinessMode = (workspace || '').toLowerCase() === 'business';
-    const finalPrompt = `You are CONSULTANT STUDIO (Powered by Gemini 4 Argon), a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
+    const finalPrompt = `You are CONSULTANT STUDIO (Powered by Google Gemini 1.5 Pro), a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
 
 Most people feel overwhelmed making big life and money decisions on their own—like figuring out how to move out, afford rent, land a job, pay off debt, fix a monthly budget, buy a car, or run a small business. Your mission is to make those decisions simple, concrete, and achievable.
 

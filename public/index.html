@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consultant Studio | Strategic Operator & Quantitative Business Hub (Gemini 4 Argon)</title>
+    <title>Consultant Studio | Personal Runway, Career & Business Financial Modeling</title>
     <meta name="description" content="Private on-device financial modeling, business breakeven calculator, and personal cash runway & career strategy studio.">
     <link rel="canonical" href="https://www.consultant-studio.app/">
 
     <!-- OpenGraph Social Metadata -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Consultant Studio | Strategic Operator & Business Hub (Gemini 4 Argon)">
-    <meta property="og:description" content="Enterprise Strategic Operator and Quantitative Command Room powered by Gemini 4 Argon. Real-time commercial modeling and forensic financial architecture.">
+    <meta property="og:title" content="Consultant Studio | Personal Runway, Career & Business Financial Modeling">
+    <meta property="og:description" content="Private on-device financial modeling powered by Google Gemini 1.5 Pro. Calculate personal cash runway, minimum target salary, and business breakeven.">
     <meta property="og:url" content="https://www.consultant-studio.app/">
     <meta property="og:site_name" content="Consultant Studio">
     <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_official_brand.png">
@@ -19,8 +19,8 @@
 
     <!-- Twitter Card Metadata -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Consultant Studio | Strategic Operator (Gemini 4 Argon)">
-    <meta name="twitter:description" content="Audit unit economics, P&L turnarounds, and board deliverables powered by Gemini 4 Argon.">
+    <meta name="twitter:title" content="Consultant Studio | Personal Runway & Business Financial Studio">
+    <meta name="twitter:description" content="Calculate personal cash runway, benchmark salaries, and model business breakeven with 100% client-side privacy.">
     <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_official_brand.png">
 
     <!-- Structured Data (JSON-LD) for Search Engines -->
@@ -141,7 +141,9 @@
         body {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-obsidian-root) !important;
             background-image: 
                 radial-gradient(circle at 50% -10%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
@@ -380,26 +382,27 @@
             box-shadow: 0 0 10px var(--accent);
         }
 
-        /* SPLIT CANVAS WORKSPACE ARCHITECTURE */
+        /* SPLIT CANVAS WORKSPACE ARCHITECTURE (SCROLL-FRIENDLY HIERARCHY) */
         .workspace-stage {
             display: flex;
             flex: 1;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: visible;
             position: relative;
             width: 100%;
-            height: calc(100% - 60px);
+            min-height: calc(100dvh - 60px);
         }
 
         #chatFeed {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 16px 16px 110px;
-            max-width: 860px;
+            padding: 20px 18px 130px;
+            max-width: 920px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -2243,28 +2246,62 @@
             </div>
         </header>
 
-        <!-- HERO INTRODUCTION SECTION -->
-        <main style="flex:1; max-width:960px; margin:0 auto; padding:36px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
+        <!-- HERO INTRODUCTION & AUDIENCE TRACK FORK -->
+        <main style="flex:1; max-width:980px; margin:0 auto; padding:36px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
             <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:5px 14px; border-radius:20px; margin-bottom:18px;">
                 <span class="telemetry-dot"></span>
-                <span style="font-size:11px; font-weight:700; color:var(--accent-glow); letter-spacing:0.03em;">PERSONAL LIFE, CAREER & BUSINESS AI CONSULTANT</span>
+                <span style="font-size:11px; font-weight:700; color:var(--accent-glow); letter-spacing:0.03em;">PRIVATE ON-DEVICE FINANCIAL & CAREER DECISION ENGINE</span>
             </div>
 
-            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:800px;">
-                Make Real-World Life, Career & Money Decisions with Confidence
-            </h1>
+            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:800px;">Make Real-World Life, Career &amp; Money Decisions with Confidence</h1>
 
             <p style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.6; max-width:680px; margin-bottom:28px;">
-                Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or growing a business—get clear answers backed by real numbers in seconds.
+                Choose your dedicated workspace track below so you only see the tools, calculators, and AI workflows built for your exact goal—processed 100% locally in your browser.
             </p>
 
-            <!-- CALL TO ACTIONS -->
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:40px; width:100%; max-width:460px;">
-                <button class="btn-export" onclick="enterStudioWithTrial()" style="width:100%; justify-content:center; font-size:15px; font-weight:800; padding:14px 24px; background:var(--accent); color:#000; border:none; border-radius:10px; box-shadow:0 10px 30px rgba(34,197,94,0.4); cursor:pointer;">
-                    <span>Open Consultant Studio (30 Days Free) →</span>
-                </button>
-                <button class="btn-export" onclick="handleGoogleSecuritySignIn()" style="width:100%; justify-content:center; gap:10px; font-size:14.5px; font-weight:700; padding:13px 24px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border-color:rgba(255,255,255,0.2); color:#FFF; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,0.4);">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
+            <!-- AUDIENCE SEGMENTATION & ONBOARDING FORK (DECOUPLED TRACKS) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:18px; width:100%; max-width:860px; margin-bottom:32px; text-align:left;">
+                <!-- TRACK 1: PERSONAL RUNWAY & CAREER -->
+                <div style="background:linear-gradient(145deg, rgba(16,185,129,0.08) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.45);">
+                    <div>
+                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#4ADE80; background:rgba(16,185,129,0.12); padding:3px 9px; border-radius:999px; border:1px solid rgba(16,185,129,0.3);">Consumer &amp; Career Track</span>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; margin:10px 0 6px 0;">👤 Personal Runway &amp; Career</h2>
+                        <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin:0 0 12px 0;">Built for individuals, job seekers, and households planning their next move without corporate B2B clutter.</p>
+                        <ul style="list-style:none; padding:0; margin:0; font-size:12.5px; color:#CBD5E1; display:flex; flex-direction:column; gap:6px;">
+                            <li>✓ Financial Life Expectancy &amp; Monthly Burn Calculator</li>
+                            <li>✓ Post-Tax Minimum Target Salary &amp; Offer Benchmark</li>
+                            <li>✓ Moving Out &amp; Rent Affordability Math</li>
+                            <li>✓ 1-Page Resume Polish &amp; STAR Interview Coaching</li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('personal')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:var(--accent); color:#000; border:none; border-radius:10px; cursor:pointer;">
+                        Enter Personal Runway Track →
+                    </button>
+                </div>
+
+                <!-- TRACK 2: BUSINESS STUDIO (OPERATORS & FOUNDERS) -->
+                <div style="background:linear-gradient(145deg, rgba(56,189,248,0.08) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(56,189,248,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.45);">
+                    <div>
+                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#38BDF8; background:rgba(56,189,248,0.12); padding:3px 9px; border-radius:999px; border:1px solid rgba(56,189,248,0.3);">Operator &amp; Founder Track</span>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; margin:10px 0 6px 0;">🏢 Business Operations Studio</h2>
+                        <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin:0 0 12px 0;">Built for small business owners, operators, and founders managing margins, pricing, and commercial P&amp;Ls.</p>
+                        <ul style="list-style:none; padding:0; margin:0; font-size:12.5px; color:#CBD5E1; display:flex; flex-direction:column; gap:6px;">
+                            <li>✓ Dynamic Breakeven &amp; 12-Month EBITDA Matrix</li>
+                            <li>✓ Rent, COGS Margin &amp; Labor Efficiency Sliders</li>
+                            <li>✓ Unit Economics (CAC / LTV) &amp; Payback Modeling</li>
+                            <li>✓ Trade Area Foot-Traffic &amp; Competitor Pricing Recon</li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('business')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:#38BDF8; color:#04131D; border:none; border-radius:10px; cursor:pointer;">
+                        Enter Business Studio Track →
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECONDARY SIGN-IN & TRIAL ACTIONS -->
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:36px; width:100%; max-width:520px;">
+                <button class="btn-export" onclick="handleGoogleSecuritySignIn()" style="flex:1; min-width:210px; justify-content:center; gap:10px; font-size:13.5px; font-weight:700; padding:11px 20px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border-color:rgba(255,255,255,0.2); color:#FFF; border-radius:10px; cursor:pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
                         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
                         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2c0 2.8.7 5.5 1.9 7.9l3.7-2.9z"/>
@@ -2272,27 +2309,19 @@
                     </svg>
                     <span>Continue with Google</span>
                 </button>
-                <button class="btn-export" onclick="openAuthModal()" style="width:100%; justify-content:center; font-size:13.5px; font-weight:600; padding:10px 20px; background:transparent; border-color:rgba(255,255,255,0.12); color:var(--text-secondary); border-radius:10px; cursor:pointer;">
-                    <span>Or Sign In with Email</span>
+                <button class="btn-export" onclick="openPricing()" style="flex:1; min-width:210px; justify-content:center; font-size:13.5px; font-weight:700; padding:11px 20px; background:transparent; border-color:rgba(255,255,255,0.16); color:#F8FAFC; border-radius:10px; cursor:pointer;">
+                    <span>View Plans &amp; 30-Day Free Trial</span>
                 </button>
             </div>
 
-            <!-- 3 VALUE PILLARS -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; width:100%; text-align:left;">
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
-                    <div style="font-size:22px; margin-bottom:8px;">🏠</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Moving Out, Rent & Money Math</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Know exactly what rent you can afford, where your paycheck is going, and how to build a real savings buffer without stress.</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
-                    <div style="font-size:22px; margin-bottom:8px;">💼</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Job Hunting, Resumes & Interviews</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Upload your resume for an instant polish, practice live voice interviews, and compare job offers side by side.</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
-                    <div style="font-size:22px; margin-bottom:8px;">🏢</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Business & Side-Hustle Strategy</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Switch to Business Mode anytime to audit margins, price your services right, and export clean PDF or Excel plans.</div>
+            <!-- TRUST, PRIVACY & SUPPORT FOOTER ON LANDING PORTAL -->
+            <div style="width:100%; border-top:1px solid rgba(255,255,255,0.08); padding-top:20px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:12px; color:var(--text-muted);">
+                <span>🔒 100% Client-Side Local Storage • Zero Cloud Database Retention</span>
+                <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <button type="button" onclick="openLegalModal('privacy')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Privacy Policy</button>
+                    <button type="button" onclick="openLegalModal('terms')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Terms of Service</button>
+                    <button type="button" onclick="openSpecsModal()" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Security Whitepaper</button>
+                    <button type="button" onclick="openLegalModal('contact')" style="background:transparent; border:none; color:var(--accent-glow); cursor:pointer; font-size:12px; font-weight:700; padding:0;">Contact &amp; Support</button>
                 </div>
             </div>
         </main>
@@ -2654,11 +2683,13 @@
                     </p>
                     <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:16px; font-size:11.5px; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
                         <span>© <span id="currentCopyrightYear">2026</span> Consultant Studio</span>
-                        <a href="/privacy.html" style="color:var(--text-secondary); text-decoration:none;">Privacy Policy</a>
+                        <button type="button" onclick="openLegalModal('privacy')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:11.5px; padding:0; text-decoration:underline;">Privacy Policy</button>
                         <span>•</span>
-                        <a href="/terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
+                        <button type="button" onclick="openLegalModal('terms')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:11.5px; padding:0; text-decoration:underline;">Terms of Service</button>
                         <span>•</span>
-                        <a href="mailto:support@consultant-studio.app" style="color:var(--accent-glow); text-decoration:none;">Executive Support</a>
+                        <button type="button" onclick="openSpecsModal()" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:11.5px; padding:0; text-decoration:underline;">Security Whitepaper</button>
+                        <span>•</span>
+                        <button type="button" onclick="openLegalModal('contact')" style="background:transparent; border:none; color:var(--accent-glow); cursor:pointer; font-size:11.5px; font-weight:700; padding:0;">Contact &amp; Support</button>
                     </div>
                 </div>
             </div>
@@ -2693,16 +2724,15 @@
 
     <!-- FIXED BOTTOM INPUT DOCK -->
     <div class="dock-container">
-        <!-- ATTACHED FILE PREVIEW CHIP -->
+        <!-- ATTACHED FILE PREVIEW CHIP WITH EXTRACTED CHARACTER & TOKEN COUNT -->
         <div id="fileAttachmentPreview" style="display:none; max-width:940px; margin:0 auto 8px auto; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
             <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); padding:4px 10px; border-radius:8px; font-size:12px; color:var(--accent-glow);">
                 <span>📎</span>
                 <span id="attachedFileName" style="font-weight:600;">document.csv</span>
                 <span onclick="removeAttachedFile()" style="cursor:pointer; margin-left:4px; font-weight:bold; color:var(--text-muted);">✕</span>
             </div>
-            <div style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#10B981; font-weight:600; background:rgba(16,185,129,0.08); padding:3px 8px; border-radius:6px; border:1px solid rgba(16,185,129,0.2);">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>Zero-Knowledge: Local Browser Memory Only • No Cloud Persistence</span>
+            <div id="attachedFilePreviewSnippet" style="font-size:11px; color:#CBD5E1; background:rgba(255,255,255,0.04); padding:3px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); max-width:460px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                Parsed locally in browser memory
             </div>
         </div>
 
@@ -2732,11 +2762,10 @@
 
             <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid rgba(167,139,250,0.3); border-radius:8px; padding:2px 6px; flex-shrink:0;">
-                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select Intelligence Engine">
-                    <option value="gemini-4-argon" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Deep Analysis)</option>
-                    <option value="auto" style="background:#0D121A; color:#FFF;">⚡ Enterprise Auto (Adaptive Routing)</option>
-                    <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash (High Reasoning)</option>
-                    <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
+                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select AI Model">
+                    <option value="gemini-1.5-pro" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">Gemini 1.5 Pro (Deep Reasoning)</option>
+                    <option value="gemini-1.5-flash" style="background:#0D121A; color:#FFF;">Gemini 1.5 Flash (Low-Latency Execution)</option>
+                    <option value="auto" style="background:#0D121A; color:#FFF;">Auto Routing (Balanced Speed &amp; Depth)</option>
                 </select>
             </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Ask anything—moving out, landing a job, fixing your budget, or weighing a decision..." onkeydown="handleInputKeydown(event)"></textarea>
@@ -3039,15 +3068,15 @@
             <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
                     <div style="font-size:13px; font-weight:700; color:#38BDF8; margin-bottom:4px;">🔒 Private On-Device Modeling</div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All attached documents (.xlsx, .docx, .pdf, images) are parsed locally inside browser memory via Mammoth.js and PDF.js. Zero company data is stored in remote databases.</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All attached documents (.xlsx, .docx, .pdf, images) are parsed locally inside browser memory via Mammoth.js, SheetJS, and PDF.js. Your personal budgets and files are never stored in a cloud database.</div>
                 </div>
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#10B981; margin-bottom:4px;">⚡ Sub-180ms Decision Classification</div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">TypeSafe Jev System One / djev-run neural pipeline on Blackwell GPU container accelerates multi-primitive intent routing without network overhead.</div>
+                    <div style="font-size:13px; font-weight:700; color:#10B981; margin-bottom:4px;">⚡ Deterministic Financial Calculators</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Runway, tax, salary, and breakeven formulas run 100% deterministically in client-side JavaScript for instant 0ms recalculation without AI hallucination.</div>
                 </div>
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#F59E0B; margin-bottom:4px;">🛡️ Multi-Model Speculative Fast-Race</div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Concurrently races Gemini 3.7 Flash, Gemini 2.0 Flash, and GPT-4o-mini with auto-failover to direct Google AI Studio free tier.</div>
+                    <div style="font-size:13px; font-weight:700; color:#F59E0B; margin-bottom:4px;">🛡️ Google Gemini 1.5 Pro &amp; 1.5 Flash Routing</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Uses Google Gemini 1.5 Pro for deep multi-document financial and career reasoning, paired with Gemini 1.5 Flash for low-latency interactive responses.</div>
                 </div>
             </div>
 
@@ -3099,10 +3128,10 @@
                 </div>
 
                 <div>
-                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Active Model Acceleration:</div>
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Active AI Model Engine:</div>
                     <div style="font-size:12.5px; color:var(--accent-glow); background:rgba(34,197,94,0.08); padding:10px 14px; border-radius:10px; border:1px solid var(--border-glow); display:flex; flex-direction:column; gap:4px;">
-                        <div>✓ <strong>Gemini Flash Direct & TypeSafe Jev Active</strong></div>
-                        <div style="font-size:11px; color:var(--text-secondary);">Sub-2s Real-Time Inference & Deep Strategic Research Pipeline</div>
+                        <div>✓ <strong>Google Gemini 1.5 Pro &amp; Gemini 1.5 Flash Active</strong></div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Deep Reasoning &amp; Low-Latency Financial Advisory Pipeline</div>
                     </div>
                 </div>
 
@@ -3154,12 +3183,12 @@
                     <div class="plan-name">Partners</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Gemini 4 Argon Deep Analysis Access</strong></li>
-                        <li>✓ <strong>Built for Couples, Roommates & Co-Founders</strong></li>
-                        <li>✓ Shared Moving, Housing & Combined Budget Planning</li>
-                        <li>✓ <strong>Unlimited Document Uploads & PDF/Excel Exports</strong></li>
-                        <li>✓ Side-by-Side Decision & Scenario Modeling</li>
-                        <li>✓ Priority Sub-2s Response Speed</li>
+                        <li>✓ <strong>Gemini 1.5 Pro (Deep Reasoning) Access</strong></li>
+                        <li>✓ <strong>Built for Couples, Roommates &amp; Co-Founders</strong></li>
+                        <li>✓ Shared Moving, Housing &amp; Combined Budget Planning</li>
+                        <li>✓ <strong>Unlimited Document Uploads &amp; PDF/Excel Exports</strong></li>
+                        <li>✓ Side-by-Side Decision &amp; Scenario Modeling</li>
+                        <li>✓ Priority Low-Latency Response Speed</li>
                         <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
                     <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Partners')">Start Partners Trial</button>
@@ -3167,18 +3196,44 @@
 
                 <!-- FAMILY & EXECUTIVE BUSINESS $79.99 -->
                 <div class="plan-box">
-                    <div class="plan-name">Family & Executive Business</div>
+                    <div class="plan-name">Family &amp; Executive Business</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Full Gemini 4 Argon Extended Reasoning</strong></li>
+                        <li>✓ <strong>Full Gemini 1.5 Pro Extended Context (2M Tokens)</strong></li>
                         <li>✓ <strong>Complete Household + Business Operations Suite</strong></li>
-                        <li>✓ Full Business P&L, Margin & Pricing Studio</li>
-                        <li>✓ Unlimited File Analysis, Contracts & Spreadsheets</li>
-                        <li>✓ Multi-Member Career, Resume & Financial Planning</li>
+                        <li>✓ Full Business P&amp;L, Margin &amp; Pricing Studio</li>
+                        <li>✓ Unlimited File Analysis, Contracts &amp; Spreadsheets</li>
+                        <li>✓ Multi-Member Career, Resume &amp; Financial Planning</li>
                         <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('exec', 7999, 'Family & Executive Business')">Start Family & Business Trial</button>
+                    <button class="btn-subscribe" onclick="checkout('exec', 7999, 'Family & Executive Business')">Start Family &amp; Business Trial</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRUST INFRASTRUCTURE MODAL: PRIVACY POLICY, TERMS OF SERVICE & CONTACT -->
+    <div class="modal-overlay" id="legalTrustModal">
+        <div class="modal-card" style="max-width:680px; padding:28px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="legalModalTitle" style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF;">🔒 Privacy Policy &amp; Local Storage Architecture</h2>
+                    <p id="legalModalSub" style="color:var(--text-secondary); font-size:12.5px; margin-top:2px;">How Consultant Studio protects your financial figures and uploaded documents.</p>
+                </div>
+                <button class="btn-modal-close" onclick="closeLegalModal()" aria-label="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div style="display:flex; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+                <button type="button" class="btn-export" onclick="openLegalModal('privacy')" style="font-size:11.5px;">Privacy Policy</button>
+                <button type="button" class="btn-export" onclick="openLegalModal('terms')" style="font-size:11.5px;">Terms of Service</button>
+                <button type="button" class="btn-export" onclick="openLegalModal('contact')" style="font-size:11.5px;">Contact &amp; Support</button>
+            </div>
+            <div id="legalModalBody" style="font-size:13px; color:#CBD5E1; line-height:1.65; max-height:55vh; overflow-y:auto; display:flex; flex-direction:column; gap:12px;">
+                <!-- Populated dynamically via openLegalModal(tab) -->
+            </div>
+            <div style="display:flex; justify-content:flex-end; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+                <button type="button" class="btn-export" onclick="closeLegalModal()">Close</button>
             </div>
         </div>
     </div>
@@ -4074,7 +4129,7 @@
                             </div>
                             <div class="meta">
                                 <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                <div><strong>Engine:</strong> TypeSafe Jev + Enterprise Zero-Cloud</div>
+                                <div><strong>Engine:</strong> Google Gemini 1.5 Pro (On-Device Privacy)</div>
                             </div>
                         </div>
                         <div class="content">
@@ -4131,14 +4186,86 @@
             if (profile.name) {
                 if (welcomeH1) welcomeH1.innerText = `Welcome back, ${profile.name.split(' ')[0]}.`;
                 if (welcomeSub) welcomeSub.innerText = `Your personal consultant for life, career, money, and business decisions${profile.company ? ` (${profile.company})` : ''}. Ask anything in plain English or attach a file to get a clear, honest breakdown.`;
-                if (sidebarName) sidebarName.innerText = profile.name + (isCreator ? ' (Creator)' : '');
-                if (authBtnText) authBtnText.innerText = 'Switch Profile';
+                if (sidebarName) sidebarName.innerText = profile.name + (isCreator ? ' (Creator)' : ' (Active Trial)');
+                if (authBtnText) authBtnText.innerText = 'Account & Plan';
             } else {
-                if (welcomeH1) welcomeH1.innerText = 'Your Personal Consultant for Everyday Decisions';
-                if (welcomeSub) welcomeSub.innerText = "Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.";
-                if (sidebarName) sidebarName.innerText = 'Guest Member';
-                if (authBtnText) authBtnText.innerText = 'Sign In / Profile';
+                if (welcomeH1) welcomeH1.innerText = 'Track Personal Cash Runway & Career Transition Math';
+                if (welcomeSub) welcomeSub.innerText = "Model your exact months and days of financial solvency, calculate your minimum target salary after taxes, benchmark job offers or consulting day-rates, and polish your resume or STAR interview answers.";
+                if (sidebarName) sidebarName.innerText = 'Guest Preview (3 Free Queries)';
+                if (authBtnText) authBtnText.innerText = 'Sign In / Start 30-Day Trial';
             }
+        }
+
+        function enterDedicatedTrack(trackMode) {
+            const portal = document.getElementById('landingPortal');
+            if (portal) portal.style.display = 'none';
+            localStorage.setItem('consultant_user_authenticated', 'true');
+            localStorage.setItem('cs_workspace', trackMode);
+            if (typeof switchConsultantMode === 'function') {
+                switchConsultantMode(trackMode);
+            }
+            const label = trackMode === 'business' ? 'Business Operations Studio' : 'Personal Runway & Career Track';
+            showToast(`Loaded ${label}—100% private on-device modeling active.`, "✓");
+        }
+
+        function openLegalModal(tab = 'privacy') {
+            const modal = document.getElementById('legalTrustModal');
+            const title = document.getElementById('legalModalTitle');
+            const sub = document.getElementById('legalModalSub');
+            const body = document.getElementById('legalModalBody');
+            if (!modal || !body) return;
+
+            if (tab === 'privacy') {
+                if (title) title.innerText = '🔒 Privacy Policy & Zero-Cloud Storage Architecture';
+                if (sub) sub.innerText = 'Effective October 2026 • Client-Side Processing Standard';
+                body.innerHTML = `
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#4ADE80; display:block; margin-bottom:4px;">1. 100% Client-Side Local Storage</strong>
+                        Your financial calculator inputs (liquid savings, monthly burn, salary targets, and breakeven sliders), task checklists, and saved Research Vault memos are stored exclusively in your browser's local storage (<code>window.localStorage</code>). We do not operate a cloud database that stores your personal budgets or net worth.
+                    </div>
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#38BDF8; display:block; margin-bottom:4px;">2. On-Device Document Parsing (.PDF, .DOCX, .XLSX)</strong>
+                        When you attach a resume, lease, or spreadsheet, text extraction happens directly inside your browser memory using PDF.js, Mammoth.js, and SheetJS. Transient prompt snippets sent to Google Gemini 1.5 Pro / Flash for live analysis are never logged to persistent disk storage or used to train models.
+                    </div>
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#F8FAFC; display:block; margin-bottom:4px;">3. Instant Data Erasure</strong>
+                        You can clear your entire local vault and profile state at any time with one click inside the Strategy Vault or Account modal.
+                    </div>
+                `;
+            } else if (tab === 'terms') {
+                if (title) title.innerText = '📋 Terms of Service & Advisory Disclaimer';
+                if (sub) sub.innerText = 'Transparent Usage Terms & Financial Modeling Scope';
+                body.innerHTML = `
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#FBBF24; display:block; margin-bottom:4px;">1. Decision-Support & Educational Modeling</strong>
+                        Consultant Studio provides quantitative financial calculators (cash runway, tax estimation, salary benchmarking, and commercial breakeven sensitivity) and AI-assisted career/operational coaching. Outputs are for informational decision-support and do not constitute licensed CPA, legal, or fiduciary investment advice.
+                    </div>
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#4ADE80; display:block; margin-bottom:4px;">2. 30-Day Free Trial & Subscription Tiers</strong>
+                        All membership tiers (Solo Operator, Partners, and Family & Executive Business) include a 30-day evaluation period. You may cancel or switch tiers at any time prior to billing.
+                    </div>
+                `;
+            } else {
+                if (title) title.innerText = '💬 Direct Contact, Support & Architecture Team';
+                if (sub) sub.innerText = 'Reach our product & operations engineering desk directly';
+                body.innerHTML = `
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#4ADE80; display:block; margin-bottom:4px;">Direct Support Channel</strong>
+                        Email: <a href="mailto:support@consultant-studio.app" style="color:#38BDF8; font-weight:700;">support@consultant-studio.app</a><br>
+                        Response SLA: Under 4 business hours for all Solo Operator, Partners, and Business accounts.
+                    </div>
+                    <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <strong style="color:#F8FAFC; display:block; margin-bottom:4px;">Security & Bug Reporting</strong>
+                        Found a calculation edge case or UI bug? Email our engineering desk directly or attach a screenshot in the chat copilot.
+                    </div>
+                `;
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeLegalModal() {
+            const modal = document.getElementById('legalTrustModal');
+            if (modal) modal.style.display = 'none';
         }
 
         function enterStudioWithTrial() {
@@ -4877,9 +5004,19 @@
                     combinedDocText += `\n=== FILE [${idx + 1}/${selectedFiles.length}]: ${file.name} ===\n${currentFileText}\n`;
                 }
 
-                uploadedDocText = combinedDocText.trim();
+                // Enforce safe 12,000-character token budget per upload batch and show extraction preview
+                const rawLen = combinedDocText.trim().length;
+                const estTokens = Math.max(1, Math.round(rawLen / 4));
+                uploadedDocText = combinedDocText.trim().slice(0, 12000);
                 if (nameLabel) {
-                    nameLabel.innerText = selectedFiles.length === 1 ? `${selectedFiles[0].name} (ready)` : `${selectedFiles.length} files attached (ready)`;
+                    nameLabel.innerText = selectedFiles.length === 1
+                        ? `${selectedFiles[0].name} (~${estTokens.toLocaleString()} tokens)`
+                        : `${selectedFiles.length} files (~${estTokens.toLocaleString()} tokens)`;
+                }
+                const snippetEl = document.getElementById('attachedFilePreviewSnippet');
+                if (snippetEl) {
+                    const cleanPreview = uploadedDocText.replace(/=== FILE[^\n]*===/g, '').replace(/\s+/g, ' ').trim().slice(0, 95);
+                    snippetEl.innerText = cleanPreview ? `Preview: "${cleanPreview}..."` : 'Extracted locally in browser memory';
                 }
 
                 // CONSUMER-FIRST AUTO-MATH: Automatically parse financial parameters from attached CSV/P&L/DOCX into the Breakeven Control Room
@@ -6699,19 +6836,10 @@
         }
 
         function handleModelChange(selectEl) {
-            if (selectEl.value === 'gemini-4-argon') {
-                const subTier = localStorage.getItem('consultant_sub_tier') || '';
-                const isCreator = localStorage.getItem('consultant_creator') === 'true';
-                const userEmail = (localStorage.getItem('consultant_user_email') || '').toLowerCase();
-                const isOperator = isCreator || userEmail.includes('landen') || userEmail.includes('jacksonlanden') || window.location.search.includes('creator=true') || window.location.search.includes('tier=exec');
-                const isProOrExec = isOperator || subTier === 'pro' || subTier === 'exec';
-                
-                if (!isProOrExec) {
-                    showToast("🌌 Gemini 4 Argon Frontier Reasoning is included in Partners and Family & Executive Business plans.", "💎");
-                    openPricing();
-                } else {
-                    showToast("🌌 Gemini 4 Argon 2M+ Frontier Reasoning Activated (Operator Access).", "✓");
-                }
+            if (selectEl.value === 'gemini-1.5-pro') {
+                showToast("Google Gemini 1.5 Pro (Deep Reasoning) active.", "✓");
+            } else if (selectEl.value === 'gemini-1.5-flash') {
+                showToast("Google Gemini 1.5 Flash (Low-Latency Execution) active.", "⚡");
             }
         }
 
@@ -6749,39 +6877,27 @@
             const assistantCard = document.createElement('div');
             assistantCard.className = 'bubble-assistant';
             
-            <!-- Plain-English Telemetry Pipeline UI Tracker -->
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
                 <div class="orchestration-tracker" id="${hudId}">
-                    <div class="tracker-step done" id="${hudId}_step1">✓ Reading documents...</div>
-                    <div class="tracker-step running" id="${hudId}_step2">⟳ Analyzing financials...</div>
-                    <div class="tracker-step pending" id="${hudId}_step3">○ Preparing recommendations...</div>
+                    <div class="tracker-step running" id="${hudId}_step1">⟳ Analyzing your numbers &amp; context with Google Gemini...</div>
                 </div>
             `;
             assistantRow.appendChild(assistantCard);
             chatFeed.appendChild(assistantRow);
             chatFeed.scrollTop = chatFeed.scrollHeight;
 
-            // Animate steps
-            const t1 = setTimeout(() => {
-                const s2 = document.getElementById(`${hudId}_step2`);
-                const s3 = document.getElementById(`${hudId}_step3`);
-                if (s2) { s2.classList.remove('running'); s2.classList.add('done'); s2.innerText = '✓ Financials analyzed'; }
-                if (s3) { s3.classList.remove('pending'); s3.classList.add('running'); s3.innerText = '⟳ Preparing recommendations...'; }
-            }, 1200);
-
             // Safe Workspace & Mode Resolution
             const currentMode = (typeof selectedMode !== 'undefined' && selectedMode) ? selectedMode : (localStorage.getItem('cs_workspace') || 'general');
+            const cacheKey = 'cs_cache_' + btoa(unescape(encodeURIComponent(currentMode + ':' + text.slice(0, 120)))).slice(0, 32);
 
-            // Always request fresh real-time AI reasoning from server (No stale session caching)
-            // Client-Side 45-Second Timeout with Resilient Fallback
             let res = null;
             let data = null;
 
             try {
                 const controller = new AbortController();
-                // ⚠️ EXTEND TIMEOUT TO 90s to ensure deep multi-part executive resumes & models complete without aborting
-                const timeoutId = setTimeout(() => controller.abort(), 90000);
+                // 30-second client timeout so copilot never hangs indefinitely
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
 
                 const reqHeaders = { 'Content-Type': 'application/json' };
@@ -6790,15 +6906,12 @@
                 }
 
                 let currentConversationId = localStorage.getItem('cs_last_conversation_id') || null;
-
-                // 🧠 Dynamic Multi-Tier Persistent Memory Injection (Vault + Facts + Controls)
                 let memoryContext = getOperatorMemoryContext();
 
-                // Auto-harvest durable entities from user input and documents
                 autoHarvestMemoryFromText(text);
                 if (docToSend) autoHarvestMemoryFromText(docToSend);
 
-                const modelOverride = document.getElementById('modelSelectOverride')?.value || 'auto';
+                const modelOverride = document.getElementById('modelSelectOverride')?.value || 'gemini-1.5-pro';
 
                 res = await fetch('/api/chat', {
                     method: 'POST',
@@ -6819,46 +6932,32 @@
                     if (data.conversationId) {
                         localStorage.setItem('cs_last_conversation_id', data.conversationId);
                     }
+                } else {
+                    throw new Error(`Server returned status ${res ? res.status : 'offline'}`);
                 }
 
                 let responseText = (data && data.response) ? data.response : "";
                 if (!responseText) {
-                    responseText = `Immediate operational review for **${escapeHtml(text)}**: Stabilize cash flow, defend baseline margins, and eliminate frontline bottlenecks. Focus on core prime costs and operational throughput.`;
+                    throw new Error("Empty response received from model.");
                 }
 
-                // If live voice consultant mode is active, speak back the answer aloud and loop listening
                 if (isVoicePracticeActive && responseText) {
                     appendLiveRoomTranscript('assistant', responseText);
                     speakInterviewerResponse(responseText, () => {
                         if (isVoicePracticeActive) {
-                            listenToCandidate(); // Auto-listen for next user spoken question
+                            listenToCandidate();
                         }
                     });
                 }
 
-                // Clear active telemetry timers when stream starts
-                clearTimeout(t1);
-
-                // Smooth exit transition for the Loading Indicator
-                const loadingHud = assistantCard.querySelector('.typing-indicator') || assistantCard.querySelector('.orchestration-tracker') || assistantCard.querySelector('.subagent-hud');
-                if (loadingHud) {
-                    loadingHud.style.transition = 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
-                    loadingHud.style.opacity = '0';
-                    loadingHud.style.transform = 'translateY(-6px) scale(0.98)';
-                }
-
-                // If response was served via deterministic fallback, keep UI clean without confusing warning banners
-                const fallbackBanner = '';
-
-                // Save successful strategy to session cache for 0ms instant reload
-                try {
-                    sessionStorage.setItem(cacheKey, responseText);
-                } catch(e) {}
-
-                // Execute exit transition for loading HUD immediately before stream starts
+                const loadingHud = assistantCard.querySelector('.orchestration-tracker');
                 if (loadingHud) {
                     loadingHud.style.display = 'none';
                 }
+
+                try {
+                    sessionStorage.setItem(cacheKey, responseText);
+                } catch(e) {}
 
                 // Stream response with smooth word-by-word animation and glowing green cursor
                 setTimeout(() => {
@@ -6962,40 +7061,9 @@
             }
         }
 
-        // Initialize SplitText Headline Animation on Welcome Banner
+        // Keep headline typography clean without character-by-character DOM splitting (prevents comma spacing bugs)
         function initSplitTextAnimation() {
-            try {
-                const heading = document.getElementById('welcomeHeading');
-                if (!heading || heading.dataset.splitInit === 'true') return;
-                heading.dataset.splitInit = 'true';
-
-                const text = heading.innerText.trim();
-                heading.innerHTML = '';
-                
-                // Split text into characters with staggered animation delays
-                let charCount = 0;
-                const words = text.split(' ');
-                words.forEach((word, wIdx) => {
-                    const wordSpan = document.createElement('span');
-                    wordSpan.style.display = 'inline-block';
-                    wordSpan.style.whiteSpace = 'nowrap';
-                    
-                    for (let i = 0; i < word.length; i++) {
-                        const charSpan = document.createElement('span');
-                        charSpan.className = 'split-char';
-                        charSpan.innerText = word[i];
-                        charSpan.style.animationDelay = `${(charCount * 0.028) + 0.15}s`;
-                        wordSpan.appendChild(charSpan);
-                        charCount++;
-                    }
-                    heading.appendChild(wordSpan);
-                    if (wIdx < words.length - 1) {
-                        heading.appendChild(document.createTextNode(' '));
-                    }
-                });
-            } catch (e) {
-                console.warn('[SplitText Animation Ignored]', e);
-            }
+            return;
         }
 
         // Boot and automatically render Breakeven Studio Charts & Tables on page ready
