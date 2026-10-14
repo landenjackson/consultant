@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-mobile-clean-v2';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-google-login-v3';
 const ASSETS = [
   '/',
   '/index.html',
