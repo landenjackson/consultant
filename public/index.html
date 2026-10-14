@@ -2117,62 +2117,61 @@
         <!-- LUXURY AMBIENT GLOW -->
         <div style="position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:600px; height:400px; background:radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(7,9,13,0) 70%); pointer-events:none;"></div>
 
-        <!-- TOP MINIMAL NAV -->
-        <header style="padding:16px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); position:relative; z-index:10; background:rgba(7,9,13,0.85); backdrop-filter:blur(12px);">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:34px; height:34px; border-radius:8px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); box-shadow:0 0 12px rgba(34,197,94,0.25);">
+        <!-- TOP MINIMAL NAV (RESPONSIVE FOR MOBILE) -->
+        <header style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.06); position:relative; z-index:10; background:rgba(7,9,13,0.9); backdrop-filter:blur(12px);">
+            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                <div style="width:32px; height:32px; border-radius:8px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); box-shadow:0 0 12px rgba(34,197,94,0.25); flex-shrink:0;">
                     <img src="/brand/consultant_studio_official_icon.jpg" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
                 </div>
-                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:#FFF; letter-spacing:-0.02em;">Consultant Studio</span>
-                <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">FRONTIER INTELLIGENCE</span>
+                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; color:#FFF; letter-spacing:-0.02em; white-space:nowrap;">Consultant Studio</span>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 14px; border-color:rgba(255,255,255,0.15); color:#FFF;">Sign In</button>
-                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:12px; font-weight:800; padding:7px 16px; background:var(--accent); color:#000; border:none; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.35);">Start 30-Day Free Trial</button>
+            <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 12px; border-color:rgba(255,255,255,0.15); color:#FFF; white-space:nowrap;">Sign In</button>
+                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:12px; font-weight:800; padding:7px 13px; background:var(--accent); color:#000; border:none; border-radius:8px; box-shadow:0 0 14px rgba(34,197,94,0.35); white-space:nowrap;">Start Free Trial</button>
             </div>
         </header>
 
         <!-- HERO INTRODUCTION SECTION -->
-        <main style="flex:1; max-width:960px; margin:0 auto; padding:48px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
-            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:4px 12px; border-radius:20px; margin-bottom:20px;">
+        <main style="flex:1; max-width:960px; margin:0 auto; padding:36px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:5px 14px; border-radius:20px; margin-bottom:18px;">
                 <span class="telemetry-dot"></span>
-                <span style="font-size:11.5px; font-weight:700; color:var(--accent-glow); letter-spacing:0.02em;">SOVEREIGN STRATEGIC INTELLIGENCE • ZERO CLOUD PERSISTENCE</span>
+                <span style="font-size:11px; font-weight:700; color:var(--accent-glow); letter-spacing:0.03em;">PERSONAL LIFE, CAREER & BUSINESS AI CONSULTANT</span>
             </div>
 
-            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(28px, 5vw, 44px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:16px; max-width:820px;">
-                Turn Operational Acumen into Boardroom Certainty
+            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:800px;">
+                Make Real-World Life, Career & Money Decisions with Confidence
             </h1>
 
-            <p style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.65; max-width:720px; margin-bottom:32px;">
-                An institutional-grade strategic operating partner for founders, C-suite executives, and private equity sponsors. Model forensic P&Ls, engineer 1-page executive resumes, stress-test 13-week liquidity, and practice live strategic voice sessions with zero external data leaks.
+            <p style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.6; max-width:680px; margin-bottom:28px;">
+                Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or growing a business—get clear answers backed by real numbers in seconds.
             </p>
 
             <!-- CALL TO ACTIONS -->
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-bottom:48px;">
-                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:15px; font-weight:800; padding:14px 28px; background:var(--accent); color:#000; border:none; border-radius:10px; box-shadow:0 10px 30px rgba(34,197,94,0.4); cursor:pointer;">
-                    <span>Deploy Workspace (30 Days Free) →</span>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:40px; width:100%; max-width:460px;">
+                <button class="btn-export" onclick="enterStudioWithTrial()" style="width:100%; justify-content:center; font-size:15px; font-weight:800; padding:14px 24px; background:var(--accent); color:#000; border:none; border-radius:10px; box-shadow:0 10px 30px rgba(34,197,94,0.4); cursor:pointer;">
+                    <span>Open Consultant Studio (30 Days Free) →</span>
                 </button>
-                <button class="btn-export" onclick="openAuthModal()" style="font-size:15px; font-weight:700; padding:14px 24px; background:#101520; border-color:rgba(255,255,255,0.18); color:#FFF; border-radius:10px; cursor:pointer;">
+                <button class="btn-export" onclick="openAuthModal()" style="width:100%; justify-content:center; font-size:14px; font-weight:700; padding:12px 24px; background:#101520; border-color:rgba(255,255,255,0.18); color:#FFF; border-radius:10px; cursor:pointer;">
                     <span>Sign In via Google or Email</span>
                 </button>
             </div>
 
             <!-- 3 VALUE PILLARS -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; width:100%; text-align:left;">
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
-                    <div style="font-size:22px; margin-bottom:10px;">📊</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Forensic P&L & Cash Modeling</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Audit prime cost floors, breakeven thresholds, and 12-month EBITDA flow-through with 1-click Excel (.xlsx) downloads.</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; width:100%; text-align:left;">
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
+                    <div style="font-size:22px; margin-bottom:8px;">🏠</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Moving Out, Rent & Money Math</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Know exactly what rent you can afford, where your paycheck is going, and how to build a real savings buffer without stress.</div>
                 </div>
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
-                    <div style="font-size:22px; margin-bottom:10px;">🎙️</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Live Auditory Consultant</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Full-duplex conversational voice advisory with male and female personas for hands-free strategy sessions.</div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
+                    <div style="font-size:22px; margin-bottom:8px;">💼</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Job Hunting, Resumes & Interviews</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Upload your resume for an instant polish, practice live voice interviews, and compare job offers side by side.</div>
                 </div>
-                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px;">
-                    <div style="font-size:22px; margin-bottom:10px;">🛡️</div>
-                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Sovereign Zero-Cloud Privacy</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">All files, workbooks, and sensitive figures process 100% in browser memory with zero database persistence.</div>
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:18px;">
+                    <div style="font-size:22px; margin-bottom:8px;">🏢</div>
+                    <div style="font-size:15px; font-weight:800; color:#FFF; margin-bottom:6px;">Business & Side-Hustle Strategy</div>
+                    <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">Switch to Business Mode anytime to audit margins, price your services right, and export clean PDF or Excel plans.</div>
                 </div>
             </div>
         </main>
@@ -2525,20 +2524,19 @@
         </div>
     </div>
 
-    <!-- EXECUTIVE PROTOCOL AUTHENTICATION & WORKSPACE CREDENTIAL MODAL -->
+    <!-- CLEAN SIGN IN & PROFILE MODAL -->
     <div class="modal-overlay" id="authModal">
-        <div class="modal-card" style="max-width:480px; padding:32px; background:radial-gradient(circle at 50% 0%, rgba(34,197,94,0.12) 0%, #0B0E14 70%); border:1px solid rgba(34,197,94,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.9), 0 0 40px rgba(34,197,94,0.15);">
-            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:16px;">
+        <div class="modal-card" style="max-width:460px; padding:26px 22px; background:radial-gradient(circle at 50% 0%, rgba(34,197,94,0.12) 0%, #0B0E14 70%); border:1px solid rgba(34,197,94,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.9);">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:40px; height:40px; border-radius:10px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); box-shadow:0 0 16px rgba(34,197,94,0.3); flex-shrink:0;">
+                    <div style="width:38px; height:38px; border-radius:10px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); flex-shrink:0;">
                         <img src="/brand/consultant_studio_official_icon.jpg" alt="Emblem" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     <div>
-                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em; display:flex; align-items:center; gap:6px;">
-                            <span>Consultant Studio</span>
-                            <span style="font-size:10px; color:#A78BFA; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); padding:2px 6px; border-radius:4px; font-weight:700;">FRONTIER INTELLIGENCE</span>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:18px; font-weight:800; color:#FFFFFF; letter-spacing:-0.02em;">
+                            Sign In to Consultant Studio
                         </h2>
-                        <p style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Sovereign Strategic Intelligence & Quantitative Operations Room</p>
+                        <p style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Personalize your life, career & financial plans</p>
                     </div>
                 </div>
                 <button class="btn-modal-close" onclick="closeAuthModal()" aria-label="Close" title="Close">
@@ -2546,47 +2544,47 @@
                 </button>
             </div>
 
-            <!-- 1-CLICK VERIFIED GOOGLE IDENTITY GATEWAY -->
-            <div style="margin: 20px 0 16px 0;">
-                <button class="btn-export" style="width:100%; justify-content:center; gap:12px; padding:12px 16px; font-size:13.5px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border:1px solid rgba(255,255,255,0.15); color:#FFFFFF; font-weight:700; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.5); cursor:pointer;" onclick="handleGoogleSecuritySignIn()">
-                    <svg width="19" height="19" viewBox="0 0 24 24">
+            <!-- 1-CLICK GOOGLE SIGN IN -->
+            <div style="margin: 18px 0 14px 0;">
+                <button class="btn-export" style="width:100%; justify-content:center; gap:10px; padding:12px 16px; font-size:13.5px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border:1px solid rgba(255,255,255,0.15); color:#FFFFFF; font-weight:700; border-radius:10px; cursor:pointer;" onclick="handleGoogleSecuritySignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
                         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
                         <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.2c0 2.8.7 5.5 1.9 7.9l3.7-2.9z"/>
                         <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"/>
                     </svg>
-                    <span>Continue with Google (One-Tap Sovereign Access)</span>
+                    <span>Continue with Google</span>
                 </button>
             </div>
 
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
-                <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Or Enter via Corporate Email</span>
+                <span style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Or Continue with Email</span>
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
             </div>
 
-            <!-- EMAIL & OPERATOR CREDENTIAL INPUTS -->
-            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
+            <!-- EMAIL & PROFILE INPUTS -->
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 18px;">
                 <div id="authErrorMsg" style="display:none; color:#F87171; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:8px 12px; font-size:12px; font-weight:600;"></div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Executive / Operator Name: <span style="color:#F87171;">*</span></label>
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Your Name: <span style="color:#F87171;">*</span></label>
                     <input type="text" id="authNameInput" class="dock-input" placeholder="e.g. Landen Jackson" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Corporate / Operator Email: <span style="color:#F87171;">*</span></label>
-                    <input type="email" id="authEmailInput" class="dock-input" placeholder="name@company.com" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Email Address: <span style="color:#F87171;">*</span></label>
+                    <input type="email" id="authEmailInput" class="dock-input" placeholder="you@example.com" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Practice / Business Name (Optional):</label>
-                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Apex Operations or Horizon Ventures" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
+                    <label style="display:block; font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px;">Current Goal or Focus (Optional):</label>
+                    <input type="text" id="authCompanyInput" class="dock-input" placeholder="e.g. Moving out, Job hunting, Budgeting, or Business" style="width:100%; border-radius:8px; padding:10px 12px; background:#07090D; border:1px solid var(--border);">
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:16px;">
-                <button class="btn-export" style="border-color:transparent; color:var(--text-muted); font-size:12px;" onclick="handleSignOut()">Sign Out / Reset</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px; flex-wrap:wrap; gap:8px;">
+                <button class="btn-export" style="border-color:transparent; color:var(--text-muted); font-size:12px;" onclick="handleSignOut()">Sign Out</button>
                 <div style="display:flex; gap:8px;">
                     <button class="btn-export" onclick="closeAuthModal()">Skip for Now</button>
-                    <button id="authSubmitBtn" class="btn-export" style="background:var(--accent); color:#000; font-weight:800; border:none; padding:9px 18px; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="saveUserProfile()">Authorize Workspace</button>
+                    <button id="authSubmitBtn" class="btn-export" style="background:var(--accent); color:#000; font-weight:800; border:none; padding:9px 18px; border-radius:8px; box-shadow:0 0 16px rgba(34,197,94,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="saveUserProfile()">Save & Continue</button>
                 </div>
             </div>
         </div>
@@ -2800,58 +2798,58 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div>
-                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:22px; font-weight:800; color:#FFFFFF;">Institutional Intelligence Tiers</h2>
-                    <p style="color:var(--text-secondary); font-size:13.5px; margin-top:3px;">Select your deployment tier. All plans include 30-day full platform evaluation.</p>
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:21px; font-weight:800; color:#FFFFFF;">Consultant Studio Membership Plans</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-top:3px;">Choose the plan that fits your life or business. Every plan starts with a 30-day free trial.</p>
                 </div>
                 <button class="btn-modal-close" onclick="closePricing()" aria-label="Close" title="Close">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <div class="pricing-grid">
-                <!-- STARTER $15.99 -->
+                <!-- SOLO OPERATOR $15.99 -->
                 <div class="plan-box">
-                    <div class="plan-name">Operator Professional</div>
+                    <div class="plan-name">Solo Operator</div>
                     <div class="plan-price">$15.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ Unlimited Strategy Reasoning & Analysis</li>
-                        <li>✓ <strong>Unlimited Document & Data Uploads (.docx/.pdf/.xlsx)</strong></li>
-                        <li>✓ Live Cash Flow & Forensic P&L Engine</li>
-                        <li>✓ Standard Advisory Telemetry</li>
-                        <li>✓ <strong>30-Day Evaluation Period ($0 Today)</strong></li>
+                        <li>✓ Unlimited Life, Career & Money Consulting</li>
+                        <li>✓ <strong>Unlimited Resume, Lease & File Uploads (.docx/.pdf/.xlsx)</strong></li>
+                        <li>✓ Rent, Moving Out & Monthly Budget Math</li>
+                        <li>✓ Job Interview Prep & Live Voice Practice</li>
+                        <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('starter', 1599, 'Operator Professional')">Deploy Professional Tier</button>
+                    <button class="btn-subscribe" onclick="checkout('starter', 1599, 'Solo Operator')">Start Solo Operator Trial</button>
                 </div>
 
-                <!-- PRO $39.99 -->
+                <!-- PARTNERS $39.99 -->
                 <div class="plan-box featured">
                     <div class="plan-badge">MOST POPULAR</div>
-                    <div class="plan-name">Strategic Partner</div>
+                    <div class="plan-name">Partners</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
                         <li>✓ <strong>🌌 Gemini 4 Argon Frontier Intelligence Access</strong></li>
-                        <li>✓ <strong>Unlimited Document & Data Uploads (.docx/.pdf/.xlsx)</strong></li>
-                        <li>✓ <strong>Unlimited Office Exports (.xlsx/.docx) / mo</strong></li>
-                        <li>✓ Sub-2s Multi-Model Accelerated Priority</li>
-                        <li>✓ Dynamic What-If Sensitivity Modeling</li>
-                        <li>✓ Multi-Domain Market Catchment Modeling</li>
-                        <li>✓ <strong>30-Day Evaluation Period ($0 Today)</strong></li>
+                        <li>✓ <strong>Built for Couples, Roommates & Co-Founders</strong></li>
+                        <li>✓ Shared Moving, Housing & Combined Budget Planning</li>
+                        <li>✓ <strong>Unlimited Document Uploads & PDF/Excel Exports</strong></li>
+                        <li>✓ Side-by-Side Decision & Scenario Modeling</li>
+                        <li>✓ Priority Sub-2s Response Speed</li>
+                        <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Strategic Partner')">Deploy Strategic Partner</button>
+                    <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Partners')">Start Partners Trial</button>
                 </div>
 
-                <!-- EXECUTIVE $79.99 -->
+                <!-- FAMILY & EXECUTIVE BUSINESS $79.99 -->
                 <div class="plan-box">
-                    <div class="plan-name">Executive Boardroom</div>
+                    <div class="plan-name">Family & Executive Business</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Full Gemini 4 Argon 2M+ Context Authority & Extended Thinking</strong></li>
-                        <li>✓ <strong>Unlimited Document & Data Uploads (.docx/.pdf/.xlsx)</strong></li>
-                        <li>✓ <strong>Unlimited Extended Thinking & File Ingestion</strong></li>
-                        <li>✓ Org Structure & KPI Incentive Modeling</li>
-                        <li>✓ 1-Page Institutional Bank Teasers</li>
-                        <li>✓ <strong>30-Day Evaluation Period ($0 Today)</strong></li>
+                        <li>✓ <strong>🌌 Full Gemini 4 Argon Extended Reasoning</strong></li>
+                        <li>✓ <strong>Complete Household + Business Operations Suite</strong></li>
+                        <li>✓ Full Business P&L, Margin & Pricing Studio</li>
+                        <li>✓ Unlimited File Analysis, Contracts & Spreadsheets</li>
+                        <li>✓ Multi-Member Career, Resume & Financial Planning</li>
+                        <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
-                    <button class="btn-subscribe" onclick="checkout('exec', 7999, 'Executive Boardroom')">Deploy Executive Boardroom</button>
+                    <button class="btn-subscribe" onclick="checkout('exec', 7999, 'Family & Executive Business')">Start Family & Business Trial</button>
                 </div>
             </div>
         </div>
@@ -2963,6 +2961,8 @@
         let isGenerating = false;
         let uploadedDocText = "";
 
+        const SEND_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
+
         function setChatState(newState) {
             chatState = newState;
             isGenerating = (newState === 'uploading' || newState === 'streaming');
@@ -2973,17 +2973,17 @@
             if (sendBtn) {
                 if (newState === 'streaming') {
                     sendBtn.disabled = true;
-                    sendBtn.innerHTML = `<span>⟳ Analyzing...</span>`;
+                    sendBtn.innerHTML = `<span style="font-size:12px;">⟳</span>`;
                 } else if (newState === 'uploading') {
                     sendBtn.disabled = true;
-                    sendBtn.innerHTML = `<span>📎 Ingesting...</span>`;
+                    sendBtn.innerHTML = `<span style="font-size:12px;">📎</span>`;
                 } else {
                     sendBtn.disabled = false;
-                    sendBtn.innerHTML = `<span>Execute Analysis</span>`;
+                    sendBtn.innerHTML = SEND_ICON_SVG;
                 }
             }
             if (userInput && (newState === 'streaming' || newState === 'uploading')) {
-                userInput.disabled = false; // keep accessible for review but prevent duplicate form submits
+                userInput.disabled = false;
             }
         }
 
@@ -3427,7 +3427,7 @@
             const sendBtn = document.getElementById('sendBtn');
             if (sendBtn) {
                 sendBtn.disabled = false;
-                sendBtn.innerText = "Execute";
+                sendBtn.innerHTML = SEND_ICON_SVG;
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3791,13 +3791,13 @@
 
             if (profile.name) {
                 if (welcomeH1) welcomeH1.innerText = `Welcome back, ${profile.name.split(' ')[0]}.`;
-                if (welcomeSub) welcomeSub.innerText = `Your personal Strategic Intelligence Studio and Operations Room${profile.company ? ` for ${profile.company}` : ''}. Audit unit economics, polish executive resumes, or draft 90-day board deliverables with zero robotic filler.`;
+                if (welcomeSub) welcomeSub.innerText = `Your personal consultant for life, career, money, and business decisions${profile.company ? ` (${profile.company})` : ''}. Ask anything in plain English or attach a file to get a clear, honest breakdown.`;
                 if (sidebarName) sidebarName.innerText = profile.name + (isCreator ? ' (Creator)' : '');
                 if (authBtnText) authBtnText.innerText = 'Switch Profile';
             } else {
-                if (welcomeH1) welcomeH1.innerText = 'Turn Operating Acumen into Boardroom Certainty';
-                if (welcomeSub) welcomeSub.innerText = 'Grounded in empirical unit economics, prime cost containment, and forensic financial modeling. Audit unit profitability, engineer 1-page quantified executive resumes, stress-test 13-week cash runway, and export boardroom-ready deliverables.';
-                if (sidebarName) sidebarName.innerText = 'Guest Operator';
+                if (welcomeH1) welcomeH1.innerText = 'Your Personal Consultant for Everyday Decisions';
+                if (welcomeSub) welcomeSub.innerText = "Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.";
+                if (sidebarName) sidebarName.innerText = 'Guest Member';
                 if (authBtnText) authBtnText.innerText = 'Sign In / Profile';
             }
         }
@@ -3806,10 +3806,9 @@
             const portal = document.getElementById('landingPortal');
             if (portal) portal.style.display = 'none';
             localStorage.setItem('consultant_user_authenticated', 'true');
-            // Route new users to the subscription tier modal first for 30-day free trial selection
             setTimeout(() => {
                 openPricing();
-                showToast("Select your deployment tier to activate your 30-day free trial ($0 today)!", "💎");
+                showToast("Choose your plan to start your 30-day free trial ($0 today)!", "💎");
             }, 300);
         }
 
@@ -3943,10 +3942,10 @@
             const email = (emailInput?.value || '').trim();
             const company = (companyInput?.value || '').trim();
 
-            // Client-side validation: Both Name and valid Work Email required
+            // Client-side validation: Both Name and valid Email required
             if (!name || !email) {
                 if (errorMsg) {
-                    errorMsg.innerText = "Please provide both your Executive Name and Corporate Email.";
+                    errorMsg.innerText = "Please enter both your Name and Email Address.";
                     errorMsg.style.display = "block";
                 }
                 if (!name && nameInput) nameInput.style.borderColor = "#F87171";
@@ -3957,7 +3956,7 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 if (errorMsg) {
-                    errorMsg.innerText = "Please enter a valid corporate/work email format.";
+                    errorMsg.innerText = "Please enter a valid email address.";
                     errorMsg.style.display = "block";
                 }
                 if (emailInput) emailInput.style.borderColor = "#F87171";
@@ -3971,7 +3970,7 @@
             
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = `<span>⏳</span> <span>Authorizing...</span>`;
+                submitBtn.innerHTML = `<span>⏳</span> <span>Saving...</span>`;
             }
 
             setTimeout(() => {
@@ -3986,13 +3985,13 @@
 
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = `Authorize Workspace`;
+                    submitBtn.innerHTML = `Save & Continue`;
                 }
 
-                showToast(`Workspace Authorized for ${displayName}`, "🛡️");
+                showToast(`Welcome, ${displayName}!`, "✓");
                 closeAuthModal();
                 syncProfileUI();
-            }, 400);
+            }, 300);
         }
 
         function openVaultModal() {
@@ -4198,12 +4197,10 @@
             const delivBar = document.createElement('div');
             delivBar.className = 'deliverables-bar';
             delivBar.innerHTML = `
-                <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
-                <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
-                <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open Interactive Canvas</button>
-                <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Report</button>
-                <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Financial Model (.xlsx)</button>
-                <button class="btn-export" onclick="saveToVault(this)">🔒 Save to Research Vault</button>
+                <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Answer</button>
+                <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
+                <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
+                <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Budget (.xlsx)</button>
             `;
             card.appendChild(delivBar);
             row.appendChild(card);
@@ -5344,47 +5341,29 @@
             const lower = (text || '').toLowerCase();
             const suggestions = [];
 
-            // 1. Scan for specific questions asked by the consultant at the end of the text
-            const questionMatches = text.match(/([A-Z][^\.\n\?!]*\?)/g);
-            if (questionMatches && questionMatches.length > 0) {
-                const lastQuestion = questionMatches[questionMatches.length - 1].trim();
-                if (lastQuestion.length > 15 && lastQuestion.length < 90) {
-                    suggestions.push({
-                        icon: '💬',
-                        label: `Execute: "${lastQuestion.slice(0, 36)}..."`,
-                        prompt: `Let's answer and model this next step: "${lastQuestion}"`
-                    });
-                }
-            }
-
-            // 2. DYNAMIC DOMAIN-CLASSIFIED QUICK-ACTION PILLS
-            if (lower.includes('saas') || lower.includes('arr') || lower.includes('mrr') || lower.includes('churn') || lower.includes('cac') || lower.includes('software') || lower.includes('b2b')) {
-                suggestions.push({ icon: '📊', label: 'Model Inbound vs. Outbound CAC/LTV', prompt: 'Model our Inbound vs. Outbound acquisition unit economics and payback period.' });
-                suggestions.push({ icon: '📑', label: 'Draft Tiered Packaging Spec', prompt: 'Draft a 3-tier pricing and feature gating matrix designed to accelerate net revenue retention (NRR).' });
-                suggestions.push({ icon: '🔄', label: 'Customer Retention Playbook', prompt: 'Design an onboarding and churn-prevention playbook to cut logo churn below 1% monthly.' });
-                suggestions.push({ icon: '🛡️', label: 'Run Runway Sensitivity Analysis', prompt: 'Stress-test our cash runway under 3 scenarios: baseline growth, 0% net expansion, and +15% burn expansion.' });
-            } else if (lower.includes('hospitality') || lower.includes('diner') || lower.includes('restaurant') || lower.includes('cogs') || lower.includes('food') || lower.includes('kitchen') || lower.includes('ticket')) {
-                suggestions.push({ icon: '🥩', label: 'Audit Prime Cost Margins (COGS + Labor)', prompt: 'Break down our prime cost equation (COGS + Labor) and calculate the dollar variance against a 58% target floor.' });
-                suggestions.push({ icon: '⏱️', label: 'Optimize Table Turns & RevPASH', prompt: 'How do we shave 90 seconds off peak fulfillment cycle times to unlock 15+ additional table turns per rush?' });
-                suggestions.push({ icon: '⭐', label: 'Design Post-Meal Review Flywheel', prompt: 'Set up an analog, zero-discount review capture protocol that generates 50+ 5-star Google reviews monthly.' });
-                suggestions.push({ icon: '🤝', label: 'Supplier Renegotiation Plan', prompt: 'Draft a vendor procurement audit and price-lock negotiation script for our top 5 high-cost ingredient categories.' });
-            } else if (lower.includes('service') || lower.includes('agency') || lower.includes('consulting') || lower.includes('hourly') || lower.includes('utilization') || lower.includes('billable') || lower.includes('retainer')) {
-                suggestions.push({ icon: '⏱️', label: 'Billable Utilization Diagnostic', prompt: 'Audit our team utilization rate against billable realization to find hidden administrative capacity drag.' });
-                suggestions.push({ icon: '💰', label: 'Fixed-Fee vs. Value Pricing Transition', prompt: 'Structure a proposal transition from cost-plus hourly billing to outcome-based fixed sprint pricing.' });
-                suggestions.push({ icon: '📈', label: 'Pipeline Velocity Audit', prompt: 'Analyze our sales pipeline velocity (Win Rate x Deal Size / Sales Cycle) and pinpoint the primary conversion leak.' });
-                suggestions.push({ icon: '🛡️', label: 'Subcontractor Margin Guardrails', prompt: 'Establish gross margin guardrails and contractor rate ceilings to defend 55%+ project gross margin.' });
-            } else if (lower.includes('resume') || lower.includes('interview') || lower.includes('career') || lower.includes('salary') || lower.includes('job') || lower.includes('experience')) {
-                suggestions.push({ icon: '📄', label: 'Quantify Top 3 Resume Bullets', prompt: 'Reframe my top 3 work achievements into quantified dollar margin capture and throughput velocity.' });
-                suggestions.push({ icon: '🎙️', label: 'Reverse Due Diligence Questions', prompt: 'Give me 4 high-conviction questions to ask the CEO during an executive interview to diagnose hidden P&L leaks.' });
-                suggestions.push({ icon: '🎯', label: 'Structure 30-60-90 Day Board Plan', prompt: 'Build an executive 30-60-90 day operational onboarding and margin stabilization roadmap.' });
-                suggestions.push({ icon: '⚡', label: 'Practice 60s Pitch Teaser', prompt: 'Give me the concise 60-second talking track for answering "What is your biggest operational win?"' });
+            if (lower.includes('rent') || lower.includes('move') || lower.includes('moving') || lower.includes('apartment') || lower.includes('lease') || lower.includes('house')) {
+                suggestions.push({ icon: '🏠', label: 'Build My Move-Out Budget', prompt: 'Help me build a complete monthly move-out budget including rent, utilities, groceries, insurance, and savings.' });
+                suggestions.push({ icon: '💰', label: 'How Much Do I Need Saved First?', prompt: 'Calculate exactly how much cash I should have saved up before signing a lease (deposit, first/last month, furniture, and emergency buffer).' });
+                suggestions.push({ icon: '📋', label: 'First Apartment Checklist', prompt: 'Give me a practical step-by-step checklist of things to check and budget for before signing my lease.' });
+            } else if (lower.includes('resume') || lower.includes('interview') || lower.includes('career') || lower.includes('salary') || lower.includes('job') || lower.includes('hire')) {
+                suggestions.push({ icon: '📄', label: 'Polish My Resume Bullets', prompt: 'Help me rewrite my top resume bullet points so they sound natural, clear, and results-driven without fake corporate buzzwords.' });
+                suggestions.push({ icon: '🎙️', label: 'Practice Interview Questions', prompt: 'Give me the top 4 interview questions for this role and natural, confident answers I can use in my own voice.' });
+                suggestions.push({ icon: '💵', label: 'Negotiate My Pay / Offer', prompt: 'How should I evaluate this job offer or ask for higher pay without risking the offer?' });
+            } else if (lower.includes('budget') || lower.includes('debt') || lower.includes('save') || lower.includes('paycheck') || lower.includes('credit') || lower.includes('money') || lower.includes('afford')) {
+                suggestions.push({ icon: '💸', label: '50/30/20 Paycheck Breakdown', prompt: 'Break my monthly take-home pay into Needs, Wants, and Savings/Debt so I know exactly where my money should go.' });
+                suggestions.push({ icon: '🛑', label: 'Find Money Leaks to Cut', prompt: 'What are the easiest monthly expenses to cut or renegotiate right now to free up extra cash?' });
+                suggestions.push({ icon: '📈', label: '30-Day Money Reset Plan', prompt: 'Give me a simple 30-day step-by-step plan to pay down debt and build a $1,000 starter emergency fund.' });
+            } else if (lower.includes('business') || lower.includes('margin') || lower.includes('cogs') || lower.includes('pricing') || lower.includes('customer') || lower.includes('revenue')) {
+                suggestions.push({ icon: '📊', label: 'Audit Costs & Margins', prompt: 'Break down my main costs and show me the fastest way to protect my profit margin.' });
+                suggestions.push({ icon: '🏷️', label: 'Test Better Pricing', prompt: 'How can I adjust my pricing or package my offer so I make more per sale without losing customers?' });
+                suggestions.push({ icon: '📋', label: '30-Day Action Plan', prompt: 'Turn this into a simple 30-day action checklist with clear weekly goals.' });
             } else {
-                suggestions.push({ icon: '📈', label: 'Calculate Bottom-Line Net Impact', prompt: 'What is the exact mathematical dollar impact and payback period for executing this move?' });
-                suggestions.push({ icon: '📋', label: 'Map 30-Day Execution Milestones', prompt: 'Break this down into an actionable 30-day week-by-week operational milestone plan with named KPI checkpoints.' });
-                suggestions.push({ icon: '🛡️', label: 'Stress-Test Downside Risk', prompt: 'What is the single biggest failure point to this strategy and how do we stress-test the downside boundary?' });
+                suggestions.push({ icon: '🧮', label: 'Run the Real-World Numbers', prompt: 'Break down the exact dollar costs and monthly math for this decision.' });
+                suggestions.push({ icon: '⚖️', label: 'Compare Pros, Cons & Risks', prompt: 'Lay out the honest pros, cons, and biggest hidden risks of each option side by side.' });
+                suggestions.push({ icon: '📋', label: 'Give Me a Step-by-Step Plan', prompt: 'Turn this into a simple step-by-step checklist I can start today.' });
             }
 
-            return suggestions.slice(0, 4);
+            return suggestions.slice(0, 3);
         }
 
         /* INTERACTIVE ACTION CHIPS & SENSITIVITY SLIDER STYLING */
@@ -5786,7 +5765,7 @@
                 const isProOrExec = isOperator || subTier === 'pro' || subTier === 'exec';
                 
                 if (!isProOrExec) {
-                    showToast("🌌 Gemini 4 Argon Frontier Reasoning is exclusive to Strategic Partner & Executive Boardroom tiers.", "💎");
+                    showToast("🌌 Gemini 4 Argon Frontier Reasoning is included in Partners and Family & Executive Business plans.", "💎");
                     openPricing();
                 } else {
                     showToast("🌌 Gemini 4 Argon 2M+ Frontier Reasoning Activated (Operator Access).", "✓");
@@ -5982,19 +5961,16 @@
                         `).join('');
                         assistantCard.appendChild(actionChips);
 
-                        // 3. Add Deliverables & Vault Bar + Model Telemetry Badge
+                        // 3. Add Compact Action Bar + Model Badge
                         const delivBar = document.createElement('div');
                         delivBar.className = 'deliverables-bar';
-                        const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.1s'}) ${data.layout ? `• <span style="color:#38BDF8;">${data.layout.replace(/_/g, ' ')}</span>` : ''}</span>` : '';
+                        const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.1s'})</span>` : '';
                         delivBar.innerHTML = `
-                            <button class="btn-export" onclick="downloadMarkdownMemo(this)" style="border-color:#38BDF8; color:#7DD3FC; font-weight:700; background:rgba(56,189,248,0.1);">📥 Export Markdown</button>
-                            <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Email / Memo</button>
-                            <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🎙️ Audio Briefing</button>
-                            <button class="btn-export" onclick="openOfficeModal()" style="border-color:#0078D4; color:#60A5FA; font-weight:700; background:rgba(0,120,212,0.1);">🏢 Export to Office 365</button>
-                            <button class="btn-export" onclick="openInCanvas(this)" style="font-weight:700;">🎨 Open Interactive Canvas</button>
-                            <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 PDF Report</button>
-                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Financial Model (.xlsx)</button>
-                            <button class="btn-export" onclick="saveToVault(this)">🔒 Save to Research Vault</button>
+                            <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
+                            <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
+                            <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
+                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Excel (.xlsx)</button>
+                            <button class="btn-export" onclick="saveToVault(this)">🔒 Save</button>
                             ${modelBadge}
                         `;
                         assistantCard.appendChild(delivBar);
