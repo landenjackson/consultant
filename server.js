@@ -14,6 +14,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+// Canonicalize bare consultant-studio.app -> www.consultant-studio.app so Google OAuth Origin & Redirect URI always match
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase();
+  if (host === 'consultant-studio.app' && req.method === 'GET') {
+    return res.redirect(301, `https://www.consultant-studio.app${req.originalUrl}`);
+  }
+  next();
+});
 // Stripe Webhook Raw Parser (Requires unparsed raw body for cryptographic signature verification)
 app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];

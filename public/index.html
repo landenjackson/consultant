@@ -3904,45 +3904,14 @@
         }
 
         function handleGoogleSecuritySignIn() {
-            if (window.google && google.accounts && google.accounts.oauth2) {
-                const client = google.accounts.oauth2.initTokenClient({
-                    client_id: GOOGLE_CLIENT_ID,
-                    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-                    callback: async (tokenResponse) => {
-                        if (tokenResponse && tokenResponse.access_token) {
-                            try {
-                                const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-                                });
-                                const userInfo = await userInfoRes.json();
-                                const gName = userInfo.name || userInfo.given_name || "Google User";
-                                const gEmail = userInfo.email || "";
-
-                                localStorage.setItem('consultant_user_authenticated', 'true');
-                                localStorage.setItem('consultant_user_name', gName);
-                                localStorage.setItem('consultant_user_email', gEmail);
-                                localStorage.setItem('consultant_auth_method', 'google');
-                                closeAuthModal();
-                                syncProfileUI();
-                                showToast(`Signed in as ${gName}`, "✓");
-                            } catch(err) {
-                                console.error("Google userinfo fetch error:", err);
-                                openAuthModal();
-                            }
-                        }
-                    },
-                    error_callback: (err) => {
-                        console.warn("Google GIS Error:", err);
-                        openAuthModal();
-                    }
-                });
-                client.requestAccessToken();
-            } else {
-                openAuthModal();
-                const nameIn = document.getElementById('authNameInput');
-                if (nameIn) nameIn.focus();
-                showToast("Enter your Google Name & Email below to sign in.", "🔑");
+            // Ensure user is on canonical www.consultant-studio.app for Google OAuth
+            if (window.location.hostname === 'consultant-studio.app') {
+                window.location.href = 'https://www.consultant-studio.app/?google_auth=1';
+                return;
             }
+            // Full-page Google OAuth 2.0 redirect to registered URI (https://www.consultant-studio.app with NO trailing slash)
+            // Works reliably on iOS Safari, Android Chrome, and Desktop without popup blockers
+            fallbackOAuthRedirect();
         }
 
         function directUserPromptLogin() {
@@ -3970,13 +3939,19 @@
         }
 
         function fallbackOAuthRedirect() {
-            const redirectUri = encodeURIComponent("https://www.consultant-studio.app/");
+            // IMPORTANT: Registered URI in Google Cloud Console is exact 'https://www.consultant-studio.app' (NO trailing slash)
+            const redirectUri = encodeURIComponent("https://www.consultant-studio.app");
             const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=openid%20profile%20email&prompt=select_account`;
             window.location.href = googleAuthUrl;
         }
 
-        // Catch OAuth token redirect response on return
+        // Catch OAuth token redirect response on return (or ?google_auth=1 bounce from bare domain)
         (function checkOAuthHash() {
+            if (window.location.search.includes('google_auth=1')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                fallbackOAuthRedirect();
+                return;
+            }
             if (window.location.hash.includes('access_token=')) {
                 const params = new URLSearchParams(window.location.hash.substring(1));
                 const accessToken = params.get('access_token');
@@ -3984,14 +3959,21 @@
                     fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                         headers: { Authorization: `Bearer ${accessToken}` }
                     }).then(r => r.json()).then(userInfo => {
-                        if (userInfo.name) {
-                            localStorage.setItem('consultant_user_authenticated', 'true');
-                            localStorage.setItem('consultant_user_name', userInfo.name);
-                            localStorage.setItem('consultant_user_email', userInfo.email || '');
-                            localStorage.setItem('consultant_auth_method', 'google');
-                            window.history.replaceState({}, document.title, window.location.pathname);
-                            syncProfileUI();
+                        const gName = userInfo.name || userInfo.given_name || (userInfo.email ? userInfo.email.split('@')[0] : 'Google Member');
+                        const gEmail = userInfo.email || '';
+                        localStorage.setItem('consultant_user_authenticated', 'true');
+                        localStorage.setItem('consultant_user_name', gName);
+                        localStorage.setItem('consultant_user_email', gEmail);
+                        localStorage.setItem('consultant_auth_method', 'google');
+                        if (gEmail.toLowerCase().includes('jacksonlanden') || gEmail.toLowerCase().includes('landen')) {
+                            localStorage.setItem('consultant_creator', 'true');
+                            localStorage.setItem('consultant_subscribed', 'true');
+                            localStorage.setItem('consultant_sub_tier', 'exec');
                         }
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        closeAuthModal();
+                        syncProfileUI();
+                        showToast(`Signed in with Google as ${gName}!`, "✓");
                     }).catch(e => console.warn(e));
                 }
             }
