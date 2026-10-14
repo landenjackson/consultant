@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Consultant Studio | Strategic Operator & Quantitative Business Hub (Gemini 4 Argon)</title>
-    <meta name="description" content="Audit unit economics, P&L turnarounds, and executive strategy deliverables powered by Gemini 4 Argon. 100% Sovereign Client-Side Privacy.">
+    <meta name="description" content="Private on-device financial modeling, business breakeven calculator, and personal cash runway & career strategy studio.">
     <link rel="canonical" href="https://www.consultant-studio.app/">
 
     <!-- OpenGraph Social Metadata -->
@@ -2272,35 +2272,134 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <img src="/brand/consultant_studio_official_icon.jpg" alt="Icon" style="width:20px; height:20px; border-radius:5px; object-fit:cover; display:inline-block;">
-                            <span id="heroStatusTag" class="status-tag">Everyday Life, Career & Money Consultant</span>
-                            <span id="heroSubBadge" style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Clear Numbers & Real-World Decisions</span>
+                            <span id="heroStatusTag" class="status-tag">Personal Runway & Career Strategy</span>
+                            <span id="heroSubBadge" style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Track Personal Cash Runway</span>
                         </div>
-                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Gemini 4 Argon • 100% Private</span>
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Private On-Device Financial Modeling</span>
                     </div>
 
-                    <!-- DUAL-MODE TOGGLE: PERSONAL LIFE & CAREER vs. BUSINESS & OPERATIONS -->
-                    <div style="display:inline-flex; background:#07090D; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:4px; gap:4px; margin-bottom:16px;">
-                        <button type="button" id="modeBtnLife" onclick="switchConsultantMode('personal')" style="padding:7px 14px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:var(--accent); color:#000; transition:all 0.2s;">
-                            🏠 Personal Life, Career & Money
+                    <!-- GLOBAL WORKSPACE TOGGLE: BUSINESS STUDIO vs. PERSONAL RUNWAY & CAREER -->
+                    <div role="tablist" aria-label="Workspace Mode Switcher" style="display:inline-flex; background:#07090D; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:4px; gap:4px; margin-bottom:16px; flex-wrap:wrap;">
+                        <button type="button" id="modeBtnBusiness" onclick="switchConsultantMode('business')" style="padding:8px 15px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary); transition:all 0.2s;">
+                            🏢 Business Studio
                         </button>
-                        <button type="button" id="modeBtnBusiness" onclick="switchConsultantMode('business')" style="padding:7px 14px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary); transition:all 0.2s;">
-                            🏢 Business & Operations
+                        <button type="button" id="modeBtnLife" onclick="switchConsultantMode('personal')" style="padding:8px 15px; border-radius:7px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; background:var(--accent); color:#000; transition:all 0.2s;">
+                            👤 Personal Runway & Career
                         </button>
                     </div>
 
                     <h1 id="welcomeHeading" style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#FFFFFF; margin-bottom:8px; letter-spacing:-0.02em;">
-                        Your Personal Consultant for Everyday Decisions
+                        Track Personal Cash Runway & Career Transition Math
                     </h1>
                     <p id="welcomeSubtext" style="color:var(--text-secondary); font-size:14px; line-height:1.6; max-width:840px; margin-bottom:14px;">
-                        Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.
+                        Model your exact months and days of financial solvency, calculate your minimum target salary after taxes, benchmark job offers or consulting day-rates, and polish your resume or STAR interview answers.
                     </p>
 
-                    <!-- SIMPLE CONVERSATIONAL STARTER CHIPS (NO JARGON TILES) -->
-                    <div id="starterChipsWrap" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('I want to move out on my own. Help me figure out how much rent I can actually afford and what I need saved up before signing a lease.')">🏠 Moving out & rent budget</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me fix my finances. Here is roughly what I make and what I spend—show me where my money is leaking and a realistic plan to get ahead.')">💸 Fix my money & budget</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me land a good job. I can attach my resume or tell you my background—help me polish it and prep for interviews.')">💼 Get a job & polish my resume</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me weigh a major life decision between two options—break down the real pros, cons, costs, and long-term impact.')">⚖️ Weigh a big life decision</button>
+                    <!-- SIDE B: EXCLUSIVE CAREER TRANSITION & PERSONAL RUNWAY MODULES -->
+                    <div id="starterChipsWrap" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; margin-top:8px;">
+                        <div class="mode-tile" onclick="sendQuick('Resume & File Polish: Audit my attached resume or background. Rewrite my bullet points into clear, quantified results and format a clean 1-page resume.')" style="border-left: 3px solid #60A5FA; background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.07); border-right:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07);">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">📄 Resume & File Polish</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Turn your work history or attached resume into clean, results-driven bullet points.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Job Interview & Case Prep (STAR Method): Help me prepare structured Situation-Task-Action-Result (STAR) interview stories, salary negotiation talking points, and smart questions for the hiring manager.')" style="border-left: 3px solid #10B981; background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.07); border-right:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07);">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">🎙️ Job Interview & Case Prep (STAR)</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Build concrete STAR method stories, practice interview Q&A, and negotiate offers.</div>
+                        </div>
+                        <div class="mode-tile" onclick="benchmarkTargetSalary()" style="border-left: 3px solid #F59E0B; background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.07); border-right:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07);">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">💵 Offer & Day-Rate Benchmark</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Compare your minimum target salary against a W-2 offer or consulting day-rate.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Moving Out & Rent Affordability Check: Based on my monthly take-home pay and savings, calculate the safe rent ceiling, move-in cash required, and post-rent monthly cash buffer.')" style="border-left: 3px solid #38BDF8; background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.07); border-right:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07);">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">🏠 Moving Out & Rent Math</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Calculate your safe rent ceiling, move-in deposit buffer, and monthly living budget.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIDE B CALCULATOR: PERSONAL FINANCIAL LIFE EXPECTANCY (RUNWAY & TARGET SALARY ENGINE) -->
+                <div id="personalRunwayStudio" style="display:block; background: rgba(14, 19, 28, 0.92); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
+                                <span class="telemetry-dot"></span> Personal Runway Engine
+                            </span>
+                            <span style="font-size:14.5px; font-weight:800; color:#FFFFFF;">Financial Life Expectancy & Target Salary Calculator</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px;" onclick="resetPersonalRunway()">Reset Defaults</button>
+                            <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px; background:rgba(34,197,94,0.12); color:var(--accent-glow); border-color:var(--border-glow); font-weight:700;" onclick="exportPersonalRunwayXLSX()">📥 Export Runway (.xlsx)</button>
+                        </div>
+                    </div>
+
+                    <!-- INPUTS GRID -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(195px, 1fr)); gap:12px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.07); margin-bottom:14px;">
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">💰 Total Liquid Savings ($)</label>
+                            <input type="number" id="prLiquidSavings" value="18000" min="0" step="500" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🏠 Essential Monthly Costs ($)</label>
+                            <input type="number" id="prEssentialCosts" value="2400" min="0" step="100" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;" title="Rent, debt, groceries, baseline utilities">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🛍️ Discretionary Spending ($)</label>
+                            <input type="number" id="prDiscretionary" value="600" min="0" step="50" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">💵 Side / Baseline Inflow ($/mo)</label>
+                            <input type="number" id="prSideIncome" value="800" min="0" step="100" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🎯 Annual Savings Target ($/yr)</label>
+                            <input type="number" id="prSavingsTarget" value="6000" min="0" step="500" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🏛️ Effective Tax Rate (%)</label>
+                            <input type="number" id="prTaxRate" value="22" min="0" max="55" step="1" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:8px 10px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                        </div>
+                    </div>
+
+                    <!-- WARM OFF-WHITE / HIGH-CONTRAST KPI CARDS FOR CORE FORMULAS -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:14px;">
+                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
+                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Net Monthly Burn</div>
+                            <div id="prNetBurnOut" style="font-size:21px; font-weight:800; color:#0F172A; font-family:monospace; margin:4px 0;">$2,200/mo</div>
+                            <div style="font-size:11px; color:#64748B;">=(Essential + Discretionary) - Inflow</div>
+                        </div>
+                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
+                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Financial Life Expectancy</div>
+                            <div id="prRunwayOut" style="font-size:21px; font-weight:800; color:#059669; font-family:monospace; margin:4px 0;">8.2 mos (249 days)</div>
+                            <div id="prDepletionDateOut" style="font-size:11px; color:#64748B;">=Liquid Reserves / Net Monthly Burn</div>
+                        </div>
+                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
+                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Minimum Target Salary</div>
+                            <div id="prTargetSalaryOut" style="font-size:21px; font-weight:800; color:#0F172A; font-family:monospace; margin:4px 0;">$44,615/yr</div>
+                            <div id="prDayRateOut" style="font-size:11px; color:#059669; font-weight:700;">~$21.45/hr • $186/day consulting floor</div>
+                        </div>
+                    </div>
+
+                    <!-- SOLVENCY TIMELINE BAR & OFFER BENCHMARKING -->
+                    <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                            <span style="font-size:11.5px; font-weight:700; color:#F8FAFC;">⏳ Visual Solvency Timeline (Months & Days Before Cash Depletion)</span>
+                            <span id="prTimelineStatusBadge" style="font-size:11px; font-weight:800; color:#4ADE80; font-family:monospace; background:rgba(34,197,94,0.12); padding:2px 8px; border-radius:6px; border:1px solid rgba(34,197,94,0.3);">Healthy Buffer (>6 Months)</span>
+                        </div>
+                        <div style="width:100%; height:14px; background:#151C28; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-bottom:8px;">
+                            <div id="prTimelineFill" style="height:100%; width:68%; background:linear-gradient(90deg, #22C55E 0%, #10B981 75%, #38BDF8 100%); transition:width 0.25s ease;"></div>
+                        </div>
+                        <div id="prTimelineMonthStrip" style="display:grid; grid-template-columns:repeat(12, 1fr); gap:4px; margin-bottom:12px;">
+                            <!-- Populated dynamically in recalcPersonalRunway() -->
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <label style="font-size:11.5px; color:var(--text-secondary); font-weight:600;">Compare Job Offer ($/yr) or Day-Rate ($/day):</label>
+                                <input type="number" id="prOfferCompareInput" value="58000" step="1000" oninput="recalcPersonalRunway()" style="width:120px; background:#0E131C; border:1px solid rgba(255,255,255,0.16); color:#4ADE80; padding:5px 8px; border-radius:6px; font-family:monospace; font-size:12px; font-weight:700;">
+                                <span id="prOfferCompareResult" style="font-size:12px; font-weight:700; color:#4ADE80;">+$13,385/yr above minimum target</span>
+                            </div>
+                            <button type="button" class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="benchmarkTargetSalary()">
+                                Analyze My Runway & Salary in Chat →
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2439,7 +2538,7 @@
                 <!-- 3. TRUST, COMPLIANCE & LEGAL FOOTER BLOCK -->
                 <div style="text-align:center; padding: 20px 14px; margin-top:24px; background: rgba(7, 9, 13, 0.8); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;">
                     <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0; line-height:1.6;">
-                        🔒 <strong>Client-Side Sovereign Privacy:</strong> All client data, financial metrics, and workbooks remain securely processed within local browser memory with zero persistent cloud leaks.
+                        🔒 <strong>Private On-Device Financial Modeling:</strong> All financial inputs, career documents, and spreadsheets are processed locally in your browser storage without cloud database dependencies.
                     </p>
                     <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:16px; font-size:11.5px; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
                         <span>© <span id="currentCopyrightYear">2026</span> Consultant Studio</span>
@@ -2517,7 +2616,7 @@
             <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid rgba(167,139,250,0.3); border-radius:8px; padding:2px 6px; flex-shrink:0;">
                 <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select Intelligence Engine">
-                    <option value="gemini-4-argon" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Frontier Intelligence)</option>
+                    <option value="gemini-4-argon" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">🌌 Gemini 4 Argon (Deep Analysis)</option>
                     <option value="auto" style="background:#0D121A; color:#FFF;">⚡ Enterprise Auto (Adaptive Routing)</option>
                     <option value="gemini-3.8-flash" style="background:#0D121A; color:#FFF;">Gemini 3.8 Flash (High Reasoning)</option>
                     <option value="gemini-3.1-flash-lite" style="background:#0D121A; color:#FFF;">Gemini 3.1 Flash-Lite (Sub-1s)</option>
@@ -2720,7 +2819,7 @@
 
             <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#38BDF8; margin-bottom:4px;">🔒 Sovereign Client Privacy</div>
+                    <div style="font-size:13px; font-weight:700; color:#38BDF8; margin-bottom:4px;">🔒 Private On-Device Modeling</div>
                     <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All attached documents (.xlsx, .docx, .pdf, images) are parsed locally inside browser memory via Mammoth.js and PDF.js. Zero company data is stored in remote databases.</div>
                 </div>
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
@@ -2836,7 +2935,7 @@
                     <div class="plan-name">Partners</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>🌌 Gemini 4 Argon Frontier Intelligence Access</strong></li>
+                        <li>✓ <strong>🌌 Gemini 4 Argon Deep Analysis Access</strong></li>
                         <li>✓ <strong>Built for Couples, Roommates & Co-Founders</strong></li>
                         <li>✓ Shared Moving, Housing & Combined Budget Planning</li>
                         <li>✓ <strong>Unlimited Document Uploads & PDF/Excel Exports</strong></li>
@@ -3915,7 +4014,7 @@
         }
 
         function directUserPromptLogin() {
-            const email = prompt("Enter your Google Account email to authenticate your Sovereign Workspace:");
+            const email = prompt("Enter your Google Account email to sign in:");
             if (email && email.includes('@')) {
                 const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                 localStorage.setItem('consultant_user_authenticated', 'true');
@@ -4497,6 +4596,7 @@
             const subBadge = document.getElementById('heroSubBadge');
             const chipsWrap = document.getElementById('starterChipsWrap');
             const beStudio = document.getElementById('breakevenStudio');
+            const prStudio = document.getElementById('personalRunwayStudio');
             const input = document.getElementById('userInput');
 
             if (btnLife && btnBiz) {
@@ -4507,37 +4607,234 @@
             }
 
             if (isPersonal) {
-                if (statusTag) statusTag.innerText = 'Everyday Life, Career & Money Consultant';
-                if (subBadge) subBadge.innerText = '• Clear Numbers & Real-World Decisions';
-                if (heading) heading.innerText = 'Your Personal Consultant for Everyday Decisions';
-                if (subtext) subtext.innerText = "Big decisions shouldn't feel impossible. Whether you're figuring out if you can afford to move out, landing a better job, fixing your monthly budget, or comparing two options—just ask in plain English or attach a file, and get a straight answer backed by real numbers.";
-                if (input) input.placeholder = 'Ask anything—moving out, landing a job, fixing your budget, or weighing a decision...';
+                if (statusTag) statusTag.innerText = 'Personal Runway & Career Strategy';
+                if (subBadge) subBadge.innerText = '• Track Personal Cash Runway';
+                if (heading) heading.innerText = 'Track Personal Cash Runway & Career Transition Math';
+                if (subtext) subtext.innerText = 'Model your exact months and days of financial solvency, calculate your minimum target salary after taxes, benchmark job offers or consulting day-rates, and polish your resume or STAR interview answers.';
+                if (input) input.placeholder = 'Ask about personal cash runway, target salary, moving out, resume polish, or STAR interview prep...';
                 if (beStudio) beStudio.style.display = 'none';
+                if (prStudio) {
+                    prStudio.style.display = 'block';
+                    if (typeof recalcPersonalRunway === 'function') recalcPersonalRunway();
+                }
                 if (chipsWrap) {
                     chipsWrap.innerHTML = `
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('I want to move out on my own. Help me figure out how much rent I can actually afford and what I need saved up before signing a lease.')">🏠 Moving out & rent budget</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me fix my finances. Here is roughly what I make and what I spend—show me where my money is leaking and a realistic plan to get ahead.')">💸 Fix my money & budget</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me land a good job. I can attach my resume or tell you my background—help me polish it and prep for interviews.')">💼 Get a job & polish my resume</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me weigh a major life decision between two options—break down the real pros, cons, costs, and long-term impact.')">⚖️ Weigh a big life decision</button>
+                        <div class="mode-tile" onclick="sendQuick('Resume & File Polish: Audit my attached resume or background. Rewrite my bullet points into clear, quantified results and format a clean 1-page resume.')" style="border-left: 3px solid #60A5FA; background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #60A5FA;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">📄 Resume & File Polish</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Turn your work history or attached resume into clean, results-driven bullet points.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Job Interview & Case Prep (STAR Method): Help me prepare structured Situation-Task-Action-Result (STAR) interview stories, salary negotiation talking points, and smart questions for the hiring manager.')" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #10B981;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">🎙️ Job Interview & Case Prep (STAR)</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Build concrete STAR method stories, practice interview Q&A, and negotiate offers.</div>
+                        </div>
+                        <div class="mode-tile" onclick="benchmarkTargetSalary()" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #F59E0B;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">💵 Offer & Day-Rate Benchmark</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Compare your minimum target salary against a W-2 offer or consulting day-rate.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Moving Out & Rent Affordability Check: Based on my monthly take-home pay and savings, calculate the safe rent ceiling, move-in cash required, and post-rent monthly cash buffer.')" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #38BDF8;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">🏠 Moving Out & Rent Math</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Calculate your safe rent ceiling, move-in deposit buffer, and monthly living budget.</div>
+                        </div>
                     `;
                 }
             } else {
-                if (statusTag) statusTag.innerText = 'Business & Operations Consultant';
-                if (subBadge) subBadge.innerText = '• Practical Numbers & Profitability';
-                if (heading) heading.innerText = 'Practical Strategy for Your Business & Operations';
-                if (subtext) subtext.innerText = 'Cut through corporate noise. Audit your margins, fix cost leaks, price your services right, and build clear action plans with real numbers.';
-                if (input) input.placeholder = 'Ask about pricing, margins, costs, hiring, or business strategy...';
+                if (statusTag) statusTag.innerText = 'Business Operations Studio';
+                if (subBadge) subBadge.innerText = '• Calculate Business Breakeven';
+                if (heading) heading.innerText = 'Calculate Business Breakeven & Unit Economics';
+                if (subtext) subtext.innerText = 'Model fixed overhead vs. contribution margin ratio, stress-test 12-month EBITDA and cash buffers with dynamic rent/COGS/labor sliders, and run B2B unit economics.';
+                if (input) input.placeholder = 'Ask about unit economics (CAC/LTV), breakeven revenue, foot-traffic geometry, or competitor pricing...';
+                if (prStudio) prStudio.style.display = 'none';
                 if (beStudio) {
                     beStudio.style.display = 'block';
                     if (typeof recalcBreakevenStudio === 'function') recalcBreakevenStudio();
                 }
                 if (chipsWrap) {
                     chipsWrap.innerHTML = `
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me audit my business costs and margins—show me where I am losing money and how to fix it.')">📊 Audit costs & margins</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me price my product or service so I stay profitable without losing customers.')">🏷️ Pricing & profitability</button>
-                        <button type="button" class="btn-export" style="border-radius:20px; padding:7px 13px; font-size:12px;" onclick="sendQuick('Help me streamline daily operations and build a simple checklist for my team.')">⚙️ Fix daily operations</button>
+                        <div class="mode-tile" onclick="sendQuick('Unit Economics (CAC/LTV): Calculate our customer acquisition cost (CAC) payback period, gross margin floor, LTV:CAC ratio, and 12-month EBITDA trajectory.')" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #22C55E;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">📊 Unit Economics (CAC / LTV)</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Model blended CAC, LTV:CAC ratios, payback months, and gross margin floors.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Foot-Traffic Geometry: Model trade area foot-traffic conversion, localized pricing power, average ticket size, and daily breakeven customer count.')" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #38BDF8;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">📍 Foot-Traffic Geometry</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Catchment conversion math, local pricing power, and daily ticket volume targets.</div>
+                        </div>
+                        <div class="mode-tile" onclick="sendQuick('Competitor Recon: Map competitor pricing spreads, cost structure vulnerabilities, and practical differentiation strategies without discounting margin.')" style="background:rgba(248,250,252,0.03); padding:12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.07); border-left:3px solid #EC4899;">
+                            <div style="font-size:13px; font-weight:800; color:#F8FAFC; margin-bottom:4px;">🎯 Competitor Recon</div>
+                            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">Analyze competitor price spreads, vulnerability gaps, and margin-safe positioning.</div>
+                        </div>
                     `;
                 }
+            }
+        }
+
+        function recalcPersonalRunway() {
+            const liquid = Math.max(0, parseFloat(document.getElementById('prLiquidSavings')?.value) || 0);
+            const essential = Math.max(0, parseFloat(document.getElementById('prEssentialCosts')?.value) || 0);
+            const discretionary = Math.max(0, parseFloat(document.getElementById('prDiscretionary')?.value) || 0);
+            const inflow = Math.max(0, parseFloat(document.getElementById('prSideIncome')?.value) || 0);
+            const savingsTarget = Math.max(0, parseFloat(document.getElementById('prSavingsTarget')?.value) || 0);
+            const taxRatePct = Math.min(90, Math.max(0, parseFloat(document.getElementById('prTaxRate')?.value) || 0));
+            const offerVal = Math.max(0, parseFloat(document.getElementById('prOfferCompareInput')?.value) || 0);
+
+            // Persist in localStorage (private on-device state)
+            try {
+                localStorage.setItem('cs_personal_runway_state', JSON.stringify({
+                    liquid, essential, discretionary, inflow, savingsTarget, taxRatePct, offerVal
+                }));
+            } catch (e) {}
+
+            // Core Formula 1: Net Monthly Burn = (Fixed Living Costs + Discretionary) - Baseline Inflow
+            const totalOutflow = essential + discretionary;
+            const netBurn = totalOutflow - inflow;
+
+            // Core Formula 2: Financial Life Expectancy (Runway) = Liquid Reserves / Net Monthly Burn
+            let runwayMonths = Infinity;
+            let runwayDays = Infinity;
+            if (netBurn > 0) {
+                runwayMonths = liquid / netBurn;
+                runwayDays = Math.round(runwayMonths * 30.4375);
+            }
+
+            // Core Formula 3: Minimum Target Salary = (Annualized Fixed Costs + Savings Target) / (1 - Effective Tax Rate)
+            const taxDec = taxRatePct / 100;
+            const minTargetSalary = (1 - taxDec) > 0 ? ((essential * 12) + savingsTarget) / (1 - taxDec) : 0;
+            const hourlyFloor = minTargetSalary / 2080;
+            const consultingDayRate = minTargetSalary / 240;
+
+            const burnEl = document.getElementById('prNetBurnOut');
+            const runwayEl = document.getElementById('prRunwayOut');
+            const depEl = document.getElementById('prDepletionDateOut');
+            const salEl = document.getElementById('prTargetSalaryOut');
+            const dayEl = document.getElementById('prDayRateOut');
+            const badgeEl = document.getElementById('prTimelineStatusBadge');
+            const fillEl = document.getElementById('prTimelineFill');
+            const stripEl = document.getElementById('prTimelineMonthStrip');
+            const offerResEl = document.getElementById('prOfferCompareResult');
+
+            if (burnEl) {
+                if (netBurn > 0) {
+                    burnEl.innerText = `$${Math.round(netBurn).toLocaleString()}/mo`;
+                    burnEl.style.color = '#0F172A';
+                } else {
+                    burnEl.innerText = `+$${Math.round(Math.abs(netBurn)).toLocaleString()}/mo Surplus`;
+                    burnEl.style.color = '#059669';
+                }
+            }
+
+            if (runwayEl && depEl) {
+                if (netBurn <= 0) {
+                    runwayEl.innerText = 'Infinite (Cash-Flow +)';
+                    runwayEl.style.color = '#059669';
+                    depEl.innerText = 'Inflow covers 100% of monthly living costs';
+                } else {
+                    const depDate = new Date(Date.now() + runwayDays * 86400000);
+                    const depStr = depDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    runwayEl.innerText = `${runwayMonths.toFixed(1)} mos (${runwayDays} days)`;
+                    runwayEl.style.color = runwayMonths >= 6 ? '#059669' : (runwayMonths >= 3 ? '#D97706' : '#DC2626');
+                    depEl.innerText = `Est. depletion date: ${depStr}`;
+                }
+            }
+
+            if (salEl) salEl.innerText = `$${Math.round(minTargetSalary).toLocaleString()}/yr`;
+            if (dayEl) dayEl.innerText = `~$${hourlyFloor.toFixed(2)}/hr W-2 • $${Math.round(consultingDayRate)}/day consulting floor`;
+
+            if (badgeEl && fillEl) {
+                const pct = netBurn <= 0 ? 100 : Math.min(100, Math.max(4, (runwayMonths / 12) * 100));
+                fillEl.style.width = `${pct}%`;
+                if (netBurn <= 0 || runwayMonths >= 6) {
+                    badgeEl.innerText = netBurn <= 0 ? 'Cash-Flow Positive (Infinite Runway)' : `Healthy Solvency (${runwayMonths.toFixed(1)} Months / ${runwayDays} Days)`;
+                    badgeEl.style.color = '#4ADE80';
+                    fillEl.style.background = 'linear-gradient(90deg, #22C55E 0%, #10B981 100%)';
+                } else if (runwayMonths >= 3) {
+                    badgeEl.innerText = `Caution Buffer (${runwayMonths.toFixed(1)} Months / ${runwayDays} Days)`;
+                    badgeEl.style.color = '#FBBF24';
+                    fillEl.style.background = 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)';
+                } else {
+                    badgeEl.innerText = `Critical Runway (${runwayMonths.toFixed(1)} Months / ${runwayDays} Days)`;
+                    badgeEl.style.color = '#F87171';
+                    fillEl.style.background = 'linear-gradient(90deg, #EF4444 0%, #F87171 100%)';
+                }
+            }
+
+            if (stripEl) {
+                let cells = '';
+                for (let m = 1; m <= 12; m++) {
+                    const rem = netBurn <= 0 ? liquid + (Math.abs(netBurn) * m) : Math.max(0, liquid - (netBurn * m));
+                    const isSolvent = rem > 0;
+                    cells += `
+                        <div style="background:${isSolvent ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'}; border:1px solid ${isSolvent ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.28)'}; border-radius:6px; padding:4px 2px; text-align:center; font-family:monospace;">
+                            <div style="font-size:9.5px; color:var(--text-muted);">M${m}</div>
+                            <div style="font-size:10px; font-weight:700; color:${isSolvent ? '#4ADE80' : '#F87171'};">$${(rem / 1000).toFixed(1)}k</div>
+                        </div>
+                    `;
+                }
+                stripEl.innerHTML = cells;
+            }
+
+            if (offerResEl) {
+                // Support either annualized salary (>1500) or consulting day-rate (<=1500 annualized over 240 billable days)
+                const annualizedOffer = offerVal <= 1500 ? offerVal * 240 : offerVal;
+                const diff = annualizedOffer - minTargetSalary;
+                const labelType = offerVal <= 1500 ? `($${offerVal}/day = $${annualizedOffer.toLocaleString()}/yr)` : '';
+                if (diff >= 0) {
+                    offerResEl.innerText = `+$${Math.round(diff).toLocaleString()}/yr above minimum target ${labelType}`;
+                    offerResEl.style.color = '#4ADE80';
+                } else {
+                    offerResEl.innerText = `-$${Math.round(Math.abs(diff)).toLocaleString()}/yr below minimum target ${labelType}`;
+                    offerResEl.style.color = '#F87171';
+                }
+            }
+
+            window._lastPersonalRunway = { liquid, essential, discretionary, inflow, savingsTarget, taxRatePct, netBurn, runwayMonths, runwayDays, minTargetSalary, consultingDayRate };
+        }
+
+        function resetPersonalRunway() {
+            const defaults = { prLiquidSavings: 18000, prEssentialCosts: 2400, prDiscretionary: 600, prSideIncome: 800, prSavingsTarget: 6000, prTaxRate: 22, prOfferCompareInput: 58000 };
+            Object.entries(defaults).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            });
+            recalcPersonalRunway();
+        }
+
+        function benchmarkTargetSalary() {
+            recalcPersonalRunway();
+            const d = window._lastPersonalRunway || {};
+            const offerVal = parseFloat(document.getElementById('prOfferCompareInput')?.value) || 58000;
+            sendQuick(`Personal Runway & Salary Benchmark: I have $${(d.liquid || 18000).toLocaleString()} in liquid savings, $${(d.essential || 2400).toLocaleString()}/mo in essential fixed costs, $${(d.discretionary || 600).toLocaleString()}/mo in discretionary spending, and $${(d.inflow || 800).toLocaleString()}/mo in side income. My net monthly burn is $${Math.round(d.netBurn || 2200).toLocaleString()}/mo (${(d.runwayMonths || 8.2).toFixed(1)} months / ${d.runwayDays || 249} days of runway), and my minimum target salary is $${Math.round(d.minTargetSalary || 44615).toLocaleString()}/yr ($${Math.round(d.consultingDayRate || 186)}/day consulting floor). Benchmark this against an offer of $${offerVal.toLocaleString()} and give me an action plan.`);
+        }
+
+        function exportPersonalRunwayXLSX() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert("SheetJS library initializing. Please retry in a moment.");
+                    return;
+                }
+                recalcPersonalRunway();
+                const d = window._lastPersonalRunway || {};
+                const wsData = [
+                    ["Month", "Starting Liquid Reserves ($)", "Essential Living Costs ($)", "Discretionary Spend ($)", "Side/Baseline Inflow ($)", "Net Monthly Burn ($)", "Ending Cash Balance ($)"]
+                ];
+                for (let m = 1; m <= 12; m++) {
+                    const r = m + 1;
+                    const startFormula = m === 1 ? d.liquid : { f: `G${r - 1}` };
+                    wsData.push([
+                        `Month ${m}`,
+                        startFormula,
+                        d.essential,
+                        d.discretionary,
+                        d.inflow,
+                        { f: `(C${r}+D${r})-E${r}` },
+                        { f: `MAX(0, B${r}-F${r})` }
+                    ]);
+                }
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, "Personal_Runway_12M");
+                XLSX.writeFile(wb, "Consultant_Studio_Personal_Runway_Model.xlsx");
+                showToast("📥 Exported Personal Cash Runway Model (.xlsx)");
+            } catch (e) {
+                console.error("Personal Runway XLSX error:", e);
             }
         }
 
@@ -6131,6 +6428,25 @@
             }
 
             initSplitTextAnimation();
+            try {
+                const savedRunway = JSON.parse(localStorage.getItem('cs_personal_runway_state') || 'null');
+                if (savedRunway) {
+                    if (savedRunway.liquid !== undefined) document.getElementById('prLiquidSavings').value = savedRunway.liquid;
+                    if (savedRunway.essential !== undefined) document.getElementById('prEssentialCosts').value = savedRunway.essential;
+                    if (savedRunway.discretionary !== undefined) document.getElementById('prDiscretionary').value = savedRunway.discretionary;
+                    if (savedRunway.inflow !== undefined) document.getElementById('prSideIncome').value = savedRunway.inflow;
+                    if (savedRunway.savingsTarget !== undefined) document.getElementById('prSavingsTarget').value = savedRunway.savingsTarget;
+                    if (savedRunway.taxRatePct !== undefined) document.getElementById('prTaxRate').value = savedRunway.taxRatePct;
+                    if (savedRunway.offerVal !== undefined) document.getElementById('prOfferCompareInput').value = savedRunway.offerVal;
+                }
+            } catch (e) {}
+            const initialMode = localStorage.getItem('cs_workspace') || 'personal';
+            if (typeof switchConsultantMode === 'function') {
+                switchConsultantMode(initialMode);
+            }
+            if (typeof recalcPersonalRunway === 'function') {
+                recalcPersonalRunway();
+            }
             if (typeof recalcBreakevenStudio === 'function') {
                 recalcBreakevenStudio();
             }

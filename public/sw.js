@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-google-oauth-fixed-v4';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-dual-engine-v5';
 const ASSETS = [
   '/',
   '/index.html',
