@@ -139,11 +139,33 @@ const evaluateWithClef = async (userText, workspace) => {
   return { domain, layout, telemetryRequired };
 };
 
+// Dynamic Natural Human Partner Response Generator (Institutional Executive Voice)
+const generateSmartDirectAnswer = (promptText, ws = 'operations') => {
+  const p = (promptText || '').toLowerCase();
+  if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
+    return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
+
+Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
+
+Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
+  }
+  if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
+    return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
+
+Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards. 
+
+Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
+  }
+  return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
+
+State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
+};
+
 // FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (OPENROUTER GEMINI 4 ARGON + DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
 const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto') => {
   const activeMyclawKey = process.env.MYCLAW_API_KEY;
   const activeOpenRouterKey = process.env.OPENROUTER_API_KEY;
-  const serverGoogleKey = process.env.GEMINI_API_KEY;
+  const serverGoogleKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   const activeGoogleKey = customKey || serverGoogleKey;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
   const startTime = Date.now();
@@ -181,7 +203,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         body: JSON.stringify({
           model: orModel,
           messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 8192,
+          max_tokens: 3500,
           temperature: 0.25
         })
       });
@@ -189,7 +211,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       if (res.ok) {
         const data = await res.json();
         const text = data.choices?.[0]?.message?.content || '';
-        if (text && text.trim().length > 10) {
+        if (text && text.trim().length > 0) {
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
           console.log(`[⚡ OpenRouter Gemini 4 Argon Winner] (${text.length} chars in ${elapsed}s)`);
           return { text, isFallback: false, model: 'gemini-4-argon', latency: `${elapsed}s` };
@@ -207,7 +229,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
   // TIER 1: Direct Multimodal Vision Execution (Parallel Race across Gemini 4 Argon, 3.1 Flash-Lite, 3.8 Flash)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-4-flash', 'gemini-4-argon'];
+    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash'];
     
     const fetchVisionGoogle = async (modelName) => {
       const controller = new AbortController();
@@ -303,8 +325,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
         // Array of high-conviction models to fulfill the pinned request instantly without timeout
         const candidateModels = isArgon
-          ? ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon']
-          : [pinnedModel, 'gemini-3.1-flash-lite'];
+          ? ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash', 'gemini-3.5-flash']
+          : [pinnedModel, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite'];
 
         try {
           const pinnedWinner = await Promise.any(candidateModels.map(m => fetchDirectGoogle(m, tokenCeiling)));
@@ -318,7 +340,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       }
 
       // High-availability parallel race across active endpoints
-      const targetModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon'];
+      const targetModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash', 'gemini-3.5-flash'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
@@ -664,28 +686,6 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       // Google AX Resumption Hook
       const activeExecutionId = conversationId || `ax_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // Dynamic Natural Human Partner Response Generator (Institutional Executive Voice)
-    const generateSmartDirectAnswer = (promptText, ws) => {
-      const p = promptText.toLowerCase();
-      if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-        return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
-
-Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
-
-Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
-      }
-      if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
-        return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
-
-Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards. 
-
-Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
-      }
-      return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
-
-State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
-    };
-
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
 
     // Limit history to the last 2 turns (trimmed to 150 chars) to strictly protect token budget and prevent context bloat
@@ -835,8 +835,9 @@ User Query: ${userMessage}`;
 
     // If primary query failed, attempt one final direct Google AI Studio generation before returning a simple response
     try {
-      if (serverGoogleKey) {
-        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${serverGoogleKey}`, {
+      const fallbackGoogleKey = customKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+      if (fallbackGoogleKey) {
+        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${fallbackGoogleKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           body: JSON.stringify({
