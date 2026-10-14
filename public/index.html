@@ -2749,89 +2749,96 @@
         </div>
     </div>
 
-    <!-- IMMERSIVE LIVE VOICE STUDIO ROOM OVERLAY (PERSISTS ACROSS BUSINESS & PERSONAL TABS) -->
-    <div class="modal-overlay" id="liveVoiceRoomModal" style="z-index:2600; background:rgba(6, 9, 15, 0.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);">
-        <div class="modal-card" style="max-width:760px; width:100%; background:radial-gradient(circle at 50% 0%, rgba(16,185,129,0.14) 0%, #090D16 68%); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:24px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.1), 0 30px 80px rgba(0,0,0,0.9);">
-            <!-- TOP HUD: LATENCY BADGE, PERSONA TOGGLE (AOEDE / FENRIR), MIC SELECTOR & CLOSE -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <span id="liveRoomStateBadge" style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; background:rgba(16,185,129,0.15); color:#4ADE80; border:1px solid rgba(16,185,129,0.35); font-family:monospace;">
-                        <span class="telemetry-dot"></span> <span id="liveRoomStateText">READY</span>
+    <!-- IMMERSIVE 1-ON-1 LIVE CONSULTANT ROOM OVERLAY (PERSISTS ACROSS BUSINESS & PERSONAL TABS) -->
+    <div class="modal-overlay" id="liveVoiceRoomModal" style="z-index:2600; background:rgba(6, 9, 15, 0.94); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); padding:10px;">
+        <div class="modal-card" style="max-width:780px; width:100%; height:min(88vh, 760px); max-height:92vh; display:flex; flex-direction:column; gap:12px; background:radial-gradient(circle at 50% 0%, rgba(16,185,129,0.12) 0%, #090D16 65%); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:18px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.1), 0 30px 80px rgba(0,0,0,0.9); overflow:hidden;">
+            <!-- COMPACT TOP BAR: STATUS, PERSONA PILL, AUDIO SETTINGS GEAR & MINIMIZE/CLOSE -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span id="liveRoomStateBadge" style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:10.5px; font-weight:800; background:rgba(16,185,129,0.15); color:#4ADE80; border:1px solid rgba(16,185,129,0.35); font-family:monospace;">
+                        <span class="telemetry-dot"></span> <span id="liveRoomStateText">LIVE 1-ON-1</span>
                     </span>
-                    <span id="liveRoomLatencyBadge" style="font-size:11px; font-family:monospace; color:#38BDF8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); padding:3px 8px; border-radius:6px; font-weight:700;">
-                        Latency: 142ms
-                    </span>
+                    <!-- PERSONA PILL TOGGLE: AOEDE vs FENRIR -->
+                    <div style="display:inline-flex; background:#05080F; border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:2px; gap:2px;">
+                        <button type="button" id="livePersonaAoedeBtn" onclick="setLiveRoomPersona('female')" style="padding:4px 10px; border-radius:999px; border:none; font-size:11px; font-weight:700; cursor:pointer; background:#10B981; color:#04130B; transition:all 0.2s;">
+                            Aoede
+                        </button>
+                        <button type="button" id="livePersonaFenrirBtn" onclick="setLiveRoomPersona('male')" style="padding:4px 10px; border-radius:999px; border:none; font-size:11px; font-weight:700; cursor:pointer; background:transparent; color:#94A3B8; transition:all 0.2s;">
+                            Fenrir
+                        </button>
+                    </div>
                 </div>
 
-                <!-- PERSONA PILL TOGGLE: AOEDE vs FENRIR -->
-                <div style="display:inline-flex; background:#05080F; border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:3px; gap:3px;">
-                    <button type="button" id="livePersonaAoedeBtn" onclick="setLiveRoomPersona('female')" style="padding:5px 12px; border-radius:999px; border:none; font-size:11.5px; font-weight:700; cursor:pointer; background:#10B981; color:#04130B; transition:all 0.2s;">
-                        Aoede (Warm & Direct)
-                    </button>
-                    <button type="button" id="livePersonaFenrirBtn" onclick="setLiveRoomPersona('male')" style="padding:5px 12px; border-radius:999px; border:none; font-size:11.5px; font-weight:700; cursor:pointer; background:transparent; color:#94A3B8; transition:all 0.2s;">
-                        Fenrir (Executive)
-                    </button>
-                </div>
-
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <button type="button" class="btn-export" style="font-size:11px; padding:5px 10px;" onclick="minimizeLiveVoiceRoom()" title="Keep voice stream active while switching tabs">Minimize</button>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button type="button" class="btn-export" style="font-size:11px; padding:4px 9px;" onclick="toggleLiveAudioConfigDrawer()" title="Microphone & Noise Gate Settings">Audio Setup</button>
+                    <button type="button" class="btn-export" style="font-size:11px; padding:4px 9px;" onclick="clearLiveRoomTranscript()" title="Clear 1-on-1 Chat">Clear</button>
+                    <button type="button" class="btn-export" style="font-size:11px; padding:4px 9px;" onclick="minimizeLiveVoiceRoom()" title="Keep voice stream active while switching tabs">Minimize</button>
                     <button type="button" class="btn-modal-close" onclick="closeLiveVoiceRoomAndStop()" aria-label="Close Live Room" title="End Session (Esc)">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
             </div>
 
-            <!-- AUDIO INPUT DEVICE DROPDOWN & NOISE GATE THRESHOLD METER -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; background:#060911; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:8px 12px;">
-                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:200px;">
-                    <span style="font-size:11px; color:#94A3B8; font-weight:600; white-space:nowrap;">Audio Input:</span>
-                    <select id="liveAudioDeviceSelect" style="flex:1; background:#0F172A; color:#F8FAFC; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; font-size:11.5px; outline:none;">
+            <!-- COLLAPSIBLE AUDIO INPUT DEVICE & NOISE GATE DRAWER (HIDDEN BY DEFAULT FOR CLEAN 1-ON-1 ROOM) -->
+            <div id="liveAudioConfigDrawer" style="display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 12px; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:180px;">
+                    <span style="font-size:11px; color:#94A3B8; font-weight:600; white-space:nowrap;">Mic:</span>
+                    <select id="liveAudioDeviceSelect" style="flex:1; background:#0F172A; color:#F8FAFC; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; font-size:11px; outline:none;">
                         <option value="default">Default System Microphone</option>
                     </select>
                 </div>
-                <div style="display:flex; align-items:center; gap:8px; min-width:210px;">
-                    <span style="font-size:11px; color:#94A3B8; font-weight:600;">Noise Gate:</span>
-                    <div style="width:90px; height:6px; background:#0F172A; border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:11px; color:#94A3B8; font-weight:600;">Gate:</span>
+                    <div style="width:80px; height:6px; background:#0F172A; border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
                         <div id="liveNoiseGateMeter" style="width:12%; height:100%; background:linear-gradient(90deg, #10B981, #38BDF8); transition:width 0.08s linear;"></div>
                     </div>
-                    <span id="liveDbReadout" style="font-size:10.5px; font-family:monospace; color:#64748B; min-width:42px;">-48 dB</span>
+                    <span id="liveDbReadout" style="font-size:10.5px; font-family:monospace; color:#64748B; min-width:40px;">-48 dB</span>
+                    <span id="liveRoomLatencyBadge" style="font-size:10px; font-family:monospace; color:#38BDF8;">142ms</span>
                 </div>
             </div>
 
-            <!-- CENTERPIECE: REACTIVE WEB AUDIO API ORB & MULTI-BAR FREQUENCY VISUALIZER -->
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:10px 0;">
-                <canvas id="liveVoiceCanvas" width="640" height="170" style="width:100%; max-width:640px; height:170px; border-radius:14px; background:radial-gradient(circle at 50% 50%, rgba(16,185,129,0.08) 0%, rgba(9,13,22,0.95) 75%); border:1px solid rgba(255,255,255,0.06);"></canvas>
+            <!-- SLEEK COMPACT REACTIVE VOICE WAVEFORM RIBBON -->
+            <div style="display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <canvas id="liveVoiceCanvas" width="640" height="84" style="width:100%; height:76px; border-radius:12px; background:radial-gradient(circle at 50% 50%, rgba(16,185,129,0.09) 0%, rgba(9,13,22,0.95) 75%); border:1px solid rgba(255,255,255,0.06);"></canvas>
             </div>
 
-            <!-- CONVERSATIONAL CANVAS: REAL-TIME TRANSCRIPTION FEED -->
-            <div id="liveRoomTranscriptFeed" style="background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; max-height:150px; min-height:92px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; font-size:13px; line-height:1.5;">
-                <div style="color:#94A3B8; font-size:12px;">
-                    Click the microphone below or press <kbd style="background:#0F172A; border:1px solid rgba(255,255,255,0.15); padding:1px 6px; border-radius:4px; font-family:monospace; color:#F8FAFC;">Space</kbd> to speak with your consultant in real time. Press <kbd style="background:#0F172A; border:1px solid rgba(255,255,255,0.15); padding:1px 6px; border-radius:4px; font-family:monospace; color:#F8FAFC;">Esc</kbd> to interrupt or cut in.
+            <!-- SPACIOUS 1-ON-1 CONVERSATIONAL CHAT STREAM -->
+            <div id="liveRoomTranscriptFeed" style="flex:1; min-height:220px; background:#060911; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; overflow-y:auto; -webkit-overflow-scrolling:touch; display:flex; flex-direction:column; gap:12px; font-size:14px; line-height:1.6;">
+                <div data-placeholder="true" style="color:#94A3B8; font-size:13px; text-align:center; margin:auto; max-width:420px; line-height:1.6;">
+                    <strong style="color:#F8FAFC; display:block; margin-bottom:4px; font-size:14px;">1-on-1 Live Consultant Session</strong>
+                    Speak naturally with your microphone or type a message below. Your consultant will reply in plain, clear paragraphs and read the takeaway aloud.
                 </div>
             </div>
 
-            <!-- TACTILE CENTRAL CONTROLS & KEYBOARD SHORTCUT HINTS -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-top:6px;">
-                <button type="button" class="btn-export" onclick="copyLiveTranscript()" style="font-size:11.5px; padding:7px 12px;">
-                    Copy Transcript
-                </button>
-
-                <div style="display:flex; align-items:center; gap:14px;">
-                    <button type="button" id="liveRoomCentralMicBtn" onclick="toggleLiveVoicePractice()" style="width:56px; height:56px; border-radius:50%; border:2px solid #F8FAFC; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#04130B; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 0 28px rgba(16,185,129,0.55); transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1);" title="Mute / Unmute Microphone (Spacebar)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <!-- DIRECT 1-ON-1 CHAT INPUT + MIC & INTERRUPT CONTROLS -->
+            <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:8px; background:#060911; border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:6px 8px;">
+                    <button type="button" id="liveRoomCentralMicBtn" onclick="toggleLiveVoicePractice()" style="width:40px; height:40px; flex-shrink:0; border-radius:50%; border:2px solid #F8FAFC; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#04130B; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 0 18px rgba(16,185,129,0.45); transition:all 0.2s;" title="Mute / Unmute Microphone (Spacebar)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
                             <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                             <line x1="12" y1="19" x2="12" y2="22"></line>
                         </svg>
                     </button>
-                    <button type="button" class="btn-export" onclick="interruptConsultantSpeech()" style="font-size:11.5px; padding:8px 13px; border-color:rgba(244,63,94,0.4); color:#FDA4AF; background:rgba(244,63,94,0.1);">
-                        Interrupt / Cut In (Esc)
+
+                    <input type="text" id="liveRoomTextInput" placeholder="Type or speak 1-on-1 with your consultant..." style="flex:1; background:transparent; border:none; color:#F8FAFC; font-size:13.5px; padding:6px 4px; outline:none;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendFromLiveRoom();}">
+
+                    <button type="button" class="btn-export" onclick="interruptConsultantSpeech()" style="font-size:11px; padding:6px 10px; border-color:rgba(244,63,94,0.35); color:#FDA4AF; background:rgba(244,63,94,0.1); white-space:nowrap;" title="Stop voice playback immediately (Esc)">
+                        Cut In
+                    </button>
+
+                    <button type="button" onclick="sendFromLiveRoom()" style="width:36px; height:36px; flex-shrink:0; border-radius:10px; border:none; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:800;" title="Send Message">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                            <polyline points="5 12 12 5 19 12"></polyline>
+                        </svg>
                     </button>
                 </div>
 
-                <span style="font-size:11px; color:#64748B; font-family:monospace;">
-                    Space: Talk • Esc: Cut In
-                </span>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#64748B; padding:0 4px;">
+                    <button type="button" onclick="copyLiveTranscript()" style="background:transparent; border:none; color:#94A3B8; cursor:pointer; font-size:11px; font-weight:600; padding:0;">📋 Copy 1-on-1 Chat</button>
+                    <span style="font-family:monospace;">Space: Toggle Mic • Esc: Cut In</span>
+                </div>
             </div>
         </div>
     </div>
@@ -5572,14 +5579,85 @@
             if (!liveAnimFrame) drawFrame();
         }
 
+        function formatCleanLiveRoomText(raw) {
+            return (raw || '')
+                .replace(/\[DOMAIN:[^\]]+\]/gi, '')
+                .replace(/\[[A-Z0-9_\s\/\-\&]+\]\s*[:=]\s*([^\n\r]+)/g, '$1')
+                .replace(/^#{1,6}\s+/gm, '')
+                .replace(/\*\*([^*]+)\*\*/g, '$1')
+                .replace(/\*([^*]+)\*/g, '$1')
+                .replace(/`([^`]+)`/g, '$1')
+                .trim();
+        }
+
         function appendLiveRoomTranscript(role, text) {
             const feed = document.getElementById('liveRoomTranscriptFeed');
             if (!feed || !text) return;
-            const row = document.createElement('div');
-            row.style.cssText = 'padding:6px 10px; border-radius:8px; background:' + (role === 'user' ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)') + '; border:1px solid ' + (role === 'user' ? 'rgba(16,185,129,0.25)' : 'rgba(56,189,248,0.25)') + ';';
-            row.innerHTML = `<strong style="color:${role === 'user' ? '#4ADE80' : '#38BDF8'}; font-size:11px; text-transform:uppercase; margin-right:6px;">${role === 'user' ? 'You' : (consultantVoiceGender === 'male' ? 'Fenrir' : 'Aoede')}:</strong><span style="color:#F8FAFC; font-size:12.5px;">${escapeHtml(text.slice(0, 320))}</span>`;
-            feed.appendChild(row);
+
+            // Remove initial placeholder card once real 1-on-1 messages arrive
+            const placeholder = feed.querySelector('[data-placeholder="true"]');
+            if (placeholder) placeholder.remove();
+
+            const isUser = (role === 'user');
+            const speakerName = isUser ? 'You' : (consultantVoiceGender === 'male' ? 'Fenrir • Consultant' : 'Aoede • Consultant');
+            const cleaned = formatCleanLiveRoomText(text);
+            const paragraphs = cleaned.split(/\n{2,}/).map(p => p.trim()).filter(Boolean).slice(0, 4);
+
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${isUser ? 'flex-end' : 'flex-start'}; width:100%;`;
+
+            const bubble = document.createElement('div');
+            bubble.style.cssText = `max-width:${isUser ? '82%' : '90%'}; padding:12px 15px; border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'}; background:${isUser ? 'linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)' : '#0E1524'}; border:1px solid ${isUser ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.09)'}; color:#F8FAFC; font-size:13.5px; line-height:1.62; box-shadow:0 4px 14px rgba(0,0,0,0.35);`;
+
+            const headerHtml = `<div style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; color:${isUser ? '#4ADE80' : '#38BDF8'}; margin-bottom:5px;">${speakerName}</div>`;
+            const bodyHtml = paragraphs.map(p => `<p style="margin:0 0 8px 0; white-space:pre-wrap;">${escapeHtml(p)}</p>`).join('');
+
+            bubble.innerHTML = headerHtml + bodyHtml;
+            wrapper.appendChild(bubble);
+            feed.appendChild(wrapper);
             feed.scrollTop = feed.scrollHeight;
+        }
+
+        function sendFromLiveRoom() {
+            const liveInput = document.getElementById('liveRoomTextInput');
+            const text = (liveInput ? liveInput.value : '').trim();
+            if (!text) return;
+            liveInput.value = '';
+            interruptConsultantSpeech();
+            appendLiveRoomTranscript('user', text);
+
+            const mainInput = document.getElementById('userInput');
+            if (mainInput) {
+                mainInput.value = text;
+                const wasVoiceActive = isVoicePracticeActive;
+                isVoicePracticeActive = true; // Ensure consultant replies back into the Live Room & speaks aloud
+                sendMessage().finally(() => {
+                    if (!wasVoiceActive) {
+                        // Keep voice active if Live Room is open
+                        const modal = document.getElementById('liveVoiceRoomModal');
+                        if (!modal || modal.style.display !== 'flex') {
+                            isVoicePracticeActive = false;
+                        }
+                    }
+                });
+            }
+        }
+
+        function toggleLiveAudioConfigDrawer() {
+            const drawer = document.getElementById('liveAudioConfigDrawer');
+            if (!drawer) return;
+            drawer.style.display = (drawer.style.display === 'none' || !drawer.style.display) ? 'flex' : 'none';
+        }
+
+        function clearLiveRoomTranscript() {
+            const feed = document.getElementById('liveRoomTranscriptFeed');
+            if (!feed) return;
+            feed.innerHTML = `
+                <div data-placeholder="true" style="color:#94A3B8; font-size:13px; text-align:center; margin:auto; max-width:420px; line-height:1.6;">
+                    <strong style="color:#F8FAFC; display:block; margin-bottom:4px; font-size:14px;">1-on-1 Live Consultant Session</strong>
+                    Speak naturally with your microphone or type a message below. Your consultant will reply in plain, clear paragraphs and read the takeaway aloud.
+                </div>
+            `;
         }
 
         function setLiveRoomPersona(gender) {
@@ -5654,16 +5732,20 @@
             const centralBtn = document.getElementById('liveRoomCentralMicBtn');
             if (centralBtn) {
                 centralBtn.style.background = 'linear-gradient(135deg, #10B981 0%, #38BDF8 100%)';
-                centralBtn.style.boxShadow = '0 0 36px rgba(56, 189, 248, 0.8)';
+                centralBtn.style.boxShadow = '0 0 24px rgba(56, 189, 248, 0.75)';
             }
 
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             initLiveAudioVisualizer();
 
-            // Direct spoken greeting + start microphone listening
-            const greeting = "Live Studio connected. What decision or numbers are we modeling today?";
-            appendLiveRoomTranscript('assistant', greeting);
-            speakInterviewerResponse(greeting);
+            // Only add a greeting if the 1-on-1 chat feed is currently empty
+            const feed = document.getElementById('liveRoomTranscriptFeed');
+            const hasMessages = feed && !feed.querySelector('[data-placeholder="true"]') && feed.children.length > 0;
+            if (!hasMessages) {
+                const greeting = "Hey! I'm right here with you. Tell me what's on your mind—whether it's moving out, a job offer, your monthly budget, or a business decision—and we'll walk through the numbers together.";
+                appendLiveRoomTranscript('assistant', greeting);
+                speakInterviewerResponse(greeting);
+            }
             
             if (SpeechRec) {
                 setTimeout(() => {

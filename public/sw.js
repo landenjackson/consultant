@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-google-tasks-mobile-v7';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-live-1on1-chat-v8';
 const ASSETS = [
   '/',
   '/index.html',
