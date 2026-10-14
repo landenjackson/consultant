@@ -1937,7 +1937,33 @@
                 font-size: 8.5px !important;
                 max-width: 70px !important;
             }
+
+            /* MOBILE READABILITY & RESPONSIVE OVERRIDES FOR PERSONAL RUNWAY, TIMELINE & LIVE VOICE ROOM */
+            .voice-dock-pill {
+                padding: 4px 8px !important;
+                font-size: 10.5px !important;
+                gap: 4px !important;
+            }
+            #personalRunwayStudio {
+                padding: 12px 10px !important;
+                margin: 10px 0 !important;
+            }
+            #prTimelineMonthStrip {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 6px !important;
+            }
+            #liveVoiceRoomModal .modal-card {
+                padding: 14px 12px !important;
+                border-radius: 16px !important;
+                max-height: 92vh !important;
+                overflow-y: auto !important;
+            }
+            #liveVoiceCanvas {
+                height: 120px !important;
+            }
         }
+        @media (max-width: 768px) {
+            .bubble-assistant {
                 padding: 18px 16px;
                 border-radius: 12px;
                 font-size: 14.5px;
@@ -2305,7 +2331,7 @@
                 <span>⚙️</span> <span>Display, Voice & Engine Settings</span>
             </button>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
-                <span>🏢</span> <span>Microsoft 365 & Office Integrations</span>
+                <span>✅</span> <span>Google Tasks & Workspace Hub</span>
             </button>
         </div>
 
@@ -2913,71 +2939,79 @@
         </div>
     </div>
 
-    <!-- MICROSOFT OFFICE 365 & ENTERPRISE SUITE HUB -->
+    <!-- GOOGLE TASKS, WORKSPACE & ACTION MANAGEMENT HUB -->
     <div class="modal-overlay" id="officeModal">
-        <div class="modal-card" style="max-width:680px; padding:32px;">
+        <div class="modal-card" style="max-width:720px; padding:26px 22px;">
             <div class="modal-header">
                 <div>
-                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
-                        <span style="color:#0078D4;">🏢</span> Microsoft 365 & Office Suite
+                    <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+                        <span style="color:#4ADE80;">✅</span> Google Tasks & Action Plan Manager
                     </h2>
-                    <p style="color:var(--text-secondary); font-size:13px; margin-top:2px;">Direct integration with Microsoft Word, Excel, PowerPoint, and OneDrive.</p>
+                    <p style="color:var(--text-secondary); font-size:12.5px; margin-top:2px;">Turn your financial, career, and business plans into trackable tasks synced with Google Tasks, Calendar, Sheets & Docs.</p>
                 </div>
                 <button class="btn-modal-close" onclick="closeOfficeModal()" aria-label="Close" title="Close">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
-                <!-- EXCEL 365 -->
-                <div style="background:rgba(16,124,65,0.06); border:1px solid rgba(16,124,65,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px; color:#107C41;">📑</span>
-                        <div>
-                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">Microsoft Excel 365</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">Forensic P&L & unit economics</div>
-                        </div>
+            <!-- INTERACTIVE TASK CHECKLIST BUILDER -->
+            <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                    <span style="font-size:12px; font-weight:800; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.04em;">Active Action Checklist</span>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button type="button" class="btn-export" style="font-size:11px; padding:4px 9px; color:#4ADE80; border-color:rgba(16,185,129,0.35);" onclick="autoExtractTasksFromChat()">+ Import Steps from Latest Chat</button>
+                        <button type="button" class="btn-export" style="font-size:11px; padding:4px 9px;" onclick="window.open('https://tasks.google.com', '_blank')">Open Google Tasks ↗</button>
                     </div>
-                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Instant workbook generation with structured telemetry sheets and sensitivity matrices.</p>
-                    <button class="btn-export" onclick="exportExcelXLSX(); closeOfficeModal();" style="border-color:#107C41; color:#4ADE80; justify-content:center;">
-                        <span>📥</span> Export to Microsoft Excel (.xlsx)
+                </div>
+
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <input type="text" id="gtNewTaskInput" placeholder="Add a task (e.g. Save $1,500 move-out buffer, Submit polished resume, Audit COGS)..." style="flex:1; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; border-radius:8px; padding:8px 12px; font-size:12.5px;" onkeydown="if(event.key==='Enter'){addGoogleTaskItem();}">
+                    <button type="button" class="btn-export" style="background:var(--accent); color:#000; font-weight:800; border:none; padding:8px 14px;" onclick="addGoogleTaskItem()">Add Task</button>
+                </div>
+
+                <div id="gtTaskListContainer" style="display:flex; flex-direction:column; gap:6px; max-height:190px; overflow-y:auto;">
+                    <!-- Populated dynamically from localStorage cs_google_tasks -->
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+                <!-- GOOGLE SHEETS / EXCEL -->
+                <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                    <div>
+                        <div style="font-weight:700; color:#FFF; font-size:13.5px;">📊 Google Sheets & Excel (.xlsx)</div>
+                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45;">Export formula-intact spreadsheets ready for Google Sheets or Excel.</div>
+                    </div>
+                    <button class="btn-export" onclick="exportExcelXLSX(); closeOfficeModal();" style="border-color:#10B981; color:#4ADE80; justify-content:center; font-size:11.5px;">
+                        Export Spreadsheet (.xlsx)
                     </button>
                 </div>
 
-                <!-- PDF BRIEF -->
-                <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px; color:#F59E0B;">📑</span>
-                        <div>
-                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">PDF Executive Report</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">Printable boardroom brief</div>
-                        </div>
+                <!-- GOOGLE DOCS / PDF BRIEF -->
+                <div style="background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                    <div>
+                        <div style="font-weight:700; color:#FFF; font-size:13.5px;">📑 Google Docs & PDF Report</div>
+                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45;">Generate a clean 1-page printable PDF or copy formatted text for Google Docs.</div>
                     </div>
-                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Clean, publication-ready PDF deliverable with formatted tables and metrics.</p>
-                    <button class="btn-export" onclick="exportExecutivePDF(); closeOfficeModal();" style="border-color:#F59E0B; color:#FBBF24; justify-content:center;">
-                        <span>📥</span> Export PDF Report
+                    <button class="btn-export" onclick="exportExecutivePDF(); closeOfficeModal();" style="border-color:#38BDF8; color:#7DD3FC; justify-content:center; font-size:11.5px;">
+                        Export PDF Report
                     </button>
                 </div>
 
-                <!-- ONEDRIVE / TEAMS SYNC -->
-                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px; color:#38BDF8;">☁️</span>
-                        <div>
-                            <div style="font-weight:700; color:#FFF; font-size:14.5px;">OneDrive & Teams Sync</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">Encrypted local workspace</div>
-                        </div>
+                <!-- GOOGLE CALENDAR REMINDER -->
+                <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                    <div>
+                        <div style="font-weight:700; color:#FFF; font-size:13.5px;">📅 Schedule in Google Calendar</div>
+                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45;">Create a Google Calendar milestone block for your active tasks and deadlines.</div>
                     </div>
-                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">All generated artifacts conform to Microsoft Office OpenXML standards for drag-and-drop OneDrive syncing.</p>
-                    <button class="btn-export" onclick="exportBankTeaser(); closeOfficeModal();" style="justify-content:center;">
-                        <span>📄</span> 1-Page Investor Brief
+                    <button class="btn-export" onclick="scheduleInGoogleCalendar()" style="border-color:#F59E0B; color:#FBBF24; justify-content:center; font-size:11.5px;">
+                        Schedule Milestone ↗
                     </button>
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
-                <span style="font-size:12px; color:var(--text-muted);">Compatible with Microsoft Office 365, Desktop 2016-2024, and Office Online.</span>
-                <button class="btn-export" onclick="closeOfficeModal()">Close Hub</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:12px; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:11.5px; color:var(--text-muted);">Synced with your on-device task list & Google Workspace exports.</span>
+                <button class="btn-export" onclick="closeOfficeModal()">Done</button>
             </div>
         </div>
     </div>
@@ -4216,7 +4250,102 @@
             }
         }
 
+        function getGoogleTasksList() {
+            try {
+                const raw = localStorage.getItem('cs_google_tasks');
+                if (raw) return JSON.parse(raw);
+            } catch (e) {}
+            return [
+                { id: 't1', text: 'Review Personal Cash Runway & Minimum Target Salary', done: false },
+                { id: 't2', text: 'Polish 1-Page Resume & Practice STAR Interview Stories', done: false },
+                { id: 't3', text: 'Audit Monthly Budget & Build 3-Month Emergency Reserve', done: false }
+            ];
+        }
+
+        function saveGoogleTasksList(list) {
+            try {
+                localStorage.setItem('cs_google_tasks', JSON.stringify(list));
+            } catch (e) {}
+        }
+
+        function renderGoogleTasksList() {
+            const container = document.getElementById('gtTaskListContainer');
+            if (!container) return;
+            const list = getGoogleTasksList();
+            if (list.length === 0) {
+                container.innerHTML = `<div style="font-size:12px; color:var(--text-muted); padding:8px;">No active tasks yet. Add one above or import steps from your latest chat!</div>`;
+                return;
+            }
+            container.innerHTML = list.map((item, idx) => `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:#0E131C; border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:8px 10px;">
+                    <label style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer; font-size:12.5px; color:${item.done ? '#64748B' : '#F8FAFC'}; text-decoration:${item.done ? 'line-through' : 'none'};">
+                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleGoogleTaskDone(${idx})" style="accent-color:#10B981; width:15px; height:15px; cursor:pointer;">
+                        <span>${escapeHtml(item.text)}</span>
+                    </label>
+                    <button type="button" onclick="deleteGoogleTaskItem(${idx})" style="background:transparent; border:none; color:#64748B; cursor:pointer; font-size:13px; padding:2px 6px;" title="Remove Task">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function addGoogleTaskItem(customText) {
+            const input = document.getElementById('gtNewTaskInput');
+            const text = (customText || (input ? input.value : '')).trim();
+            if (!text) return;
+            const list = getGoogleTasksList();
+            list.unshift({ id: 'gt_' + Date.now(), text, done: false });
+            saveGoogleTasksList(list);
+            if (input && !customText) input.value = '';
+            renderGoogleTasksList();
+            showToast("Added to Google Tasks checklist!", "✅");
+        }
+
+        function toggleGoogleTaskDone(idx) {
+            const list = getGoogleTasksList();
+            if (list[idx]) {
+                list[idx].done = !list[idx].done;
+                saveGoogleTasksList(list);
+                renderGoogleTasksList();
+            }
+        }
+
+        function deleteGoogleTaskItem(idx) {
+            const list = getGoogleTasksList();
+            list.splice(idx, 1);
+            saveGoogleTasksList(list);
+            renderGoogleTasksList();
+        }
+
+        function autoExtractTasksFromChat() {
+            const lastAssistant = Array.from(document.querySelectorAll('.bubble-assistant')).pop();
+            if (!lastAssistant) {
+                showToast("Ask the consultant a question first to import action steps!", "💡");
+                return;
+            }
+            const rawText = getTargetDocumentText(lastAssistant);
+            const lines = rawText.split('\n').map(l => l.replace(/^[\s\-\*\d\.]+/, '').trim()).filter(l => l.length > 14 && l.length < 130);
+            const picked = lines.slice(-3);
+            if (picked.length === 0) {
+                showToast("No bulleted action steps found in the latest message.", "ℹ️");
+                return;
+            }
+            const list = getGoogleTasksList();
+            picked.forEach((step, i) => {
+                list.unshift({ id: 'gt_' + Date.now() + '_' + i, text: step, done: false });
+            });
+            saveGoogleTasksList(list);
+            renderGoogleTasksList();
+            showToast(`Imported ${picked.length} action steps into your task list!`, "✅");
+        }
+
+        function scheduleInGoogleCalendar() {
+            const list = getGoogleTasksList().filter(t => !t.done);
+            const title = encodeURIComponent("Consultant Studio: Action Plan & Financial Milestone");
+            const details = encodeURIComponent("Action Checklist:\n" + list.map(t => "• " + t.text).join("\n"));
+            window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`, '_blank');
+        }
+
         function openOfficeModal() {
+            renderGoogleTasksList();
             const m = document.getElementById('officeModal');
             if (m) m.style.display = 'flex';
         }
@@ -6700,8 +6829,9 @@
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
+                            <button class="btn-export" onclick="openOfficeModal()" style="border-color:#10B981; color:#4ADE80; font-weight:700; background:rgba(16,185,129,0.1);">✅ Google Tasks</button>
                             <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
-                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Excel (.xlsx)</button>
+                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Sheets (.xlsx)</button>
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save</button>
                             ${modelBadge}
                         `;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-live-voice-room-v6';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-google-tasks-mobile-v7';
 const ASSETS = [
   '/',
   '/index.html',
