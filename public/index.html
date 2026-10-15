@@ -3062,15 +3062,20 @@
                     </button>
                 </div>
 
-                <!-- GOOGLE DOCS / PDF BRIEF -->
+                <!-- GOOGLE DOCS / WORD (.DOCX) / PDF BRIEF -->
                 <div style="background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.25); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
                     <div>
-                        <div style="font-weight:700; color:#FFF; font-size:13.5px;">📑 Google Docs & PDF Report</div>
-                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45;">Generate a clean 1-page printable PDF or copy formatted text for Google Docs.</div>
+                        <div style="font-weight:700; color:#FFF; font-size:13.5px;">📄 1-Page Word (.docx) &amp; PDF</div>
+                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45;">Download an ATS-ready 1-Page Word (.docx) file or printable PDF report.</div>
                     </div>
-                    <button class="btn-export" onclick="exportExecutivePDF(); closeOfficeModal();" style="border-color:#38BDF8; color:#7DD3FC; justify-content:center; font-size:11.5px;">
-                        Export PDF Report
-                    </button>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-export" onclick="exportWordDocx(); closeOfficeModal();" style="flex:1; border-color:#38BDF8; color:#38BDF8; background:rgba(56,189,248,0.1); font-weight:700; justify-content:center; font-size:11px;">
+                            📄 Word (.docx)
+                        </button>
+                        <button class="btn-export" onclick="exportExecutivePDF(); closeOfficeModal();" style="flex:1; border-color:#F59E0B; color:#FBBF24; justify-content:center; font-size:11px;">
+                            📑 PDF
+                        </button>
+                    </div>
                 </div>
 
                 <!-- GOOGLE CALENDAR REMINDER -->
@@ -4849,6 +4854,7 @@
             delivBar.innerHTML = `
                 <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Answer</button>
                 <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
+                <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
                 <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
                 <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Budget (.xlsx)</button>
             `;
@@ -6839,7 +6845,7 @@
 
         // 1-CLICK DEDICATED MARKDOWN MEMORANDUM EXPORTER
         function downloadMarkdownMemo(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? (btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant')) : document.querySelector('.bubble-assistant');
             if (!card) return;
             const text = (card.querySelector('.stream-content')?.innerText || card.innerText || "").trim();
             const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
@@ -6852,6 +6858,86 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showToast("Downloaded Markdown Memorandum (.md)!", "📥");
+        }
+
+        // 1-CLICK NATIVE MICROSOFT WORD (.DOCX) RESUME & STRATEGY EXPORTER (OPENXML + JSZIP)
+        async function exportWordDocx(btn) {
+            try {
+                const rawText = getTargetDocumentText(btn);
+                if (!rawText || rawText.trim().length < 5) {
+                    showToast("Generate a resume or strategy in chat first to export (.docx)!", "📄");
+                    return;
+                }
+                showToast("Building ATS-Ready Word Document (.docx)...", "📄");
+
+                const xmlEsc = (s) => String(s || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&apos;');
+
+                const lines = rawText
+                    .replace(/\r\n/g, '\n')
+                    .split('\n')
+                    .map(l => l.trim())
+                    .filter(l => l.length > 0 && !/^(?:📋|🔊|✅|📑|📊|🔒|📄|⚡\s*Deep|⚡\s*Low|🔎\s*Live Tavily)/.test(l));
+
+                let bodyXml = '';
+                lines.forEach((line, idx) => {
+                    const cleanLine = line.replace(/^\*{1,3}|\*{1,3}$/g, '').trim();
+                    const isHeading = /^#{1,4}\s+/.test(line) || (idx === 0 && cleanLine.length < 85) || (/^[0-9]+\.\s+[A-Z]/.test(cleanLine) && cleanLine.length < 75);
+                    const isBullet = /^[•\-\*]\s+/.test(line);
+
+                    if (isHeading) {
+                        const headingText = cleanLine.replace(/^#{1,4}\s+/, '');
+                        bodyXml += `<w:p><w:pPr><w:spacing w:before="160" w:after="60"/>${idx === 0 ? '<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="4" w:color="0F172A"/></w:pBdr>' : ''}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/><w:b/><w:color w:val="0F172A"/><w:sz w:val="${idx === 0 ? '28' : '23'}"/></w:rPr><w:t>${xmlEsc(headingText)}</w:t></w:r></w:p>`;
+                    } else if (isBullet) {
+                        const bulletText = cleanLine.replace(/^[•\-\*]\s+/, '').replace(/\*\*(.*?)\*\*/g, '$1');
+                        bodyXml += `<w:p><w:pPr><w:ind w:left="360" w:hanging="180"/><w:spacing w:before="30" w:after="40"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/><w:sz w:val="21"/></w:rPr><w:t xml:space="preserve">• ${xmlEsc(bulletText)}</w:t></w:r></w:p>`;
+                    } else {
+                        const paraText = cleanLine.replace(/\*\*(.*?)\*\*/g, '$1');
+                        bodyXml += `<w:p><w:pPr><w:spacing w:before="40" w:after="80"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/><w:sz w:val="21"/></w:rPr><w:t xml:space="preserve">${xmlEsc(paraText)}</w:t></w:r></w:p>`;
+                    }
+                });
+
+                if (typeof JSZip !== 'undefined') {
+                    const zip = new JSZip();
+                    zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`);
+                    zip.folder('_rels').file('.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`);
+                    zip.folder('word').file('document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${bodyXml}
+    <w:sectPr>
+      <w:pgSz w:w="12240" w:h="15840"/>
+      <w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`);
+
+                    const blob = await zip.generateAsync({
+                        type: 'blob',
+                        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    });
+                    triggerUniversalDownload(blob, `Consultant_Studio_Resume_Brief_${new Date().toISOString().slice(0, 10)}.docx`);
+                    showToast("📄 Downloaded 1-Page Word Document (.docx)!", "✓");
+                } else {
+                    downloadMarkdownMemo(btn);
+                }
+            } catch (err) {
+                console.error("DOCX Export Error:", err);
+                showToast("Exporting fallback document...", "📄");
+                downloadMarkdownMemo(btn);
+            }
         }
 
         // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER (PURIFIES EMAIL BODY ONLY)
@@ -7366,6 +7452,7 @@
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
+                            <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#10B981; color:#4ADE80; font-weight:700; background:rgba(16,185,129,0.1);">✅ Google Tasks</button>
                             <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
                             <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Sheets (.xlsx)</button>

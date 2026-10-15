@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-15-zero-timeout-files-v13';
+const CACHE_NAME = 'consultant-studio-v2026-10-15-docx-resume-export-v14';
 const ASSETS = [
   '/',
   '/index.html',
