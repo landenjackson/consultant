@@ -191,14 +191,14 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     });
   }
 
-  // TIER 0: OpenRouter Direct Execution for Gemini 1.5 Pro / Flash / Argon (and Fallback)
-  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
+  // TIER 0: OpenRouter Direct Execution for Deep Reasoning / Low-Latency Execution
+  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
     try {
       const orModel = 'google/gemini-4-argon';
-      const displayLabel = (pinnedModel && pinnedModel.includes('flash')) ? 'Gemini 1.5 Flash' : 'Gemini 1.5 Pro';
+      const displayLabel = (pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash'))) ? 'Low-Latency Execution' : 'Deep Reasoning';
       console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length}]`);
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -327,7 +327,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
     try {
       if (pinnedModel && pinnedModel !== 'auto') {
-        const isPro = pinnedModel.includes('pro') || pinnedModel.includes('argon');
+        const isPro = pinnedModel.includes('deep') || pinnedModel.includes('pro') || pinnedModel.includes('argon');
         const tokenCeiling = isPro ? 8192 : 4096;
         console.log(`[Executing Dedicated Engine: ${pinnedModel} | MaxTokens: ${tokenCeiling}]`);
 
@@ -339,7 +339,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         try {
           const pinnedWinner = await Promise.any(candidateModels.map(m => fetchDirectGoogle(m, tokenCeiling)));
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          const displayModel = isPro ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash';
+          const displayModel = isPro ? 'Deep Reasoning' : 'Low-Latency Execution';
           console.log(`[⚡ Pinned Engine Success (${displayModel}) via ${pinnedWinner.model}] (${pinnedWinner.text.length} chars in ${elapsed}s)`);
           return { text: pinnedWinner.text, isFallback: false, model: displayModel, latency: `${elapsed}s` };
         } catch(pinnedErr) {
@@ -352,7 +352,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
-      return { text: winner.text, isFallback: false, model: 'Gemini 1.5 Flash', latency: `${elapsed}s` };
+      return { text: winner.text, isFallback: false, model: 'Low-Latency Execution', latency: `${elapsed}s` };
     } catch (gErr) {
       console.warn('[Direct Google Speculative Notice]:', gErr.message);
     }
@@ -767,7 +767,7 @@ User Message: ${userMessage}`;
 
     // Dynamic, Practical Life, Career, Money & Business Decision Consultant Instruction
     const isBusinessMode = (workspace || '').toLowerCase() === 'business';
-    const finalPrompt = `You are CONSULTANT STUDIO (Powered by Google Gemini 1.5 Pro), a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
+    const finalPrompt = `You are CONSULTANT STUDIO, a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
 
 Most people feel overwhelmed making big life and money decisions on their own—like figuring out how to move out, afford rent, land a job, pay off debt, fix a monthly budget, buy a car, or run a small business. Your mission is to make those decisions simple, concrete, and achievable.
 

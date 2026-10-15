@@ -10,7 +10,7 @@
     <!-- OpenGraph Social Metadata -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Consultant Studio | Personal Runway, Career & Business Financial Modeling">
-    <meta property="og:description" content="Private on-device financial modeling powered by Google Gemini 1.5 Pro. Calculate personal cash runway, minimum target salary, and business breakeven.">
+    <meta property="og:description" content="Private on-device financial modeling with Deep Reasoning. Calculate personal cash runway, minimum target salary, and business breakeven.">
     <meta property="og:url" content="https://www.consultant-studio.app/">
     <meta property="og:site_name" content="Consultant Studio">
     <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_official_brand.png">
@@ -2762,10 +2762,10 @@
 
             <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid rgba(167,139,250,0.3); border-radius:8px; padding:2px 6px; flex-shrink:0;">
-                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select AI Model">
-                    <option value="gemini-1.5-pro" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">Gemini 1.5 Pro (Deep Reasoning)</option>
-                    <option value="gemini-1.5-flash" style="background:#0D121A; color:#FFF;">Gemini 1.5 Flash (Low-Latency Execution)</option>
-                    <option value="auto" style="background:#0D121A; color:#FFF;">Auto Routing (Balanced Speed &amp; Depth)</option>
+                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select Execution Mode">
+                    <option value="deep-reasoning" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">Deep Reasoning</option>
+                    <option value="low-latency" style="background:#0D121A; color:#FFF;">Low-Latency Execution</option>
+                    <option value="auto" style="background:#0D121A; color:#FFF;">Balanced Speed &amp; Depth</option>
                 </select>
             </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Ask anything—moving out, landing a job, fixing your budget, or weighing a decision..." onkeydown="handleInputKeydown(event)"></textarea>
@@ -3075,8 +3075,8 @@
                     <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Runway, tax, salary, and breakeven formulas run 100% deterministically in client-side JavaScript for instant 0ms recalculation without AI hallucination.</div>
                 </div>
                 <div style="background:#090D14; border:1px solid #282E3D; border-radius:10px; padding:14px;">
-                    <div style="font-size:13px; font-weight:700; color:#F59E0B; margin-bottom:4px;">🛡️ Google Gemini 1.5 Pro &amp; 1.5 Flash Routing</div>
-                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Uses Google Gemini 1.5 Pro for deep multi-document financial and career reasoning, paired with Gemini 1.5 Flash for low-latency interactive responses.</div>
+                    <div style="font-size:13px; font-weight:700; color:#F59E0B; margin-bottom:4px;">🛡️ Deep Reasoning &amp; Low-Latency Routing</div>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Uses Deep Reasoning for multi-document financial and career strategy, paired with Low-Latency Execution for fast interactive responses.</div>
                 </div>
             </div>
 
@@ -3128,10 +3128,10 @@
                 </div>
 
                 <div>
-                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Active AI Model Engine:</div>
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:8px;">Active Execution Mode:</div>
                     <div style="font-size:12.5px; color:var(--accent-glow); background:rgba(34,197,94,0.08); padding:10px 14px; border-radius:10px; border:1px solid var(--border-glow); display:flex; flex-direction:column; gap:4px;">
-                        <div>✓ <strong>Google Gemini 1.5 Pro &amp; Gemini 1.5 Flash Active</strong></div>
-                        <div style="font-size:11px; color:var(--text-secondary);">Deep Reasoning &amp; Low-Latency Financial Advisory Pipeline</div>
+                        <div>✓ <strong>Deep Reasoning &amp; Low-Latency Execution Active</strong></div>
+                        <div style="font-size:11px; color:var(--text-secondary);">Adaptive Financial &amp; Career Advisory Pipeline</div>
                     </div>
                 </div>
 
@@ -3183,12 +3183,12 @@
                     <div class="plan-name">Partners</div>
                     <div class="plan-price">$39.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>Gemini 1.5 Pro (Deep Reasoning) Access</strong></li>
+                        <li>✓ <strong>Deep Reasoning Access</strong></li>
                         <li>✓ <strong>Built for Couples, Roommates &amp; Co-Founders</strong></li>
                         <li>✓ Shared Moving, Housing &amp; Combined Budget Planning</li>
                         <li>✓ <strong>Unlimited Document Uploads &amp; PDF/Excel Exports</strong></li>
                         <li>✓ Side-by-Side Decision &amp; Scenario Modeling</li>
-                        <li>✓ Priority Low-Latency Response Speed</li>
+                        <li>✓ Priority Low-Latency Execution Speed</li>
                         <li>✓ <strong>30-Day Free Trial ($0 Today)</strong></li>
                     </ul>
                     <button class="btn-subscribe" onclick="checkout('pro', 3999, 'Partners')">Start Partners Trial</button>
@@ -3199,7 +3199,7 @@
                     <div class="plan-name">Family &amp; Executive Business</div>
                     <div class="plan-price">$79.99<span>/mo</span></div>
                     <ul class="plan-features">
-                        <li>✓ <strong>Full Gemini 1.5 Pro Extended Context (2M Tokens)</strong></li>
+                        <li>✓ <strong>Extended Context &amp; Deep Reasoning (2M Tokens)</strong></li>
                         <li>✓ <strong>Complete Household + Business Operations Suite</strong></li>
                         <li>✓ Full Business P&amp;L, Margin &amp; Pricing Studio</li>
                         <li>✓ Unlimited File Analysis, Contracts &amp; Spreadsheets</li>
@@ -4129,7 +4129,7 @@
                             </div>
                             <div class="meta">
                                 <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                <div><strong>Engine:</strong> Google Gemini 1.5 Pro (On-Device Privacy)</div>
+                                <div><strong>Mode:</strong> Deep Reasoning (On-Device Privacy)</div>
                             </div>
                         </div>
                         <div class="content">
@@ -4225,7 +4225,7 @@
                     </div>
                     <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
                         <strong style="color:#38BDF8; display:block; margin-bottom:4px;">2. On-Device Document Parsing (.PDF, .DOCX, .XLSX)</strong>
-                        When you attach a resume, lease, or spreadsheet, text extraction happens directly inside your browser memory using PDF.js, Mammoth.js, and SheetJS. Transient prompt snippets sent to Google Gemini 1.5 Pro / Flash for live analysis are never logged to persistent disk storage or used to train models.
+                        When you attach a resume, lease, or spreadsheet, text extraction happens directly inside your browser memory using PDF.js, Mammoth.js, and SheetJS. Transient prompt snippets sent for live Deep Reasoning analysis are never logged to persistent disk storage or used to train models.
                     </div>
                     <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
                         <strong style="color:#F8FAFC; display:block; margin-bottom:4px;">3. Instant Data Erasure</strong>
@@ -6836,10 +6836,12 @@
         }
 
         function handleModelChange(selectEl) {
-            if (selectEl.value === 'gemini-1.5-pro') {
-                showToast("Google Gemini 1.5 Pro (Deep Reasoning) active.", "✓");
-            } else if (selectEl.value === 'gemini-1.5-flash') {
-                showToast("Google Gemini 1.5 Flash (Low-Latency Execution) active.", "⚡");
+            if (selectEl.value === 'deep-reasoning') {
+                showToast("Deep Reasoning mode active.", "✓");
+            } else if (selectEl.value === 'low-latency') {
+                showToast("Low-Latency Execution mode active.", "⚡");
+            } else {
+                showToast("Balanced Speed & Depth mode active.", "✓");
             }
         }
 
@@ -6880,7 +6882,7 @@
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
                 <div class="orchestration-tracker" id="${hudId}">
-                    <div class="tracker-step running" id="${hudId}_step1">⟳ Analyzing your numbers &amp; context with Google Gemini...</div>
+                    <div class="tracker-step running" id="${hudId}_step1">⟳ Analyzing your numbers &amp; context...</div>
                 </div>
             `;
             assistantRow.appendChild(assistantCard);
@@ -6911,7 +6913,7 @@
                 autoHarvestMemoryFromText(text);
                 if (docToSend) autoHarvestMemoryFromText(docToSend);
 
-                const modelOverride = document.getElementById('modelSelectOverride')?.value || 'gemini-1.5-pro';
+                const modelOverride = document.getElementById('modelSelectOverride')?.value || 'deep-reasoning';
 
                 res = await fetch('/api/chat', {
                     method: 'POST',

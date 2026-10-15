@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-trust-tracks-v9';
+const CACHE_NAME = 'consultant-studio-v2026-10-14-clean-labels-v10';
 const ASSETS = [
   '/',
   '/index.html',
