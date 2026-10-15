@@ -279,11 +279,13 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
   const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    const timeoutId = setTimeout(() => controller.abort(), 38000);
     try {
       const orModel = 'google/gemini-4-argon';
-      const displayLabel = (pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash'))) ? 'Low-Latency Execution' : 'Deep Reasoning';
-      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length}]`);
+      const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
+      const displayLabel = isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning';
+      const maxOutTokens = isLowLatency ? 1400 : (hasImages ? 1800 : 2200);
+      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -296,7 +298,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         body: JSON.stringify({
           model: orModel,
           messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: 3500,
+          max_tokens: maxOutTokens,
           temperature: 0.25
         })
       });
@@ -844,9 +846,17 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       : '';
 
     // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + Live Tavily Market Research IN PARALLEL
+    // Skip blocking Tavily web search when the user attached a file/image so file/vision analysis starts at 0ms!
     const clefPromise = evaluateWithClef(userMessage, workspace);
-    const tavilyQuery = buildTavilyResearchQuery(userMessage, workspace, 'auto');
-    const tavilyData = await runTavilyLookup(tavilyQuery, 4);
+    const hasHeavyAttachment = Boolean((documentText && documentText.length > 180) || (Array.isArray(images) && images.length > 0));
+    let tavilyData = { query: '', answer: '', results: [] };
+    if (!hasHeavyAttachment) {
+      const tavilyQuery = buildTavilyResearchQuery(userMessage, workspace, 'auto');
+      tavilyData = await Promise.race([
+        runTavilyLookup(tavilyQuery, 4),
+        new Promise(r => setTimeout(() => r({ query: tavilyQuery, answer: '', results: [] }), 1800))
+      ]);
+    }
     const tavilyContextBlock = (tavilyData && (tavilyData.answer || (tavilyData.results && tavilyData.results.length > 0)))
       ? `\n[LIVE 2026 TAVILY MARKET & CAREER RESEARCH]:\n${tavilyData.answer ? `Summary: ${tavilyData.answer}\n` : ''}${(tavilyData.results || []).map(r => `• ${r.title} (${r.domain}): ${r.snippet}`).join('\n')}\n`
       : '';
