@@ -314,7 +314,8 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 
   let contentPayload = prompt;
   if (hasImages) {
-    contentPayload = [{ type: 'text', text: prompt }];
+    // Place image_url blocks FIRST before the text prompt so multimodal models see the pixels before reading any document tags!
+    contentPayload = [];
     imageObjs.slice(0, 10).forEach(img => {
       if (img && img.mimeType && img.data) {
         contentPayload.push({
@@ -323,6 +324,7 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         });
       }
     });
+    contentPayload.push({ type: 'text', text: prompt });
   }
 
   // TIER 0: OpenRouter Direct Execution for Deep Reasoning / Low-Latency Execution
@@ -1007,15 +1009,22 @@ User Message: ${userMessage}`;
       }
     }
 
-    // Clean text payload (strip any inline base64 strings so prompt doesn't blow token limits)
-    const cleanDocText = String(documentText || '').replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]').trim();
+    // Clean text payload (strip any inline base64 strings and any image placeholder lines so the model never thinks the image is "just a placeholder")
+    const cleanDocText = String(documentText || '')
+      .replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '')
+      .replace(/\[(?:Attached Image|Visual Image Attached)[^\]]*\]/gi, '')
+      .trim();
     
     // Delimiter Hardening & Explicit Document/Vision Analysis Directive
-    const hasAttachedDocs = cleanDocText.length > 0;
+    const hasRealDocText = cleanDocText.replace(/=== FILE[^\n]*===/g, '').replace(/\[Document File:[^\]]*\]/g, '').trim().length > 10;
+    const hasAttachedDocs = hasRealDocText;
     const hasAttachedImages = imageObjs.length > 0;
     const isolatedDocumentBlock = (hasAttachedDocs || hasAttachedImages)
-      ? `\n[ATTACHED USER FILES & IMAGES (${imageObjs.length} visual frame(s) attached) — READ & ANALYZE DIRECTLY]:\n` +
-        `CRITICAL INSTRUCTION FOR ATTACHED FILES/IMAGES: The user has uploaded real files or images below. You MUST carefully read and analyze the exact text, numbers, line items, resume bullet points, or visual details inside the attached content. Reference specific numbers, names, and facts directly from their attachment in your answer.\n` +
+      ? `\n[ATTACHED USER FILES & IMAGES (${imageObjs.length} visual image frame(s) attached directly to this message) — READ & ANALYZE DIRECTLY]:\n` +
+        `CRITICAL INSTRUCTION FOR ATTACHED FILES/IMAGES: ` +
+        (hasAttachedImages
+          ? `The user has attached ${imageObjs.length} actual image(s)/page(s) directly to this multimodal message. Look directly at the attached image(s), read every word, bullet point, number, and heading visible in the image(s), and analyze their exact content. NEVER say the file is a placeholder or didn't attach!\n`
+          : `The user has uploaded a document below. Carefully read and analyze the exact text, numbers, line items, and resume bullet points inside <attached_document_content>.\n`) +
         (hasAttachedDocs ? `<attached_document_content>\n${cleanDocText.slice(0, 18000)}\n</attached_document_content>\n` : '')
       : '';
 

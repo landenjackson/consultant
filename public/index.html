@@ -3389,6 +3389,9 @@
         let isGenerating = false;
         let uploadedDocText = "";
         let uploadedImages = [];
+        let lastSessionDocText = "";
+        let lastSessionImages = [];
+        let lastSessionDocName = "";
 
         const SEND_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
 
@@ -3826,6 +3829,9 @@
             messages = [];
             uploadedDocText = "";
             uploadedImages = [];
+            lastSessionDocText = "";
+            lastSessionImages = [];
+            lastSessionDocName = "";
             attachedFileNameStr = "";
             isGenerating = false;
 
@@ -5141,7 +5147,7 @@
 
                         if (visionObj && visionObj.data && uploadedImages.length < 10) {
                             uploadedImages.push(visionObj);
-                            currentFileText = `[Attached Image / Screenshot Ready for Vision Analysis: ${file.name}]`;
+                            currentFileText = `[Visual Image Attached: ${file.name} — Read all text, numbers, and layout directly from the attached multimodal image frame]`;
                         } else {
                             currentFileText = `[Attached Image: ${file.name}]`;
                         }
@@ -5157,6 +5163,10 @@
 
                 // Enforce safe 18,000-character text budget (pure text only; images live separately in uploadedImages[])
                 uploadedDocText = combinedDocText.trim().slice(0, 18000);
+                // Persist in active session memory so follow-up questions & retries ALWAYS retain the uploaded file/image!
+                lastSessionDocText = uploadedDocText;
+                lastSessionImages = [...uploadedImages];
+                lastSessionDocName = attachedFileNameStr;
                 const rawLen = uploadedDocText.length;
                 const estTokens = Math.max(1, Math.round(rawLen / 4) + (uploadedImages.length * 260));
                 if (nameLabel) {
@@ -7275,15 +7285,21 @@
             const chatFeed = document.getElementById('chatFeed');
 
             // Capture file text & images for the request BEFORE clearing the dock
-            const docToSend = uploadedDocText;
-            const imagesToSend = Array.isArray(uploadedImages) ? [...uploadedImages] : [];
-            const docNameToSend = attachedFileNameStr;
+            // If no new file was attached on this turn, retain the active session's uploaded file/image so follow-ups & retries never lose context!
+            const isFreshUpload = Boolean(uploadedDocText || (uploadedImages && uploadedImages.length > 0));
+            const docToSend = isFreshUpload ? uploadedDocText : lastSessionDocText;
+            const imagesToSend = isFreshUpload
+                ? (Array.isArray(uploadedImages) ? [...uploadedImages] : [])
+                : (Array.isArray(lastSessionImages) ? [...lastSessionImages] : []);
+            const docNameToSend = isFreshUpload ? attachedFileNameStr : lastSessionDocName;
 
-            // User Message (with inline thumbnail strip if images were attached)
+            // User Message (with inline thumbnail strip if fresh images were attached)
             const userRow = document.createElement('div');
             userRow.className = 'chat-row';
-            const fileBadge = docNameToSend ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached &amp; Ingested:</span> <strong>${escapeHtml(docNameToSend)}</strong></div>` : '';
-            const thumbStrip = imagesToSend.length > 0
+            const fileBadge = docNameToSend
+                ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 ${isFreshUpload ? 'Attached &amp; Ingested' : 'Active Session File'}:</span> <strong>${escapeHtml(docNameToSend)}</strong></div>`
+                : '';
+            const thumbStrip = (isFreshUpload && imagesToSend.length > 0)
                 ? `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">` +
                   imagesToSend.map(img => img.dataUri ? `<img src="${img.dataUri}" alt="${escapeHtml(img.name || 'Attached Image')}" style="max-height:76px; max-width:120px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); object-fit:cover;">` : '').join('') +
                   `</div>`
@@ -7291,7 +7307,7 @@
             userRow.innerHTML = `<div class="bubble-user">${fileBadge}${thumbStrip}${escapeHtml(text)}</div>`;
             chatFeed.appendChild(userRow);
 
-            removeAttachedFile(); // Clear file chip after capturing payload
+            removeAttachedFile(); // Clear file chip from dock while keeping lastSessionDocText / lastSessionImages active for follow-ups
 
             messages.push({ role: 'user', content: text });
 
