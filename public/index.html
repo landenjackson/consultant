@@ -797,9 +797,16 @@
             line-height: 1.7;
             color: #E2E8F0;
             box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
-            contain: content;
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            -webkit-touch-callout: default !important;
             animation: chatCardEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            will-change: transform, opacity;
+        }
+
+        .bubble-assistant *, .stream-content, .stream-content *, .bubble-user, .bubble-user *, .dock-input, input, textarea {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            -webkit-touch-callout: default !important;
         }
 
         .bubble-assistant blockquote {
@@ -4048,7 +4055,7 @@
             const editor = document.getElementById('canvasEditor');
             if (!editor) return;
             const text = getCleanStrategyText(editor);
-            navigator.clipboard.writeText(text);
+            writeToUniversalClipboard(text);
             showToast("Copied strategy text to clipboard!", "📋");
             
             // Smooth non-blocking UI indicator
@@ -6177,7 +6184,7 @@
         function copyLiveTranscript() {
             const feed = document.getElementById('liveRoomTranscriptFeed');
             if (!feed) return;
-            navigator.clipboard.writeText(feed.innerText || '');
+            writeToUniversalClipboard(feed.innerText || '');
             showToast("Live Room transcript copied to clipboard!", "📋");
         }
 
@@ -6950,69 +6957,93 @@
             }
         }
 
-        // 1-CLICK EXECUTIVE EMAIL & DEAL MEMO CLIPBOARD COPIER (PURIFIES EMAIL BODY ONLY)
+        // UNIVERSAL APPLE iOS / SAFARI / DESKTOP CLIPBOARD ENGINE (WITH SYNCHRONOUS TEXTAREA FALLBACK)
+        function writeToUniversalClipboard(text) {
+            return new Promise((resolve) => {
+                const clean = String(text || '').trim();
+                if (!clean) {
+                    resolve(false);
+                    return;
+                }
+                const syncCopyFallback = () => {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = clean;
+                        ta.setAttribute('readonly', '');
+                        ta.style.cssText = 'position:fixed; top:0; left:0; width:2em; height:2em; padding:0; border:none; outline:none; box-shadow:none; background:transparent; opacity:0.01; z-index:-1; font-size:16px;';
+                        document.body.appendChild(ta);
+                        ta.focus();
+                        ta.select();
+                        ta.setSelectionRange(0, clean.length);
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    } catch (err) {
+                        return false;
+                    }
+                };
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                    navigator.clipboard.writeText(clean).then(() => {
+                        resolve(true);
+                    }).catch(() => {
+                        resolve(syncCopyFallback());
+                    });
+                } else {
+                    resolve(syncCopyFallback());
+                }
+            });
+        }
+
+        // 1-CLICK FULL RESPONSE & EMAIL CLIPBOARD COPIER (PRESERVES COMPLETE RESUME / STRATEGY SECTIONS ACROSS "---" DIVIDERS)
         function copyExecutiveEmail(btn) {
-            const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+            const card = btn ? (btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant')) : document.querySelector('.bubble-assistant');
             if (!card) return;
-            const text = (card.querySelector('.stream-content')?.innerText || card.innerText || "").trim();
+            const streamEl = card.querySelector('.stream-content');
+            const rawText = (streamEl ? (streamEl.innerText || streamEl.textContent) : getTargetDocumentText(card) || "").trim();
 
-            let purifiedEmail = text;
+            let purifiedText = rawText;
 
-            // 1. Isolate starting from "Subject:" or "Hi / Dear / Hey / To:"
-            const startPatterns = [
-                /(?:Subject|Re|Regarding):\s*[^\n]+/i,
-                /(?:^|\n)(?:Hi|Dear|Hey|To)\s+[^,\n]+,/i
-            ];
-
-            for (const pat of startPatterns) {
-                const match = text.match(pat);
+            // Only isolate from "Subject:" if the user explicitly asked for an email draft
+            const isEmailDraft = /(?:^|\n)Subject:\s*[^\n]+/i.test(rawText) && !/(?:PROFESSIONAL SUMMARY|CORE SKILLS|PROFESSIONAL EXPERIENCE|EDUCATION)/i.test(rawText);
+            if (isEmailDraft) {
+                const match = rawText.match(/(?:^|\n)Subject:\s*[^\n]+/i);
                 if (match && match.index !== undefined) {
-                    purifiedEmail = text.slice(match.index);
-                    break;
+                    purifiedText = rawText.slice(match.index).trim();
                 }
             }
 
-            // 2. Cut off trailing AI commentary, operator interrogation, sensitivity sliders, and UI metadata
+            // Strip only UI button labels / telemetry footers (NEVER cut at --- or *** horizontal rules!)
             const stopPatterns = [
-                /\n\s*\*{3,}/,                                // ***
-                /\n\s*---/,                                   // ---
-                /\n\s*(?:Operator Interrogation|Interrogation Intake|Diagnostic Questions):/i,
-                /\n\s*Reply with your answers/i,
                 /\n\s*🪄\s*Dynamic What-If/i,
-                /\n\s*Dynamic What-If/i,
-                /\n\s*📈\s*Calculate/i,
-                /\n\s*📋\s*Copy Email/i,
-                /\n\s*🎙️\s*Audio Briefing/i,
-                /\n\s*⚡\s*gemini/i
+                /\n\s*🔎\s*Live Tavily Benchmarks:/i,
+                /\n\s*📋\s*Copy\b/i
             ];
 
             for (const stopPat of stopPatterns) {
-                const stopIdx = purifiedEmail.search(stopPat);
+                const stopIdx = purifiedText.search(stopPat);
                 if (stopIdx !== -1) {
-                    purifiedEmail = purifiedEmail.slice(0, stopIdx).trim();
+                    purifiedText = purifiedText.slice(0, stopIdx).trim();
                 }
             }
 
-            // 3. Clean trailing buttons, action tags, and markdown artifacts
-            purifiedEmail = purifiedEmail
+            purifiedText = purifiedText
                 .replace(/\[Action:[^\]]+\]/gi, '')
                 .replace(/`{3}[\w]*/g, '')
                 .trim();
 
-            navigator.clipboard.writeText(purifiedEmail).then(() => {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '✓ Copied Clean Email!';
-                btn.style.borderColor = '#10B981';
-                btn.style.color = '#34D399';
-                showToast('📋 Clean Email copied (prose & UI stripped)!', '✓');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.style.borderColor = '#A855F7';
-                    btn.style.color = '#C084FC';
-                }, 2200);
-            }).catch(e => {
-                console.warn("Clipboard copy fallback:", e);
-                navigator.clipboard.writeText(purifiedEmail);
+            writeToUniversalClipboard(purifiedText || rawText).then((ok) => {
+                if (btn) {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '✓ Copied!';
+                    btn.style.borderColor = '#10B981';
+                    btn.style.color = '#34D399';
+                    setTimeout(() => {
+                        btn.innerHTML = orig;
+                        btn.style.borderColor = '#A855F7';
+                        btn.style.color = '#C084FC';
+                    }, 2200);
+                }
+                showToast('📋 Full response copied to clipboard — ready to paste!', '✓');
             });
         }
 
