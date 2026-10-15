@@ -3383,6 +3383,7 @@
         let messages = [];
         let isGenerating = false;
         let uploadedDocText = "";
+        let uploadedImages = [];
 
         const SEND_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
 
@@ -3819,6 +3820,7 @@
             // Clear in-memory conversation array
             messages = [];
             uploadedDocText = "";
+            uploadedImages = [];
             attachedFileNameStr = "";
             isGenerating = false;
 
@@ -4944,36 +4946,97 @@
 
         let attachedFileNameStr = "";
 
+        // Helper to compress an image or canvas into a clean Vision payload ({ name, mimeType, data, dataUri })
+        function compressCanvasToVisionObj(canvas, name) {
+            const dataUri = canvas.toDataURL('image/jpeg', 0.85);
+            const parts = dataUri.split(',');
+            return {
+                name: name || 'image.jpg',
+                mimeType: 'image/jpeg',
+                data: parts[1] || '',
+                dataUri
+            };
+        }
+
+        // Fallback DOCX XML extractor using JSZip (captures paragraphs, tables, headers & textboxes if mammoth fails)
+        async function extractDocxFallbackWithJSZip(arrayBuffer) {
+            if (typeof JSZip === 'undefined') return '';
+            try {
+                const zip = await JSZip.loadAsync(arrayBuffer);
+                const xmlFiles = Object.keys(zip.files).filter(k => /^word\/(document|header\d*|footer\d*)\.xml$/i.test(k));
+                let out = [];
+                for (const xf of xmlFiles) {
+                    const xmlStr = await zip.files[xf].async('string');
+                    const paragraphs = xmlStr.split(/<\/w:p>|<\/w:tr>/i);
+                    for (const p of paragraphs) {
+                        const texts = [...p.matchAll(/<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/gi)].map(m => m[1]);
+                        if (texts.length > 0) {
+                            const line = texts.join('').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").trim();
+                            if (line) out.push(line);
+                        }
+                    }
+                }
+                return out.join('\n');
+            } catch (e) {
+                console.warn('JSZip DOCX fallback error:', e);
+                return '';
+            }
+        }
+
         // MULTI-FILE & MULTI-PHOTO (UP TO 10 ASSETS) INGESTION HANDLER
         async function handleFileUpload(e) {
             const files = Array.from(e.target.files || []);
             if (files.length === 0) return;
+
+            setChatState('uploading');
 
             // Allow up to 10 files in batch
             const selectedFiles = files.slice(0, 10);
 
             const preview = document.getElementById('fileAttachmentPreview');
             const nameLabel = document.getElementById('attachedFileName');
+            const snippetEl = document.getElementById('attachedFilePreviewSnippet');
             if (preview && nameLabel) {
                 nameLabel.innerText = selectedFiles.length === 1 ? `Reading ${selectedFiles[0].name}...` : `Reading ${selectedFiles.length} files...`;
                 preview.style.display = 'flex';
             }
+            if (snippetEl) {
+                snippetEl.innerText = 'Extracting text & vision frames...';
+            }
 
             attachedFileNameStr = selectedFiles.map(f => f.name).join(', ');
             let combinedDocText = "";
+            uploadedImages = [];
 
             try {
                 for (let idx = 0; idx < selectedFiles.length; idx++) {
                     const file = selectedFiles[idx];
-                    const ext = file.name.split('.').pop().toLowerCase();
+                    const ext = (file.name.includes('.') ? file.name.split('.').pop() : '').toLowerCase();
                     let currentFileText = "";
 
                     if (ext === 'docx') {
                         const arrayBuffer = await file.arrayBuffer();
-                        const result = await mammoth.extractRawText({ arrayBuffer });
-                        currentFileText = result.value || "";
+                        let extracted = "";
+                        if (typeof mammoth !== 'undefined' && mammoth.extractRawText) {
+                            try {
+                                const result = await mammoth.extractRawText({ arrayBuffer });
+                                extracted = (result && result.value) ? result.value.trim() : "";
+                            } catch (mErr) {
+                                console.warn("Mammoth DOCX notice, trying JSZip XML fallback:", mErr);
+                            }
+                        }
+                        if (!extracted || extracted.length < 20) {
+                            const fallbackXmlText = await extractDocxFallbackWithJSZip(arrayBuffer);
+                            if (fallbackXmlText && fallbackXmlText.length > extracted.length) {
+                                extracted = fallbackXmlText;
+                            }
+                        }
+                        currentFileText = extracted || `[Word Document Attached: ${file.name}]`;
                     } else if (ext === 'pdf') {
                         const arrayBuffer = await file.arrayBuffer();
+                        if (window.pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                        }
                         const loadingTask = pdfjsLib.getDocument({
                             data: new Uint8Array(arrayBuffer),
                             useSystemFonts: true,
@@ -4981,31 +5044,62 @@
                         });
                         const pdf = await loadingTask.promise;
                         let fullPdfText = "";
-                        for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+                        const maxPages = Math.min(pdf.numPages, 25);
+                        for (let i = 1; i <= maxPages; i++) {
                             const page = await pdf.getPage(i);
                             const textContent = await page.getTextContent();
                             const pageItems = textContent.items
                                 .map(item => (typeof item.str === 'string' ? item.str : ''))
                                 .filter(str => str.trim().length > 0);
-                            fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
+                            if (pageItems.length > 0) {
+                                fullPdfText += `\n--- Page ${i} ---\n` + pageItems.join(' ');
+                            }
                         }
-                        currentFileText = fullPdfText.trim() || `[PDF Document: ${file.name}]`;
+                        // Scanned PDF / Image-PDF Fallback: if extracted text is empty or tiny (< 40 chars), render first 3 pages to Vision JPEG frames!
+                        if (fullPdfText.replace(/---\s*Page\s*\d+\s*---/g, '').trim().length < 40) {
+                            const renderPages = Math.min(pdf.numPages, 3);
+                            for (let p = 1; p <= renderPages && uploadedImages.length < 10; p++) {
+                                try {
+                                    const page = await pdf.getPage(p);
+                                    const viewport = page.getViewport({ scale: 1.6 });
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = viewport.width;
+                                    canvas.height = viewport.height;
+                                    const ctx = canvas.getContext('2d');
+                                    await page.render({ canvasContext: ctx, viewport }).promise;
+                                    const visionObj = compressCanvasToVisionObj(canvas, `${file.name} (Page ${p})`);
+                                    if (visionObj.data) uploadedImages.push(visionObj);
+                                } catch (pdfRenderErr) {
+                                    console.warn("Scanned PDF page render notice:", pdfRenderErr);
+                                }
+                            }
+                            currentFileText = `[Scanned / Visual PDF Document: ${file.name} — ${renderPages} page(s) rendered for Vision OCR]`;
+                        } else {
+                            currentFileText = fullPdfText.trim();
+                        }
                     } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
                         const arrayBuffer = await file.arrayBuffer();
-                        const wb = XLSX.read(arrayBuffer, { type: 'array' });
-                        let fullSheetText = "";
-                        wb.SheetNames.forEach(sheetName => {
-                            const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
-                            fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv;
-                        });
-                        currentFileText = fullSheetText;
-                    } else if (ext === 'txt' || ext === 'json' || ext === 'md') {
+                        if (typeof XLSX !== 'undefined') {
+                            const wb = XLSX.read(arrayBuffer, { type: 'array' });
+                            let fullSheetText = "";
+                            wb.SheetNames.forEach(sheetName => {
+                                const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName], { blankrows: false });
+                                if (csv && csv.trim()) {
+                                    fullSheetText += `\n--- Sheet: ${sheetName} ---\n` + csv.trim();
+                                }
+                            });
+                            currentFileText = fullSheetText.trim() || await file.text();
+                        } else {
+                            currentFileText = await file.text();
+                        }
+                    } else if (ext === 'txt' || ext === 'json' || ext === 'md' || ext === 'tsv') {
                         currentFileText = await file.text();
-                    } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name)) {
-                        // Optimal resolution for LLM OCR & layout recognition (~300-600 KB)
-                        currentFileText = await new Promise((resolve) => {
+                    } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp|heic)$/i.test(file.name)) {
+                        // Store compressed image in dedicated uploadedImages[] so 12,000-char text cap NEVER truncates base64 image bytes!
+                        const visionObj = await new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onload = function(event) {
+                                const rawDataUrl = String(event.target.result || '');
                                 const img = new Image();
                                 img.onload = function() {
                                     const MAX_DIM = 1600;
@@ -5022,56 +5116,84 @@
                                     canvas.height = height;
                                     const ctx = canvas.getContext('2d');
                                     if (!ctx) {
-                                        resolve(`[Attached Image: ${file.name}]`);
+                                        const m = rawDataUrl.match(/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,(.+)$/);
+                                        resolve(m ? { name: file.name, mimeType: m[1], data: m[2], dataUri: rawDataUrl } : null);
                                         return;
                                     }
                                     ctx.drawImage(img, 0, 0, width, height);
-                                    const compressedDataUri = canvas.toDataURL('image/jpeg', 0.85);
-                                    resolve(`[Attached Image / Screenshot: ${file.name}]\n${compressedDataUri}`);
+                                    resolve(compressCanvasToVisionObj(canvas, file.name));
                                 };
-                                img.onerror = () => resolve(`[Attached Image: ${file.name}]`);
-                                img.src = event.target.result;
+                                img.onerror = () => {
+                                    const m = rawDataUrl.match(/^data:(image\/[a-zA-Z0-9\+\-\.]+);base64,(.+)$/);
+                                    resolve(m ? { name: file.name, mimeType: m[1], data: m[2], dataUri: rawDataUrl } : null);
+                                };
+                                img.src = rawDataUrl;
                             };
-                            reader.onerror = () => resolve(`[Attached Image: ${file.name}]`);
+                            reader.onerror = () => resolve(null);
                             reader.readAsDataURL(file);
                         });
+
+                        if (visionObj && visionObj.data && uploadedImages.length < 10) {
+                            uploadedImages.push(visionObj);
+                            currentFileText = `[Attached Image / Screenshot Ready for Vision Analysis: ${file.name}]`;
+                        } else {
+                            currentFileText = `[Attached Image: ${file.name}]`;
+                        }
                     } else {
-                        // Fallback binary / unsupported format warning
                         showToast(`Notice: File format .${ext} ingested as plain text context.`, "📎");
                         currentFileText = await file.text();
                     }
 
-                    combinedDocText += `\n=== FILE [${idx + 1}/${selectedFiles.length}]: ${file.name} ===\n${currentFileText}\n`;
+                    if (currentFileText) {
+                        combinedDocText += `\n=== FILE [${idx + 1}/${selectedFiles.length}]: ${file.name} ===\n${currentFileText}\n`;
+                    }
                 }
 
-                // Enforce safe 12,000-character token budget per upload batch and show extraction preview
-                const rawLen = combinedDocText.trim().length;
-                const estTokens = Math.max(1, Math.round(rawLen / 4));
-                uploadedDocText = combinedDocText.trim().slice(0, 12000);
+                // Enforce safe 18,000-character text budget (pure text only; images live separately in uploadedImages[])
+                uploadedDocText = combinedDocText.trim().slice(0, 18000);
+                const rawLen = uploadedDocText.length;
+                const estTokens = Math.max(1, Math.round(rawLen / 4) + (uploadedImages.length * 260));
                 if (nameLabel) {
+                    const imgNote = uploadedImages.length > 0 ? ` • ${uploadedImages.length} image${uploadedImages.length > 1 ? 's' : ''} ready` : '';
                     nameLabel.innerText = selectedFiles.length === 1
-                        ? `${selectedFiles[0].name} (~${estTokens.toLocaleString()} tokens)`
-                        : `${selectedFiles.length} files (~${estTokens.toLocaleString()} tokens)`;
+                        ? `${selectedFiles[0].name} (~${estTokens.toLocaleString()} tokens${imgNote})`
+                        : `${selectedFiles.length} files (~${estTokens.toLocaleString()} tokens${imgNote})`;
                 }
-                const snippetEl = document.getElementById('attachedFilePreviewSnippet');
                 if (snippetEl) {
-                    const cleanPreview = uploadedDocText.replace(/=== FILE[^\n]*===/g, '').replace(/\s+/g, ' ').trim().slice(0, 95);
-                    snippetEl.innerText = cleanPreview ? `Preview: "${cleanPreview}..."` : 'Extracted locally in browser memory';
+                    const cleanPreview = uploadedDocText
+                        .replace(/=== FILE[^\n]*===/g, '')
+                        .replace(/\[Attached Image[^\]]*\]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .slice(0, 110);
+                    if (cleanPreview) {
+                        snippetEl.innerText = `Preview: "${cleanPreview}..."`;
+                    } else if (uploadedImages.length > 0) {
+                        snippetEl.innerText = `🖼️ ${uploadedImages.length} high-res image(s) prepared for Multimodal Vision OCR`;
+                    } else {
+                        snippetEl.innerText = 'Extracted locally in browser memory';
+                    }
                 }
 
-                // CONSUMER-FIRST AUTO-MATH: Automatically parse financial parameters from attached CSV/P&L/DOCX into the Breakeven Control Room
-                autoIngestFinancialsFromText(uploadedDocText);
+                // CONSUMER-FIRST AUTO-MATH: Only auto-calibrate Breakeven sliders if user is in Business Mode
+                if ((window.selectedMode || 'personal') === 'business' && uploadedDocText.length > 20) {
+                    autoIngestFinancialsFromText(uploadedDocText);
+                }
             } catch (err) {
                 console.error("Multi-File Parsing Error:", err);
                 uploadedDocText = `[Attached batch: ${attachedFileNameStr}]`;
-                if (nameLabel) nameLabel.innerText = `${selectedFiles.length} files attached`;
+                if (nameLabel) nameLabel.innerText = `${selectedFiles.length} file(s) attached`;
+            } finally {
+                setChatState('idle');
             }
         }
 
         function removeAttachedFile() {
             uploadedDocText = "";
+            uploadedImages = [];
             attachedFileNameStr = "";
-            document.getElementById('fileInput').value = "";
+            const fi = document.getElementById('fileInput');
+            if (fi) fi.value = "";
             const preview = document.getElementById('fileAttachmentPreview');
             if (preview) preview.style.display = 'none';
         }
@@ -7048,7 +7170,14 @@
         async function sendMessage() {
             if (chatState === 'streaming' || chatState === 'uploading') return;
             const input = document.getElementById('userInput');
-            const text = input ? input.value.trim() : '';
+            let text = input ? input.value.trim() : '';
+            // Allow sending an attached file/image with 1 click on Send even if the text box is blank!
+            if (!text && (uploadedDocText || (uploadedImages && uploadedImages.length > 0))) {
+                const isPersonal = (window.selectedMode || 'personal') !== 'business';
+                text = isPersonal
+                    ? `Analyze my attached file (${attachedFileNameStr || 'document/image'}). Extract the key details, numbers, or resume bullets and give me clear, practical recommendations.`
+                    : `Analyze my attached file (${attachedFileNameStr || 'document/image'}). Break down the key financial metrics, costs, and actionable next steps.`;
+            }
             if (!text) return;
 
             setChatState('streaming');
@@ -7056,20 +7185,27 @@
             const hero = document.getElementById('heroBanner');
             if (hero) hero.style.display = 'none';
 
-            input.value = '';
+            if (input) input.value = '';
             const chatFeed = document.getElementById('chatFeed');
 
-            // User Message
+            // Capture file text & images for the request BEFORE clearing the dock
+            const docToSend = uploadedDocText;
+            const imagesToSend = Array.isArray(uploadedImages) ? [...uploadedImages] : [];
+            const docNameToSend = attachedFileNameStr;
+
+            // User Message (with inline thumbnail strip if images were attached)
             const userRow = document.createElement('div');
             userRow.className = 'chat-row';
-            const fileBadge = attachedFileNameStr ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached & Ingested:</span> <strong>${escapeHtml(attachedFileNameStr)}</strong></div>` : '';
-            userRow.innerHTML = `<div class="bubble-user">${fileBadge}${escapeHtml(text)}</div>`;
+            const fileBadge = docNameToSend ? `<div style="font-size:11.5px; color:var(--accent-glow); margin-bottom:4px; display:flex; align-items:center; gap:4px;"><span>📎 Attached &amp; Ingested:</span> <strong>${escapeHtml(docNameToSend)}</strong></div>` : '';
+            const thumbStrip = imagesToSend.length > 0
+                ? `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">` +
+                  imagesToSend.map(img => img.dataUri ? `<img src="${img.dataUri}" alt="${escapeHtml(img.name || 'Attached Image')}" style="max-height:76px; max-width:120px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); object-fit:cover;">` : '').join('') +
+                  `</div>`
+                : '';
+            userRow.innerHTML = `<div class="bubble-user">${fileBadge}${thumbStrip}${escapeHtml(text)}</div>`;
             chatFeed.appendChild(userRow);
 
-            // Capture file text for the request, then reset the dock
-            const docToSend = uploadedDocText;
-            const docNameToSend = attachedFileNameStr;
-            removeAttachedFile(); // Clear file chip after sending
+            removeAttachedFile(); // Clear file chip after capturing payload
 
             messages.push({ role: 'user', content: text });
 
@@ -7124,7 +7260,12 @@
                         conversationId: currentConversationId,
                         workspace: currentMode,
                         model: modelOverride,
-                        documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : '')
+                        documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : ''),
+                        images: imagesToSend.map(img => ({
+                            name: img.name || 'image.jpg',
+                            mimeType: img.mimeType || 'image/jpeg',
+                            data: img.data
+                        }))
                     })
                 });
                 clearTimeout(timeoutId);

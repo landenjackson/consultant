@@ -821,7 +821,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
   app.post('/api/chat', async (req, res) => {
     try {
-      const { messages = [], workspace = 'general', documentText = '', conversationId = null, model = 'auto' } = req.body;
+      const { messages = [], workspace = 'general', documentText = '', images = [], conversationId = null, model = 'auto' } = req.body;
       const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
 
       if (!userMessage) {
@@ -884,13 +884,24 @@ ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.sl
 User Message: ${userMessage}`;
     };
 
-    // Extract all embedded base64 image data if attached (Supports large iPhone/Android camera photos)
+    // Extract all embedded or explicitly passed base64 image data (Supports up to 10 high-res photos, screenshots, or scanned PDF pages)
     let imageObjs = [];
-    if (documentText && documentText.includes('data:image/')) {
+    if (Array.isArray(images)) {
+      images.slice(0, 10).forEach(img => {
+        if (img && img.data && String(img.data).length > 50) {
+          imageObjs.push({
+            name: img.name || 'image.jpg',
+            mimeType: img.mimeType || 'image/jpeg',
+            data: String(img.data).replace(/^data:image\/[a-zA-Z0-9\+\-\.]+;base64,/, '').replace(/[\s\r\n]+/g, '')
+          });
+        }
+      });
+    }
+    if (documentText && documentText.includes('data:image/') && imageObjs.length < 10) {
       const regex = /data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([A-Za-z0-9+/=]+)/g;
       let match;
       while ((match = regex.exec(documentText)) !== null && imageObjs.length < 10) {
-        if (match[2] && match[2].length > 100) {
+        if (match[2] && match[2].length > 50) {
           imageObjs.push({
             mimeType: match[1],
             data: match[2].replace(/[\s\r\n]+/g, '')
@@ -899,12 +910,16 @@ User Message: ${userMessage}`;
       }
     }
 
-    // Clean text payload (strip huge base64 strings so prompt doesn't blow token limits)
-    const cleanDocText = documentText.replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]');
+    // Clean text payload (strip any inline base64 strings so prompt doesn't blow token limits)
+    const cleanDocText = String(documentText || '').replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]').trim();
     
-    // Delimiter Hardening & Prompt Injection Shielding (Mantis Security Recommendation)
-    const isolatedDocumentBlock = cleanDocText
-      ? `\n<untrusted_document_context source="client_upload">\n${cleanDocText.slice(0, 12000)}\n</untrusted_document_context>\n`
+    // Delimiter Hardening & Explicit Document/Vision Analysis Directive
+    const hasAttachedDocs = cleanDocText.length > 0;
+    const hasAttachedImages = imageObjs.length > 0;
+    const isolatedDocumentBlock = (hasAttachedDocs || hasAttachedImages)
+      ? `\n[ATTACHED USER FILES & IMAGES (${imageObjs.length} visual frame(s) attached) — READ & ANALYZE DIRECTLY]:\n` +
+        `CRITICAL INSTRUCTION FOR ATTACHED FILES/IMAGES: The user has uploaded real files or images below. You MUST carefully read and analyze the exact text, numbers, line items, resume bullet points, or visual details inside the attached content. Reference specific numbers, names, and facts directly from their attachment in your answer.\n` +
+        (hasAttachedDocs ? `<attached_document_content>\n${cleanDocText.slice(0, 18000)}\n</attached_document_content>\n` : '')
       : '';
 
     // Dynamic, Practical Life, Career, Money & Business Decision Consultant Instruction
@@ -983,15 +998,26 @@ User Query: ${userMessage}`;
       });
     }
 
-    // If primary query failed, attempt one final direct Google AI Studio generation before returning a simple response
+    // If primary query failed, attempt one final direct Google AI Studio generation (with multimodal image parts if present)
     try {
       const fallbackGoogleKey = customKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
       if (fallbackGoogleKey) {
+        const fallbackParts = [{ text: finalPrompt }];
+        imageObjs.forEach(img => {
+          if (img && img.data) {
+            fallbackParts.push({
+              inline_data: {
+                mime_type: img.mimeType || 'image/jpeg',
+                data: img.data
+              }
+            });
+          }
+        });
         const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${fallbackGoogleKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
+            contents: [{ role: 'user', parts: fallbackParts }],
             generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
           })
         });
