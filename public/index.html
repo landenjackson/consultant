@@ -2542,6 +2542,46 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- LIVE JOB & RESUME OPTION FINDER (POWERED BY TAVILY — ZERO HARD SCROLLING) -->
+                    <div id="tavilyCareerPickerStudio" style="margin-top:14px; background:#07090D; border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <span style="font-size:11px; background:rgba(56,189,248,0.14); color:#38BDF8; padding:3px 9px; border-radius:6px; font-weight:800; border:1px solid rgba(56,189,248,0.35);">
+                                    🔎 Live Job &amp; Resume Picker
+                                </span>
+                                <span style="font-size:13px; font-weight:800; color:#F8FAFC;">Choose Target Jobs, Salary Ranges &amp; Best Resume Angles in 1 Click (No Hard Scrolling)</span>
+                            </div>
+                            <div style="display:inline-flex; background:#0E131C; border:1px solid rgba(255,255,255,0.1); border-radius:7px; padding:2px;">
+                                <button type="button" id="tvlyModeJobsBtn" onclick="setTavilyPickerCategory('jobs')" style="background:#38BDF8; color:#000; border:none; padding:4px 10px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer;">💼 Target Jobs &amp; Pay</button>
+                                <button type="button" id="tvlyModeResumeBtn" onclick="setTavilyPickerCategory('resume')" style="background:transparent; color:var(--text-secondary); border:none; padding:4px 10px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">📄 Resume Format &amp; Keywords</button>
+                            </div>
+                        </div>
+
+                        <!-- ONE-TAP ROLE & RESUME PRESET PILLS -->
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">Quick Pick:</span>
+                            <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(56,189,248,0.3); color:#E2E8F0;" onclick="quickRunTavilyPicker('Marketing & Growth Analyst')">📊 Marketing Analyst</button>
+                            <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(34,197,94,0.3); color:#E2E8F0;" onclick="quickRunTavilyPicker('Operations & Supply Chain Coordinator')">⚙️ Operations Lead / Analyst</button>
+                            <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(245,158,11,0.3); color:#E2E8F0;" onclick="quickRunTavilyPicker('Financial & Business Operations Analyst')">💵 Financial / BizOps Analyst</button>
+                            <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(168,85,247,0.3); color:#E2E8F0;" onclick="quickRunTavilyPicker('Project & Account Management Associate')">🚀 Project / Account Manager</button>
+                            <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(236,72,153,0.3); color:#E2E8F0;" onclick="quickRunTavilyPicker('1-Page ATS Results-Driven Resume Format 2026', 'resume')">📄 Best 2026 Resume Options</button>
+                        </div>
+
+                        <!-- SEARCH BAR -->
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="text" id="tavilyCareerSearchInput" placeholder="Type a job title, city, or resume style (e.g. Marketing Analyst Tallahassee, Remote Ops Coordinator, ATS 1-Page Resume)..." onkeydown="if(event.key==='Enter'){event.preventDefault(); runTavilyCareerLookup();}" style="flex:1; min-width:220px; background:#0E131C; border:1px solid rgba(255,255,255,0.16); color:#F8FAFC; padding:9px 12px; border-radius:8px; font-size:12.5px;">
+                            <button type="button" id="tavilyCareerSearchBtn" onclick="runTavilyCareerLookup()" style="background:#38BDF8; color:#000; font-weight:800; border:none; padding:9px 16px; border-radius:8px; font-size:12.5px; cursor:pointer; white-space:nowrap;">
+                                🔎 Find Best Options
+                            </button>
+                        </div>
+
+                        <!-- PICKABLE RESULTS CONTAINER -->
+                        <div id="tavilyCareerResultsWrap" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+                            <div id="tavilyCareerTakeaway" style="font-size:12px; color:#E2E8F0; background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); padding:10px 12px; border-radius:8px; margin-bottom:10px; line-height:1.5;"></div>
+                            <div id="tavilyCareerCardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(235px, 1fr)); gap:10px;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (HIDDEN IN PERSONAL MODE, SHOWN IN BUSINESS MODE) -->
@@ -5266,6 +5306,166 @@
             sendQuick(`Personal Runway & Salary Benchmark: I have $${(d.liquid || 18000).toLocaleString()} in liquid savings, $${(d.essential || 2400).toLocaleString()}/mo in essential fixed costs, $${(d.discretionary || 600).toLocaleString()}/mo in discretionary spending, and $${(d.inflow || 800).toLocaleString()}/mo in side income. My net monthly burn is $${Math.round(d.netBurn || 2200).toLocaleString()}/mo (${(d.runwayMonths || 8.2).toFixed(1)} months / ${d.runwayDays || 249} days of runway), and my minimum target salary is $${Math.round(d.minTargetSalary || 44615).toLocaleString()}/yr ($${Math.round(d.consultingDayRate || 186)}/day consulting floor). Benchmark this against an offer of $${offerVal.toLocaleString()} and give me an action plan.`);
         }
 
+        // LIVE TAVILY JOB & RESUME OPTION PICKER (1-CLICK SELECTION WITHOUT HARD SCROLLING)
+        window.tavilyPickerCategory = 'jobs';
+        window.tavilyLastCards = [];
+
+        function setTavilyPickerCategory(cat) {
+            window.tavilyPickerCategory = cat === 'resume' ? 'resume' : 'jobs';
+            const btnJobs = document.getElementById('tvlyModeJobsBtn');
+            const btnResume = document.getElementById('tvlyModeResumeBtn');
+            const input = document.getElementById('tavilyCareerSearchInput');
+            if (btnJobs && btnResume) {
+                const isJobs = window.tavilyPickerCategory === 'jobs';
+                btnJobs.style.background = isJobs ? '#38BDF8' : 'transparent';
+                btnJobs.style.color = isJobs ? '#000' : 'var(--text-secondary)';
+                btnJobs.style.fontWeight = isJobs ? '800' : '700';
+                btnResume.style.background = !isJobs ? '#38BDF8' : 'transparent';
+                btnResume.style.color = !isJobs ? '#000' : 'var(--text-secondary)';
+                btnResume.style.fontWeight = !isJobs ? '800' : '700';
+            }
+            if (input) {
+                input.placeholder = window.tavilyPickerCategory === 'resume'
+                    ? 'Type your target role or resume style (e.g. Entry Marketing Analyst Resume, Operations Lead ATS Bullets, 1-Page Clean Format)...'
+                    : 'Type a job title, skill, or city (e.g. Marketing Analyst Tallahassee, Remote Operations Coordinator, Business Analyst)...';
+            }
+        }
+
+        function quickRunTavilyPicker(presetQuery, forceCategory) {
+            if (forceCategory) {
+                setTavilyPickerCategory(forceCategory);
+            } else {
+                setTavilyPickerCategory('jobs');
+            }
+            const input = document.getElementById('tavilyCareerSearchInput');
+            if (input) input.value = presetQuery;
+            runTavilyCareerLookup();
+        }
+
+        async function runTavilyCareerLookup() {
+            const input = document.getElementById('tavilyCareerSearchInput');
+            const btn = document.getElementById('tavilyCareerSearchBtn');
+            const wrap = document.getElementById('tavilyCareerResultsWrap');
+            const takeawayEl = document.getElementById('tavilyCareerTakeaway');
+            const gridEl = document.getElementById('tavilyCareerCardsGrid');
+            const query = (input?.value || '').trim();
+            if (!query) {
+                if (typeof showToast === 'function') showToast('Enter a role or click a Quick Pick pill above!', '🔎');
+                if (input) input.focus();
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = '⟳ Researching Live...';
+            }
+            if (wrap) wrap.style.display = 'block';
+            if (takeawayEl) takeawayEl.innerHTML = '🔎 <strong>Scanning live 2026 job market, salary benchmarks, and ATS resume standards via Tavily...</strong>';
+            if (gridEl) gridEl.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/research/lookup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query,
+                        category: window.tavilyPickerCategory || 'jobs',
+                        workspace: window.selectedMode || 'personal'
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || data.error) {
+                    throw new Error(data.error || 'Research lookup failed');
+                }
+
+                window.tavilyLastCards = data.cards || [];
+                const estSalary = Number(data.estimatedSalary) || 60000;
+                const minTarget = Math.round(window._lastPersonalRunway?.minTargetSalary || 44615);
+                const diff = estSalary - minTarget;
+                const diffBadge = diff >= 0
+                    ? `<span style="background:rgba(34,197,94,0.15); color:#4ADE80; border:1px solid rgba(34,197,94,0.35); padding:2px 7px; border-radius:5px; font-family:monospace; font-weight:800; font-size:11px;">+$${diff.toLocaleString()}/yr above your minimum target</span>`
+                    : `<span style="background:rgba(248,113,113,0.15); color:#F87171; border:1px solid rgba(248,113,113,0.35); padding:2px 7px; border-radius:5px; font-family:monospace; font-weight:800; font-size:11px;">-$${Math.abs(diff).toLocaleString()}/yr vs. target</span>`;
+
+                if (takeawayEl) {
+                    takeawayEl.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
+                            <span style="font-weight:800; color:#38BDF8; font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em;">✓ Live Tavily Research Summary — ${escapeHtml(data.query)}</span>
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                <span style="font-family:monospace; font-size:11.5px; font-weight:800; color:#F8FAFC;">Est. Market Pay: ~$${estSalary.toLocaleString()}/yr</span>
+                                ${diffBadge}
+                            </div>
+                        </div>
+                        <div style="color:#CBD5E1; font-size:12px;">${escapeHtml(data.synthesizedTakeaway || '')}</div>
+                    `;
+                }
+
+                if (gridEl) {
+                    gridEl.innerHTML = (data.cards || []).map((card, idx) => {
+                        const sal = Number(card.salaryEstimate) || estSalary;
+                        return `
+                            <div style="background:#0E131C; border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px; margin-bottom:6px;">
+                                        <span style="font-size:10.5px; font-weight:800; color:#38BDF8; background:rgba(56,189,248,0.12); padding:2px 7px; border-radius:5px; border:1px solid rgba(56,189,248,0.28);">Option ${idx + 1} • ${escapeHtml(card.source || 'Verified')}</span>
+                                        <span style="font-size:11.5px; font-weight:800; color:#4ADE80; font-family:monospace;">~$${sal.toLocaleString()}/yr</span>
+                                    </div>
+                                    <div style="font-size:13px; font-weight:800; color:#F8FAFC; line-height:1.35; margin-bottom:6px;">${escapeHtml(card.title)}</div>
+                                    <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${escapeHtml(card.summary)}</div>
+                                </div>
+                                <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
+                                    <button type="button" class="btn-export" onclick="chooseTavilyCareerCard(${idx}, 'tailor_resume')" style="flex:1; background:rgba(56,189,248,0.15); border-color:rgba(56,189,248,0.4); color:#38BDF8; font-weight:800; font-size:11px; padding:6px 8px; text-align:center;">
+                                        📄 Choose &amp; Tailor Resume
+                                    </button>
+                                    <button type="button" class="btn-export" onclick="chooseTavilyCareerCard(${idx}, 'benchmark_pay')" style="background:rgba(34,197,94,0.14); border-color:rgba(34,197,94,0.35); color:#4ADE80; font-weight:800; font-size:11px; padding:6px 8px;" title="Load this salary into your Runway Calculator">
+                                        💵 Load $${Math.round(sal / 1000)}k Offer
+                                    </button>
+                                    <button type="button" class="btn-export" onclick="chooseTavilyCareerCard(${idx}, 'prep_interview')" style="background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.12); color:#E2E8F0; font-weight:700; font-size:11px; padding:6px 8px;">
+                                        🎙️ STAR Prep
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                if (takeawayEl) {
+                    takeawayEl.innerHTML = `<span style="color:#F87171; font-weight:700;">⚠️ ${escapeHtml(err.message || 'Could not complete live lookup. Try again.')}</span>`;
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = '🔎 Find Best Options';
+                }
+            }
+        }
+
+        function chooseTavilyCareerCard(idx, actionType) {
+            const card = (window.tavilyLastCards || [])[idx];
+            if (!card) return;
+            const sal = Number(card.salaryEstimate) || 60000;
+            const offerInput = document.getElementById('prOfferCompareInput');
+            if (offerInput && sal > 0) {
+                offerInput.value = sal;
+                recalcPersonalRunway();
+            }
+
+            if (actionType === 'benchmark_pay') {
+                if (typeof showToast === 'function') {
+                    showToast(`💵 Loaded $${sal.toLocaleString()}/yr into Offer Benchmark!`, '✓');
+                }
+                sendQuick(`Job & Pay Fit Check: I chose "${card.title}" (~$${sal.toLocaleString()}/yr from ${card.source}). Based on my Personal Runway minimum target salary of $${Math.round(window._lastPersonalRunway?.minTargetSalary || 44615).toLocaleString()}/yr, break down my monthly take-home pay after taxes, safe 30% rent budget, and what skills from "${card.summary.slice(0, 180)}" I should emphasize.`);
+                return;
+            }
+
+            if (actionType === 'prep_interview') {
+                sendQuick(`STAR Interview Prep forChosen Role ("${card.title}"): Based on live market research (${card.summary.slice(0, 200)}), give me the top 3 interview questions hiring managers ask for this exact role, concrete STAR method answer templates I can use in plain English, and smart negotiation talking points for a ~$${sal.toLocaleString()}/yr target.`);
+                return;
+            }
+
+            // Default: tailor_resume
+            sendQuick(`Tailor My Resume for Chosen Option ("${card.title}"): Based on live 2026 market research from ${card.source} ("${card.summary.slice(0, 220)}"), give me 4 ready-to-copy, quantified resume bullet points and the top ATS keywords I can drop straight into my 1-page resume—using grounded, realistic entry/junior-level operator & analyst wording with zero fake executive jargon.`);
+        }
+
         function exportPersonalRunwayXLSX() {
             try {
                 if (typeof XLSX === 'undefined') {
@@ -7004,6 +7204,19 @@
                             <button class="action-chip" onclick="triggerPresetAction('${escapeHtml(s.prompt)}')">${s.icon} ${escapeHtml(s.label)}</button>
                         `).join('');
                         assistantCard.appendChild(actionChips);
+
+                        // 2.5 LIVE TAVILY RESEARCH SOURCES STRIP (1-CLICK PICKABLE IN CHAT)
+                        if (data?.researchSources && Array.isArray(data.researchSources) && data.researchSources.length > 0) {
+                            const srcWrap = document.createElement('div');
+                            srcWrap.style.cssText = 'display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05);';
+                            srcWrap.innerHTML = `<span style="font-size:10.5px; font-weight:800; color:#38BDF8; text-transform:uppercase; letter-spacing:0.03em;">🔎 Live Tavily Benchmarks:</span>` +
+                                data.researchSources.map(src => {
+                                    const shortTitle = (src.title || src.domain || 'Benchmark').replace(/\s*[\|\-–].*$/, '').trim().slice(0, 42);
+                                    const followPrompt = `Use the benchmark from "${shortTitle}" (${src.domain}) to tailor my resume bullets and action plan.`;
+                                    return `<button type="button" class="btn-export" onclick="triggerPresetAction('${escapeHtml(followPrompt)}')" style="font-size:10.5px; padding:3px 8px; background:rgba(56,189,248,0.08); border-color:rgba(56,189,248,0.28); color:#CBD5E1;" title="${escapeHtml(src.snippet || '')}">✓ ${escapeHtml(shortTitle)} <span style="color:#38BDF8;">(${escapeHtml(src.domain || '')})</span></button>`;
+                                }).join('');
+                            assistantCard.appendChild(srcWrap);
+                        }
 
                         // 3. Add Compact Action Bar + Model Badge
                         const delivBar = document.createElement('div');

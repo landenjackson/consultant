@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-14-clean-labels-v10';
+const CACHE_NAME = 'consultant-studio-v2026-10-15-tavily-career-picker-v11';
 const ASSETS = [
   '/',
   '/index.html',
