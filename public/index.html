@@ -7320,8 +7320,8 @@
 
             try {
                 const controller = new AbortController();
-                // 60-second client timeout so multi-page files & high-res vision OCR never abort mid-generation
-                const timeoutId = setTimeout(() => controller.abort(), 60000);
+                // 75-second client timeout so 6,500-token full resume/file analyses + auto-continuation never abort mid-generation
+                const timeoutId = setTimeout(() => controller.abort(), 75000);
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
 
                 const reqHeaders = { 'Content-Type': 'application/json' };

@@ -253,8 +253,58 @@ Provide your target gross margin floor and top expense categories to model your 
 State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
 };
 
+// CATEGORY-AWARE TOKEN BUDGET & COMPLETION ENGINE (ENSURES EVERY RESPONSE FINISHES CLEANLY)
+function resolveCategoryTokenProfile(userText = '', workspace = 'personal', pinnedModel = 'auto', hasAttachments = false, hasImages = false) {
+  const lower = String(userText || '').toLowerCase();
+  const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
+  let category = 'general';
+  let maxTokens = 4096;
+  let completionDirective = '';
+
+  if (lower.includes('resume') || lower.includes('cv') || lower.includes('bullet') || lower.includes('cover letter') || lower.includes('ats') || lower.includes('rewrite')) {
+    category = 'resume_audit';
+    maxTokens = 6500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (RESUME & FILE POLISH — ${maxTokens} TOKEN BUDGET):
+- You MUST output the COMPLETE, end-to-end 1-page resume or full set of rewritten bullet points without ever cutting off mid-section.
+- Keep your intro takeaway to 2–3 sentences so 85%+ of your token budget goes directly into the concrete, copy-ready resume sections (Header, Summary, Experience Bullets, Education, and Skills) plus 2–3 immediate next steps.`;
+  } else if (lower.includes('interview') || lower.includes('star') || lower.includes('question') || lower.includes('negotiate') || lower.includes('talking point')) {
+    category = 'interview_prep';
+    maxTokens = 5500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (INTERVIEW & STAR PREP — ${maxTokens} TOKEN BUDGET):
+- Deliver complete, word-for-word STAR stories (Situation, Task, Action, Result) and salary negotiation scripts from start to finish.
+- Avoid long introductory preambles; give 3–4 full, ready-to-speak answers and end with a complete closing summary.`;
+  } else if (lower.includes('runway') || lower.includes('salary') || lower.includes('offer') || lower.includes('day-rate') || lower.includes('move') || lower.includes('rent') || lower.includes('budget') || lower.includes('paycheck') || lower.includes('debt')) {
+    category = 'personal_runway_finance';
+    maxTokens = 5000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (PERSONAL RUNWAY, SALARY & LIVING MATH — ${maxTokens} TOKEN BUDGET):
+- Break down the exact monthly and annual dollar math clearly in a compact table or bulleted ledger (Take-Home Pay, Essential Burn, Safe Rent Ceiling, Runway Impact, and Net Surplus), followed by a complete 3-step action plan. Never stop mid-calculation.`;
+  } else if ((workspace || '').toLowerCase() === 'business' || lower.includes('unit economics') || lower.includes('cac') || lower.includes('ltv') || lower.includes('breakeven') || lower.includes('foot-traffic') || lower.includes('competitor') || lower.includes('margin') || lower.includes('cogs')) {
+    category = 'business_economics';
+    maxTokens = 6000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (BUSINESS STUDIO & UNIT ECONOMICS — ${maxTokens} TOKEN BUDGET):
+- Present the bottom-line unit economics takeaway first, followed by a complete markdown financial table, competitor/pricing breakdown, and a finished 3-step operator checklist.`;
+  } else if (hasAttachments || hasImages) {
+    category = 'document_vision_analysis';
+    maxTokens = 6500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (ATTACHED FILE / IMAGE ANALYSIS — ${maxTokens} TOKEN BUDGET):
+- Extract every key figure, line item, or section from the attached file/image completely and finish with concrete recommendations. Never truncate a list or table mid-way.`;
+  } else {
+    category = 'general_advisory';
+    maxTokens = 4500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (COMPLETE ADVISORY — ${maxTokens} TOKEN BUDGET):
+- Structure your response so every section, calculation, and final 3-step action checklist finishes completely with a clean concluding sentence.`;
+  }
+
+  if (isLowLatency) {
+    //Even in Low-Latency mode, keep at least 3,800 tokens so answers never clip mid-sentence
+    maxTokens = Math.max(3800, Math.round(maxTokens * 0.78));
+  }
+
+  return { category, maxTokens, completionDirective };
+}
+
 // FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (OPENROUTER GEMINI 4 ARGON + DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
-const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto') => {
+const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto', categoryTokenCap = null) => {
   const activeMyclawKey = process.env.MYCLAW_API_KEY;
   const activeOpenRouterKey = process.env.OPENROUTER_API_KEY;
   const serverGoogleKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -279,12 +329,12 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
   const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 38000);
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
     try {
       const orModel = 'google/gemini-4-argon';
       const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
       const displayLabel = isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning';
-      const maxOutTokens = isLowLatency ? 1400 : (hasImages ? 1800 : 2200);
+      const maxOutTokens = categoryTokenCap || (isLowLatency ? 4096 : 6000);
       console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -305,11 +355,48 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        const text = data.choices?.[0]?.message?.content || '';
+        let text = data.choices?.[0]?.message?.content || '';
+        const finishReason = (data.choices?.[0]?.finish_reason || '').toLowerCase();
+
+        // AUTO-CONTINUATION SEAM: If response ever hits token length limit, seamlessly fetch the remaining sentences!
+        if (text && finishReason === 'length') {
+          console.log(`[⟳ Auto-Continuation Triggered (${displayLabel}): response hit ${maxOutTokens} token cap, completing tail...]`);
+          try {
+            const contRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${activeOpenRouterKey}`,
+                'HTTP-Referer': 'https://www.consultant-studio.app',
+                'X-Title': 'Consultant Studio'
+              },
+              body: JSON.stringify({
+                model: orModel,
+                messages: [
+                  { role: 'user', content: contentPayload },
+                  { role: 'assistant', content: text },
+                  { role: 'user', content: 'Continue from the exact word where you left off and finish the remaining points concisely without repeating anything above.' }
+                ],
+                max_tokens: 2500,
+                temperature: 0.2
+              })
+            });
+            if (contRes.ok) {
+              const contData = await contRes.json();
+              const tailText = contData.choices?.[0]?.message?.content || '';
+              if (tailText && tailText.trim()) {
+                text = `${text.trimEnd()}\n${tailText.trimStart()}`;
+              }
+            }
+          } catch (contErr) {
+            console.warn('[Auto-Continuation Notice]:', contErr.message);
+          }
+        }
+
         if (text && text.trim().length > 0) {
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          console.log(`[⚡ OpenRouter Winner (${displayLabel})] (${text.length} chars in ${elapsed}s)`);
-          return { text, isFallback: false, model: displayLabel, latency: `${elapsed}s` };
+          console.log(`[⚡ OpenRouter Winner (${displayLabel})] (${text.length} chars in ${elapsed}s | finish_reason=${finishReason || 'stop'})`);
+          return { text, isFallback: false, model: displayLabel, latency: `${elapsed}s`, finishReason };
         }
       } else {
         const errBody = await res.text().catch(() => '');
@@ -934,6 +1021,7 @@ User Message: ${userMessage}`;
 
     // Dynamic, Practical Life, Career, Money & Business Decision Consultant Instruction
     const isBusinessMode = (workspace || '').toLowerCase() === 'business';
+    const tokenProfile = resolveCategoryTokenProfile(userMessage, workspace, model, hasAttachedDocs, hasAttachedImages);
     const finalPrompt = `You are CONSULTANT STUDIO, a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
 
 Most people feel overwhelmed making big life and money decisions on their own—like figuring out how to move out, afford rent, land a job, pay off debt, fix a monthly budget, buy a car, or run a small business. Your mission is to make those decisions simple, concrete, and achievable.
@@ -950,21 +1038,22 @@ CORE CONVERSATIONAL PRINCIPLES:
 - When someone asks about landing a job, resumes, or interviews, give them concrete, realistic wording and practical steps that actually get people hired—without inflating their title into fake executive jargon.
 - When someone is torn between two life or career choices, lay out the real pros, cons, hidden costs, and long-term impact (1 year vs. 5 years from now), and give a clear recommendation.
 
-3. END WITH A SIMPLE NEXT STEP:
+3. END WITH A SIMPLE NEXT STEP & NEVER CUT OFF MID-SENTENCE:
 - Finish with 1 to 3 concrete things they can do today, or ask one simple follow-up question (like their monthly take-home pay or target city) to dial in the exact numbers for them.
+- ${tokenProfile.completionDirective}
 
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
-Active Mode: ${isBusinessMode ? 'BUSINESS & OPERATIONS' : 'PERSONAL LIFE, CAREER & MONEY'}
+Active Mode: ${isBusinessMode ? 'BUSINESS & OPERATIONS' : 'PERSONAL LIFE, CAREER & MONEY'} | Category: ${tokenProfile.category.toUpperCase()}
 ${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
 User Query: ${userMessage}`;
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
 
-    console.log(`[Executing Instant Live Inference | Multimodal Images: ${imageObjs.length} | BYOK Key: ${!!customKey} | Pinned Model: ${model}]`);
+    console.log(`[Executing Instant Live Inference | Category: ${tokenProfile.category} (${tokenProfile.maxTokens} tokens) | Multimodal Images: ${imageObjs.length} | Pinned Model: ${model}]`);
     let liveResponse = null;
     try {
-      liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model);
+      liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model, tokenProfile.maxTokens);
     } catch (qErr) {
       console.error('[Live Query Warning]:', qErr.message);
     }
