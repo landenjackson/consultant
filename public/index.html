@@ -5920,11 +5920,25 @@
             }
         }
 
-        // Global Audio Context & Unlocker for Mobile Safari / Chrome
+        // Global Audio Context, Shared Mobile HTML5 Audio Element & Unlocker for Mobile Safari / Chrome
         let globalAudioCtx = null;
+        let sharedMobileAudioEl = null;
         let silentAudioUnlocked = false;
+        let autoSpeakMainChat = localStorage.getItem('cs_auto_speak_replies') === 'true';
 
         function unlockMobileAudio() {
+            if (!sharedMobileAudioEl) {
+                try {
+                    sharedMobileAudioEl = new Audio();
+                    sharedMobileAudioEl.playsInline = true;
+                    sharedMobileAudioEl.setAttribute('playsinline', 'true');
+                    sharedMobileAudioEl.setAttribute('webkit-playsinline', 'true');
+                    // Tiny silent WAV to bless the HTML5 Audio element during the user's tap gesture
+                    sharedMobileAudioEl.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+                    const p = sharedMobileAudioEl.play();
+                    if (p && typeof p.catch === 'function') p.catch(() => {});
+                } catch (e) {}
+            }
             if (!silentAudioUnlocked) {
                 try {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -6049,7 +6063,13 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
-            if (!liveAudioCtx && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // IMPORTANT FOR MOBILE (iOS Safari / Android Chrome):
+            // Do NOT call getUserMedia() while SpeechRecognition is active! On iOS/Android, opening a parallel
+            // getUserMedia mic stream steals the hardware audio session from webkitSpeechRecognition and causes
+            // the Live Room to freeze after the initial intro greeting.
+            const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+            const hasSpeechRec = Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+            if (!isMobileDevice && !hasSpeechRec && !liveAudioCtx && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 try {
                     const deviceId = document.getElementById('liveAudioDeviceSelect')?.value;
                     const constraints = { audio: deviceId && deviceId !== 'default' ? { deviceId: { exact: deviceId } } : true };
@@ -6158,7 +6178,7 @@
             const isUser = (role === 'user');
             const speakerName = isUser ? 'You' : (consultantVoiceGender === 'male' ? 'Fenrir • Consultant' : 'Aoede • Consultant');
             const cleaned = formatCleanLiveRoomText(text);
-            const paragraphs = cleaned.split(/\n{2,}/).map(p => p.trim()).filter(Boolean).slice(0, 4);
+            const paragraphs = cleaned.split(/\n{2,}/).map(p => p.trim()).filter(Boolean).slice(0, 6);
 
             const wrapper = document.createElement('div');
             wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${isUser ? 'flex-end' : 'flex-start'}; width:100%;`;
@@ -6166,9 +6186,13 @@
             const bubble = document.createElement('div');
             bubble.style.cssText = `max-width:${isUser ? '82%' : '90%'}; padding:12px 15px; border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'}; background:${isUser ? 'linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)' : '#0E1524'}; border:1px solid ${isUser ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.09)'}; color:#F8FAFC; font-size:13.5px; line-height:1.62; box-shadow:0 4px 14px rgba(0,0,0,0.35);`;
 
-            const headerHtml = `<div style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; color:${isUser ? '#4ADE80' : '#38BDF8'}; margin-bottom:5px;">${speakerName}</div>`;
+            const replayBtnHtml = !isUser
+                ? `<button type="button" onclick="speakInterviewerResponse(this.closest('div[data-live-msg]')?.dataset?.liveMsg || '')" style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.35); color:#38BDF8; border-radius:999px; padding:2px 8px; font-size:10px; font-weight:700; cursor:pointer;">🔊 Replay Audio</button>`
+                : '';
+            const headerHtml = `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; color:${isUser ? '#4ADE80' : '#38BDF8'}; margin-bottom:5px;"><span>${speakerName}</span>${replayBtnHtml}</div>`;
             const bodyHtml = paragraphs.map(p => `<p style="margin:0 0 8px 0; white-space:pre-wrap;">${escapeHtml(p)}</p>`).join('');
 
+            bubble.setAttribute('data-live-msg', cleaned);
             bubble.innerHTML = headerHtml + bodyHtml;
             wrapper.appendChild(bubble);
             feed.appendChild(wrapper);
@@ -6176,6 +6200,7 @@
         }
 
         function sendFromLiveRoom() {
+            unlockMobileAudio();
             const liveInput = document.getElementById('liveRoomTextInput');
             const text = (liveInput ? liveInput.value : '').trim();
             if (!text) return;
@@ -6183,20 +6208,14 @@
             interruptConsultantSpeech();
             appendLiveRoomTranscript('user', text);
 
+            const stateTxt = document.getElementById('liveRoomStateText');
+            if (stateTxt) stateTxt.innerText = 'THINKING...';
+
             const mainInput = document.getElementById('userInput');
             if (mainInput) {
                 mainInput.value = text;
-                const wasVoiceActive = isVoicePracticeActive;
-                isVoicePracticeActive = true; // Ensure consultant replies back into the Live Room & speaks aloud
-                sendMessage().finally(() => {
-                    if (!wasVoiceActive) {
-                        // Keep voice active if Live Room is open
-                        const modal = document.getElementById('liveVoiceRoomModal');
-                        if (!modal || modal.style.display !== 'flex') {
-                            isVoicePracticeActive = false;
-                        }
-                    }
-                });
+                isVoicePracticeActive = true; // Keep Live Room voice active for every single reply!
+                sendMessage();
             }
         }
 
@@ -6295,19 +6314,21 @@
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             initLiveAudioVisualizer();
 
-            // Only add a greeting if the 1-on-1 chat feed is currently empty
+            // Only add a greeting if the 1-on-1 chat feed is currently empty, and wait until greeting finishes before starting mic!
             const feed = document.getElementById('liveRoomTranscriptFeed');
             const hasMessages = feed && !feed.querySelector('[data-placeholder="true"]') && feed.children.length > 0;
             if (!hasMessages) {
                 const greeting = "Hey! I'm right here with you. Tell me what's on your mind—whether it's moving out, a job offer, your monthly budget, or a business decision—and we'll walk through the numbers together.";
                 appendLiveRoomTranscript('assistant', greeting);
-                speakInterviewerResponse(greeting);
-            }
-            
-            if (SpeechRec) {
+                speakInterviewerResponse(greeting, () => {
+                    if (isVoicePracticeActive && SpeechRec) {
+                        listenToCandidate();
+                    }
+                });
+            } else if (SpeechRec) {
                 setTimeout(() => {
                     if (isVoicePracticeActive) listenToCandidate();
-                }, 400);
+                }, 250);
             }
         }
 
@@ -6359,15 +6380,38 @@
             try {
                 if (speechRecognition) {
                     try { speechRecognition.abort(); } catch(e){}
+                    speechRecognition = null;
                 }
 
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
                 speechRecognition = new SpeechRec();
-                speechRecognition.continuous = true;  // Keep listening open full-duplex like Gemini Live
+                // iOS Safari WebKit drops or freezes when continuous=true; use single-utterance auto-restart on iOS!
+                speechRecognition.continuous = !isIOS;
                 speechRecognition.interimResults = true;
                 speechRecognition.lang = 'en-US';
 
                 let recognizedText = '';
+                let latestTranscript = '';
+                let hasDispatchedTurn = false;
                 let debounceTimer = null;
+
+                const stateTxt = document.getElementById('liveRoomStateText');
+                if (stateTxt && !activeAudioElement) stateTxt.innerText = 'LISTENING';
+
+                const dispatchSpokenTurn = (spoken) => {
+                    if (hasDispatchedTurn || !spoken || spoken.trim().length < 2) return;
+                    hasDispatchedTurn = true;
+                    if (debounceTimer) clearTimeout(debounceTimer);
+                    try { speechRecognition.stop(); } catch(e){}
+                    const cleanSpoken = spoken.trim();
+                    const liveInput = document.getElementById('liveRoomTextInput');
+                    if (liveInput) liveInput.value = '';
+                    const userInput = document.getElementById('userInput');
+                    if (userInput) userInput.value = cleanSpoken;
+                    if (stateTxt) stateTxt.innerText = 'THINKING...';
+                    appendLiveRoomTranscript('user', cleanSpoken);
+                    sendMessage();
+                };
 
                 speechRecognition.onresult = (event) => {
                     let interim = '';
@@ -6379,13 +6423,18 @@
                         }
                     }
 
-                    const fullSpoken = (recognizedText || interim).trim();
+                    const fullSpoken = (recognizedText + ' ' + interim).trim();
+                    latestTranscript = fullSpoken;
 
                     // If user starts speaking while consultant is talking, barge-in / interrupt immediately
                     if (fullSpoken.length > 2) {
                         interruptConsultantSpeech();
                     }
 
+                    const liveInput = document.getElementById('liveRoomTextInput');
+                    if (liveInput && fullSpoken) {
+                        liveInput.value = fullSpoken;
+                    }
                     const userInput = document.getElementById('userInput');
                     if (userInput && fullSpoken) {
                         userInput.value = fullSpoken;
@@ -6393,28 +6442,37 @@
 
                     if (debounceTimer) clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
-                        if (fullSpoken && fullSpoken.length > 2) {
-                            try { speechRecognition.stop(); } catch(e){}
-                            appendLiveRoomTranscript('user', fullSpoken);
-                            sendMessage();
+                        if (latestTranscript && latestTranscript.length > 2) {
+                            dispatchSpokenTurn(latestTranscript);
                         }
-                    }, 1400); // 1.4s natural pause before sending answer
+                    }, 1350);
                 };
 
                 speechRecognition.onerror = (err) => {
                     console.warn('[Speech Recognition Event]:', err.error);
-                    if (isVoicePracticeActive && err.error !== 'aborted') {
+                    if (err.error === 'not-allowed' || err.error === 'service-not-allowed') {
+                        if (stateTxt) stateTxt.innerText = 'TYPE OR TAP MIC';
+                        return;
+                    }
+                    if (isVoicePracticeActive && err.error !== 'aborted' && !hasDispatchedTurn) {
                         setTimeout(() => {
-                            if (isVoicePracticeActive) listenToCandidate();
-                        }, 600);
+                            if (isVoicePracticeActive && !activeAudioElement) listenToCandidate();
+                        }, 650);
                     }
                 };
 
                 speechRecognition.onend = () => {
-                    if (isVoicePracticeActive && !recognizedText) {
+                    // On iOS Safari, speechRecognition ends automatically when the user pauses speaking—dispatch immediately!
+                    if (!hasDispatchedTurn && latestTranscript && latestTranscript.trim().length > 2) {
+                        dispatchSpokenTurn(latestTranscript);
+                        return;
+                    }
+                    if (isVoicePracticeActive && !hasDispatchedTurn && !activeAudioElement && chatState !== 'streaming') {
                         setTimeout(() => {
-                            if (isVoicePracticeActive) listenToCandidate();
-                        }, 400);
+                            if (isVoicePracticeActive && !activeAudioElement && chatState !== 'streaming') {
+                                listenToCandidate();
+                            }
+                        }, 450);
                     }
                 };
 
@@ -6424,10 +6482,17 @@
             }
         }
 
-        // 100% RELIABLE DUAL-PIPELINE GOOGLE FLASH NEURAL AUDIO + WEBSPEECH ENGINE
+        // 100% RELIABLE DUAL-PIPELINE EDGE NEURAL MP3 + WEBSPEECH ENGINE (SPEAKS EVERY REPLY ALOUD)
         async function speakInterviewerResponse(text, onComplete) {
+            // Stop active mic recognition while consultant is speaking so phone speaker doesn't echo into the mic
+            if (speechRecognition) {
+                try { speechRecognition.abort(); } catch (e) {}
+                speechRecognition = null;
+            }
+            interruptConsultantSpeech();
+
             // Clean markdown syntax, math formulas, brackets, and telemetry tags so audio speaks naturally
-            const cleanText = text
+            const cleanText = String(text || '')
                 .replace(/\[[A-Z0-9_\s\/\-\&]+\]\s*[:=]\s*([^\n\r]+)/g, '$1')
                 .replace(/\[DOMAIN:[^\]]+\]/g, '')
                 .replace(/\+[=\-\+]+\+/g, '')
@@ -6437,22 +6502,26 @@
                 .replace(/<[^>]+>/g, '')
                 .replace(/\s+/g, ' ')
                 .trim()
-                .slice(0, 300);
+                .slice(0, 650);
 
             if (!cleanText) {
                 if (onComplete) onComplete();
                 return;
             }
 
+            const stateTxt = document.getElementById('liveRoomStateText');
+            if (stateTxt) stateTxt.innerText = 'SPEAKING...';
+
             let completed = false;
             const finish = () => {
                 if (!completed) {
                     completed = true;
+                    if (stateTxt) stateTxt.innerText = isVoicePracticeActive ? 'LISTENING' : 'LIVE 1-ON-1';
                     if (onComplete) onComplete();
                 }
             };
 
-            // 1. Primary: High-fidelity Google Gemini Neural Audio Stream
+            // 1. Primary: High-fidelity Server Neural MP3 Audio Stream (Uses sharedMobileAudioEl so iOS Safari never blocks playback after async fetch!)
             try {
                 const customKey = localStorage.getItem('cs_user_gemini_key') || '';
                 const headers = { 'Content-Type': 'application/json' };
@@ -6468,7 +6537,10 @@
                 if (ttsRes.ok) {
                     const ttsData = await ttsRes.json();
                     if (ttsData.audioBase64) {
-                        const audio = new Audio(`data:${ttsData.mimeType};base64,${ttsData.audioBase64}`);
+                        const audio = sharedMobileAudioEl || new Audio();
+                        audio.pause();
+                        audio.src = `data:${ttsData.mimeType || 'audio/mpeg'};base64,${ttsData.audioBase64}`;
+                        audio.currentTime = 0;
                         activeAudioElement = audio;
                         audio.onended = () => {
                             activeAudioElement = null;
@@ -6481,7 +6553,7 @@
                         const playPromise = audio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch(err => {
-                                console.warn('[Audio Play Autoplay Blocked]:', err);
+                                console.warn('[Audio Play Autoplay Blocked, using WebSpeech]:', err);
                                 activeAudioElement = null;
                                 fallbackWebSpeech(cleanText, finish);
                             });
@@ -6490,7 +6562,7 @@
                     }
                 }
             } catch(e) {
-                console.warn('[Google TTS Fallback to WebSpeech]:', e);
+                console.warn('[Server TTS Fallback to WebSpeech]:', e);
             }
 
             // 2. Secondary: Direct Local WebSpeech Synthesis
@@ -7492,13 +7564,18 @@
                     throw new Error("Empty response received from model.");
                 }
 
-                if (isVoicePracticeActive && responseText) {
+                // Always mirror into Live Room transcript AND speak every reply aloud whenever Live Room is open or voice mode is active!
+                const liveModalEl = document.getElementById('liveVoiceRoomModal');
+                const isLiveModalOpen = Boolean(liveModalEl && liveModalEl.style.display === 'flex');
+                if (responseText) {
                     appendLiveRoomTranscript('assistant', responseText);
-                    speakInterviewerResponse(responseText, () => {
-                        if (isVoicePracticeActive) {
-                            listenToCandidate();
-                        }
-                    });
+                    if (isVoicePracticeActive || isLiveModalOpen || autoSpeakMainChat) {
+                        speakInterviewerResponse(responseText, () => {
+                            if (isVoicePracticeActive || isLiveModalOpen) {
+                                listenToCandidate();
+                            }
+                        });
+                    }
                 }
 
                 const loadingHud = assistantCard.querySelector('.orchestration-tracker');

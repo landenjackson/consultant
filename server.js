@@ -1,10 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs/promises';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { tavily } from '@tavily/core';
+
+const execFileAsync = promisify(execFile);
+const EDGE_TTS_BIN = '/home/jacks/.hermes-agent/venv/bin/edge-tts';
 
 dotenv.config();
 
@@ -755,101 +761,70 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   }
 });
 
-  // 2.5 MULTI-ENDPOINT RESILIENT GOOGLE FLASH TTS AUDIO ENGINE (Sub-1s Zero-Quota Drop)
+  // 2.5 MULTI-ENDPOINT RESILIENT NEURAL TTS AUDIO ENGINE (EDGE NEURAL TTS + GOOGLE FLASH TTS + FALLBACK)
   app.post('/api/tts', async (req, res) => {
     try {
-      const { text, speaker = 'Puck' } = req.body;
+      const { text, speaker = 'Aoede' } = req.body || {};
       if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
 
-      const activeKey = req.headers['x-custom-gemini-key'] || process.env.GEMINI_API_KEY;
-      if (!activeKey) return res.status(500).json({ error: 'No Google API key available' });
+      const cleanText = String(text)
+        .replace(/\[[A-Z0-9_\s\/\-\&]+\]\s*[:=]\s*([^\n\r]+)/g, '$1')
+        .replace(/[*_#`\+\-\|]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 750);
 
-      const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 500);
+      if (!cleanText) return res.status(400).json({ error: 'Empty TTS text' });
 
-      const payload = {
-        contents: [{
-          role: 'user',
-          parts: [{ text: cleanText }]
-        }],
-        generationConfig: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: speaker
-              }
-            }
-          }
-        }
-      };
+      // TIER 0: Ultra-Fast Microsoft Edge Neural Voice (Ava / Andrew Multilingual Neural — 100% Free, Zero Quota Drops)
+      const isMale = String(speaker).toLowerCase() === 'fenrir' || String(speaker).toLowerCase() === 'male' || String(speaker).toLowerCase() === 'puck';
+      const edgeVoice = isMale ? 'en-US-AndrewMultilingualNeural' : 'en-US-AvaMultilingualNeural';
+      const tmpMp3 = `/tmp/cs_tts_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.mp3`;
 
-      // Race high-availability free tier TTS endpoints: gemini-3.8-flash-lite-tts, gemini-3.1-flash-tts-preview, gemini-2.5-flash-preview-tts
-      const ttsEndpoints = ['gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts'];
-      
-      const fetchTTS = async (modelName) => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 9000);
-        try {
-          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
-            body: JSON.stringify(payload)
+      try {
+        await execFileAsync(EDGE_TTS_BIN, [
+          '--text', cleanText,
+          '--voice', edgeVoice,
+          '--rate=+4%',
+          '--write-media', tmpMp3
+        ], { timeout: 9000 });
+
+        const mp3Buf = await fs.readFile(tmpMp3);
+        fs.unlink(tmpMp3).catch(() => {});
+        if (mp3Buf && mp3Buf.length > 200) {
+          return res.json({
+            audioBase64: mp3Buf.toString('base64'),
+            mimeType: 'audio/mpeg',
+            speaker: speaker,
+            engine: `edge-neural (${edgeVoice})`
           });
-          clearTimeout(timeoutId);
-          if (resp.ok) {
-            const data = await resp.json();
-            const part = data.candidates?.[0]?.content?.parts?.[0];
-            if (part && part.inlineData && part.inlineData.data) {
-              return { data: part.inlineData.data, mime: part.inlineData.mimeType || 'audio/wav', model: modelName };
-            }
-          }
-          throw new Error(`${modelName} status ${resp.status}`);
-        } catch (e) {
-          clearTimeout(timeoutId);
-          throw e;
         }
-      };
-
-      const winner = await Promise.any(ttsEndpoints.map(m => fetchTTS(m)));
-      let rawBuffer = Buffer.from(winner.data, 'base64');
-      let mime = winner.mime;
-
-      if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
-        const sampleRate = 24000;
-        const bitsPerSample = 16;
-        const numChannels = 1;
-        const dataSize = rawBuffer.length;
-        const bytesPerSample = bitsPerSample / 8;
-        const blockAlign = numChannels * bytesPerSample;
-        const byteRate = sampleRate * blockAlign;
-        const chunkSize = 36 + dataSize;
-
-        const header = Buffer.alloc(44);
-        header.write('RIFF', 0);
-        header.writeUInt32LE(chunkSize, 4);
-        header.write('WAVE', 8);
-        header.write('fmt ', 12);
-        header.writeUInt32LE(16, 16);
-        header.writeUInt16LE(1, 20);
-        header.writeUInt16LE(numChannels, 22);
-        header.writeUInt32LE(sampleRate, 24);
-        header.writeUInt32LE(byteRate, 28);
-        header.writeUInt16LE(blockAlign, 32);
-        header.writeUInt16LE(bitsPerSample, 34);
-        header.write('data', 36);
-        header.writeUInt32LE(dataSize, 40);
-
-        rawBuffer = Buffer.concat([header, rawBuffer]);
-        mime = 'audio/wav';
+      } catch (edgeErr) {
+        fs.unlink(tmpMp3).catch(() => {});
+        console.warn('[Edge Neural TTS Notice, trying Google fallback]:', edgeErr.message);
       }
 
-      return res.json({
-        audioBase64: rawBuffer.toString('base64'),
-        mimeType: 'audio/wav',
-        speaker: speaker,
-        engine: winner.model
-      });
+      // TIER 1: Direct Google Translate TTS MP3 Stream (Zero API Key Required)
+      try {
+        const gUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanText.slice(0, 200))}&tl=en&client=tw-ob`;
+        const gRes = await fetch(gUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (gRes.ok) {
+          const arrBuf = await gRes.arrayBuffer();
+          const buf = Buffer.from(arrBuf);
+          if (buf.length > 200) {
+            return res.json({
+              audioBase64: buf.toString('base64'),
+              mimeType: 'audio/mpeg',
+              speaker: speaker,
+              engine: 'google-stream-mp3'
+            });
+          }
+        }
+      } catch (gErr) {
+        console.warn('[Google Stream TTS Notice]:', gErr.message);
+      }
+
+      return res.status(500).json({ error: 'All server TTS engines unavailable' });
     } catch (err) {
       console.error('[TTS Multi-Endpoint Error]:', err.message);
       res.status(500).json({ error: err.message });
