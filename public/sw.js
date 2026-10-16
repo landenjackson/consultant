@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-15-apple-clipboard-fix-v17';
+const CACHE_NAME = 'consultant-studio-v2026-10-15-pdf-save-vault-v18';
 const ASSETS = [
   '/',
   '/index.html',
