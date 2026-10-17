@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-16-live-room-neural-audio-v19';
+const CACHE_NAME = 'consultant-studio-v2026-10-17-past-dev-memory-v20';
 const ASSETS = [
   '/',
   '/index.html',

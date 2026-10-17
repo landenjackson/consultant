@@ -884,10 +884,140 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
     }
   });
 
+  // 2.8 PAST.DEV MEMORY API HELPERS (PER-USER AUDIENCE SCOPING, LIVE INGESTION & RECALL)
+  const PAST_API_BASE = 'https://api.past.dev/api/v1';
+  const ensuredPastAudiences = new Set(['user-landen']);
+
+  function resolvePastUserScope(rawIdentity) {
+    const cleanEmail = String(rawIdentity || '').trim().toLowerCase();
+    if (!cleanEmail || cleanEmail === 'landen' || cleanEmail.includes('landen') || cleanEmail === 'creator') {
+      return { identity: 'landen@consultant-studio.app', audience: 'user-landen' };
+    }
+    const slugBase = cleanEmail.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 36) || 'guest';
+    const audience = `user-${slugBase}`;
+    const identity = cleanEmail.includes('@') ? cleanEmail : `${slugBase}@consultant-studio.app`;
+    return { identity, audience };
+  }
+
+  async function ensurePastAudience(audience, identity) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || ensuredPastAudiences.has(audience)) return;
+    try {
+      const resp = await fetch(`${PAST_API_BASE}/audiences/${encodeURIComponent(audience)}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          kind: 'fixed',
+          name: `Consultant Studio User (${identity})`,
+          identities: [identity]
+        })
+      });
+      if (resp.ok) ensuredPastAudiences.add(audience);
+    } catch (e) {
+      console.warn('[past.dev Audience Setup Notice]:', e.message);
+    }
+  }
+
+  async function recallPastMemory(query, rawIdentity, timeoutMs = 2400) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || !query || String(query).trim().length < 3) return null;
+    const { identity } = resolvePastUserScope(rawIdentity);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(`${PAST_API_BASE}/recall`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          query: String(query).trim().slice(0, 1000),
+          identity
+        })
+      });
+      clearTimeout(timer);
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const results = Array.isArray(data?.results) ? data.results.slice(0, 6) : [];
+      if (results.length === 0) return null;
+      const formatted = results.map((r, i) => {
+        const src = r.sources?.[0];
+        const dateTag = (src?.occurredAt || r.occurredAt || '').slice(0, 10);
+        const labelTag = src?.label || src?.sourceId || 'Memory';
+        return `• [${dateTag} | ${labelTag}]: ${String(r.content || '').replace(/\s+/g, ' ').trim()}`;
+      }).join('\n');
+      return {
+        identity,
+        count: results.length,
+        usedEvidenceTokens: data.usedEvidenceTokens || 0,
+        block: `\n[PAST.DEV RECALLED USER MEMORY (Scoped to ${identity})]:\n${formatted}\n`
+      };
+    } catch (e) {
+      clearTimeout(timer);
+      return null;
+    }
+  }
+
+  async function ingestPastMemoryItem({ id, label, content, timestamp, rawIdentity }) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || !content || String(content).trim().length < 10) return null;
+    const { identity, audience } = resolvePastUserScope(rawIdentity);
+    await ensurePastAudience(audience, identity);
+    const safeId = String(id || `cs-item-${Date.now()}`).replace(/[^a-zA-Z0-9._\-]/g, '-').slice(0, 110);
+    const isoTime = timestamp && /^\d{4}-\d{2}-\d{2}T/.test(timestamp) ? timestamp : new Date().toISOString();
+    const cleanContent = String(content).slice(0, 30000);
+    const resp = await fetch(`${PAST_API_BASE}/ingest`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: safeId,
+        label: String(label || 'Consultant Studio Memory').slice(0, 120),
+        timestamp: isoTime,
+        audience,
+        content: cleanContent
+      })
+    });
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      throw new Error(`past.dev ingest ${resp.status}: ${errTxt.slice(0, 200)}`);
+    }
+    return await resp.json();
+  }
+
+  app.post('/api/memory/ingest', async (req, res) => {
+    try {
+      const { id, label, content, timestamp, userIdentity } = req.body || {};
+      const result = await ingestPastMemoryItem({ id, label, content, timestamp, rawIdentity: userIdentity });
+      if (!result) return res.status(400).json({ error: 'PAST_API_KEY not configured or empty content' });
+      return res.status(202).json(result);
+    } catch (err) {
+      console.warn('[past.dev Live Ingest Warning]:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/memory/recall', async (req, res) => {
+    try {
+      const { query, userIdentity } = req.body || {};
+      const recalled = await recallPastMemory(query, userIdentity, 8000);
+      return res.json(recalled || { identity: resolvePastUserScope(userIdentity).identity, count: 0, block: '' });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
   // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
   app.post('/api/chat', async (req, res) => {
     try {
-      const { messages = [], workspace = 'general', documentText = '', images = [], conversationId = null, model = 'auto' } = req.body;
+      const { messages = [], workspace = 'general', documentText = '', images = [], conversationId = null, model = 'auto', userIdentity = null } = req.body;
       const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
 
       if (!userMessage) {
@@ -909,9 +1039,10 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
         }).join('\n\n')
       : '';
 
-    // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + Live Tavily Market Research IN PARALLEL
+    // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + past.dev Memory Recall + Live Tavily Market Research IN PARALLEL
     // Skip blocking Tavily web search when the user attached a file/image so file/vision analysis starts at 0ms!
     const clefPromise = evaluateWithClef(userMessage, workspace);
+    const pastRecallPromise = recallPastMemory(userMessage, userIdentity, 2400);
     const hasHeavyAttachment = Boolean((documentText && documentText.length > 180) || (Array.isArray(images) && images.length > 0));
     let tavilyData = { query: '', answer: '', results: [] };
     if (!hasHeavyAttachment) {
@@ -921,6 +1052,8 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
         new Promise(r => setTimeout(() => r({ query: tavilyQuery, answer: '', results: [] }), 1800))
       ]);
     }
+    const pastMemoryData = await pastRecallPromise;
+    const pastMemoryBlock = pastMemoryData?.block || '';
     const tavilyContextBlock = (tavilyData && (tavilyData.answer || (tavilyData.results && tavilyData.results.length > 0)))
       ? `\n[LIVE 2026 TAVILY MARKET & CAREER RESEARCH]:\n${tavilyData.answer ? `Summary: ${tavilyData.answer}\n` : ''}${(tavilyData.results || []).map(r => `• ${r.title} (${r.domain}): ${r.snippet}`).join('\n')}\n`
       : '';
@@ -1028,7 +1161,7 @@ CORE CONVERSATIONAL PRINCIPLES:
 
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
 Active Mode: ${isBusinessMode ? 'BUSINESS & OPERATIONS' : 'PERSONAL LIFE, CAREER & MONEY'} | Category: ${tokenProfile.category.toUpperCase()}
-${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
+${pastMemoryBlock}${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
 User Query: ${userMessage}`;
 
     // Capture optional client BYOK key from request headers
@@ -1171,6 +1304,75 @@ app.post('/api/autopilot/triage', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// ONE-CLICK MASKED PAST.DEV KEY CONFIGURATOR (SAVES TO .env WITHOUT TERMINAL OR CHAT EXPOSURE)
+app.post('/api/config/past-key', async (req, res) => {
+  try {
+    const rawKey = String(req.body?.key || '').trim();
+    if (!rawKey || rawKey.length < 8 || /[\r\n]/.test(rawKey)) {
+      return res.status(400).json({ error: 'Invalid PAST_API_KEY format' });
+    }
+    process.env.PAST_API_KEY = rawKey;
+    const envPath = path.join(__dirname, '.env');
+    let envContent = '';
+    try {
+      envContent = await fs.readFile(envPath, 'utf-8');
+    } catch (e) {}
+    const lines = envContent.split('\n').filter(l => !l.startsWith('PAST_API_KEY='));
+    lines.push(`PAST_API_KEY=${rawKey}`);
+    await fs.writeFile(envPath, lines.filter((l, i, arr) => l !== '' || i < arr.length - 1).join('\n') + '\n', { mode: 0o600 });
+    return res.json({ ok: true, configured: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/past-key/status', (req, res) => {
+  return res.json({ configured: Boolean(process.env.PAST_API_KEY && process.env.PAST_API_KEY.length > 8) });
+});
+
+app.get('/past-key', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect past.dev — Consultant Studio</title>
+  <style>
+    body { background:#080A0F; color:#F8FAFC; font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:16px; box-sizing:border-box; }
+    .card { max-width:420px; width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,0.7); }
+    h2 { margin:0 0 8px 0; font-size:19px; }
+    p { margin:0 0 16px 0; font-size:13.5px; color:#94A3B8; line-height:1.5; }
+    input { width:100%; box-sizing:border-box; background:#07090D; border:1px solid rgba(255,255,255,0.16); color:#FFF; border-radius:10px; padding:12px; font-size:14px; margin-bottom:12px; outline:none; }
+    button { width:100%; background:#10B981; color:#04130B; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:800; cursor:pointer; }
+    .status { margin-top:12px; font-size:13px; color:#4ADE80; display:none; text-align:center; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🔒 Connect past.dev Memory</h2>
+    <p>Paste your <code>PAST_API_KEY</code> below and tap Save. It writes directly to your server's <code>.env</code> without ever touching chat or terminal.</p>
+    <input type="password" id="k" placeholder="Paste PAST_API_KEY here..." autocomplete="off">
+    <button onclick="save()">Save Key to Server .env</button>
+    <div id="st" class="status">✓ Saved to .env! Return to Telegram and say "done".</div>
+  </div>
+  <script>
+    async function save() {
+      const val = document.getElementById('k').value.trim();
+      if (!val) return;
+      const r = await fetch('/api/config/past-key', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ key: val }) });
+      if (r.ok) {
+        document.getElementById('k').value = '';
+        document.getElementById('st').style.display = 'block';
+      } else {
+        alert('Could not save key—check format.');
+      }
+    }
+  </script>
+</body>
+</html>`);
 });
 
 // START SERVER WITH OPENCLAW ENTERPRISE CRASH RESILIENCE & CLEAN SHUTDOWN

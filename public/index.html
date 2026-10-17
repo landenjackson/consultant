@@ -3199,6 +3199,18 @@
                     </div>
                     <div id="geminiKeyStatus" style="font-size:11px; color:var(--accent-glow); margin-top:4px; display:none;">✓ Personal Gemini Key active (stored in browser)</div>
                 </div>
+
+                <div style="border-top:1px solid var(--border); padding-top:14px;">
+                    <div style="font-size:13px; font-weight:700; color:#FFF; margin-bottom:4px;">🧠 past.dev Memory API Key (Server .env):</div>
+                    <p style="font-size:11.5px; color:var(--text-secondary); margin:0 0 8px 0; line-height:1.4;">
+                        Paste your <code>PAST_API_KEY</code> to save it directly into your server's <code>.env</code> file with zero terminal commands.
+                    </p>
+                    <div style="display:flex; gap:8px;">
+                        <input type="password" id="pastApiKeyInput" class="dock-input" placeholder="Paste PAST_API_KEY..." style="flex:1; border-radius:8px; padding:7px 10px; font-size:12px; background:#07090D; border:1px solid var(--border);">
+                        <button class="btn-export" style="padding:6px 14px; font-size:12px; background:#38BDF8; color:#000; font-weight:700; border:none;" onclick="savePastApiKey()">Save .env</button>
+                    </div>
+                    <div id="pastKeyStatus" style="font-size:11px; color:#38BDF8; margin-top:4px; display:none;">✓ PAST_API_KEY saved in server .env</div>
+                </div>
             </div>
         </div>
     </div>
@@ -4127,9 +4139,11 @@
                     const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                     const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
                     if (!vault.some(v => v.text === cleanVaultText)) {
-                        vault.unshift({ id: `vault_${Date.now()}`, title: vTitle, text: cleanVaultText, timestamp });
+                        const newId = `vault_${Date.now()}`;
+                        vault.unshift({ id: newId, title: vTitle, text: cleanVaultText, timestamp });
                         localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
                         if (typeof updateVaultCount === 'function') updateVaultCount();
+                        syncMemoryToPastDev(newId, vTitle, `# ${vTitle}\n\n${cleanVaultText}`);
                     }
                 } catch (vErr) {}
 
@@ -4747,6 +4761,29 @@
             syncGeminiKeyUI();
         }
 
+        async function savePastApiKey() {
+            const input = document.getElementById('pastApiKeyInput');
+            const key = input ? input.value.trim() : '';
+            if (!key) return;
+            try {
+                const res = await fetch('/api/config/past-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key })
+                });
+                if (res.ok) {
+                    input.value = '';
+                    const st = document.getElementById('pastKeyStatus');
+                    if (st) st.style.display = 'block';
+                    showToast("PAST_API_KEY saved to server .env!", "🧠");
+                } else {
+                    showToast("Invalid key format.", "⚠️");
+                }
+            } catch (e) {
+                showToast("Could not reach server.", "⚠️");
+            }
+        }
+
         function syncGeminiKeyUI() {
             const savedKey = localStorage.getItem('cs_user_gemini_key') || '';
             const input = document.getElementById('userGeminiKeyInput');
@@ -4768,6 +4805,32 @@
             showToast(`Font size updated to ${size}.`, "⚙️");
         }
 
+        // Live past.dev Memory Sync Helper (Non-blocking background ingest per user audience)
+        function getActiveUserIdentityForPast() {
+            const email = (localStorage.getItem('consultant_user_email') || '').trim().toLowerCase();
+            if (email) return email;
+            const name = (localStorage.getItem('consultant_user_name') || '').trim().toLowerCase();
+            if (name) return name;
+            return 'landen@consultant-studio.app';
+        }
+
+        function syncMemoryToPastDev(id, label, content) {
+            try {
+                if (!content || String(content).trim().length < 15) return;
+                fetch('/api/memory/ingest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id,
+                        label,
+                        content,
+                        timestamp: new Date().toISOString(),
+                        userIdentity: getActiveUserIdentityForPast()
+                    })
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
         // Vault Saving & Retrieval Engine
         function saveToVault(btn) {
             const card = btn.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
@@ -4786,9 +4849,11 @@
             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
-            vault.unshift({ id: `vault_${Date.now()}`, title, text, timestamp });
+            const newId = `vault_${Date.now()}`;
+            vault.unshift({ id: newId, title, text, timestamp });
             localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
             updateVaultCount();
+            syncMemoryToPastDev(newId, `Strategy Vault: ${title}`, `# Strategy Vault Memo: ${title}\n\n${text}`);
 
             // Instant visual confirmation on button
             const orig = btn.innerText;
@@ -5237,16 +5302,18 @@
                     localStorage.setItem('cs_saved_chat_pdf_text', lastSessionDocText);
                     localStorage.setItem('cs_saved_chat_pdf_name', lastSessionDocName);
                     localStorage.setItem('cs_saved_chat_pdf_images', JSON.stringify(lastSessionImages.slice(0, 3)));
-                    // Also auto-save uploaded PDF/document into the Consultant Studio Strategy Vault so user can reopen it anytime
+                    // Also auto-save uploaded PDF/document into the Consultant Studio Strategy Vault & past.dev Memory so user can reopen/recall it anytime
                     if (lastSessionDocText && lastSessionDocText.length > 20) {
                         const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
                         const docTitle = `📎 Uploaded PDF/Doc: ${lastSessionDocName.slice(0, 42)}`;
+                        const docSlug = `cs-doc-${lastSessionDocName.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 48)}`;
                         if (!vault.some(v => v.title === docTitle)) {
                             const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                             vault.unshift({ id: `vault_pdf_${Date.now()}`, title: docTitle, text: lastSessionDocText, timestamp });
                             localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
                             if (typeof updateVaultCount === 'function') updateVaultCount();
                         }
+                        syncMemoryToPastDev(docSlug, `Uploaded Document: ${lastSessionDocName.slice(0, 60)}`, `# Uploaded Document: ${lastSessionDocName}\n\n${lastSessionDocText}`);
                     }
                 } catch (e) {}
                 const rawLen = uploadedDocText.length;
@@ -7540,6 +7607,7 @@
                         conversationId: currentConversationId,
                         workspace: currentMode,
                         model: modelOverride,
+                        userIdentity: getActiveUserIdentityForPast(),
                         documentText: (docToSend ? `[Document File: ${docNameToSend}]\n${docToSend}\n` : '') + (memoryContext ? `\n${memoryContext}` : ''),
                         images: imagesToSend.map(img => ({
                             name: img.name || 'image.jpg',
