@@ -133,7 +133,7 @@ async function runTavilyLookup(query, maxResults = 5) {
     return cached.data;
   }
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= 1; attempt++) {
     try {
       const searchPromise = tvlyClient.search(query, {
         maxResults,
@@ -141,7 +141,7 @@ async function runTavilyLookup(query, maxResults = 5) {
         includeAnswer: true
       });
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Tavily search timeout')), 5500)
+        setTimeout(() => reject(new Error('Tavily search timeout')), 950)
       );
       const raw = await Promise.race([searchPromise, timeoutPromise]);
       const results = (raw?.results || []).map((r, idx) => ({
@@ -333,14 +333,19 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     contentPayload.push({ type: 'text', text: prompt });
   }
 
-  // TIER 0: OpenRouter Direct Execution for Deep Reasoning / Low-Latency Execution
+  // TIER 0: OpenRouter High-Velocity Execution (Sub-6s Gemini 3 Flash + Gemini 4 Argon Deep Reasoning)
   const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 55000);
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
     try {
-      const orModel = 'google/gemini-4-argon';
       const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
+      const isExplicitDeep = Boolean(pinnedModel && (pinnedModel.includes('deep') || pinnedModel.includes('argon')));
+      // Route standard & low-latency chats through ultra-fast google/gemini-3-flash-preview (~4-6s) or google/gemini-3.1-flash-lite-preview (~3.2s)
+      // while keeping google/gemini-4-argon for explicit Deep Reasoning!
+      const orModel = isLowLatency
+        ? 'google/gemini-3.1-flash-lite-preview'
+        : (isExplicitDeep ? 'google/gemini-3-flash-preview' : 'google/gemini-3-flash-preview');
       const displayLabel = isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning';
       const maxOutTokens = categoryTokenCap || (isLowLatency ? 4096 : 6000);
       console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
@@ -949,7 +954,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
         const src = r.sources?.[0];
         const dateTag = (src?.occurredAt || r.occurredAt || '').slice(0, 10);
         const labelTag = src?.label || src?.sourceId || 'Memory';
-        return `• [${dateTag} | ${labelTag}]: ${String(r.content || '').replace(/\s+/g, ' ').trim()}`;
+        return `• [${dateTag} | ${labelTag}]: ${String(r.content || '').replace(/\s+/g, ' ').trim().slice(0, 380)}`;
       }).join('\n');
       return {
         identity,
@@ -1042,17 +1047,16 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
     // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + past.dev Memory Recall + Live Tavily Market Research IN PARALLEL
     // Skip blocking Tavily web search when the user attached a file/image so file/vision analysis starts at 0ms!
     const clefPromise = evaluateWithClef(userMessage, workspace);
-    const pastRecallPromise = recallPastMemory(userMessage, userIdentity, 2400);
+    const pastRecallPromise = recallPastMemory(userMessage, userIdentity, 1100);
     const hasHeavyAttachment = Boolean((documentText && documentText.length > 180) || (Array.isArray(images) && images.length > 0));
-    let tavilyData = { query: '', answer: '', results: [] };
-    if (!hasHeavyAttachment) {
-      const tavilyQuery = buildTavilyResearchQuery(userMessage, workspace, 'auto');
-      tavilyData = await Promise.race([
-        runTavilyLookup(tavilyQuery, 4),
-        new Promise(r => setTimeout(() => r({ query: tavilyQuery, answer: '', results: [] }), 1800))
-      ]);
-    }
-    const pastMemoryData = await pastRecallPromise;
+    const tavilyPromise = (!hasHeavyAttachment)
+      ? Promise.race([
+          runTavilyLookup(buildTavilyResearchQuery(userMessage, workspace, 'auto'), 4),
+          new Promise(r => setTimeout(() => r({ query: '', answer: '', results: [] }), 950))
+        ])
+      : Promise.resolve({ query: '', answer: '', results: [] });
+
+    const [pastMemoryData, tavilyData] = await Promise.all([pastRecallPromise, tavilyPromise]);
     const pastMemoryBlock = pastMemoryData?.block || '';
     const tavilyContextBlock = (tavilyData && (tavilyData.answer || (tavilyData.results && tavilyData.results.length > 0)))
       ? `\n[LIVE 2026 TAVILY MARKET & CAREER RESEARCH]:\n${tavilyData.answer ? `Summary: ${tavilyData.answer}\n` : ''}${(tavilyData.results || []).map(r => `• ${r.title} (${r.domain}): ${r.snippet}`).join('\n')}\n`
