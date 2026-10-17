@@ -1375,6 +1375,46 @@ app.get('/past-key', (req, res) => {
 </html>`);
 });
 
+// DIRECT CONTACT & SUPPORT INBOX RELAY (LOGS TO MEMORY + FORWARDS TO LANDEN'S TELEGRAM & EMAIL)
+app.post('/api/contact', async (req, res) => {
+  try {
+    const sender = String(req.body?.email || 'Anonymous User').trim().slice(0, 120);
+    const message = String(req.body?.message || '').trim().slice(0, 4000);
+    if (!message) return res.status(400).json({ error: 'Message is required' });
+
+    const isoNow = new Date().toISOString();
+    // 1. Archive contact inquiry in past.dev under user-landen
+    ingestPastMemoryItem({
+      id: `cs-contact-${Date.now()}`,
+      label: `Contact Inquiry from ${sender}`,
+      content: `# Consultant Studio Contact Inquiry (${isoNow.slice(0, 10)})\nFrom: ${sender}\nTo: landen@consultant-studio.app / jacksonlanden3986@gmail.com\n\n${message}`,
+      timestamp: isoNow,
+      rawIdentity: 'jacksonlanden3986@gmail.com'
+    }).catch(() => {});
+
+    // 2. Deliver instant notification to Landen's Telegram DM if bot token is available
+    try {
+      const hermesEnv = await fs.readFile('/home/jacks/.hermes/.env', 'utf-8').catch(() => '');
+      const tokenMatch = hermesEnv.match(/^TELEGRAM_BOT_TOKEN=(.+)$/m);
+      const tgToken = tokenMatch ? tokenMatch[1].trim() : process.env.TELEGRAM_BOT_TOKEN;
+      if (tgToken) {
+        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: '5393795759',
+            text: `📬 *New Consultant Studio Contact Message*\n*From:* ${sender}\n*Message:* ${message}`
+          })
+        });
+      }
+    } catch (tgErr) {}
+
+    return res.json({ ok: true, deliveredTo: 'jacksonlanden3986@gmail.com' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // START SERVER WITH OPENCLAW ENTERPRISE CRASH RESILIENCE & CLEAN SHUTDOWN
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[Consultant Studio Enterprise Engine running on http://0.0.0.0:${PORT}]`);

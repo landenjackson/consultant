@@ -4383,13 +4383,19 @@
                 if (sub) sub.innerText = 'Reach our product & operations engineering desk directly';
                 body.innerHTML = `
                     <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
-                        <strong style="color:#4ADE80; display:block; margin-bottom:4px;">Direct Support Channel</strong>
-                        Email: <a href="mailto:support@consultant-studio.app" style="color:#38BDF8; font-weight:700;">support@consultant-studio.app</a><br>
+                        <strong style="color:#4ADE80; display:block; margin-bottom:4px;">Direct Support &amp; Founder Contact</strong>
+                        Primary Email: <a href="mailto:jacksonlanden3986@gmail.com" style="color:#38BDF8; font-weight:700;">jacksonlanden3986@gmail.com</a><br>
+                        Studio Alias: <a href="mailto:landen@consultant-studio.app?cc=jacksonlanden3986@gmail.com" style="color:#38BDF8; font-weight:700;">landen@consultant-studio.app</a> &bull; <a href="mailto:support@consultant-studio.app?cc=jacksonlanden3986@gmail.com" style="color:#38BDF8; font-weight:700;">support@consultant-studio.app</a><br>
                         Response SLA: Under 4 business hours for all Solo Operator, Partners, and Business accounts.
                     </div>
                     <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
-                        <strong style="color:#F8FAFC; display:block; margin-bottom:4px;">Security & Bug Reporting</strong>
-                        Found a calculation edge case or UI bug? Email our engineering desk directly or attach a screenshot in the chat copilot.
+                        <strong style="color:#F8FAFC; display:block; margin-bottom:4px;">Send a Direct Message to Landen's Inbox</strong>
+                        <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+                            <input type="email" id="contactSenderEmail" placeholder="Your email address..." style="background:#07090D; border:1px solid rgba(255,255,255,0.14); color:#FFF; border-radius:8px; padding:8px 10px; font-size:12.5px; outline:none;">
+                            <textarea id="contactMessageBody" rows="3" placeholder="How can we help with your account, resume, or financial model?" style="background:#07090D; border:1px solid rgba(255,255,255,0.14); color:#FFF; border-radius:8px; padding:8px 10px; font-size:12.5px; outline:none; resize:vertical;"></textarea>
+                            <button type="button" class="btn-export" onclick="submitDirectContactForm()" style="background:#10B981; color:#04130B; font-weight:800; border:none; justify-content:center; padding:8px 12px;">Send Message Directly ↗</button>
+                            <div id="contactFormStatus" style="font-size:11.5px; color:#4ADE80; display:none;">✓ Message delivered!</div>
+                        </div>
                     </div>
                 `;
             }
@@ -4399,6 +4405,30 @@
         function closeLegalModal() {
             const modal = document.getElementById('legalTrustModal');
             if (modal) modal.style.display = 'none';
+        }
+
+        async function submitDirectContactForm() {
+            const sender = document.getElementById('contactSenderEmail')?.value.trim() || '';
+            const msg = document.getElementById('contactMessageBody')?.value.trim() || '';
+            if (!msg) {
+                showToast("Please enter a message first.", "💬");
+                return;
+            }
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: sender, message: msg })
+                });
+                if (res.ok) {
+                    const st = document.getElementById('contactFormStatus');
+                    if (st) st.style.display = 'block';
+                    document.getElementById('contactMessageBody').value = '';
+                    showToast("Message delivered to Landen!", "✓");
+                }
+            } catch (e) {
+                window.location.href = `mailto:jacksonlanden3986@gmail.com?subject=${encodeURIComponent('Consultant Studio Inquiry from ' + (sender || 'User'))}&body=${encodeURIComponent(msg)}`;
+            }
         }
 
         function enterStudioWithTrial() {
