@@ -891,7 +891,7 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   function resolvePastUserScope(rawIdentity) {
     const cleanEmail = String(rawIdentity || '').trim().toLowerCase();
     if (!cleanEmail || cleanEmail === 'landen' || cleanEmail.includes('landen') || cleanEmail === 'creator') {
-      return { identity: 'landen@consultant-studio.app', audience: 'user-landen' };
+      return { identity: 'jacksonlanden3986@gmail.com', audience: 'user-landen' };
     }
     const slugBase = cleanEmail.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 36) || 'guest';
     const audience = `user-${slugBase}`;
