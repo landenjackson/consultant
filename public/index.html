@@ -2887,6 +2887,7 @@
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid rgba(167,139,250,0.3); border-radius:8px; padding:2px 6px; flex-shrink:0;">
                 <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select Execution Mode">
                     <option value="deep-reasoning" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">Deep Reasoning</option>
+                    <option value="harness2" style="background:#0D121A; color:#38BDF8; font-weight:800;">🔬 Harness² Propose–Probe–Compose</option>
                     <option value="low-latency" style="background:#0D121A; color:#FFF;">Low-Latency Execution</option>
                     <option value="auto" style="background:#0D121A; color:#FFF;">Balanced Speed &amp; Depth</option>
                 </select>
@@ -4959,6 +4960,7 @@
             localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 30)));
             updateVaultCount();
             syncMemoryToPastDev(newId, `Strategy Vault: ${title}`, `# Strategy Vault Memo: ${title}\n\n${text}`);
+            showToast("🔒 Saved to Vault + reflected EXPERIENCE.md lesson to past.dev!", "✓");
 
             // Instant visual confirmation on button
             const orig = btn.innerText;
@@ -4968,6 +4970,18 @@
                 btn.innerText = orig;
                 btn.style.color = "";
             }, 1800);
+        }
+
+        function runHarness2DeepAuditOnCard(btn) {
+            const sel = document.getElementById('modelSelectOverride');
+            if (sel) sel.value = 'harness2';
+            const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || 'Audit my current career, resume, and financial runway strategy';
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.value = `Run a Harness² Propose–Probe–Compose Deep Audit on: ${lastUserMsg}`;
+                showToast("🔬 Launching Harness² Parallel Propose–Probe–Compose + Experience Reflection...", "⚡");
+                sendMessage();
+            }
         }
 
         function purgeVault() {
@@ -8010,6 +8024,7 @@
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#10B981; color:#4ADE80; font-weight:700; background:rgba(16,185,129,0.1);">✅ Google Tasks</button>
                             <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
                             <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Sheets (.xlsx)</button>
+                            <button class="btn-export" onclick="runHarness2DeepAuditOnCard(this)" style="border-color:#C084FC; color:#E879F9; font-weight:700; background:rgba(192,132,252,0.1);" title="Run Harness² Parallel Propose-Probe-Compose & Reflect Lesson to past.dev">🔬 Harness² Audit</button>
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save</button>
                             ${modelBadge}
                         `;

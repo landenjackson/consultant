@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-18-monday-sweep-tracker-v22';
+const CACHE_NAME = 'consultant-studio-v2026-10-18-harness2-compose-reflector-v23';
 const ASSETS = [
   '/',
   '/index.html',

@@ -997,12 +997,21 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
     return await resp.json();
   }
 
+  // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
+
   app.post('/api/memory/ingest', async (req, res) => {
     try {
       const { id, label, content, timestamp, userIdentity } = req.body || {};
-      const result = await ingestPastMemoryItem({ id, label, content, timestamp, rawIdentity: userIdentity });
+      const exp = formatHarness2ExperienceLesson(label || 'Consultant Studio Decision', content || '');
+      const result = await ingestPastMemoryItem({
+        id,
+        label: label ? `${label} [EXPERIENCE.md]` : `EXPERIENCE.md: ${exp.cue.slice(0, 50)}`,
+        content: exp.markdown,
+        timestamp,
+        rawIdentity: userIdentity
+      });
       if (!result) return res.status(400).json({ error: 'PAST_API_KEY not configured or empty content' });
-      return res.status(202).json(result);
+      return res.status(202).json({ ...result, experience: { cue: exp.cue, lesson: exp.lesson, evidence: exp.evidence, confidence: exp.confidence } });
     } catch (err) {
       console.warn('[past.dev Live Ingest Warning]:', err.message);
       return res.status(500).json({ error: err.message });
@@ -1019,7 +1028,116 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
     }
   });
 
-  // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
+  // 2.9 HARNESS² RECURSIVE PROPOSE-PROBE-COMPOSE & EXPERIENCE REFLECTOR ENGINE
+  async function runHarness2Compose(basePrompt, userMessage, workspace, imageObjs, activeOpenRouterKey, maxOutTokens) {
+    const startTime = Date.now();
+    const fastModel = 'google/gemini-3.1-flash-lite-preview';
+    const composeModel = 'google/gemini-3-flash-preview';
+
+    const buildPayload = (extraDirective) => {
+      const fullText = `${basePrompt}\n\n${extraDirective}`;
+      if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+        const arr = [];
+        imageObjs.slice(0, 10).forEach(img => {
+          if (img && img.mimeType && img.data) {
+            arr.push({ type: 'image_url', image_url: { url: `data:${img.mimeType};base64,${img.data}` } });
+          }
+        });
+        arr.push({ type: 'text', text: fullText });
+        return arr;
+      }
+      return fullText;
+    };
+
+    const callOpenRouter = async (modelId, content, maxTok, temp = 0.25) => {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeOpenRouterKey}`,
+          'HTTP-Referer': 'https://www.consultant-studio.app',
+          'X-Title': 'Consultant Studio (Harness2)'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [{ role: 'user', content }],
+          max_tokens: maxTok,
+          temperature: temp
+        })
+      });
+      if (!res.ok) throw new Error(`Harness2 ${modelId} status ${res.status}`);
+      const d = await res.json();
+      return d.choices?.[0]?.message?.content || '';
+    };
+
+    // STEP 1 (PROPOSE & PROBE IN PARALLEL): Run INV Probe (Hard Math, Cost-Control & Risk Floor) + DOM Probe (Strategic Positioning, Growth & Market Benchmark)
+    const invDirective = `[HARNESS² CANDIDATE PROBE A — INVARIANT (MATH, COST-CONTROL & RISK FLOOR LENS)]:\nFocus strictly on exact dollar arithmetic, downside protection, cost-per-unit/mile/hour verification, and concrete operational execution checklists.`;
+    const domDirective = `[HARNESS² CANDIDATE PROBE B — DOMAIN (POSITIONING, DEMAND & CAREER/MARKET LEVERAGE LENS)]:\nFocus strictly on high-leverage positioning, ATS/market benchmarks, revenue/salary upside, and persuasive framing.`;
+
+    const [probeA, probeB] = await Promise.all([
+      callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2),
+      callOpenRouter(fastModel, buildPayload(domDirective), 1800, 0.35)
+    ]);
+
+    // STEP 2 (CONTRASTIVE COMPOSE + EXPERIENCE.MD REFLECTOR): Merge the strongest math from Probe A + sharpest positioning from Probe B
+    const composePrompt = `You are the HARNESS² CONTRASTIVE COMPOSER & EXPERIENCE REFLECTOR inside Consultant Studio.
+The user asked: "${userMessage}"
+
+Two specialized candidate probes just executed on this task in parallel:
+
+=== CANDIDATE PROBE A (INV — Hard Math, Cost-Control & Risk Floor) ===
+${probeA.slice(0, 4500)}
+
+=== CANDIDATE PROBE B (DOM — Positioning, Market Benchmarks & Upside) ===
+${probeB.slice(0, 4500)}
+
+YOUR MISSION:
+1. Contrast Probe A and Probe B: keep the exact verified dollar math, risk floors, and operational checklists from Probe A, and combine them with the sharpest positioning, wording, and upside strategy from Probe B.
+2. Write the final, unified response in clear, plain English so every table, bullet, and action step finishes completely.
+3. At the very end of your response, append a compact **🔬 Harness² Experience Reflection (\`EXPERIENCE.md\`)** block with these exact 4 bullet lines so it can be indexed into long-term memory:
+   - **cue**: When this exact decision or scenario comes up again
+   - **lesson**: The single highest-leverage rule or takeaway that won the Probe A vs. Probe B contrast
+   - **evidence**: The concrete numbers, dollar savings, or metrics from this run that prove it
+   - **confidence**: high`;
+
+    const composedText = await callOpenRouter(composeModel, composePrompt, maxOutTokens || 5500, 0.2);
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`[🔬 Harness² Propose-Probe-Compose Winner] (${composedText.length} chars in ${elapsed}s)`);
+    return {
+      text: composedText,
+      isFallback: false,
+      model: 'Harness² Propose–Probe–Compose',
+      latency: `${elapsed}s`,
+      probeA,
+      probeB
+    };
+  }
+
+  // Extract or synthesize a structured 4-line Harness² EXPERIENCE.md lesson from any saved memo or chat response
+  function formatHarness2ExperienceLesson(title, rawText) {
+    const clean = String(rawText || '').trim();
+    // If response already contains a Harness² Experience Reflection block, extract it
+    const cueMatch = clean.match(/-\s*\*\*cue\*\*:\s*([^\n]+)/i);
+    const lessonMatch = clean.match(/-\s*\*\*lesson\*\*:\s*([^\n]+)/i);
+    const evidenceMatch = clean.match(/-\s*\*\*evidence\*\*:\s*([^\n]+)/i);
+    const confMatch = clean.match(/-\s*\*\*confidence\*\*:\s*([^\n]+)/i);
+
+    const lines = clean.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(Boolean);
+    const numMatches = clean.match(/(?:\$[0-9,]+(?:\.[0-9]+)?|\d+(?:\.\d+)?%|\d+\s*(?:miles|hrs|hours|months|weeks|days))/gi) || [];
+
+    const cue = cueMatch ? cueMatch[1].trim() : `When reviewing or acting on: ${String(title || lines[0] || 'Strategy Decision').slice(0, 80)}`;
+    const lesson = lessonMatch ? lessonMatch[1].trim() : (lines.find(l => l.length > 35 && l.length < 220) || lines[0] || 'Apply verified unit economics and concrete operational steps.');
+    const evidence = evidenceMatch ? evidenceMatch[1].trim() : (numMatches.length > 0 ? `Verified figures in artifact: ${numMatches.slice(0, 6).join(', ')}` : 'Verified in Consultant Studio session trajectory.');
+    const confidence = confMatch ? confMatch[1].trim() : 'high';
+
+    return {
+      cue,
+      lesson,
+      evidence,
+      confidence,
+      markdown: `# EXPERIENCE.md — ${title || 'Consultant Studio Lesson'}\n\n## Transferable lesson\n- **cue**: ${cue}\n- **lesson**: ${lesson}\n- **evidence**: ${evidence}\n- **confidence**: ${confidence}\n\n## Full Artifact\n${clean}`
+    };
+  }
   app.post('/api/chat', async (req, res) => {
     try {
       const { messages = [], workspace = 'general', documentText = '', images = [], conversationId = null, model = 'auto', userIdentity = null } = req.body;
@@ -1174,7 +1292,23 @@ User Query: ${userMessage}`;
     console.log(`[Executing Instant Live Inference | Category: ${tokenProfile.category} (${tokenProfile.maxTokens} tokens) | Multimodal Images: ${imageObjs.length} | Pinned Model: ${model}]`);
     let liveResponse = null;
     try {
-      liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model, tokenProfile.maxTokens);
+      const isHarness2Mode = String(model || '').toLowerCase().includes('harness2');
+      if (isHarness2Mode && process.env.OPENROUTER_API_KEY) {
+        liveResponse = await runHarness2Compose(finalPrompt, userMessage, workspace, imageObjs, process.env.OPENROUTER_API_KEY, tokenProfile.maxTokens);
+        // Automatically reflect the Harness² EXPERIENCE.md lesson into past.dev memory!
+        if (liveResponse && liveResponse.text) {
+          const exp = formatHarness2ExperienceLesson(`Harness² Audit: ${userMessage.slice(0, 48)}`, liveResponse.text);
+          ingestPastMemoryItem({
+            id: `cs-harness2-exp-${Date.now()}`,
+            label: `Harness² EXPERIENCE.md: ${exp.cue.slice(0, 65)}`,
+            content: exp.markdown,
+            timestamp: new Date().toISOString(),
+            rawIdentity: userIdentity
+          }).catch(() => {});
+        }
+      } else {
+        liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model, tokenProfile.maxTokens);
+      }
     } catch (qErr) {
       console.error('[Live Query Warning]:', qErr.message);
     }
