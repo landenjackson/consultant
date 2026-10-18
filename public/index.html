@@ -2551,6 +2551,81 @@
                         </div>
                     </div>
 
+                    <!-- MONDAY SWEEP & WEEKLY ROUTE PROFIT TRACKER (PREMIER LOGISTICS SERVICES / DRIVER UNIT ECONOMICS) -->
+                    <div id="mondaySweepTrackerStudio" style="margin-top:14px; background:#07090D; border:1px solid rgba(16,185,129,0.32); border-radius:10px; padding:14px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <span style="font-size:11px; background:rgba(16,185,129,0.16); color:#4ADE80; padding:3px 9px; border-radius:6px; font-weight:800; border:1px solid rgba(16,185,129,0.35);">
+                                    🚗 Monday Sweep &amp; Route Profit Tracker
+                                </span>
+                                <span style="font-size:13px; font-weight:800; color:#F8FAFC;">Weekly Driver Unit Economics, 30% Tax/Maint Reserve &amp; 20% Runway Builder</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(16,185,129,0.35); color:#4ADE80; font-weight:700;" onclick="logMondaySweepWeek()">✅ Log Monday Sweep</button>
+                                <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(56,189,248,0.35); color:#38BDF8; font-weight:700;" onclick="exportMondaySweepXLSX()">📊 Export Tracker (.xlsx)</button>
+                                <button type="button" class="btn-export" style="padding:4px 9px; font-size:11px; border-color:rgba(168,85,247,0.35); color:#C084FC; font-weight:700;" onclick="analyzeMondaySweepInChat()">💬 Analyze Week in Chat</button>
+                            </div>
+                        </div>
+
+                        <!-- WEEKLY INPUTS -->
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin-bottom:12px;">
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">💵 Weekly Gross Earnings ($)</label>
+                                <input type="number" id="msWeeklyGross" value="1000" min="0" step="25" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#4ADE80; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🛣️ Total Miles Driven</label>
+                                <input type="number" id="msWeeklyMiles" value="480" min="0" step="10" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">⏱️ Active Hours Driven</label>
+                                <input type="number" id="msWeeklyHours" value="32" min="1" step="1" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">⛽ Actual Gas Spend ($)</label>
+                                <input type="number" id="msWeeklyGas" value="95" min="0" step="5" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🏦 Tax/Maint Sweep (%)</label>
+                                <input type="number" id="msTaxSweepPct" value="30" min="0" max="60" step="5" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#FBBF24; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:10.5px; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">🚀 Runway Savings (%)</label>
+                                <input type="number" id="msSavingsSweepPct" value="20" min="0" max="60" step="5" oninput="recalcMondaySweep()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#38BDF8; padding:7px 9px; border-radius:7px; font-family:monospace; font-size:13px; font-weight:700;">
+                            </div>
+                        </div>
+
+                        <!-- 4 LIVE MONDAY SWEEP OUTPUT CARDS -->
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)); gap:10px;">
+                            <div style="background:#0E131C; border:1px solid rgba(251,191,36,0.3); border-radius:8px; padding:10px 12px;">
+                                <div style="font-size:10.5px; font-weight:700; color:#FBBF24; text-transform:uppercase;">1. Monday Tax &amp; Maint Sweep</div>
+                                <div id="msTaxSweepOut" style="font-size:18px; font-weight:800; color:#F8FAFC; font-family:monospace; margin:3px 0;">$300.00</div>
+                                <div id="msIrsShieldOut" style="font-size:10.5px; color:#94A3B8;">IRS Mileage Shield ($0.70/mi): $336</div>
+                            </div>
+                            <div style="background:#0E131C; border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:10px 12px;">
+                                <div style="font-size:10.5px; font-weight:700; color:#38BDF8; text-transform:uppercase;">2. Runway / Exit Fund Sweep</div>
+                                <div id="msSavingsSweepOut" style="font-size:18px; font-weight:800; color:#F8FAFC; font-family:monospace; margin:3px 0;">$200.00</div>
+                                <div id="msSixMonthRunwayOut" style="font-size:10.5px; color:#94A3B8;">26-Week Exit Stack: +$5,200</div>
+                            </div>
+                            <div style="background:#0E131C; border:1px solid rgba(16,185,129,0.35); border-radius:8px; padding:10px 12px;">
+                                <div style="font-size:10.5px; font-weight:700; color:#4ADE80; text-transform:uppercase;">3. Spendable Net Take-Home</div>
+                                <div id="msSpendableNetOut" style="font-size:18px; font-weight:800; color:#4ADE80; font-family:monospace; margin:3px 0;">$405.00/wk</div>
+                                <div id="msMonthlyNetEqOut" style="font-size:10.5px; color:#94A3B8;">~$1,755/mo clean after gas &amp; sweeps</div>
+                            </div>
+                            <div style="background:#0E131C; border:1px solid rgba(168,85,247,0.3); border-radius:8px; padding:10px 12px;">
+                                <div style="font-size:10.5px; font-weight:700; color:#C084FC; text-transform:uppercase;">4. Route Unit Economics</div>
+                                <div id="msRouteUnitOut" style="font-size:18px; font-weight:800; color:#F8FAFC; font-family:monospace; margin:3px 0;">$2.08/mi • $28.28/hr</div>
+                                <div id="msRouteMarginOut" style="font-size:10.5px; color:#94A3B8;">Net after gas: $1.89/mi (90.5% margin)</div>
+                            </div>
+                        </div>
+
+                        <!-- LOGGED MONDAY SWEEPS HISTORY STRIP -->
+                        <div id="msHistoryLogWrap" style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11.5px; color:#94A3B8;">
+                            <span id="msHistorySummaryText">📅 Ready for Monday Sweep — log each week to track your cumulative Tax/Maint &amp; Exit Runway stack.</span>
+                            <button type="button" onclick="clearMondaySweepHistory()" style="background:transparent; border:none; color:#64748B; font-size:11px; cursor:pointer; text-decoration:underline;">Reset Log</button>
+                        </div>
+                    </div>
+
                     <!-- LIVE JOB & RESUME OPTION FINDER (POWERED BY TAVILY — ZERO HARD SCROLLING) -->
                     <div id="tavilyCareerPickerStudio" style="margin-top:14px; background:#07090D; border:1px solid rgba(56,189,248,0.28); border-radius:10px; padding:14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
@@ -5817,6 +5892,188 @@
             }
         }
 
+        // MONDAY SWEEP & WEEKLY ROUTE PROFIT ENGINE (PREMIER LOGISTICS SERVICES UNIT ECONOMICS)
+        function recalcMondaySweep() {
+            const gross = Math.max(0, parseFloat(document.getElementById('msWeeklyGross')?.value || 0));
+            const miles = Math.max(0, parseFloat(document.getElementById('msWeeklyMiles')?.value || 0));
+            const hours = Math.max(0.5, parseFloat(document.getElementById('msWeeklyHours')?.value || 1));
+            const gas = Math.max(0, parseFloat(document.getElementById('msWeeklyGas')?.value || 0));
+            const taxPct = Math.max(0, Math.min(80, parseFloat(document.getElementById('msTaxSweepPct')?.value || 30)));
+            const savPct = Math.max(0, Math.min(80, parseFloat(document.getElementById('msSavingsSweepPct')?.value || 20)));
+
+            const taxSweep = Math.round(gross * (taxPct / 100) * 100) / 100;
+            const savSweep = Math.round(gross * (savPct / 100) * 100) / 100;
+            const irsMileageShield = Math.round(miles * 0.70 * 100) / 100;
+            const netAfterGas = Math.max(0, gross - gas);
+            const spendableNet = Math.max(0, Math.round((gross - taxSweep - savSweep - gas) * 100) / 100);
+            const monthlySpendableEq = Math.round(spendableNet * 4.33);
+            const sixMonthExitStack = Math.round(savSweep * 26);
+
+            const revPerMile = miles > 0 ? (gross / miles) : 0;
+            const netPerMile = miles > 0 ? (netAfterGas / miles) : 0;
+            const netHourlyAfterGas = netAfterGas / hours;
+            const fuelMarginPct = gross > 0 ? ((netAfterGas / gross) * 100) : 0;
+
+            const taxEl = document.getElementById('msTaxSweepOut');
+            const irsEl = document.getElementById('msIrsShieldOut');
+            const savEl = document.getElementById('msSavingsSweepOut');
+            const stackEl = document.getElementById('msSixMonthRunwayOut');
+            const spendEl = document.getElementById('msSpendableNetOut');
+            const moEqEl = document.getElementById('msMonthlyNetEqOut');
+            const unitEl = document.getElementById('msRouteUnitOut');
+            const margEl = document.getElementById('msRouteMarginOut');
+
+            if (taxEl) taxEl.innerText = `$${taxSweep.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            if (irsEl) irsEl.innerText = `IRS Mileage Shield ($0.70/mi): $${irsMileageShield.toLocaleString()} deducted`;
+            if (savEl) savEl.innerText = `$${savSweep.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            if (stackEl) stackEl.innerText = `26-Week Exit Stack: +$${sixMonthExitStack.toLocaleString()}`;
+            if (spendEl) spendEl.innerText = `$${spendableNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/wk`;
+            if (moEqEl) moEqEl.innerText = `~$${monthlySpendableEq.toLocaleString()}/mo clean after gas & sweeps`;
+            if (unitEl) unitEl.innerText = `$${revPerMile.toFixed(2)}/mi • $${netHourlyAfterGas.toFixed(2)}/hr`;
+            if (margEl) margEl.innerText = `Net after gas: $${netPerMile.toFixed(2)}/mi (${fuelMarginPct.toFixed(1)}% fuel margin)`;
+
+            const state = { gross, miles, hours, gas, taxPct, savPct, taxSweep, savSweep, irsMileageShield, spendableNet, monthlySpendableEq, sixMonthExitStack, revPerMile, netPerMile, netHourlyAfterGas, fuelMarginPct };
+            window._lastMondaySweep = state;
+            try {
+                localStorage.setItem('cs_monday_sweep_current', JSON.stringify(state));
+            } catch (e) {}
+            renderMondaySweepHistorySummary();
+        }
+
+        function renderMondaySweepHistorySummary() {
+            const el = document.getElementById('msHistorySummaryText');
+            if (!el) return;
+            try {
+                const logs = JSON.parse(localStorage.getItem('cs_monday_sweep_logs') || '[]');
+                if (!logs.length) {
+                    el.innerText = '📅 Ready for Monday Sweep — log each week to track your cumulative Tax/Maint & Exit Runway stack.';
+                    return;
+                }
+                const totGross = logs.reduce((s, r) => s + (r.gross || 0), 0);
+                const totTax = logs.reduce((s, r) => s + (r.taxSweep || 0), 0);
+                const totSav = logs.reduce((s, r) => s + (r.savSweep || 0), 0);
+                const totMiles = logs.reduce((s, r) => s + (r.miles || 0), 0);
+                el.innerHTML = `✅ <strong>${logs.length} Week(s) Logged:</strong> Gross: <strong>$${totGross.toLocaleString()}</strong> • Tax/Maint Reserved: <strong style="color:#FBBF24;">$${totTax.toLocaleString()}</strong> • Exit Runway Saved: <strong style="color:#38BDF8;">$${totSav.toLocaleString()}</strong> • Miles: <strong>${totMiles.toLocaleString()} mi</strong>`;
+            } catch (e) {}
+        }
+
+        function logMondaySweepWeek() {
+            recalcMondaySweep();
+            const s = window._lastMondaySweep || {};
+            const logs = JSON.parse(localStorage.getItem('cs_monday_sweep_logs') || '[]');
+            const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const entry = { id: `ms_${Date.now()}`, date: dateStr, ...s };
+            logs.push(entry);
+            localStorage.setItem('cs_monday_sweep_logs', JSON.stringify(logs));
+            renderMondaySweepHistorySummary();
+
+            // Also sync to past.dev memory so Consultant Studio and Hermes always know your latest Monday Sweep & Route P&L!
+            const memoText = `Week of ${dateStr} Monday Sweep & Route Profit Log:\n` +
+                `• Weekly Gross Earnings: $${s.gross}\n` +
+                `• Miles Driven: ${s.miles} mi (IRS $0.70/mi Tax Shield: $${s.irsMileageShield})\n` +
+                `• Active Hours: ${s.hours} hrs ($${(s.netHourlyAfterGas || 0).toFixed(2)}/hr net after gas)\n` +
+                `• Actual Gas Spend: $${s.gas} ($${(s.revPerMile || 0).toFixed(2)}/mi gross, $${(s.netPerMile || 0).toFixed(2)}/mi net)\n` +
+                `• Monday Tax & Maintenance Sweep (${s.taxPct}%): $${s.taxSweep}\n` +
+                `• Exit Runway Savings Sweep (${s.savPct}%): $${s.savSweep}\n` +
+                `• Clean Spendable Net Take-Home: $${s.spendableNet}/wk (~$${s.monthlySpendableEq}/mo)`;
+            if (typeof syncMemoryToPastDev === 'function') {
+                syncMemoryToPastDev(`cs-monday-sweep-${new Date().toISOString().slice(0, 10)}`, `Monday Sweep Log (${dateStr})`, `# Monday Sweep & Route Profit Log (${dateStr})\n\n${memoText}`);
+            }
+            showToast(`✅ Logged Monday Sweep ($${s.taxSweep} Tax/Maint + $${s.savSweep} Runway Saved)!`, '🚗');
+        }
+
+        function clearMondaySweepHistory() {
+            if (confirm("Clear your logged Monday Sweep history?")) {
+                localStorage.removeItem('cs_monday_sweep_logs');
+                renderMondaySweepHistorySummary();
+            }
+        }
+
+        function analyzeMondaySweepInChat() {
+            recalcMondaySweep();
+            const s = window._lastMondaySweep || {};
+            sendQuick(`Monday Sweep & Route Unit Economics Check: This week I grossed $${s.gross} across ${s.miles} miles and ${s.hours} active hours, with $${s.gas} in gas. My ${s.taxPct}% Monday Tax/Maintenance Sweep is $${s.taxSweep}, my ${s.savPct}% Exit Runway Sweep is $${s.savSweep}, and my IRS mileage deduction shield ($0.70/mi) is $${s.irsMileageShield}, leaving $${s.spendableNet}/wk (~$${s.monthlySpendableEq}/mo) in clean spendable take-home ($${(s.revPerMile || 0).toFixed(2)}/mi gross, $${(s.netHourlyAfterGas || 0).toFixed(2)}/hr net after gas). Break down how this stacks my 6-month exit runway toward a $58k-$72k Supply Chain & Operations Analyst role and how I can frame these route unit-economics metrics on my resume.`);
+        }
+
+        function exportMondaySweepXLSX() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert("SheetJS library initializing. Please retry in a moment.");
+                    return;
+                }
+                recalcMondaySweep();
+                const s = window._lastMondaySweep || {};
+                const logs = JSON.parse(localStorage.getItem('cs_monday_sweep_logs') || '[]');
+                const wsData = [
+                    ["PREMIER LOGISTICS SERVICES — MONDAY SWEEP & WEEKLY ROUTE PROFIT TRACKER"],
+                    ["Prepared for: Landen Jackson | Target: 6-Month Cash Stack -> Supply Chain & Operations Analyst ($58k-$72k)"],
+                    [],
+                    ["Week / Date", "Gross Earnings ($)", "Miles Driven", "Active Hours", "Gas Spend ($)", "Gross $/Mile", "Net $/Hour (After Gas)", "IRS Mileage Shield ($0.70/mi)", `Monday Tax/Maint Sweep (${s.taxPct}%)`, `Exit Runway Sweep (${s.savPct}%)`, "Clean Spendable Net ($)"]
+                ];
+
+                if (logs.length > 0) {
+                    logs.forEach((l, i) => {
+                        const r = i + 5;
+                        wsData.push([
+                            l.date || `Week ${i + 1}`,
+                            l.gross,
+                            l.miles,
+                            l.hours,
+                            l.gas,
+                            { f: `ROUND(B${r}/MAX(1,C${r}), 2)` },
+                            { f: `ROUND((B${r}-E${r})/MAX(1,D${r}), 2)` },
+                            { f: `ROUND(C${r}*0.70, 2)` },
+                            { f: `ROUND(B${r}*${(l.taxPct || 30) / 100}, 2)` },
+                            { f: `ROUND(B${r}*${(l.savPct || 20) / 100}, 2)` },
+                            { f: `ROUND(B${r}-E${r}-I${r}-J${r}, 2)` }
+                        ]);
+                    });
+                } else {
+                    for (let w = 1; w <= 26; w++) {
+                        const r = w + 4;
+                        wsData.push([
+                            `Week ${w} (Monday Sweep)`,
+                            s.gross || 1000,
+                            s.miles || 480,
+                            s.hours || 32,
+                            s.gas || 95,
+                            { f: `ROUND(B${r}/MAX(1,C${r}), 2)` },
+                            { f: `ROUND((B${r}-E${r})/MAX(1,D${r}), 2)` },
+                            { f: `ROUND(C${r}*0.70, 2)` },
+                            { f: `ROUND(B${r}*${(s.taxPct || 30) / 100}, 2)` },
+                            { f: `ROUND(B${r}*${(s.savPct || 20) / 100}, 2)` },
+                            { f: `ROUND(B${r}-E${r}-I${r}-J${r}, 2)` }
+                        ]);
+                    }
+                }
+
+                const lastRow = wsData.length;
+                const totalRow = lastRow + 1;
+                wsData.push([
+                    "6-MONTH / CUMULATIVE TOTAL",
+                    { f: `SUM(B5:B${lastRow})` },
+                    { f: `SUM(C5:C${lastRow})` },
+                    { f: `SUM(D5:D${lastRow})` },
+                    { f: `SUM(E5:E${lastRow})` },
+                    { f: `ROUND(B${totalRow}/MAX(1,C${totalRow}), 2)` },
+                    { f: `ROUND((B${totalRow}-E${totalRow})/MAX(1,D${totalRow}), 2)` },
+                    { f: `SUM(H5:H${lastRow})` },
+                    { f: `SUM(I5:I${lastRow})` },
+                    { f: `SUM(J5:J${lastRow})` },
+                    { f: `SUM(K5:K${lastRow})` }
+                ]);
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                ws['!cols'] = [{ wch: 24 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 22 }, { wch: 24 }, { wch: 24 }, { wch: 22 }, { wch: 22 }];
+                XLSX.utils.book_append_sheet(wb, ws, "Monday_Sweep_26W_Model");
+                XLSX.writeFile(wb, "Landen_Jackson_Monday_Sweep_Route_Profit_Tracker.xlsx");
+                showToast("📊 Exported 26-Week Monday Sweep & Route Profit Tracker (.xlsx)!", "🚗");
+            } catch (e) {
+                console.error("Monday Sweep XLSX error:", e);
+            }
+        }
+
         // Render all pending charts inside a container with rich executive depth & tooltips
         function initializePendingCharts(container) {
             if (typeof Chart === 'undefined') return;
@@ -7844,6 +8101,20 @@
             }
             if (typeof recalcPersonalRunway === 'function') {
                 recalcPersonalRunway();
+            }
+            if (typeof recalcMondaySweep === 'function') {
+                try {
+                    const savedMs = JSON.parse(localStorage.getItem('cs_monday_sweep_current') || 'null');
+                    if (savedMs) {
+                        if (savedMs.gross !== undefined) document.getElementById('msWeeklyGross').value = savedMs.gross;
+                        if (savedMs.miles !== undefined) document.getElementById('msWeeklyMiles').value = savedMs.miles;
+                        if (savedMs.hours !== undefined) document.getElementById('msWeeklyHours').value = savedMs.hours;
+                        if (savedMs.gas !== undefined) document.getElementById('msWeeklyGas').value = savedMs.gas;
+                        if (savedMs.taxPct !== undefined) document.getElementById('msTaxSweepPct').value = savedMs.taxPct;
+                        if (savedMs.savPct !== undefined) document.getElementById('msSavingsSweepPct').value = savedMs.savPct;
+                    }
+                } catch (e) {}
+                recalcMondaySweep();
             }
             if (typeof recalcBreakevenStudio === 'function') {
                 recalcBreakevenStudio();
