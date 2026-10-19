@@ -333,26 +333,40 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     contentPayload.push({ type: 'text', text: prompt });
   }
 
-  // TIER 0: OpenRouter High-Velocity Execution (Sub-6s Gemini 3 Flash + DeepSeek Quantitative + Gemini 4 Argon Deep Reasoning)
-  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('deepseek') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
+  // TIER 0: OpenRouter High-Velocity Execution (Sub-6s Gemini 3 Flash + MiniMax M3.1 Flash + DeepSeek Quantitative)
+  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('deepseek') || pinnedModel.includes('minimax') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
   if (activeOpenRouterKey && isArgonRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
     try {
-      const isDeepSeek = Boolean(pinnedModel && pinnedModel.toLowerCase().includes('deepseek'));
-      const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
-      const isExplicitDeep = Boolean(pinnedModel && (pinnedModel.includes('deep') || pinnedModel.includes('argon')));
-      // Route DeepSeek requests to deepseek/deepseek-chat-v3-0324 (or gemini-3-flash-preview if images attached),
-      // low-latency to google/gemini-3.1-flash-lite-preview (~2.6s), and standard/deep to google/gemini-3-flash-preview (~6s)
-      const orModel = (isDeepSeek && !hasImages)
-        ? 'deepseek/deepseek-chat-v3-0324'
-        : (isLowLatency ? 'google/gemini-3.1-flash-lite-preview' : 'google/gemini-3-flash-preview');
-      const displayLabel = isDeepSeek
-        ? 'DeepSeek Quantitative Math'
-        : (isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning');
+      const lowerPin = String(pinnedModel || '').toLowerCase();
+      const isMiniMax = lowerPin.includes('minimax');
+      const isDeepSeek = lowerPin.includes('deepseek');
+      const isLowLatency = Boolean(lowerPin.includes('latency') || lowerPin.includes('flash'));
+      // Route MiniMax M3.1 Flash ("Space Bunny") to minimax/minimax-m3.1-flash:free (with fallback to minimax/minimax-m3),
+      // DeepSeek requests to deepseek/deepseek-chat-v3-0324, low-latency to google/gemini-3.1-flash-lite-preview, and standard/deep to google/gemini-3-flash-preview
+      const orModel = isMiniMax
+        ? 'minimax/minimax-m3.1-flash:free'
+        : ((isDeepSeek && !hasImages)
+            ? 'deepseek/deepseek-chat-v3-0324'
+            : (isLowLatency ? 'google/gemini-3.1-flash-lite-preview' : 'google/gemini-3-flash-preview'));
+      const displayLabel = isMiniMax
+        ? 'MiniMax M3.1 Flash (Space Bunny)'
+        : (isDeepSeek
+            ? 'DeepSeek Quantitative Math'
+            : (isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning'));
       const maxOutTokens = categoryTokenCap || (isLowLatency ? 4096 : 6000);
       console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const reqBody = {
+        model: orModel,
+        messages: [{ role: 'user', content: contentPayload }],
+        max_tokens: maxOutTokens,
+        temperature: 0.25
+      };
+      if (isMiniMax) {
+        reqBody.reasoning = { effort: 'low' };
+      }
+      let res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -361,13 +375,23 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
           'X-Title': 'Consultant Studio'
         },
         signal: controller.signal,
-        body: JSON.stringify({
-          model: orModel,
-          messages: [{ role: 'user', content: contentPayload }],
-          max_tokens: maxOutTokens,
-          temperature: 0.25
-        })
+        body: JSON.stringify(reqBody)
       });
+      // Seamless paid fallback if free endpoint is ever rate-limited
+      if (isMiniMax && !res.ok) {
+        reqBody.model = 'minimax/minimax-m3';
+        res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeOpenRouterKey}`,
+            'HTTP-Referer': 'https://www.consultant-studio.app',
+            'X-Title': 'Consultant Studio'
+          },
+          signal: controller.signal,
+          body: JSON.stringify(reqBody)
+        });
+      }
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
@@ -1073,16 +1097,21 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
       return d.choices?.[0]?.message?.content || '';
     };
 
-    // STEP 1 (PROPOSE & PROBE IN PARALLEL — CROSS-FAMILY DIVERSITY: DEEPSEEK MATH AUDITOR vs. GEMINI STRATEGIST):
+    // STEP 1 (PROPOSE & PROBE IN PARALLEL — CROSS-FAMILY DIVERSITY: MINIMAX M3.1 / DEEPSEEK AUDITOR vs. GEMINI STRATEGIST):
     const hasImgs = Array.isArray(imageObjs) && imageObjs.length > 0;
-    const probeAModel = hasImgs ? fastModel : 'deepseek/deepseek-chat-v3-0324';
-    const probeBModel = fastModel;
-    const invDirective = `[HARNESS² CANDIDATE PROBE A — DEEPSEEK QUANTITATIVE & INVARIANT AUDITOR (HARD MATH, COST-CONTROL & RISK FLOOR LENS)]:\nFocus strictly on exact dollar arithmetic, downside protection, cost-per-unit/mile/hour verification, and concrete operational execution checklists.`;
+    const invDirective = `[HARNESS² CANDIDATE PROBE A — SPACE BUNNY / DEEPSEEK QUANTITATIVE AUDITOR (HARD MATH, COST-CONTROL & RISK FLOOR LENS)]:\nFocus strictly on exact dollar arithmetic, downside protection, cost-per-unit/mile/hour verification, and concrete operational execution checklists.`;
     const domDirective = `[HARNESS² CANDIDATE PROBE B — GEMINI DOMAIN STRATEGIST (POSITIONING, DEMAND & CAREER/MARKET LEVERAGE LENS)]:\nFocus strictly on high-leverage positioning, ATS/market benchmarks, revenue/salary upside, and persuasive framing.`;
 
+    const probeAPromise = hasImgs
+      ? callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2)
+      : Promise.any([
+          callOpenRouter('minimax/minimax-m3.1-flash:free', buildPayload(invDirective), 1800, 0.2),
+          callOpenRouter('deepseek/deepseek-chat-v3-0324', buildPayload(invDirective), 1800, 0.2)
+        ]).catch(() => callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2));
+
     const [probeA, probeB] = await Promise.all([
-      callOpenRouter(probeAModel, buildPayload(invDirective), 1800, 0.2).catch(() => callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2)),
-      callOpenRouter(probeBModel, buildPayload(domDirective), 1800, 0.35)
+      probeAPromise,
+      callOpenRouter(fastModel, buildPayload(domDirective), 1800, 0.35)
     ]);
 
     // STEP 2 (CONTRASTIVE COMPOSE + EXPERIENCE.MD REFLECTOR): Merge the strongest math from Probe A + sharpest positioning from Probe B
