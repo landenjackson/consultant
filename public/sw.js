@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-19-emerald-gold-wealth-v31';
+const CACHE_NAME = 'consultant-studio-v2026-10-19-no-liveroom-v32';
 const ASSETS = [
   '/',
   '/index.html',
