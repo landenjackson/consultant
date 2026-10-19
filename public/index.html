@@ -2842,6 +2842,8 @@
                     <span style="font-size:11px; background:rgba(34,197,94,0.12); color:var(--accent-glow); padding:2px 8px; border-radius:12px; border:1px solid var(--border-glow);">Live Editable</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
+                    <button class="btn-export" id="canvasUndoBtn" onclick="undoCanvasVersion()" style="padding:4px 8px; font-size:11px; border-color:rgba(251,191,36,0.35); color:#FBBF24;" title="Undo to previous saved version (up to 10 steps)">↩️ Undo</button>
+                    <button class="btn-export" onclick="shareCanvasOrCardLink(document.getElementById('canvasEditor'))" style="padding:4px 8px; font-size:11px; border-color:rgba(56,189,248,0.35); color:#38BDF8;" title="Generate 1-click public read-only link (no sign-in needed)">🔗 Share Link</button>
                     <button class="btn-export" onclick="copyCanvasText()" style="padding:4px 8px; font-size:11px;">📋 Copy</button>
                     <button class="btn-export" onclick="toggleCanvas(false)" style="padding:4px 8px; font-size:11px;">✕</button>
                 </div>
@@ -4055,6 +4057,7 @@
                 });
 
                 editor.innerHTML = clone.innerHTML;
+                pushCanvasVersionSnapshot(editor.innerHTML);
 
                 // Fire Chart.js initialization after panel animation settles
                 setTimeout(() => {
@@ -5128,6 +5131,7 @@
             delivBar.className = 'deliverables-bar';
             delivBar.innerHTML = `
                 <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Answer</button>
+                <button class="btn-export" onclick="shareCanvasOrCardLink(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.12);" title="Create 1-click public read-only link (no sign-in required)">🔗 Share Link</button>
                 <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
                 <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
                 <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
@@ -8038,6 +8042,7 @@
                         const modelBadge = data?.model ? `<span style="font-size:10.5px; color:var(--text-muted); font-family:monospace; display:inline-flex; align-items:center; gap:4px; margin-left:auto;"><span style="color:var(--accent-glow);">⚡</span> ${data.model} (${data.latency || '1.1s'})</span>` : '';
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
+                            <button class="btn-export" onclick="shareCanvasOrCardLink(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.14);" title="Create 1-click public read-only link (no sign-in required)">🔗 Share Link</button>
                             <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
                             <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
                             <button class="btn-export" onclick="openOfficeModal()" style="border-color:#10B981; color:#4ADE80; font-weight:700; background:rgba(16,185,129,0.1);">✅ Google Tasks</button>
@@ -8219,6 +8224,105 @@
             const labor = document.getElementById('beLaborSlider')?.value || 28;
             logConversionEvent('ai_chat_push', { source: 'business_breakeven', rev, cogs, opex, labor });
             sendQuick(`Business Breakeven & 12-Month EBITDA Stress Test: My projected monthly revenue is $${Number(rev).toLocaleString()}/mo with ${cogs}% COGS, $${Number(opex).toLocaleString()}/mo fixed overhead, and ${labor}% variable labor. Calculate my exact monthly breakeven floor, Prime Cost %, safety buffer for a 20% slow-month revenue dip, and a 90-day margin improvement plan.`);
+        }
+
+        // OPENCLAW-INSPIRED 1-CLICK NO-SIGN-IN PUBLIC LINK SHARING & 10-STEP CANVAS UNDO
+        window._canvasVersionStack = JSON.parse(localStorage.getItem('cs_canvas_version_stack') || '[]');
+
+        function pushCanvasVersionSnapshot(htmlContent) {
+            try {
+                if (!htmlContent || typeof htmlContent !== 'string') return;
+                const stack = window._canvasVersionStack || [];
+                if (stack.length > 0 && stack[stack.length - 1] === htmlContent) return;
+                stack.push(htmlContent);
+                while (stack.length > 10) stack.shift();
+                window._canvasVersionStack = stack;
+                localStorage.setItem('cs_canvas_version_stack', JSON.stringify(stack));
+                const undoBtn = document.getElementById('canvasUndoBtn');
+                if (undoBtn) undoBtn.innerText = `↩️ Undo (${stack.length})`;
+            } catch (e) {}
+        }
+
+        function undoCanvasVersion() {
+            const editor = document.getElementById('canvasEditor');
+            if (!editor) return;
+            const stack = window._canvasVersionStack || [];
+            if (stack.length <= 1) {
+                showToast("Already at the earliest saved Canvas version.", "↩️");
+                return;
+            }
+            stack.pop();
+            const prevHtml = stack[stack.length - 1];
+            editor.innerHTML = prevHtml;
+            window._canvasVersionStack = stack;
+            localStorage.setItem('cs_canvas_version_stack', JSON.stringify(stack));
+            const undoBtn = document.getElementById('canvasUndoBtn');
+            if (undoBtn) undoBtn.innerText = `↩️ Undo (${stack.length})`;
+            showToast(`Restored previous version (${stack.length}/10 in history).`, "↩️");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const editor = document.getElementById('canvasEditor');
+            if (editor) {
+                let debounceTimer = null;
+                editor.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        pushCanvasVersionSnapshot(editor.innerHTML);
+                    }, 1200);
+                });
+            }
+        });
+
+        async function shareCanvasOrCardLink(btnOrEl) {
+            try {
+                let targetCard = null;
+                if (btnOrEl && btnOrEl.id === 'canvasEditor') {
+                    targetCard = btnOrEl;
+                } else if (btnOrEl && btnOrEl.closest) {
+                    targetCard = btnOrEl.closest('.bubble-assistant') || document.querySelector('.bubble-assistant');
+                } else {
+                    targetCard = document.querySelector('.bubble-assistant') || document.getElementById('canvasEditor');
+                }
+                if (!targetCard) {
+                    showToast("No strategy memo found to share yet.", "⚠️");
+                    return;
+                }
+                const cleanText = getCleanStrategyText(targetCard) || targetCard.innerText || '';
+                if (!cleanText.trim()) {
+                    showToast("Memo is empty.", "⚠️");
+                    return;
+                }
+                const firstLine = cleanText.split('\n').map(l => l.replace(/^[#*\-\s]+/, '').trim()).find(l => l.length > 5) || 'Consultant Studio Financial & Strategy Brief';
+                const title = firstLine.slice(0, 95);
+                const track = localStorage.getItem('cs_workspace') || 'personal';
+                if (btnOrEl && btnOrEl.tagName === 'BUTTON') {
+                    btnOrEl.innerText = '⏳ Creating Link...';
+                }
+                const res = await fetch('/api/share', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        content: cleanText,
+                        track,
+                        model: document.getElementById('modelSelectOverride')?.selectedOptions?.[0]?.text || 'Consultant Studio AI'
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.url) throw new Error(data.error || 'Share failed');
+
+                await copyTextReliable(data.url);
+                logConversionEvent('share_link_created', { id: data.id, track });
+                if (btnOrEl && btnOrEl.tagName === 'BUTTON') {
+                    btnOrEl.innerText = '✓ Link Copied!';
+                    setTimeout(() => { btnOrEl.innerText = '🔗 Share Link'; }, 2800);
+                }
+                showToast(`Public read-only link copied! Anyone can view without signing in: ${data.url}`, "🔗");
+            } catch (e) {
+                if (btnOrEl && btnOrEl.tagName === 'BUTTON') btnOrEl.innerText = '🔗 Share Link';
+                showToast("Could not create share link: " + e.message, "⚠️");
+            }
         }
 
         // PWA Service Worker Registration

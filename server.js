@@ -1864,6 +1864,113 @@ app.get('/robots.txt', (req, res) => {
   return res.send(`User-agent: *\nAllow: /\nSitemap: https://www.consultant-studio.app/sitemap.xml\n`);
 });
 
+// ============================================================================
+// OPENCLAW-INSPIRED 1-CLICK NO-SIGN-IN PUBLIC MEMO SHARING (/share/:id)
+// ============================================================================
+const SHARES_DIR = path.join(__dirname, 'shared_memos');
+
+app.post('/api/share', async (req, res) => {
+  try {
+    const title = String(req.body?.title || 'Consultant Studio Financial & Strategy Brief').trim().slice(0, 140);
+    const content = String(req.body?.content || '').trim().slice(0, 45000);
+    const track = String(req.body?.track || 'personal').trim().slice(0, 24);
+    const model = String(req.body?.model || 'Consultant Studio AI').trim().slice(0, 80);
+    if (!content) return res.status(400).json({ error: 'Content is required' });
+
+    await fs.mkdir(SHARES_DIR, { recursive: true });
+    const shareId = crypto.randomBytes(5).toString('hex');
+    const record = {
+      id: shareId,
+      title,
+      content,
+      track: track === 'business' ? 'business' : 'personal',
+      model,
+      createdAt: new Date().toISOString()
+    };
+    await fs.writeFile(path.join(SHARES_DIR, `${shareId}.json`), JSON.stringify(record, null, 2), 'utf-8');
+    return res.json({
+      ok: true,
+      id: shareId,
+      url: `https://www.consultant-studio.app/share/${shareId}`
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/share/:id', async (req, res) => {
+  try {
+    const rawId = String(req.params.id || '').replace(/[^a-f0-9]/gi, '').slice(0, 20);
+    if (!rawId) return res.redirect('/');
+    const filePath = path.join(SHARES_DIR, `${rawId}.json`);
+    const rawJson = await fs.readFile(filePath, 'utf-8').catch(() => null);
+    if (!rawJson) return res.status(404).send('Shared memo not found.');
+    const rec = JSON.parse(rawJson);
+    const safeTitle = rec.title.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    const safeContentJson = JSON.stringify(rec.content);
+    const ctaHref = rec.track === 'business' ? '/?track=business' : '/?track=personal';
+    const ctaText = rec.track === 'business'
+      ? 'Model Your Own Business Breakeven Free →'
+      : 'Calculate Your Personal Cash Runway & Salary Free →';
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${safeTitle} | Consultant Studio Shared Brief</title>
+  <meta name="description" content="Read this shared financial & strategy brief generated on Consultant Studio—no sign-in required.">
+  <meta property="og:title" content="${safeTitle}">
+  <meta property="og:description" content="Shared via Consultant Studio — Private On-Device Financial & Career Decision Engine.">
+  <meta property="og:url" content="https://www.consultant-studio.app/share/${rec.id}">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:28px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:28px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:16px; color:#FFF; text-decoration:none; display:flex; align-items:center; gap:8px; }
+    .badge { font-size:11px; font-weight:800; color:#38BDF8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); padding:3px 10px; border-radius:999px; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:10px 18px; border-radius:9px; text-decoration:none; font-size:13.5px; display:inline-block; }
+    .card { background:#0D121B; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    h1, h2, h3 { font-family:'Plus Jakarta Sans',sans-serif; color:#FFF; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px; }
+    th, td { border:1px solid rgba(255,255,255,0.12); padding:9px 12px; text-align:left; }
+    th { background:#131B2A; color:#4ADE80; }
+    code, pre { background:#06080C; color:#4ADE80; border-radius:6px; padding:2px 6px; font-family:monospace; }
+    pre { padding:14px; overflow-x:auto; border:1px solid rgba(255,255,255,0.08); }
+    .cta-footer { margin-top:30px; background:linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.4); border-radius:14px; padding:24px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/" class="brand">Consultant Studio <span class="badge">🔗 Public Read-Only Link • No Sign-In Required</span></a>
+      <a href="${ctaHref}" class="btn">${ctaText}</a>
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:#94A3B8; margin-bottom:6px; font-family:monospace;">Shared ${rec.createdAt.slice(0, 10)} • Engine: ${rec.model}</div>
+      <h1 style="margin-top:0; font-size:clamp(22px, 3.5vw, 30px); border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">${safeTitle}</h1>
+      <div id="memoBody"></div>
+    </div>
+    <div class="cta-footer">
+      <h2 style="margin-top:0;">Want to Run Your Own Numbers 100% Privately?</h2>
+      <p style="color:#94A3B8; margin-bottom:18px;">Consultant Studio runs client-side in your browser with zero cloud database retention. Model your personal cash runway, post-tax salary floor, or 12-month business breakeven in 60 seconds.</p>
+      <a href="${ctaHref}" class="btn">${ctaText}</a>
+    </div>
+  </div>
+  <script>
+    const raw = ${safeContentJson};
+    document.getElementById('memoBody').innerHTML = window.marked ? marked.parse(raw) : raw.replace(/\\n/g, '<br>');
+  </script>
+</body>
+</html>`);
+  } catch (e) {
+    return res.status(500).send('Could not load shared brief.');
+  }
+});
+
 // START SERVER WITH OPENCLAW ENTERPRISE CRASH RESILIENCE & CLEAN SHUTDOWN
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[Consultant Studio Enterprise Engine running on http://0.0.0.0:${PORT}]`);
