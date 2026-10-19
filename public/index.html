@@ -74,23 +74,26 @@
         }
     </script>
     <style>
-        /* EXECUTIVE DARK OBSIDIAN DESIGN TOKENS & LUXURY BUSINESS HUB STYLING */
+        /* EXECUTIVE EMERALD & GOLD WEALTH DESIGN TOKENS */
         :root {
-            --bg-obsidian-root: #080A0F;
-            --bg-obsidian-surface: #0E131C;
-            --bg-obsidian-elevated: #151C28;
-            --border-obsidian: rgba(255, 255, 255, 0.12);
-            --border-obsidian-hover: rgba(34, 197, 94, 0.45);
+            --bg-obsidian-root: #070A09;
+            --bg-obsidian-surface: #0C1311;
+            --bg-obsidian-elevated: #121D19;
+            --border-obsidian: rgba(245, 158, 11, 0.16);
+            --border-obsidian-hover: rgba(251, 191, 36, 0.55);
             --text-obsidian-primary: #F8FAFC;
-            --text-obsidian-muted: #CBD5E1;
+            --text-obsidian-muted: #E2E8F0;
             --text-obsidian-sub: #94A3B8;
-            --accent-cyan: #38BDF8;
-            --accent-emerald: #22C55E;
-            --accent-glow: #4ADE80;
-            --accent-dim: rgba(34, 197, 94, 0.12);
-            --accent-gradient: linear-gradient(135deg, #22C55E 0%, #10B981 50%, #059669 100%);
-            --luxury-glass: rgba(14, 19, 28, 0.78);
-            --luxury-glass-border: 1px solid rgba(255, 255, 255, 0.12);
+            --accent-cyan: #FBBF24;
+            --accent-gold: #F59E0B;
+            --accent-gold-glow: #FDE68A;
+            --accent-emerald: #10B981;
+            --accent-glow: #34D399;
+            --border-glow: rgba(245, 158, 11, 0.38);
+            --accent-dim: rgba(16, 185, 129, 0.14);
+            --accent-gradient: linear-gradient(135deg, #10B981 0%, #059669 55%, #D97706 100%);
+            --luxury-glass: rgba(12, 19, 17, 0.84);
+            --luxury-glass-border: 1px solid rgba(245, 158, 11, 0.2);
 
             /* MAPPED TOKENS (HIGH ACCESSIBILITY CONTRAST PASS) */
             --bg: var(--bg-obsidian-root);
@@ -147,18 +150,18 @@
             overflow-y: auto;
             background-color: var(--bg-obsidian-root) !important;
             background-image: 
-                radial-gradient(circle at 50% -10%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.04) 0%, transparent 40%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
+                radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.14) 0%, transparent 52%),
+                radial-gradient(circle at 95% 90%, rgba(245, 158, 11, 0.09) 0%, transparent 45%),
+                linear-gradient(180deg, rgba(251, 191, 36, 0.02) 0%, transparent 100%);
         }
 
         /* PREMIUM GLASS HEADER */
         header {
             height: 58px;
-            background: rgba(11, 15, 22, 0.85);
+            background: rgba(8, 13, 11, 0.9);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.22);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -190,13 +193,13 @@
 
         /* LUXURY EXECUTIVE HERO BANNER & MISSION TILES */
         .hero-banner-card {
-            background: linear-gradient(145deg, rgba(14, 19, 28, 0.9) 0%, rgba(9, 12, 18, 0.98) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(145deg, rgba(12, 20, 17, 0.94) 0%, rgba(7, 11, 9, 0.99) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.25);
             border-radius: 20px;
             padding: 26px 28px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(251, 191, 36, 0.16);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
@@ -205,7 +208,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent, #22C55E, #38BDF8, transparent);
+            background: linear-gradient(90deg, transparent, #10B981, #F59E0B, #FDE68A, #10B981, transparent);
         }
 
         .hero-banner-card::after {
@@ -215,7 +218,7 @@
             right: -60px;
             width: 220px;
             height: 220px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 72%);
             pointer-events: none;
             border-radius: 50%;
             animation: meshDrift 16s ease-in-out infinite;
@@ -223,8 +226,8 @@
 
         /* REFINED MISSION TILES */
         .mode-tile {
-            background: rgba(15, 20, 30, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(12, 20, 17, 0.78);
+            border: 1px solid rgba(245, 158, 11, 0.16);
             border-radius: 14px;
             padding: 16px 18px;
             display: flex;
@@ -237,10 +240,10 @@
         }
 
         .mode-tile:hover {
-            border-color: rgba(34, 197, 94, 0.45);
-            background: rgba(20, 28, 42, 0.9);
+            border-color: rgba(251, 191, 36, 0.65);
+            background: rgba(16, 28, 23, 0.95);
             transform: translateY(-3px);
-            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.6), 0 0 24px rgba(34, 197, 94, 0.12);
+            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.65), 0 0 24px rgba(245, 158, 11, 0.16);
         }
 
         .mode-tile::after {
@@ -2292,10 +2295,10 @@
                     </button>
                 </div>
 
-                <!-- TRACK 2: BUSINESS STUDIO (OPERATORS & FOUNDERS) -->
-                <div style="background:linear-gradient(145deg, rgba(56,189,248,0.08) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(56,189,248,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.45);">
+                <!-- TRACK 2: BUSINESS STUDIO (OPERATORS & FOUNDERS — GOLD WEALTH ACCENT) -->
+                <div style="background:linear-gradient(145deg, rgba(245,158,11,0.11) 0%, rgba(12,19,17,0.96) 100%); border:1px solid rgba(245,158,11,0.42); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.5);">
                     <div>
-                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#38BDF8; background:rgba(56,189,248,0.12); padding:3px 9px; border-radius:999px; border:1px solid rgba(56,189,248,0.3);">Operator &amp; Founder Track</span>
+                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#FBBF24; background:rgba(245,158,11,0.15); padding:3px 9px; border-radius:999px; border:1px solid rgba(245,158,11,0.38);">Operator &amp; Founder Track</span>
                         <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; margin:10px 0 6px 0;">🏢 Business Operations Studio</h2>
                         <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin:0 0 12px 0;">Built for small business owners, operators, and founders managing margins, pricing, and commercial P&amp;Ls.</p>
                         <ul style="list-style:none; padding:0; margin:0; font-size:12.5px; color:#CBD5E1; display:flex; flex-direction:column; gap:6px;">
@@ -2305,7 +2308,7 @@
                             <li>✓ Trade Area Foot-Traffic &amp; Competitor Pricing Recon</li>
                         </ul>
                     </div>
-                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('business')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:#38BDF8; color:#04131D; border:none; border-radius:10px; cursor:pointer;">
+                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('business')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:10px; cursor:pointer; box-shadow:0 0 18px rgba(245,158,11,0.3);">
                         Enter Business Studio Track →
                     </button>
                 </div>
@@ -2511,22 +2514,22 @@
                         </div>
                     </div>
 
-                    <!-- WARM OFF-WHITE / HIGH-CONTRAST KPI CARDS FOR CORE FORMULAS -->
+                    <!-- EMERALD & GOLD WEALTH KPI CARDS FOR CORE FORMULAS -->
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:14px;">
-                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
-                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Net Monthly Burn</div>
-                            <div id="prNetBurnOut" style="font-size:21px; font-weight:800; color:#0F172A; font-family:monospace; margin:4px 0;">$2,200/mo</div>
-                            <div style="font-size:11px; color:#64748B;">=(Essential + Discretionary) - Inflow</div>
+                        <div style="background:linear-gradient(145deg, #0D1714 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(245,158,11,0.32); border-radius:12px; padding:14px 16px; box-shadow:inset 0 1px 0 rgba(251,191,36,0.12);">
+                            <div style="font-size:11px; font-weight:800; color:#FBBF24; text-transform:uppercase; letter-spacing:0.05em;">Net Monthly Burn</div>
+                            <div id="prNetBurnOut" style="font-size:22px; font-weight:800; color:#FFFFFF; font-family:monospace; margin:4px 0;">$2,200/mo</div>
+                            <div style="font-size:11px; color:#94A3B8;">=(Essential + Discretionary) - Inflow</div>
                         </div>
-                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
-                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Financial Life Expectancy</div>
-                            <div id="prRunwayOut" style="font-size:21px; font-weight:800; color:#059669; font-family:monospace; margin:4px 0;">8.2 mos (249 days)</div>
-                            <div id="prDepletionDateOut" style="font-size:11px; color:#64748B;">=Liquid Reserves / Net Monthly Burn</div>
+                        <div style="background:linear-gradient(145deg, rgba(16,185,129,0.16) 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(16,185,129,0.45); border-radius:12px; padding:14px 16px; box-shadow:0 0 22px rgba(16,185,129,0.12);">
+                            <div style="font-size:11px; font-weight:800; color:#34D399; text-transform:uppercase; letter-spacing:0.05em;">Financial Life Expectancy</div>
+                            <div id="prRunwayOut" style="font-size:22px; font-weight:800; color:#4ADE80; font-family:monospace; margin:4px 0;">8.2 mos (249 days)</div>
+                            <div id="prDepletionDateOut" style="font-size:11px; color:#A7F3D0;">=Liquid Reserves / Net Monthly Burn</div>
                         </div>
-                        <div style="background:#F8FAFC; color:#0F172A; border:1px solid #E2E8F0; border-radius:10px; padding:13px 14px;">
-                            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em;">Minimum Target Salary</div>
-                            <div id="prTargetSalaryOut" style="font-size:21px; font-weight:800; color:#0F172A; font-family:monospace; margin:4px 0;">$44,615/yr</div>
-                            <div id="prDayRateOut" style="font-size:11px; color:#059669; font-weight:700;">~$21.45/hr • $186/day consulting floor</div>
+                        <div style="background:linear-gradient(145deg, rgba(245,158,11,0.16) 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(245,158,11,0.45); border-radius:12px; padding:14px 16px; box-shadow:0 0 22px rgba(245,158,11,0.12);">
+                            <div style="font-size:11px; font-weight:800; color:#FBBF24; text-transform:uppercase; letter-spacing:0.05em;">Minimum Target Salary</div>
+                            <div id="prTargetSalaryOut" style="font-size:22px; font-weight:800; color:#FDE68A; font-family:monospace; margin:4px 0;">$44,615/yr</div>
+                            <div id="prDayRateOut" style="font-size:11px; color:#4ADE80; font-weight:700;">~$21.45/hr • $186/day consulting floor</div>
                         </div>
                     </div>
 
@@ -2553,9 +2556,9 @@
                             </button>
                         </div>
                         <!-- WEEK 3 CONTEXTUAL AI CHAT ACTIVATION PROMPT (CAREER TRACK) -->
-                        <div style="margin-top:10px; background:linear-gradient(90deg, rgba(16,185,129,0.12) 0%, rgba(56,189,248,0.12) 100%); border:1px dashed rgba(56,189,248,0.45); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                            <span style="font-size:11.5px; color:#E2E8F0;">💡 <strong>Want a custom 90-day solvency &amp; salary negotiation script?</strong> Send your exact calculator numbers to the AI Strategist in one tap.</span>
-                            <button type="button" class="btn-export" style="padding:5px 11px; font-size:11px; background:#38BDF8; color:#04131D; font-weight:800; border:none;" onclick="logConversionEvent('ai_chat_push', {source:'personal_runway'}); benchmarkTargetSalary();">
+                        <div style="margin-top:10px; background:linear-gradient(90deg, rgba(16,185,129,0.14) 0%, rgba(245,158,11,0.14) 100%); border:1px dashed rgba(245,158,11,0.55); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <span style="font-size:11.5px; color:#FEF3C7;">💡 <strong>Want a custom 90-day wealth &amp; salary negotiation script?</strong> Send your exact calculator numbers to the AI Strategist in one tap.</span>
+                            <button type="button" class="btn-export" style="padding:5px 11px; font-size:11px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; font-weight:800; border:none;" onclick="logConversionEvent('ai_chat_push', {source:'personal_runway'}); benchmarkTargetSalary();">
                                 Stress-Test My Numbers in AI Chat ↗
                             </button>
                         </div>
@@ -5650,23 +5653,23 @@
             if (burnEl) {
                 if (netBurn > 0) {
                     burnEl.innerText = `$${Math.round(netBurn).toLocaleString()}/mo`;
-                    burnEl.style.color = '#0F172A';
+                    burnEl.style.color = '#FFFFFF';
                 } else {
                     burnEl.innerText = `+$${Math.round(Math.abs(netBurn)).toLocaleString()}/mo Surplus`;
-                    burnEl.style.color = '#059669';
+                    burnEl.style.color = '#4ADE80';
                 }
             }
 
             if (runwayEl && depEl) {
                 if (netBurn <= 0) {
                     runwayEl.innerText = 'Infinite (Cash-Flow +)';
-                    runwayEl.style.color = '#059669';
+                    runwayEl.style.color = '#4ADE80';
                     depEl.innerText = 'Inflow covers 100% of monthly living costs';
                 } else {
                     const depDate = new Date(Date.now() + runwayDays * 86400000);
                     const depStr = depDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     runwayEl.innerText = `${runwayMonths.toFixed(1)} mos (${runwayDays} days)`;
-                    runwayEl.style.color = runwayMonths >= 6 ? '#059669' : (runwayMonths >= 3 ? '#D97706' : '#DC2626');
+                    runwayEl.style.color = runwayMonths >= 6 ? '#4ADE80' : (runwayMonths >= 3 ? '#FBBF24' : '#F87171');
                     depEl.innerText = `Est. depletion date: ${depStr}`;
                 }
             }
