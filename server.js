@@ -1588,6 +1588,282 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// ============================================================================
+// OKARA MARKETING STRATEGY ENGINE: TELEMETRY, SEO SITEMAP & CALCULATOR GUIDES
+// ============================================================================
+const TELEMETRY_LOG_FILE = path.join(__dirname, 'telemetry_events.jsonl');
+
+app.post('/api/telemetry/event', async (req, res) => {
+  try {
+    const evt = {
+      ts: new Date().toISOString(),
+      event: String(req.body?.event || 'page_view').slice(0, 64),
+      variant: String(req.body?.variant || 'A').slice(0, 8),
+      track: String(req.body?.track || '').slice(0, 32),
+      meta: req.body?.meta && typeof req.body.meta === 'object' ? req.body.meta : {}
+    };
+    await fs.appendFile(TELEMETRY_LOG_FILE, JSON.stringify(evt) + '\n', 'utf-8').catch(() => {});
+    return res.json({ ok: true });
+  } catch (e) {
+    return res.json({ ok: false });
+  }
+});
+
+app.get('/api/telemetry/summary', async (req, res) => {
+  try {
+    const raw = await fs.readFile(TELEMETRY_LOG_FILE, 'utf-8').catch(() => '');
+    const lines = raw.split('\n').filter(Boolean);
+    const stats = {
+      totalEvents: lines.length,
+      byVariant: {
+        A: { views: 0, trial_start: 0, track_select: 0, calculator_interaction: 0, ai_chat_push: 0 },
+        B: { views: 0, trial_start: 0, track_select: 0, calculator_interaction: 0, ai_chat_push: 0 }
+      },
+      byTrack: { personal: 0, business: 0 }
+    };
+    for (const l of lines) {
+      try {
+        const row = JSON.parse(l);
+        const v = row.variant === 'B' ? 'B' : 'A';
+        if (row.event === 'hero_impression') stats.byVariant[v].views++;
+        if (stats.byVariant[v][row.event] !== undefined) stats.byVariant[v][row.event]++;
+        if (row.track === 'personal' || row.track === 'business') stats.byTrack[row.track]++;
+      } catch (e) {}
+    }
+    return res.json(stats);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+const SEO_GUIDES = {
+  'cash-runway-calculator': {
+    slug: 'cash-runway-calculator',
+    title: 'Cash Runway Calculator: How Long Will My Savings Last Before I Quit or Pivot?',
+    metaDesc: 'Calculate your exact personal cash runway in months and days, model your depletion date, and build a 3-to-6 month solvency buffer with 100% client-side privacy.',
+    track: 'personal',
+    tag: 'Career Transitioner • Consumer Track',
+    ctaLabel: 'Launch Free Cash Runway Calculator →',
+    ctaUrl: '/?track=personal&focus=runway',
+    summary: 'Know your exact solvency timeline in minutes before giving notice, taking a career break, or relocating.',
+    bodyHtml: `
+      <h2>Why "Rough Mental Math" Fails During a Career Transition</h2>
+      <p>When you are considering leaving a job, pivoting into a new industry, or navigating a layoff, dividing your bank balance by your rent gives a dangerously false sense of security. True personal cash runway depends on four variables working together:</p>
+      <ul>
+        <li><strong>Liquid Reserves ($):</strong> Cash in checking, high-yield savings, and money market accounts you can access without early-withdrawal penalties.</li>
+        <li><strong>Essential Fixed Burn ($/mo):</strong> Rent/mortgage, utilities, insurance, minimum debt payments, and baseline groceries.</li>
+        <li><strong>Discretionary Flex Burn ($/mo):</strong> Subscriptions, dining out, and non-essential spending that can be cut immediately in "Bridge Mode."</li>
+        <li><strong>Bridge / Side Income ($/mo):</strong> Part-time consulting, route/delivery income, severance, or unemployment inflows that offset monthly burn.</li>
+      </ul>
+      <h2>The Exact Cash Runway Formula</h2>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#4ADE80; overflow-x:auto;">Net Monthly Burn = (Essential Fixed Costs + Discretionary Spend) - Monthly Bridge Income
+Runway (Months)  = Liquid Reserves / Net Monthly Burn
+Runway (Days)    = Runway (Months) × 30.44</pre>
+      <h2>Example: Extending a 4.5-Month Runway to 11.2 Months</h2>
+      <p>Suppose you have <strong>$18,000</strong> in liquid savings, <strong>$2,400/mo</strong> in essential bills, and <strong>$600/mo</strong> in discretionary spending ($3,000/mo total burn). With zero inflows, your money runs out in exactly <strong>6.0 months (182 days)</strong>.</p>
+      <p>If you trim $300/mo of discretionary bloat and add just <strong>$1,100/mo</strong> in bridge income (or apply the <em>Monday Sweep</em> rule—30% tax/maintenance reserve, 20% runway savings), your net burn drops to <strong>$1,600/mo</strong>, stretching your solvency timeline to <strong>11.25 months (342 days)</strong>—giving you nearly a full year to land the right role without desperation.</p>
+      <h2>Why Privacy Matters When Modeling Your Net Worth</h2>
+      <p>Most online budget tools require linking your bank credentials via Plaid or storing your personal balance sheet in a third-party cloud. <strong>Consultant Studio runs 100% client-side in your browser</strong>—your savings, burn rate, and depletion date never leave your device.</p>
+    `
+  },
+  'minimum-salary-calculator-after-taxes': {
+    slug: 'minimum-salary-calculator-after-taxes',
+    title: 'Minimum Salary Calculator After Taxes: Never Undersell Yourself on a Job Offer',
+    metaDesc: 'Calculate your exact post-tax minimum target salary, hourly floor, and consulting day-rate needed to cover living costs and hit your annual savings goal.',
+    track: 'personal',
+    ctaLabel: 'Calculate My Post-Tax Minimum Salary →',
+    ctaUrl: '/?track=personal&focus=salary',
+    tag: 'Job Seeker • Offer Negotiation',
+    summary: 'Reverse-engineer the exact pre-tax base salary and hourly rate required to fund your lifestyle, savings target, and taxes.',
+    bodyHtml: `
+      <h2>The Most Common Job-Offer Mistake: Accepting a Gross Number That Fails Your Net Budget</h2>
+      <p>When a recruiter asks <em>"What are your salary expectations?"</em>, guessing a round number like $55,000 or $65,000 without running your post-tax reverse math is the fastest way to lock yourself into a paycheck-to-paycheck trap.</p>
+      <h2>How to Reverse-Engineer Your Minimum Target Salary</h2>
+      <p>Instead of starting with gross salary and subtracting taxes, start with your <strong>Required Annual Net Take-Home</strong> and divide by your after-tax retention ratio:</p>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#4ADE80; overflow-x:auto;">Annual Net Required = (Monthly Essential + Discretionary Costs × 12) + Annual Savings Goal
+Minimum Gross Salary = Annual Net Required / (1 - Effective Tax Rate)</pre>
+      <h2>Worked Benchmark Example (22% Effective Tax + $6,000/yr Savings Goal)</h2>
+      <ul>
+        <li><strong>Monthly Living Costs:</strong> $2,400 essential + $600 discretionary = $3,000/mo ($36,000/yr net)</li>
+        <li><strong>Annual Runway Savings Target:</strong> $6,000/yr ($500/mo)</li>
+        <li><strong>Total Net Cash Needed:</strong> $42,000/yr after taxes</li>
+        <li><strong>At a 22% Effective Tax Rate:</strong> $42,000 ÷ (1 - 0.22) = <strong>$53,846/yr Minimum Gross Salary Floor</strong> (~$25.89/hr or $224/day consulting equivalent).</li>
+      </ul>
+      <p>Inside Consultant Studio's <strong>Personal Runway Track</strong>, you can type any competing job offer (e.g. $58,000 vs. $64,000) into the live benchmark box to see your exact annual surplus/deficit—and click one button to generate a word-for-word salary negotiation script.</p>
+    `
+  },
+  'small-business-breakeven-calculator-free': {
+    slug: 'small-business-breakeven-calculator-free',
+    title: 'Small Business Breakeven Calculator & 12-Month EBITDA Model (Free, On-Device)',
+    metaDesc: 'Model your small business breakeven point, COGS margin, labor efficiency, and 12-month EBITDA runway before signing a commercial lease or hiring.',
+    track: 'business',
+    ctaLabel: 'Open Free Business Breakeven Studio →',
+    ctaUrl: '/?track=business&focus=breakeven',
+    tag: 'Solo Operator & Founder Track',
+    summary: 'Model your commercial breakeven before it breaks you—with interactive COGS, rent, and labor sliders.',
+    bodyHtml: `
+      <h2>Why Solo Operators Need Unit-Economics Clarity Before Signing a Lease</h2>
+      <p>For a 1–10 person restaurant, retail storefront, service company, or agency doing $0–$2M in revenue, you don't need a $300/month corporate FP&A suite—you need to know the exact monthly revenue required so a slow Tuesday doesn't wipe out your operating account.</p>
+      <h2>The Commercial Breakeven & Prime Cost Formula</h2>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#38BDF8; overflow-x:auto;">Contribution Margin Ratio = 1 - (COGS % + Variable Labor %)
+Monthly Breakeven Revenue = Fixed Monthly Overhead (Rent + Insurance + Base OpEx) / Contribution Margin Ratio</pre>
+      <h2>Stress-Testing Prime Cost (COGS + Labor) Across 12 Months</h2>
+      <p>In hospitality and retail operations, <strong>Prime Cost (COGS + Labor)</strong> must stay below <strong>60%–65%</strong> of gross revenue:</p>
+      <ul>
+        <li>If your fixed overhead is <strong>$8,500/mo</strong>, COGS is <strong>32%</strong>, and variable labor is <strong>28%</strong>, your Contribution Margin is <strong>40%</strong>.</li>
+        <li>Your monthly breakeven floor is <strong>$8,500 ÷ 0.40 = $21,250/mo</strong>.</li>
+        <li>Shaving just <strong>3% off COGS waste</strong> (from 32% to 29%) drops your breakeven floor to <strong>$19,767/mo</strong>—saving $17,796/yr in required top-line sales!</li>
+      </ul>
+      <p>Use Consultant Studio's <strong>Business Operations Studio</strong> to drag live Revenue, COGS %, Fixed OpEx, and Labor % sliders across a 12-month EBITDA table and export a formula-driven <code>.xlsx</code> workbook in one click.</p>
+    `
+  },
+  'how-to-compare-job-offers': {
+    slug: 'how-to-compare-job-offers',
+    title: 'How to Compare Job Offers: Base Salary, Post-Tax Take-Home, Commute & Runway Impact',
+    metaDesc: 'Compare two job offers side-by-side by calculating true net monthly cash flow, commute fuel/time costs, rent affordability, and career trajectory.',
+    track: 'personal',
+    ctaLabel: 'Compare My Job Offers in Consultant Studio →',
+    ctaUrl: '/?track=personal&focus=compare',
+    tag: 'Career Strategy • Decision Matrix',
+    summary: 'Look past the headline salary: compare net take-home pay, commute unit economics, and 12-month wealth velocity.',
+    bodyHtml: `
+      <h2>Why a Higher Base Salary Can Actually Leave You With Less Money</h2>
+      <p>Comparing Offer A ($62,000 in a high-rent metro with a 45-minute commute) against Offer B ($56,000 remote or local with a 10-minute commute) requires looking at <strong>Net Investable Surplus</strong>—not headline gross pay.</p>
+      <h2>The 4-Pillar Job Offer Comparison Checklist</h2>
+      <ol>
+        <li><strong>Post-Tax Monthly Take-Home:</strong> Account for state income tax differences (e.g., 0% state income tax in Florida/Texas vs. 6%–10% elsewhere).</li>
+        <li><strong>Commute & Vehicle Depreciation Math:</strong> A 40-mile round-trip commute (200 miles/week) costs <strong>$140/week ($7,280/yr)</strong> at the IRS $0.70/mile standard rate, plus 200+ hours of unpaid windshield time.</li>
+        <li><strong>30% Rent-to-Net-Income Ratio:</strong> Keep base rent at or below 30% of your net take-home pay so you can maintain at least a 20% savings rate.</li>
+        <li><strong>12-Month Resume & Skill Compounding:</strong> Does the role build verifiable proof points in Supply Chain, Operations, Pricing, or AI Analytics?</li>
+      </ol>
+      <p>In Consultant Studio, you can upload both offer letters (or job descriptions) + your resume and run <strong>🔬 Harness² (MiniMax/DeepSeek + Gemini Compose)</strong> to get a side-by-side mathematical P&L audit and career positioning verdict in 10 seconds.</p>
+    `
+  }
+};
+
+function renderGuidesHtml(activeGuide) {
+  const allList = Object.values(SEO_GUIDES);
+  if (!activeGuide) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial & Career Decision Guides | Consultant Studio</title>
+  <meta name="description" content="Free practical guides and on-device calculators for personal cash runway, post-tax minimum salary, job offer comparison, and small business breakeven modeling.">
+  <link rel="canonical" href="https://www.consultant-studio.app/guides">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.65; }
+    .wrap { max-width:920px; margin:0 auto; padding:32px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:36px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:17px; color:#FFF; text-decoration:none; display:flex; align-items:center; gap:10px; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:9px 16px; border-radius:8px; text-decoration:none; font-size:13px; display:inline-block; }
+    .card { background:#0E131D; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; margin-bottom:18px; transition:border-color 0.2s; }
+    .card:hover { border-color:#4ADE80; }
+    .tag { font-size:11px; font-weight:800; text-transform:uppercase; color:#4ADE80; background:rgba(34,197,94,0.12); padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px; }
+    h1 { font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(26px,4vw,36px); margin:0 0 12px 0; }
+    h2 { font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; margin:0 0 8px 0; }
+    h2 a { color:#FFF; text-decoration:none; }
+    p { color:#94A3B8; margin:0 0 14px 0; font-size:14.5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/" class="brand">Consultant Studio <span style="font-size:11px; color:#4ADE80; font-weight:700;">• Decision Guides</span></a>
+      <a href="/" class="btn">Launch Calculators Free →</a>
+    </div>
+    <h1>Private Financial &amp; Career Decision Guides</h1>
+    <p style="margin-bottom:28px;">Actionable math, unit economics templates, and interactive calculators—processed 100% client-side in your browser with zero cloud exposure.</p>
+    ${allList.map(g => `
+      <div class="card">
+        <span class="tag">${g.tag}</span>
+        <h2><a href="/guides/${g.slug}">${g.title}</a></h2>
+        <p>${g.summary}</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/guides/${g.slug}" style="color:#38BDF8; font-weight:700; font-size:13px; text-decoration:none;">Read Full Guide &amp; Formula →</a>
+          <a href="${g.ctaUrl}" style="color:#4ADE80; font-weight:700; font-size:13px; text-decoration:none;">${g.ctaLabel}</a>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+</body>
+</html>`;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${activeGuide.title} | Consultant Studio</title>
+  <meta name="description" content="${activeGuide.metaDesc}">
+  <link rel="canonical" href="https://www.consultant-studio.app/guides/${activeGuide.slug}">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.7; }
+    .wrap { max-width:820px; margin:0 auto; padding:32px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:32px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:16px; color:#FFF; text-decoration:none; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:11px 20px; border-radius:9px; text-decoration:none; font-size:14px; display:inline-block; }
+    .tag { font-size:11px; font-weight:800; text-transform:uppercase; color:#4ADE80; background:rgba(34,197,94,0.12); padding:4px 10px; border-radius:999px; display:inline-block; margin-bottom:12px; }
+    h1 { font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(24px,4vw,34px); line-height:1.22; margin:0 0 14px 0; }
+    h2 { font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; color:#FFF; margin:28px 0 10px 0; }
+    p, li { color:#CBD5E1; font-size:15px; }
+    .cta-box { margin:32px 0; background:linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.4); border-radius:14px; padding:24px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/guides" class="brand">← All Decision Guides</a>
+      <a href="${activeGuide.ctaUrl}" class="btn">${activeGuide.ctaLabel}</a>
+    </div>
+    <span class="tag">${activeGuide.tag}</span>
+    <h1>${activeGuide.title}</h1>
+    <p style="font-size:16.5px; color:#94A3B8; margin-bottom:24px;">${activeGuide.summary}</p>
+    ${activeGuide.bodyHtml}
+    <div class="cta-box">
+      <h2 style="margin-top:0;">Run Your Numbers 100% Privately in Your Browser</h2>
+      <p style="color:#94A3B8; margin-bottom:16px;">Zero cloud database retention. No bank login required. Instant visual solvency timeline, EBITDA sliders, and AI strategy audit.</p>
+      <a href="${activeGuide.ctaUrl}" class="btn">${activeGuide.ctaLabel}</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+app.get('/guides', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(renderGuidesHtml(null));
+});
+
+app.get('/guides/:slug', (req, res) => {
+  const g = SEO_GUIDES[req.params.slug];
+  if (!g) return res.redirect('/guides');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(renderGuidesHtml(g));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const urls = [
+    'https://www.consultant-studio.app/',
+    'https://www.consultant-studio.app/guides',
+    ...Object.keys(SEO_GUIDES).map(s => `https://www.consultant-studio.app/guides/${s}`)
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map(u => `  <url><loc>${u}</loc><changefreq>weekly</changefreq><priority>${u.endsWith('/') ? '1.0' : '0.8'}</priority></url>`).join('\n') +
+    `\n</urlset>`;
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  return res.send(xml);
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  return res.send(`User-agent: *\nAllow: /\nSitemap: https://www.consultant-studio.app/sitemap.xml\n`);
+});
+
 // START SERVER WITH OPENCLAW ENTERPRISE CRASH RESILIENCE & CLEAN SHUTDOWN
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[Consultant Studio Enterprise Engine running on http://0.0.0.0:${PORT}]`);

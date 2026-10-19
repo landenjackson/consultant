@@ -2261,10 +2261,10 @@
                 <span style="font-size:11px; font-weight:700; color:var(--accent-glow); letter-spacing:0.03em;">PRIVATE ON-DEVICE FINANCIAL & CAREER DECISION ENGINE</span>
             </div>
 
-            <h1 style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:800px;">Make Real-World Life, Career &amp; Money Decisions with Confidence</h1>
+            <h1 id="landingHeroHeadline" style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:820px;">Know exactly how long your money lasts — before you quit, pivot, or sign.</h1>
 
-            <p style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.6; max-width:680px; margin-bottom:28px;">
-                Choose your dedicated workspace track below so you only see the tools, calculators, and AI workflows built for your exact goal—processed 100% locally in your browser.
+            <p id="landingHeroSubheadline" style="font-size:clamp(14px, 2vw, 16px); color:var(--text-secondary); line-height:1.6; max-width:720px; margin-bottom:28px;">
+                The private, on-device financial decision engine that delivers CFO-level modeling without cloud exposure, subscription bloat, or corporate complexity.
             </p>
 
             <!-- AUDIENCE SEGMENTATION & ONBOARDING FORK (DECOUPLED TRACKS) -->
@@ -2326,6 +2326,7 @@
             <div style="width:100%; border-top:1px solid rgba(255,255,255,0.08); padding-top:20px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:12px; color:var(--text-muted);">
                 <span>🔒 100% Client-Side Local Storage • Zero Cloud Database Retention</span>
                 <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <a href="/guides" style="color:#4ADE80; font-weight:700; font-size:12px; text-decoration:underline;">📚 Free Runway &amp; Breakeven Guides</a>
                     <button type="button" onclick="openLegalModal('privacy')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Privacy Policy</button>
                     <button type="button" onclick="openLegalModal('terms')" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Terms of Service</button>
                     <button type="button" onclick="openSpecsModal()" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:12px; padding:0; text-decoration:underline;">Security Whitepaper</button>
@@ -2547,6 +2548,13 @@
                             </div>
                             <button type="button" class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="benchmarkTargetSalary()">
                                 Analyze My Runway & Salary in Chat →
+                            </button>
+                        </div>
+                        <!-- WEEK 3 CONTEXTUAL AI CHAT ACTIVATION PROMPT (CAREER TRACK) -->
+                        <div style="margin-top:10px; background:linear-gradient(90deg, rgba(16,185,129,0.12) 0%, rgba(56,189,248,0.12) 100%); border:1px dashed rgba(56,189,248,0.45); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <span style="font-size:11.5px; color:#E2E8F0;">💡 <strong>Want a custom 90-day solvency &amp; salary negotiation script?</strong> Send your exact calculator numbers to the AI Strategist in one tap.</span>
+                            <button type="button" class="btn-export" style="padding:5px 11px; font-size:11px; background:#38BDF8; color:#04131D; font-weight:800; border:none;" onclick="logConversionEvent('ai_chat_push', {source:'personal_runway'}); benchmarkTargetSalary();">
+                                Stress-Test My Numbers in AI Chat ↗
                             </button>
                         </div>
                     </div>
@@ -2792,8 +2800,15 @@
                                 📥 Export Active Model (.xlsx)
                             </button>
                         </div>
-                        <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="sendQuick('Run a live 90-day turnaround audit with forensic P&L unit economics, interactive pivot chart, and executive talking tracks.')">
+                        <button class="btn-export" style="background:var(--accent); color:#000; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="pushBreakevenToAiChat()">
                             Test Live Audit Now →
+                        </button>
+                    </div>
+                    <!-- WEEK 3 CONTEXTUAL AI CHAT ACTIVATION PROMPT (OPERATOR TRACK) -->
+                    <div style="margin-top:10px; background:linear-gradient(90deg, rgba(56,189,248,0.12) 0%, rgba(16,185,129,0.12) 100%); border:1px dashed rgba(56,189,248,0.45); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:11.5px; color:#E2E8F0;">💡 <strong>Not sure if your margins survive a slow month?</strong> Push your live COGS, Fixed OpEx, and Labor sliders into AI Chat for a 90-day margin turnaround plan.</span>
+                        <button type="button" class="btn-export" style="padding:5px 11px; font-size:11px; background:#38BDF8; color:#04131D; font-weight:800; border:none;" onclick="pushBreakevenToAiChat()">
+                            Stress-Test Breakeven in AI Chat ↗
                         </button>
                     </div>
                     </div> <!-- /beStudioCollapsibleContent -->
@@ -4412,6 +4427,7 @@
             if (portal) portal.style.display = 'none';
             localStorage.setItem('consultant_user_authenticated', 'true');
             localStorage.setItem('cs_workspace', trackMode);
+            logConversionEvent('track_select', { track: trackMode });
             if (typeof switchConsultantMode === 'function') {
                 switchConsultantMode(trackMode);
             }
@@ -4513,6 +4529,7 @@
             const portal = document.getElementById('landingPortal');
             if (portal) portal.style.display = 'none';
             localStorage.setItem('consultant_user_authenticated', 'true');
+            logConversionEvent('trial_start', { source: 'landing_cta' });
             setTimeout(() => {
                 openPricing();
                 showToast("Choose your plan to start your 30-day free trial ($0 today)!", "💎");
@@ -8136,7 +8153,73 @@
             if (typeof recalcBreakevenStudio === 'function') {
                 recalcBreakevenStudio();
             }
+            initOkaraMarketingEngine();
         });
+
+        // OKARA MARKETING STRATEGY ENGINE: A/B HERO HEADLINE TEST, CONVERSION TELEMETRY & CONTEXTUAL AI PUSH
+        window._heroHeadlineVariant = localStorage.getItem('cs_hero_ab_variant') || (Math.random() < 0.5 ? 'A' : 'B');
+        localStorage.setItem('cs_hero_ab_variant', window._heroHeadlineVariant);
+
+        function logConversionEvent(eventName, extraMeta = {}) {
+            try {
+                const track = extraMeta.track || localStorage.getItem('cs_workspace') || 'personal';
+                fetch('/api/telemetry/event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: eventName,
+                        variant: window._heroHeadlineVariant || 'A',
+                        track,
+                        meta: extraMeta
+                    })
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
+        function initOkaraMarketingEngine() {
+            try {
+                // 1. Apply 50/50 A/B Headline from Okara Marketing Strategy
+                const h1 = document.getElementById('landingHeroHeadline');
+                if (h1) {
+                    if (window._heroHeadlineVariant === 'B') {
+                        h1.innerText = 'The private financial calculator your accountant wishes you had.';
+                    } else {
+                        h1.innerText = 'Know exactly how long your money lasts — before you quit, pivot, or sign.';
+                    }
+                }
+                logConversionEvent('hero_impression');
+
+                // 2. Support Deep Links from SEO Guides (/?track=personal&focus=runway or /?track=business&focus=breakeven)
+                const params = new URLSearchParams(window.location.search);
+                const linkTrack = params.get('track');
+                if (linkTrack === 'personal' || linkTrack === 'business') {
+                    enterDedicatedTrack(linkTrack);
+                }
+
+                // 3. Seed Okara 30-Day Marketing Execution Kit into Strategy Vault once
+                if (!localStorage.getItem('cs_okara_marketing_kit_seeded_v1')) {
+                    const vault = JSON.parse(localStorage.getItem('consultant_vault') || '[]');
+                    vault.unshift({
+                        id: 'okara-marketing-kit-v1',
+                        title: '🚀 Okara 30-Day Marketing Execution Kit (SEO, Reddit, Short-Form & 5-Email Sequences)',
+                        category: 'strategy',
+                        date: new Date().toLocaleDateString(),
+                        content: `# Consultant Studio — 30-Day Marketing Execution Kit\n\n## 1. Live SEO Guides & Sitemap (Active on Domain)\n- **Guide Hub**: https://www.consultant-studio.app/guides\n- **Rank #1 (Runway)**: https://www.consultant-studio.app/guides/cash-runway-calculator\n- **Rank #2 (Post-Tax Salary)**: https://www.consultant-studio.app/guides/minimum-salary-calculator-after-taxes\n- **Rank #3 (Business Breakeven)**: https://www.consultant-studio.app/guides/small-business-breakeven-calculator-free\n- **Rank #4 (Job Offer Comparison)**: https://www.consultant-studio.app/guides/how-to-compare-job-offers\n- **Sitemap**: https://www.consultant-studio.app/sitemap.xml\n\n## 2. Three 45-Second Short-Form Video Scripts (TikTok / Reels / Shorts)\n- **Video 1 ("Watch me calculate my real job offer minimum")**: Show $2,400 essential + $600 flex + $500/mo savings target at 22% tax -> $53,846/yr minimum gross floor. Compare a $58k offer (+$4,154 surplus) and click "Stress-Test in AI Chat".\n- **Video 2 ("How long will $18,000 actually last if I quit today?")**: Show the 12-month visual solvency strip turning red at Month 6, then add $800/mo bridge income to stretch solvency to 8.2 months (249 days).\n- **Video 3 ("Can my small business survive a slow month?")**: Drag COGS from 32% down to 29% on the 12-month EBITDA matrix and show how a 3% food/inventory waste cut lowers monthly breakeven by $1,480/mo.\n\n## 3. Dual-Track 5-Email Onboarding Sequence\n- **Career Track (Days 0, 2, 4, 7, 12)**: (1) Your Exact Solvency Date, (2) The Post-Tax Salary Trap, (3) How to Compare Two Offers Beyond Base Pay, (4) The Monday Sweep Bridge Strategy, (5) 1-Click ATS Resume & Live Voice Interview Prep.\n- **Operator Track (Days 0, 2, 4, 7, 12)**: (1) Your Monthly Breakeven Floor, (2) Prime Cost (COGS + Labor) Under 60%, (3) Stress-Testing a Slow Month Before Signing a Lease, (4) Running a Harness² Dual-Model P&L Audit, (5) Exporting Your 12-Month Board Workbook (.xlsx).`
+                    });
+                    localStorage.setItem('consultant_vault', JSON.stringify(vault.slice(0, 50)));
+                    localStorage.setItem('cs_okara_marketing_kit_seeded_v1', 'true');
+                }
+            } catch (e) {}
+        }
+
+        function pushBreakevenToAiChat() {
+            const rev = document.getElementById('beRevenueSlider')?.value || 28000;
+            const cogs = document.getElementById('beCogsSlider')?.value || 32;
+            const opex = document.getElementById('beOpexSlider')?.value || 8500;
+            const labor = document.getElementById('beLaborSlider')?.value || 28;
+            logConversionEvent('ai_chat_push', { source: 'business_breakeven', rev, cogs, opex, labor });
+            sendQuick(`Business Breakeven & 12-Month EBITDA Stress Test: My projected monthly revenue is $${Number(rev).toLocaleString()}/mo with ${cogs}% COGS, $${Number(opex).toLocaleString()}/mo fixed overhead, and ${labor}% variable labor. Calculate my exact monthly breakeven floor, Prime Cost %, safety buffer for a 20% slow-month revenue dip, and a 90-day margin improvement plan.`);
+        }
 
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-19-minimax-m31-space-bunny-v25';
+const CACHE_NAME = 'consultant-studio-v2026-10-19-okara-marketing-seo-v26';
 const ASSETS = [
   '/',
   '/index.html',
