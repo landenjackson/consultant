@@ -1752,6 +1752,11 @@ function renderGuidesHtml(activeGuide) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financial & Career Decision Guides | Consultant Studio</title>
   <meta name="description" content="Free practical guides and on-device calculators for personal cash runway, post-tax minimum salary, job offer comparison, and small business breakeven modeling.">
+  <meta property="og:title" content="Financial & Career Decision Guides | Consultant Studio">
+  <meta property="og:description" content="100% On-Device Financial Decision Engine • Zero Cloud Retention.">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
   <link rel="canonical" href="https://www.consultant-studio.app/guides">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -1800,6 +1805,11 @@ function renderGuidesHtml(activeGuide) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${activeGuide.title} | Consultant Studio</title>
   <meta name="description" content="${activeGuide.metaDesc}">
+  <meta property="og:title" content="${activeGuide.title} | Consultant Studio">
+  <meta property="og:description" content="${activeGuide.metaDesc}">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
   <link rel="canonical" href="https://www.consultant-studio.app/guides/${activeGuide.slug}">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -1866,6 +1876,138 @@ app.get('/robots.txt', (req, res) => {
 });
 
 // ============================================================================
+// SUNRA ZERO-COPY PHONE OAUTH DIRECT REDIRECT (/sunra-start -> /sunra-callback)
+// ============================================================================
+const SUNRA_PKCE_FILE = '/home/jacks/.hermes/cache/scratch/sunra_phone_oauth.json';
+
+app.get('/sunra-start', async (req, res) => {
+  try {
+    const verifier = crypto.randomBytes(32).toString('base64url');
+    const challenge = crypto.createHash('sha256').update(verifier).digest('base64url');
+    const state = crypto.randomBytes(24).toString('base64url');
+    const redirectUri = 'https://www.consultant-studio.app/sunra-callback';
+
+    const regRes = await fetch('https://mcp.sunra.ai/oauth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_name: 'Sunra for your agent',
+        redirect_uris: [redirectUri],
+        grant_types: ['authorization_code', 'refresh_token'],
+        response_types: ['code'],
+        token_endpoint_auth_method: 'none'
+      })
+    });
+    const regData = await regRes.json();
+    const clientId = regData.client_id;
+
+    await fs.writeFile(SUNRA_PKCE_FILE, JSON.stringify({
+      clientId,
+      verifier,
+      state,
+      redirectUri,
+      createdAt: Date.now()
+    }, null, 2), 'utf-8');
+
+    const authUrl = new URL('https://mcp.sunra.ai/oauth/authorize');
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('scope', 'mcp');
+    authUrl.searchParams.set('state', state);
+    authUrl.searchParams.set('code_challenge', challenge);
+    authUrl.searchParams.set('code_challenge_method', 'S256');
+    authUrl.searchParams.set('resource', 'https://mcp.sunra.ai/');
+
+    return res.redirect(authUrl.toString());
+  } catch (e) {
+    return res.status(500).send('Failed to start Sunra OAuth: ' + e.message);
+  }
+});
+
+app.get('/sunra-callback', async (req, res) => {
+  try {
+    const code = String(req.query.code || '');
+    const state = String(req.query.state || '');
+    if (!code) return res.status(400).send('Missing authorization code from Sunra.');
+
+    const saved = JSON.parse(await fs.readFile(SUNRA_PKCE_FILE, 'utf-8'));
+    if (saved.state !== state) {
+      return res.status(400).send('State mismatch—please open /sunra-start again.');
+    }
+
+    const tokenRes = await fetch('https://mcp.sunra.ai/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: saved.redirectUri,
+        client_id: saved.clientId,
+        code_verifier: saved.verifier,
+        resource: 'https://mcp.sunra.ai/'
+      }).toString()
+    });
+    const tokenBody = await tokenRes.json();
+    if (!tokenRes.ok || !tokenBody.access_token) {
+      return res.status(500).send('Token exchange failed: ' + JSON.stringify(tokenBody));
+    }
+
+    const now = Date.now();
+    const expiresIn = Number(tokenBody.expires_in) || 3600;
+    const credsPath = '/home/jacks/.config/sunra/credentials.json';
+    await fs.mkdir('/home/jacks/.config/sunra', { recursive: true, mode: 0o700 });
+    const store = {
+      version: 1,
+      servers: {
+        'https://mcp.sunra.ai/': {
+          clients: {
+            other: {
+              client_id: saved.clientId,
+              client_name: 'Sunra for your agent',
+              issuer: 'https://mcp.sunra.ai',
+              redirect_uri: saved.redirectUri,
+              registered_at: now
+            }
+          },
+          resource: 'https://mcp.sunra.ai/',
+          issuer: 'https://mcp.sunra.ai',
+          endpoints: {
+            authorization_endpoint: 'https://mcp.sunra.ai/oauth/authorize',
+            token_endpoint: 'https://mcp.sunra.ai/oauth/token',
+            registration_endpoint: 'https://mcp.sunra.ai/oauth/register',
+            revocation_endpoint: 'https://mcp.sunra.ai/oauth/revoke'
+          },
+          tokens: {
+            access_token: tokenBody.access_token,
+            refresh_token: tokenBody.refresh_token || null,
+            token_type: 'Bearer',
+            scope: tokenBody.scope || 'mcp',
+            expires_at: now + expiresIn * 1000,
+            obtained_at: now,
+            client_id: saved.clientId
+          },
+          signed_in_at: now
+        }
+      }
+    };
+    await fs.writeFile(credsPath, JSON.stringify(store, null, 2), { mode: 0o600 });
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(`<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Connected to Sunra!</title></head>
+<body style="background:#07090D; color:#4ADE80; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; text-align:center; padding:20px;">
+  <div style="background:#0E131D; border:1px solid #22C55E; border-radius:16px; padding:32px; max-width:400px;">
+    <h1 style="margin:0 0 10px 0; color:#FFF;">✅ Connected to Sunra!</h1>
+    <p style="color:#94A3B8; margin:0;">Your Sunra CLI credentials are saved on your server. Close this tab and reply <strong>"done"</strong> on Telegram!</p>
+  </div>
+</body></html>`);
+  } catch (e) {
+    return res.status(500).send('Callback error: ' + e.message);
+  }
+});
+
+// ============================================================================
 // OPENCLAW-INSPIRED 1-CLICK NO-SIGN-IN PUBLIC MEMO SHARING (/share/:id)
 // ============================================================================
 const SHARES_DIR = path.join(__dirname, 'shared_memos');
@@ -1925,6 +2067,9 @@ app.get('/share/:id', async (req, res) => {
   <meta property="og:title" content="${safeTitle}">
   <meta property="og:description" content="Shared via Consultant Studio — Private On-Device Financial & Career Decision Engine.">
   <meta property="og:url" content="https://www.consultant-studio.app/share/${rec.id}">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
   <style>
