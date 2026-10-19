@@ -5,11 +5,6 @@ Allow: /guides/cash-runway-calculator
 Allow: /guides/minimum-salary-calculator-after-taxes
 Allow: /guides/small-business-breakeven-calculator-free
 Allow: /guides/how-to-compare-job-offers
-Allow: /standards.html
-Allow: /trade-area-strategy.html
-Allow: /trust-research.html
-Allow: /orchestration-creed.html
 Allow: /manifest.json
-Allow: /icon.svg
 
 Sitemap: https://www.consultant-studio.app/sitemap.xml

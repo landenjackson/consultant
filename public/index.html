@@ -2355,21 +2355,18 @@
         </div>
 
         <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
-            <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:4px 0 2px 6px;">Settings & Workspace</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
-                <span>💳</span> <span>Subscriptions & Free Trial</span>
-            </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
-                <span>👤</span> <span>Account Info & Profile</span>
-            </button>
+            <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:4px 0 2px 6px;">Workspace</div>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
-                <span>🔒</span> <span>Strategy & Research Vault</span>
+                <span>🔒</span> <span>Saved Vault</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
+                <span>💳</span> <span>Plans &amp; Free Trial</span>
             </button>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openSettingsModal(); toggleSidebar(false);">
-                <span>⚙️</span> <span>Display, Voice & Engine Settings</span>
+                <span>⚙️</span> <span>Voice &amp; Display Settings</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openOfficeModal(); toggleSidebar(false);">
-                <span>✅</span> <span>Google Tasks & Workspace Hub</span>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
+                <span>👤</span> <span>Account Profile</span>
             </button>
         </div>
 
@@ -2559,8 +2556,14 @@
                         </div>
                     </div>
 
+                    <!-- COLLAPSIBLE ADVANCED TOOLS DRAWER (MONDAY SWEEP & LIVE JOB FINDER — HIDDEN BY DEFAULT FOR ZERO CLUTTER) -->
+                    <details style="margin-top:12px; background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 14px;">
+                        <summary style="cursor:pointer; font-size:12.5px; font-weight:700; color:#94A3B8; outline:none; user-select:none;">
+                            ➕ Open Optional Career &amp; Bridge Tools (Weekly Route Profit Sweep &amp; Live Job Finder)
+                        </summary>
+                        <div style="margin-top:12px;">
                     <!-- MONDAY SWEEP & WEEKLY ROUTE PROFIT TRACKER (PREMIER LOGISTICS SERVICES / DRIVER UNIT ECONOMICS) -->
-                    <div id="mondaySweepTrackerStudio" style="margin-top:14px; background:#07090D; border:1px solid rgba(16,185,129,0.32); border-radius:10px; padding:14px;">
+                    <div id="mondaySweepTrackerStudio" style="background:#07090D; border:1px solid rgba(16,185,129,0.32); border-radius:10px; padding:14px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                 <span style="font-size:11px; background:rgba(16,185,129,0.16); color:#4ADE80; padding:3px 9px; border-radius:6px; font-weight:800; border:1px solid rgba(16,185,129,0.35);">
@@ -2673,6 +2676,8 @@
                             <div id="tavilyCareerCardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(235px, 1fr)); gap:10px;"></div>
                         </div>
                     </div>
+                        </div>
+                    </details>
                 </div>
 
                 <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (HIDDEN IN PERSONAL MODE, SHOWN IN BUSINESS MODE) -->
@@ -2900,15 +2905,12 @@
                 </svg>
             </button>
 
-            <!-- MODEL SELECTION OVERRIDE DROPDOWN -->
+            <!-- MODEL SELECTION OVERRIDE DROPDOWN (3 CLEAN MODES) -->
             <div id="modelSelectWrap" style="display:inline-flex; align-items:center; background:#07090D; border:1px solid rgba(167,139,250,0.3); border-radius:8px; padding:2px 6px; flex-shrink:0;">
-                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select Execution Mode">
-                    <option value="deep-reasoning" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">Deep Reasoning</option>
-                    <option value="minimax" style="background:#0D121A; color:#FBBF24; font-weight:800;">🚀 MiniMax M3.1 Flash (Space Bunny — 1M Context)</option>
-                    <option value="harness2" style="background:#0D121A; color:#38BDF8; font-weight:800;">🔬 Harness² (MiniMax/DeepSeek + Gemini Compose)</option>
-                    <option value="deepseek" style="background:#0D121A; color:#4ADE80; font-weight:800;">🧠 DeepSeek Quantitative &amp; P&amp;L Math</option>
-                    <option value="low-latency" style="background:#0D121A; color:#FFF;">Low-Latency Execution</option>
-                    <option value="auto" style="background:#0D121A; color:#FFF;">Balanced Speed &amp; Depth</option>
+                <select id="modelSelectOverride" onchange="handleModelChange(this)" style="background:transparent; border:none; color:#C4B5FD; font-size:11px; font-weight:700; outline:none; cursor:pointer;" title="Select AI Mode">
+                    <option value="deep-reasoning" selected style="background:#0D121A; color:#A78BFA; font-weight:700;">⚡ Standard AI</option>
+                    <option value="minimax" style="background:#0D121A; color:#FBBF24; font-weight:800;">🚀 Fast 1M (MiniMax)</option>
+                    <option value="harness2" style="background:#0D121A; color:#38BDF8; font-weight:800;">🔬 Deep Audit (Harness²)</option>
                 </select>
             </div>
             <textarea id="userInput" class="dock-input" rows="1" placeholder="Ask anything—moving out, landing a job, fixing your budget, or weighing a decision..." onkeydown="handleInputKeydown(event)"></textarea>
@@ -5130,12 +5132,10 @@
             const delivBar = document.createElement('div');
             delivBar.className = 'deliverables-bar';
             delivBar.innerHTML = `
-                <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy Answer</button>
+                <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
                 <button class="btn-export" onclick="shareCanvasOrCardLink(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.12);" title="Create 1-click public read-only link (no sign-in required)">🔗 Share Link</button>
-                <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
                 <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
                 <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
-                <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Budget (.xlsx)</button>
             `;
             card.appendChild(delivBar);
             row.appendChild(card);
@@ -8043,12 +8043,8 @@
                         delivBar.innerHTML = `
                             <button class="btn-export" onclick="copyExecutiveEmail(this)" style="border-color:#A855F7; color:#C084FC; font-weight:700; background:rgba(168,85,247,0.1);">📋 Copy</button>
                             <button class="btn-export" onclick="shareCanvasOrCardLink(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.14);" title="Create 1-click public read-only link (no sign-in required)">🔗 Share Link</button>
-                            <button class="btn-export" onclick="playVoiceBriefing(this)" style="border-color:var(--accent); color:var(--accent-glow); font-weight:700;">🔊 Listen</button>
                             <button class="btn-export" onclick="exportWordDocx(this)" style="border-color:#38BDF8; color:#38BDF8; font-weight:700; background:rgba(56,189,248,0.1);">📄 Word (.docx)</button>
-                            <button class="btn-export" onclick="openOfficeModal()" style="border-color:#10B981; color:#4ADE80; font-weight:700; background:rgba(16,185,129,0.1);">✅ Google Tasks</button>
                             <button class="btn-export" onclick="exportExecutivePDF(this)" style="border-color:#F59E0B; color:#FBBF24; font-weight:700;">📑 Save PDF</button>
-                            <button class="btn-export" onclick="exportExcelXLSX(this)" style="border-color:#107C41; color:#4ADE80; font-weight:700;">📊 Sheets (.xlsx)</button>
-                            <button class="btn-export" onclick="runHarness2DeepAuditOnCard(this)" style="border-color:#C084FC; color:#E879F9; font-weight:700; background:rgba(192,132,252,0.1);" title="Run Harness² Parallel Propose-Probe-Compose & Reflect Lesson to past.dev">🔬 Harness² Audit</button>
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save</button>
                             ${modelBadge}
                         `;

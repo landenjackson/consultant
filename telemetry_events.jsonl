@@ -1,0 +1,4 @@
+{"ts":"2026-10-19T19:06:23.087Z","event":"hero_impression","variant":"A","track":"personal","meta":{}}
+{"ts":"2026-10-19T19:25:24.365Z","event":"track_select","variant":"B","track":"personal","meta":{"track":"personal"}}
+{"ts":"2026-10-19T19:25:24.367Z","event":"hero_impression","variant":"B","track":"personal","meta":{}}
+{"ts":"2026-10-19T19:25:49.239Z","event":"ai_chat_push","variant":"B","track":"personal","meta":{"source":"personal_runway"}}

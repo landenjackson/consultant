@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-19-share-links-undo-v27';
+const CACHE_NAME = 'consultant-studio-v2026-10-19-clean-focused-v28';
 const ASSETS = [
   '/',
   '/index.html',
