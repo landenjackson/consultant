@@ -75,10 +75,37 @@
         }
     </script>
     <style>
-        /* 24K GOLD SOVEREIGN COIN EMBLEM WITH SUBTLE 3D SHIMMER */
+        /* 24K GOLD SOVEREIGN COIN EMBLEM WITH TACTILE SPIN & ECHO RINGS */
         @keyframes goldCoinFloat {
             0%, 100% { transform: translateY(0px) rotateY(0deg); box-shadow: 0 0 18px rgba(245, 158, 11, 0.45), inset 0 0 10px rgba(253, 230, 138, 0.35); }
-            50% { transform: translateY(-2px) rotateY(14deg); box-shadow: 0 6px 26px rgba(245, 158, 11, 0.65), 0 0 14px rgba(16, 185, 129, 0.35); }
+            50% { transform: translateY(-2.5px) rotateY(16deg); box-shadow: 0 6px 26px rgba(245, 158, 11, 0.65), 0 0 14px rgba(16, 185, 129, 0.35); }
+        }
+        @keyframes goldCoinFlip360 {
+            0% { transform: scale(1) rotateY(0deg); }
+            45% { transform: scale(1.18) rotateY(190deg); box-shadow: 0 0 38px rgba(251, 191, 36, 0.95), 0 0 22px rgba(16, 185, 129, 0.75); }
+            100% { transform: scale(1) rotateY(360deg); }
+        }
+        @keyframes echoRingExpand {
+            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.85; }
+            100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+        }
+        @keyframes kpiValueBounce {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.07); text-shadow: 0 0 18px rgba(74, 222, 128, 0.65); }
+            100% { transform: scale(1); }
+        }
+        @keyframes dockEchoWave {
+            0% { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 0 rgba(16, 185, 129, 0.55), 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 10px rgba(16, 185, 129, 0), 0 0 0 18px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 0 rgba(16, 185, 129, 0), 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        @keyframes cardBorderEcho {
+            0% { border-color: rgba(251, 191, 36, 0.9) !important; box-shadow: 0 0 32px rgba(245, 158, 11, 0.35), 0 0 16px rgba(16, 185, 129, 0.25) !important; }
+            100% { border-color: rgba(245, 158, 11, 0.32) !important; }
+        }
+        @keyframes eqBarBounce {
+            0%, 100% { transform: scaleY(0.3); opacity: 0.6; }
+            50% { transform: scaleY(1.15); opacity: 1; }
         }
         .gold-sovereign-coin {
             border-radius: 50%;
@@ -90,6 +117,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+        }
+        .gold-sovereign-coin:active {
+            transform: scale(0.9);
+        }
+        .gold-sovereign-coin.coin-spinning {
+            animation: goldCoinFlip360 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
         .gold-sovereign-coin img {
             width: 100%;
@@ -97,6 +134,54 @@
             object-fit: cover;
             border-radius: 50%;
             display: block;
+            pointer-events: none;
+        }
+        .kpi-pop-active {
+            animation: kpiValueBounce 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .dock-box.dock-typing-echo {
+            animation: dockEchoWave 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+            border-color: rgba(251, 191, 36, 0.65) !important;
+        }
+        .dock-box.dock-streaming-active {
+            border-color: rgba(16, 185, 129, 0.75) !important;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.85), 0 0 26px rgba(16, 185, 129, 0.32), 0 0 12px rgba(245, 158, 11, 0.25) !important;
+        }
+        .echo-ripple-ring {
+            position: fixed;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(251, 191, 36, 0.75);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.55);
+            pointer-events: none;
+            z-index: 9999;
+            animation: echoRingExpand 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .echo-wave-bars {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            height: 14px;
+            margin-right: 6px;
+        }
+        .echo-wave-bars span {
+            width: 3px;
+            height: 12px;
+            border-radius: 99px;
+            background: linear-gradient(180deg, #FBBF24 0%, #10B981 100%);
+            animation: eqBarBounce 0.75s ease-in-out infinite;
+        }
+        .echo-wave-bars span:nth-child(2) { animation-delay: 0.12s; height: 15px; }
+        .echo-wave-bars span:nth-child(3) { animation-delay: 0.24s; height: 10px; }
+        .echo-wave-bars span:nth-child(4) { animation-delay: 0.36s; height: 14px; }
+        /* SPRING PHYSICS FOR ALL INTERACTIVE BUTTONS & CHIPS */
+        .btn-export, .action-chip, .btn-send, .btn-icon {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-export:active, .action-chip:active, .btn-icon:active {
+            transform: scale(0.93) !important;
         }
         /* EXECUTIVE EMERALD & GOLD WEALTH DESIGN TOKENS */
         :root {
@@ -5638,6 +5723,9 @@
             }
 
             window._lastPersonalRunway = { liquid, essential, discretionary, inflow, savingsTarget, taxRatePct, netBurn, runwayMonths, runwayDays, minTargetSalary, consultingDayRate };
+            if (typeof window.triggerKpiEcho === 'function') {
+                window.triggerKpiEcho([burnEl, runwayEl, salEl]);
+            }
         }
 
         function resetPersonalRunway() {
@@ -7809,10 +7897,14 @@
             
             const hudId = 'hud_' + Date.now();
             assistantCard.innerHTML = `
-                <div class="orchestration-tracker" id="${hudId}">
-                    <div class="tracker-step running" id="${hudId}_step1">⟳ Analyzing your numbers &amp; context...</div>
+                <div class="orchestration-tracker" id="${hudId}" style="display:flex; align-items:center; gap:8px;">
+                    <div class="echo-wave-bars"><span></span><span></span><span></span><span></span></div>
+                    <div class="tracker-step running" id="${hudId}_step1">Analyzing your numbers &amp; context...</div>
                 </div>
             `;
+            if (typeof window.triggerStudioEcho === 'function') {
+                window.triggerStudioEcho('send');
+            }
             assistantRow.appendChild(assistantCard);
             chatFeed.appendChild(assistantRow);
             chatFeed.scrollTop = chatFeed.scrollHeight;
@@ -7938,6 +8030,9 @@
                             <button class="btn-export" onclick="saveToVault(this)">🔒 Save</button>
                         `;
                         assistantCard.appendChild(delivBar);
+                        if (typeof window.triggerStudioEcho === 'function') {
+                            window.triggerStudioEcho('reply', assistantCard);
+                        }
                         chatFeed.scrollTop = chatFeed.scrollHeight;
 
                         // Increment memo count
@@ -8209,6 +8304,118 @@
                 showToast("Could not create share link: " + e.message, "⚠️");
             }
         }
+
+        // INTERACTIVE ECHO PHYSICS, TACTILE COIN SPIN & CHAT COUPLED ANIMATION ENGINE
+        (function initInteractiveEchoSystem() {
+            function triggerHaptic(ms = 12) {
+                try {
+                    if (navigator.vibrate) navigator.vibrate(ms);
+                    if (window.Telegram?.WebApp?.HapticFeedback?.impactOccurred) {
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    }
+                } catch (e) {}
+            }
+
+            function spawnEchoRing(x, y, color = 'rgba(251, 191, 36, 0.8)') {
+                if (!x && !y) return;
+                const ring = document.createElement('div');
+                ring.className = 'echo-ripple-ring';
+                ring.style.left = `${x}px`;
+                ring.style.top = `${y}px`;
+                ring.style.borderColor = color;
+                document.body.appendChild(ring);
+                setTimeout(() => ring.remove(), 640);
+            }
+
+            function spinAllGoldCoins() {
+                document.querySelectorAll('.gold-sovereign-coin').forEach(coin => {
+                    coin.classList.remove('coin-spinning');
+                    void coin.offsetWidth;
+                    coin.classList.add('coin-spinning');
+                    setTimeout(() => coin.classList.remove('coin-spinning'), 760);
+                });
+            }
+
+            window.triggerKpiEcho = function(elements) {
+                if (!Array.isArray(elements)) return;
+                elements.forEach(el => {
+                    if (!el) return;
+                    el.classList.remove('kpi-pop-active');
+                    void el.offsetWidth;
+                    el.classList.add('kpi-pop-active');
+                });
+            };
+
+            window.triggerStudioEcho = function(type, targetEl) {
+                const dock = document.querySelector('.dock-box');
+                spinAllGoldCoins();
+                triggerHaptic(type === 'send' ? 18 : 12);
+
+                if (type === 'send' && dock) {
+                    dock.classList.add('dock-streaming-active');
+                } else if (type === 'reply') {
+                    if (dock) dock.classList.remove('dock-streaming-active');
+                    if (targetEl) {
+                        targetEl.style.animation = 'cardBorderEcho 1.2s ease';
+                    }
+                    // Echo pulse across visible calculator & hero cards
+                    document.querySelectorAll('.spatial-depth-card').forEach(card => {
+                        card.style.animation = 'none';
+                        void card.offsetWidth;
+                        card.style.animation = 'cardBorderEcho 1.1s ease';
+                    });
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // 1. Tap any 24K Gold Coin to spin 360° + emit golden ripple + haptic tap
+                document.addEventListener('click', (e) => {
+                    const coin = e.target.closest('.gold-sovereign-coin');
+                    if (coin) {
+                        const rect = coin.getBoundingClientRect();
+                        spawnEchoRing(rect.left + rect.width / 2, rect.top + rect.height / 2, '#FBBF24');
+                        spinAllGoldCoins();
+                        triggerHaptic(15);
+                        return;
+                    }
+                    const btn = e.target.closest('.btn-export, .action-chip, .btn-send, #modeBtnLife, #modeBtnBusiness');
+                    if (btn && e.clientX && e.clientY) {
+                        spawnEchoRing(e.clientX, e.clientY, 'rgba(16, 185, 129, 0.75)');
+                        triggerHaptic(10);
+                    }
+                }, { passive: true });
+
+                // 2. Typing in #userInput echoes a subtle wave into the dock & Gold Coin
+                const input = document.getElementById('userInput');
+                const dock = document.querySelector('.dock-box');
+                let typeEchoTimer = null;
+                if (input && dock) {
+                    input.addEventListener('input', () => {
+                        dock.classList.remove('dock-typing-echo');
+                        void dock.offsetWidth;
+                        dock.classList.add('dock-typing-echo');
+                        clearTimeout(typeEchoTimer);
+                        typeEchoTimer = setTimeout(() => {
+                            dock.classList.remove('dock-typing-echo');
+                        }, 900);
+                    });
+                }
+
+                // 3. Interactive 3D tilt/glare on desktop pointer move & mobile touch drag across .spatial-depth-card
+                document.querySelectorAll('.spatial-depth-card').forEach(card => {
+                    card.addEventListener('pointermove', (e) => {
+                        if (window.innerWidth < 768) return;
+                        const r = card.getBoundingClientRect();
+                        const x = (e.clientX - r.left) / r.width - 0.5;
+                        const y = (e.clientY - r.top) / r.height - 0.5;
+                        card.style.transform = `perspective(1200px) rotateX(${(-y * 3.2).toFixed(2)}deg) rotateY(${(x * 3.2).toFixed(2)}deg) translateY(-2px)`;
+                    });
+                    card.addEventListener('pointerleave', () => {
+                        card.style.transform = '';
+                    });
+                });
+            });
+        })();
 
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {

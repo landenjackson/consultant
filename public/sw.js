@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-zero-horiz-scroll-v40';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-interactive-echo-v41';
 const ASSETS = [
   '/',
   '/index.html',
