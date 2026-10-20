@@ -64,8 +64,6 @@
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <!-- 2031 Spatial 3D Model Viewer for Interactive Sunra GLB Emblem -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <!-- Google Identity Services (GIS) Official SDK (Popup / One-Tap Auth) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Telegram Mini App Official SDK -->
@@ -76,6 +74,29 @@
         }
     </script>
     <style>
+        /* 24K GOLD SOVEREIGN COIN EMBLEM WITH SUBTLE 3D SHIMMER */
+        @keyframes goldCoinFloat {
+            0%, 100% { transform: translateY(0px) rotateY(0deg); box-shadow: 0 0 18px rgba(245, 158, 11, 0.45), inset 0 0 10px rgba(253, 230, 138, 0.35); }
+            50% { transform: translateY(-2px) rotateY(14deg); box-shadow: 0 6px 26px rgba(245, 158, 11, 0.65), 0 0 14px rgba(16, 185, 129, 0.35); }
+        }
+        .gold-sovereign-coin {
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #F59E0B;
+            background: radial-gradient(circle at 30% 30%, #FDE68A 0%, #D97706 55%, #070A09 100%);
+            animation: goldCoinFloat 4.5s ease-in-out infinite;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gold-sovereign-coin img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
         /* EXECUTIVE EMERALD & GOLD WEALTH DESIGN TOKENS */
         :root {
             --bg-obsidian-root: #070A09;
@@ -2272,24 +2293,29 @@
         <div style="position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:600px; height:400px; background:radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(7,9,13,0) 70%); pointer-events:none;"></div>
 
         <!-- TOP MINIMAL NAV (RESPONSIVE FOR MOBILE) -->
-        <header style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.06); position:relative; z-index:10; background:rgba(7,9,13,0.9); backdrop-filter:blur(12px);">
-            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                <div style="width:32px; height:32px; border-radius:8px; overflow:hidden; border:1px solid rgba(34,197,94,0.4); box-shadow:0 0 12px rgba(34,197,94,0.25); flex-shrink:0;">
-                    <img src="/brand/consultant_studio_official_icon.png?v=30" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
+        <header style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid rgba(245,158,11,0.18); position:relative; z-index:10; background:rgba(7,9,13,0.92); backdrop-filter:blur(12px);">
+            <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <div class="gold-sovereign-coin" style="width:34px; height:34px;">
+                    <img src="/brand/gold_coin_emblem.webp?v=36" alt="Consultant Studio Gold Coin">
                 </div>
-                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; color:#FFF; letter-spacing:-0.02em; white-space:nowrap;">Consultant Studio</span>
+                <span style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15.5px; color:#FFF; letter-spacing:-0.02em; white-space:nowrap;">Consultant Studio</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-                <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 12px; border-color:rgba(255,255,255,0.15); color:#FFF; white-space:nowrap;">Sign In</button>
-                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:12px; font-weight:800; padding:7px 13px; background:var(--accent); color:#000; border:none; border-radius:8px; box-shadow:0 0 14px rgba(34,197,94,0.35); white-space:nowrap;">Start Free Trial</button>
+                <button class="btn-export" onclick="openAuthModal()" style="font-size:12px; font-weight:700; padding:7px 12px; border-color:rgba(245,158,11,0.3); color:#FDE68A; white-space:nowrap;">Sign In</button>
+                <button class="btn-export" onclick="enterStudioWithTrial()" style="font-size:12px; font-weight:800; padding:7px 13px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:8px; box-shadow:0 0 14px rgba(245,158,11,0.35); white-space:nowrap;">Start Free Trial</button>
             </div>
         </header>
 
         <!-- HERO INTRODUCTION & AUDIENCE TRACK FORK -->
-        <main style="flex:1; max-width:980px; margin:0 auto; padding:36px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
-            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border:1px solid var(--border-glow); padding:5px 14px; border-radius:20px; margin-bottom:18px;">
-                <span class="telemetry-dot"></span>
-                <span style="font-size:11px; font-weight:700; color:var(--accent-glow); letter-spacing:0.03em;">PRIVATE ON-DEVICE FINANCIAL & CAREER DECISION ENGINE</span>
+        <main style="flex:1; max-width:980px; margin:0 auto; padding:28px 20px 60px 20px; text-align:center; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center;">
+            <!-- CENTERPIECE 24K GOLD SOVEREIGN COIN EMBLEM -->
+            <div class="gold-sovereign-coin" style="width:78px; height:78px; margin-bottom:14px; border-width:2.5px;">
+                <img src="/brand/gold_coin_emblem.webp?v=36" alt="Consultant Studio 24K Gold Coin Emblem">
+            </div>
+
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); padding:5px 14px; border-radius:20px; margin-bottom:14px;">
+                <span class="telemetry-dot" style="background:#FBBF24; box-shadow:0 0 8px #FBBF24;"></span>
+                <span style="font-size:11px; font-weight:800; color:#FDE68A; letter-spacing:0.04em;">PRIVATE ON-DEVICE FINANCIAL &amp; CAREER ENGINE</span>
             </div>
 
             <h1 id="landingHeroHeadline" style="font-family:'Plus Jakarta Sans'; font-size:clamp(26px, 5vw, 42px); font-weight:800; color:#FFFFFF; line-height:1.18; letter-spacing:-0.03em; margin-bottom:14px; max-width:820px;">Know exactly how long your money lasts — before you quit, pivot, or sign.</h1>
@@ -2368,12 +2394,12 @@
     <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:310px; max-width:88vw; background:#0B0E14; border-right:1px solid rgba(255,255,255,0.08); z-index:950; transform:translateX(-100%); transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display:flex; flex-direction:column; padding:20px 16px; box-shadow:20px 0 60px rgba(0,0,0,0.9); overflow-y:auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08);">
             <div style="display:flex; align-items:center; gap:10px;">
-                <div class="brand-logo" style="width:30px; height:30px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
-                    <img src="/brand/consultant_studio_official_icon.png?v=30" alt="Logo" style="width:100%; height:100%; border-radius:8px; object-fit:cover;">
+                <div class="gold-sovereign-coin" style="width:32px; height:32px;">
+                    <img src="/brand/gold_coin_emblem.webp?v=36" alt="Gold Coin Logo">
                 </div>
                 <div>
                     <div style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14.5px; color:#FFF;">Consultant Studio</div>
-                    <div style="font-size:10px; font-weight:700; color:var(--accent-glow); text-transform:uppercase; letter-spacing:0.04em;">Executive AI Hub</div>
+                    <div style="font-size:10px; font-weight:700; color:#FBBF24; text-transform:uppercase; letter-spacing:0.04em;">Wealth &amp; Career Hub</div>
                 </div>
             </div>
             <button class="btn-modal-close" onclick="toggleSidebar(false)" aria-label="Close" title="Close">
@@ -2418,9 +2444,9 @@
         </button>
 
         <!-- CENTER: CLEAN BRAND LOGO & TITLE -->
-        <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:8px;">
-            <div class="brand-logo" style="width:28px; height:28px; background:transparent; border:none; display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;">
-                <img src="/brand/consultant_studio_official_icon.png?v=30" alt="Logo" style="width:100%; height:100%; border-radius:6px; object-fit:cover;">
+        <div class="brand-group" onclick="scrollToTop()" style="cursor:pointer; display:flex; align-items:center; gap:9px;">
+            <div class="gold-sovereign-coin" style="width:30px; height:30px;">
+                <img src="/brand/gold_coin_emblem.webp?v=36" alt="Gold Coin Logo">
             </div>
             <span class="brand-text" style="font-family:'Plus Jakarta Sans'; font-size:15px; font-weight:800; letter-spacing:-0.02em; color:#FFFFFF;">Consultant Studio</span>
         </div>
@@ -2445,8 +2471,8 @@
                 <div class="hero-banner-card spatial-depth-card" style="padding:20px 24px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
                         <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:240px;">
-                            <div style="width:52px; height:52px; border-radius:12px; overflow:hidden; border:1px solid rgba(245,158,11,0.45); background:radial-gradient(circle at 50% 50%, rgba(16,185,129,0.22) 0%, #070A09 80%); flex-shrink:0;" title="Drag to spin 3D Emblem">
-                                <model-viewer src="/brand/consultant_studio_emblem_3d.glb" poster="/brand/consultant_studio_official_icon.png?v=34" auto-rotate camera-controls disable-zoom interaction-prompt="none" shadow-intensity="1" exposure="1.2" style="width:100%; height:100%; background:transparent;"></model-viewer>
+                            <div class="gold-sovereign-coin" style="width:56px; height:56px; border-width:2px;" title="Consultant Studio 24K Gold Coin Emblem">
+                                <img src="/brand/gold_coin_emblem.webp?v=36" alt="24K Gold Coin Emblem">
                             </div>
                             <div>
                                 <h1 id="welcomeHeading" style="font-family:'Plus Jakarta Sans'; font-size:20px; font-weight:800; color:#FFFFFF; margin:0 0 3px 0; letter-spacing:-0.02em;">

@@ -1,9 +1,10 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-mobile-chat-polish-v35';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-gold-coin-v36';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
+  '/brand/gold_coin_emblem.webp',
   '/brand/icon-192.png',
   '/brand/icon-512.png',
   '/brand/consultant_studio_official_icon.png',
