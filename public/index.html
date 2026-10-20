@@ -64,6 +64,8 @@
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <!-- 2031 Spatial 3D Model Viewer for Interactive Sunra GLB Emblem -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <!-- Google Identity Services (GIS) Official SDK (Popup / One-Tap Auth) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Telegram Mini App Official SDK -->
@@ -150,9 +152,34 @@
             overflow-y: auto;
             background-color: var(--bg-obsidian-root) !important;
             background-image: 
-                radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.14) 0%, transparent 52%),
-                radial-gradient(circle at 95% 90%, rgba(245, 158, 11, 0.09) 0%, transparent 45%),
-                linear-gradient(180deg, rgba(251, 191, 36, 0.02) 0%, transparent 100%);
+                linear-gradient(180deg, rgba(6, 10, 8, 0.72) 0%, rgba(6, 10, 8, 0.88) 55%, rgba(5, 8, 7, 0.96) 100%),
+                url('/brand/sunra_spatial_bg.webp?v=33');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            perspective: 1400px;
+        }
+
+        /* 2031 SPATIAL DEPTH ELEVATION & SPECULAR REFRACTION */
+        .spatial-depth-card {
+            background: linear-gradient(155deg, rgba(14, 24, 20, 0.78) 0%, rgba(7, 12, 10, 0.92) 100%) !important;
+            backdrop-filter: blur(28px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+            border: 1px solid rgba(245, 158, 11, 0.32) !important;
+            box-shadow:
+                0 32px 70px -15px rgba(0, 0, 0, 0.88),
+                0 0 40px rgba(16, 185, 129, 0.10),
+                inset 0 1.5px 0 rgba(253, 230, 138, 0.35),
+                inset 0 -1px 0 rgba(16, 185, 129, 0.22) !important;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .spatial-depth-card:hover {
+            transform: translateY(-4px) scale(1.006);
+            box-shadow:
+                0 40px 85px -12px rgba(0, 0, 0, 0.92),
+                0 0 52px rgba(245, 158, 11, 0.18),
+                inset 0 1.5px 0 rgba(253, 230, 138, 0.55),
+                inset 0 -1px 0 rgba(16, 185, 129, 0.35) !important;
         }
 
         /* PREMIUM GLASS HEADER */
@@ -2275,13 +2302,17 @@
                 <img src="/brand/consultant_studio_social_banner.png?v=30" alt="Consultant Studio Solvency & Financial Engine" style="width:100%; height:auto; display:block;">
             </div>
 
-            <!-- AUDIENCE SEGMENTATION & ONBOARDING FORK (DECOUPLED TRACKS) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:18px; width:100%; max-width:860px; margin-bottom:32px; text-align:left;">
+            <!-- AUDIENCE SEGMENTATION & ONBOARDING FORK (2031 SPATIAL HOLOGRAPHIC TRACKS) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:20px; width:100%; max-width:880px; margin-bottom:32px; text-align:left;">
                 <!-- TRACK 1: PERSONAL RUNWAY & CAREER -->
-                <div style="background:linear-gradient(145deg, rgba(16,185,129,0.08) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.35); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.45);">
+                <div class="spatial-depth-card" style="border-radius:18px; padding:18px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; overflow:hidden;">
                     <div>
-                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#4ADE80; background:rgba(16,185,129,0.12); padding:3px 9px; border-radius:999px; border:1px solid rgba(16,185,129,0.3);">Consumer &amp; Career Track</span>
-                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; margin:10px 0 6px 0;">👤 Personal Runway &amp; Career</h2>
+                        <div style="width:100%; height:145px; border-radius:12px; overflow:hidden; margin-bottom:14px; position:relative; border:1px solid rgba(16,185,129,0.4); box-shadow:0 12px 30px rgba(0,0,0,0.6);">
+                            <img src="/brand/sunra_personal_3d.webp?v=33" alt="Personal Runway 3D Solvency Sculpture" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(7,11,9,0.92) 100%);"></div>
+                            <span style="position:absolute; bottom:10px; left:10px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#4ADE80; background:rgba(7,12,10,0.85); backdrop-filter:blur(8px); padding:4px 10px; border-radius:999px; border:1px solid rgba(16,185,129,0.45);">Consumer &amp; Career Track</span>
+                        </div>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19.5px; font-weight:800; color:#FFFFFF; margin:4px 0 6px 0;">👤 Personal Runway &amp; Career</h2>
                         <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin:0 0 12px 0;">Built for individuals, job seekers, and households planning their next move without corporate B2B clutter.</p>
                         <ul style="list-style:none; padding:0; margin:0; font-size:12.5px; color:#CBD5E1; display:flex; flex-direction:column; gap:6px;">
                             <li>✓ Financial Life Expectancy &amp; Monthly Burn Calculator</li>
@@ -2290,16 +2321,20 @@
                             <li>✓ 1-Page Resume Polish &amp; STAR Interview Coaching</li>
                         </ul>
                     </div>
-                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('personal')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:var(--accent); color:#000; border:none; border-radius:10px; cursor:pointer;">
+                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('personal')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#04130B; border:none; border-radius:10px; cursor:pointer; box-shadow:0 0 22px rgba(16,185,129,0.35);">
                         Enter Personal Runway Track →
                     </button>
                 </div>
 
                 <!-- TRACK 2: BUSINESS STUDIO (OPERATORS & FOUNDERS — GOLD WEALTH ACCENT) -->
-                <div style="background:linear-gradient(145deg, rgba(245,158,11,0.11) 0%, rgba(12,19,17,0.96) 100%); border:1px solid rgba(245,158,11,0.42); border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; box-shadow:0 16px 40px rgba(0,0,0,0.5);">
+                <div class="spatial-depth-card" style="border-radius:18px; padding:18px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; overflow:hidden;">
                     <div>
-                        <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#FBBF24; background:rgba(245,158,11,0.15); padding:3px 9px; border-radius:999px; border:1px solid rgba(245,158,11,0.38);">Operator &amp; Founder Track</span>
-                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19px; font-weight:800; color:#FFFFFF; margin:10px 0 6px 0;">🏢 Business Operations Studio</h2>
+                        <div style="width:100%; height:145px; border-radius:12px; overflow:hidden; margin-bottom:14px; position:relative; border:1px solid rgba(245,158,11,0.45); box-shadow:0 12px 30px rgba(0,0,0,0.6);">
+                            <img src="/brand/sunra_business_3d.webp?v=33" alt="Business Operations 3D Enterprise Matrix" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(7,11,9,0.92) 100%);"></div>
+                            <span style="position:absolute; bottom:10px; left:10px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#FBBF24; background:rgba(7,12,10,0.85); backdrop-filter:blur(8px); padding:4px 10px; border-radius:999px; border:1px solid rgba(245,158,11,0.5);">Operator &amp; Founder Track</span>
+                        </div>
+                        <h2 style="font-family:'Plus Jakarta Sans'; font-size:19.5px; font-weight:800; color:#FFFFFF; margin:4px 0 6px 0;">🏢 Business Operations Studio</h2>
                         <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin:0 0 12px 0;">Built for small business owners, operators, and founders managing margins, pricing, and commercial P&amp;Ls.</p>
                         <ul style="list-style:none; padding:0; margin:0; font-size:12.5px; color:#CBD5E1; display:flex; flex-direction:column; gap:6px;">
                             <li>✓ Dynamic Breakeven &amp; 12-Month EBITDA Matrix</li>
@@ -2308,7 +2343,7 @@
                             <li>✓ Trade Area Foot-Traffic &amp; Competitor Pricing Recon</li>
                         </ul>
                     </div>
-                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('business')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:10px; cursor:pointer; box-shadow:0 0 18px rgba(245,158,11,0.3);">
+                    <button type="button" class="btn-export" onclick="enterDedicatedTrack('business')" style="width:100%; justify-content:center; font-size:13.5px; font-weight:800; padding:12px 18px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:10px; cursor:pointer; box-shadow:0 0 22px rgba(245,158,11,0.35);">
                         Enter Business Studio Track →
                     </button>
                 </div>
@@ -2423,14 +2458,24 @@
         <main id="chatFeed">
             <!-- UPLIFTING HERO BANNER -->
             <div id="heroBanner">
-                <div class="hero-banner-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <img src="/brand/consultant_studio_official_icon.png?v=30" alt="Icon" style="width:22px; height:22px; border-radius:5px; object-fit:cover; display:inline-block;">
-                            <span id="heroStatusTag" class="status-tag">Personal Runway & Career Strategy</span>
-                            <span id="heroSubBadge" style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Track Personal Cash Runway</span>
+                <div class="hero-banner-card spatial-depth-card">
+                    <!-- 2031 SPATIAL HOLOGRAPHIC ART RIBBON & INTERACTIVE 3D GLB EMBLEM -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid rgba(245,158,11,0.22);">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:240px;">
+                            <div style="width:68px; height:68px; border-radius:14px; overflow:hidden; border:1px solid rgba(245,158,11,0.45); background:radial-gradient(circle at 50% 50%, rgba(16,185,129,0.25) 0%, #070A09 80%); flex-shrink:0; box-shadow:0 10px 25px rgba(0,0,0,0.7), inset 0 1px 0 rgba(253,230,138,0.4);" title="Drag to spin 3D Sunra Emblem">
+                                <model-viewer src="/brand/consultant_studio_emblem_3d.glb" poster="/brand/consultant_studio_official_icon.png?v=33" auto-rotate camera-controls disable-zoom interaction-prompt="none" shadow-intensity="1" exposure="1.2" style="width:100%; height:100%; background:transparent;"></model-viewer>
+                            </div>
+                            <div>
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <span id="heroStatusTag" class="status-tag" style="color:#FDE68A; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.05em;">Personal Runway &amp; Career Strategy</span>
+                                    <span id="heroSubBadge" style="font-size:11.5px; color:var(--accent-glow); font-weight:700;">• Interactive 3D Solvency Engine</span>
+                                </div>
+                                <div style="font-size:11.5px; color:#94A3B8; margin-top:3px;">🔒 100% On-Device Financial Modeling • Spin the 3D Emblem or Switch Tracks Below</div>
+                            </div>
                         </div>
-                        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">Private On-Device Financial Modeling</span>
+                        <div style="width:190px; height:68px; border-radius:12px; overflow:hidden; border:1px solid rgba(16,185,129,0.4); box-shadow:0 10px 24px rgba(0,0,0,0.65); flex-shrink:0;">
+                            <img id="heroTrack3dArt" src="/brand/sunra_personal_3d.webp?v=33" alt="3D Financial Sculpture" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        </div>
                     </div>
 
                     <!-- GLOBAL WORKSPACE TOGGLE: BUSINESS STUDIO vs. PERSONAL RUNWAY & CAREER -->
@@ -2472,7 +2517,7 @@
                 </div>
 
                 <!-- SIDE B CALCULATOR: PERSONAL FINANCIAL LIFE EXPECTANCY (RUNWAY & TARGET SALARY ENGINE) -->
-                <div id="personalRunwayStudio" style="display:block; background: rgba(14, 19, 28, 0.92); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 14px 40px rgba(0,0,0,0.6);">
+                <div id="personalRunwayStudio" class="spatial-depth-card" style="display:block; border-radius: 18px; padding: 20px; margin: 16px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span style="font-size:11.5px; background:rgba(34,197,94,0.15); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
@@ -2689,7 +2734,7 @@
                 </div>
 
                 <!-- LIVE ARTIFACT DEMO PREVIEW: BREAKEVEN SENSITIVITY STUDIO (HIDDEN IN PERSONAL MODE, SHOWN IN BUSINESS MODE) -->
-                <div id="breakevenStudio" style="display:none; background: rgba(9, 13, 22, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 45px rgba(0,0,0,0.65);">
+                <div id="breakevenStudio" class="spatial-depth-card" style="display:none; border-radius: 18px; padding: 20px; margin: 16px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                         <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="toggleBreakevenCollapse()">
                             <span style="font-size:11px; background:rgba(16,185,129,0.12); color:#4ADE80; padding:4px 10px; border-radius:6px; font-weight:700; border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:0.04em;">
@@ -5417,6 +5462,10 @@
             const beStudio = document.getElementById('breakevenStudio');
             const prStudio = document.getElementById('personalRunwayStudio');
             const input = document.getElementById('userInput');
+            const artEl = document.getElementById('heroTrack3dArt');
+            if (artEl) {
+                artEl.src = isPersonal ? '/brand/sunra_personal_3d.webp?v=33' : '/brand/sunra_business_3d.webp?v=33';
+            }
 
             if (btnLife && btnBiz) {
                 btnLife.style.background = isPersonal ? 'var(--accent)' : 'transparent';

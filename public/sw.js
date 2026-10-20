@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-19-no-liveroom-v32';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-spatial-2031-sunra-v33';
 const ASSETS = [
   '/',
   '/index.html',
