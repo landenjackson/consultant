@@ -326,6 +326,77 @@
         [data-theme="light"] .dock-input {
             color: var(--text-primary) !important;
         }
+        /* COMPREHENSIVE LIGHT THEME READABILITY OVERRIDES FOR ALL INNER CONTAINERS & TEXT */
+        [data-theme="light"] .btn-icon-drawer,
+        [data-theme="light"] #headerThemeToggleBtn,
+        [data-theme="light"] .header-reset-btn {
+            background: #F1F5F9 !important;
+            border: 1px solid #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        [data-theme="light"] #personalRunwayStudio span,
+        [data-theme="light"] #breakevenStudio span,
+        [data-theme="light"] #mondaySweepTrackerStudio span,
+        [data-theme="light"] #tavilyCareerPickerStudio span {
+            color: var(--text-primary);
+        }
+        [data-theme="light"] #prTimelineStatusBadge,
+        [data-theme="light"] #prOfferCompareResult,
+        [data-theme="light"] #prDayRateOut {
+            color: #047857 !important;
+        }
+        [data-theme="light"] #prDepletionDateOut {
+            color: #334155 !important;
+        }
+        [data-theme="light"] #prKpiGrid > div > div:first-child {
+            color: #B45309 !important;
+        }
+        [data-theme="light"] #prKpiGrid > div:nth-child(2) > div:first-child {
+            color: #047857 !important;
+        }
+        [data-theme="light"] div[role="tablist"] {
+            background: #F1F5F9 !important;
+            border: 1px solid #CBD5E1 !important;
+        }
+        [data-theme="light"] #modelSelectWrap {
+            background: #F1F5F9 !important;
+            border: 1px solid #CBD5E1 !important;
+        }
+        [data-theme="light"] #modelSelectOverride,
+        [data-theme="light"] #modelSelectOverride option {
+            background: #FFFFFF !important;
+            color: #0F172A !important;
+        }
+        [data-theme="light"] #personalRunwayStudio > div:nth-of-type(4),
+        [data-theme="light"] #personalRunwayStudio details,
+        [data-theme="light"] #mondaySweepTrackerStudio,
+        [data-theme="light"] #mondaySweepTrackerStudio > div > div,
+        [data-theme="light"] #tavilyCareerPickerStudio,
+        [data-theme="light"] #breakevenStudio .be-controls-grid,
+        [data-theme="light"] #breakevenStudio .be-chart-wrap {
+            background: #F8FAFC !important;
+            border-color: #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        [data-theme="light"] #prTimelineFill {
+            background: linear-gradient(90deg, #10B981 0%, #059669 100%) !important;
+        }
+        [data-theme="light"] #prTimelineMonthStrip > div {
+            background: #ECFDF5 !important;
+            border-color: #A7F3D0 !important;
+        }
+        [data-theme="light"] #prTimelineMonthStrip > div > div:first-child {
+            color: #475569 !important;
+        }
+        [data-theme="light"] #prTimelineMonthStrip > div > div:last-child {
+            color: #047857 !important;
+        }
+        [data-theme="light"] footer,
+        [data-theme="light"] #chatFeed > div > div:last-child {
+            background: #F1F5F9 !important;
+            border-color: #CBD5E1 !important;
+            color: #475569 !important;
+        }
 
         @keyframes meshDrift {
             0% { transform: translate(0px, 0px) scale(1); }
@@ -2719,11 +2790,11 @@
                 <!-- SIDE B CALCULATOR: PERSONAL CASH RUNWAY & TARGET SALARY -->
                 <div id="personalRunwayStudio" class="spatial-depth-card" style="display:block; border-radius: 18px; padding: 20px; margin: 16px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="font-size:11px; background:rgba(34,197,94,0.14); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:flex; align-items:center; gap:5px;">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1; min-width:180px;">
+                            <span style="font-size:11px; background:rgba(34,197,94,0.14); color:var(--accent-glow); padding:4px 9px; border-radius:6px; font-weight:700; border:1px solid var(--border-glow); display:inline-flex; align-items:center; gap:5px; white-space:nowrap; flex-shrink:0;">
                                 <span class="telemetry-dot"></span> Cash Runway
                             </span>
-                            <span style="font-size:15px; font-weight:800; color:#FFFFFF;">Monthly Savings Runway &amp; Minimum Salary</span>
+                            <span id="prCardTitleText" style="font-size:15px; font-weight:800; color:var(--text-primary);">Monthly Savings Runway &amp; Minimum Salary</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                             <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px;" onclick="resetPersonalRunway()">Reset</button>
@@ -3144,7 +3215,7 @@
                     <option value="harness2" style="background:#0D121A; color:#38BDF8; font-weight:800;">🔬 Deep Analysis</option>
                 </select>
             </div>
-            <textarea id="userInput" class="dock-input" rows="1" placeholder="Ask anything—moving out, landing a job, fixing your budget, or weighing a decision..." onkeydown="handleInputKeydown(event)"></textarea>
+            <input type="text" id="userInput" class="dock-input" placeholder="Ask about your runway, salary, or budget..." autocomplete="off" onkeydown="handleInputKeydown(event)" style="height:40px; min-height:40px; max-height:40px; padding:0 6px; line-height:40px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
             <button id="sendBtn" class="btn-send" onclick="sendMessage()" title="Execute Analysis">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -5739,7 +5810,7 @@
             if (isPersonal) {
                 if (heading) heading.innerText = 'Personal Runway & Career Transitions';
                 if (subtext) subtext.innerText = 'Audit monthly cash burn, calculate months & days to depletion, and lock in your post-tax minimum salary floor.';
-                if (input) input.placeholder = 'Ask about your cash runway, target salary floor, safe rent ceiling, or offer negotiation...';
+                if (input) input.placeholder = 'Ask about your runway, salary, or budget...';
                 if (beStudio) beStudio.style.display = 'none';
                 if (prStudio) {
                     prStudio.style.display = 'block';
@@ -5756,7 +5827,7 @@
             } else {
                 if (heading) heading.innerText = 'Independent Solo & Variable Income Studio';
                 if (subtext) subtext.innerText = 'Smooth irregular revenue, automate 25–30% tax & 20% wealth runway sweeps, and protect monthly business margins.';
-                if (input) input.placeholder = 'Ask about smoothing irregular 1099 income, quarterly tax sweeps, breakeven revenue, or margin protection...';
+                if (input) input.placeholder = 'Ask about 1099 taxes, breakeven, or margins...';
                 if (prStudio) prStudio.style.display = 'none';
                 if (beStudio) {
                     beStudio.style.display = 'block';
