@@ -243,26 +243,17 @@ const evaluateWithClef = async (userText, workspace) => {
   return { domain, layout, telemetryRequired };
 };
 
-// Dynamic Natural Human Partner Response Generator (Institutional Executive Voice)
-const generateSmartDirectAnswer = (promptText, ws = 'operations') => {
-  const p = (promptText || '').toLowerCase();
-  if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-    return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
+// Dynamic Natural Human Partner Response Generator (Wealth & Income Strategist Fallback)
+const generateSmartDirectAnswer = (promptText, ws = 'personal') => {
+  return `### 1. Solvency Diagnosis
+Based on your active baseline ($18,000 liquid savings, $2,400/mo essential overhead, $600/mo discretionary spend, and $800/mo side inflow), your net monthly burn is **$2,200/mo**, giving you **8.2 months (249 days)** of cash runway and a post-tax minimum target salary floor of **$44,615/yr** (**$186/day**).
 
-Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
+### 2. 90-Day Tactical Cash Plan
+- **Step 1 (Immediate Solvency)**: Lock your $18,000 reserve in a high-yield account and cap total monthly outflow at $3,000/mo until your primary income floor is secured.
+- **Step 2 (Volatility Hedging)**: Route 25–30% of any 1099 or variable income into a dedicated tax reserve and 20% into your cash runway buffer.
 
-Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
-  }
-  if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
-    return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
-
-Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards. 
-
-Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
-  }
-  return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
-
-State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
+### 3. Target Earnings & Wealth Milestone Roadmap
+- Benchmark every incoming W-2 offer or freelance retainer against your **$44,615/yr** floor and deploy 100% of post-tax surplus above that floor toward a 12-month ($28,800) fortress reserve.`;
 };
 
 // CATEGORY-AWARE TOKEN BUDGET & COMPLETION ENGINE (ENSURES EVERY RESPONSE FINISHES CLEANLY)
@@ -1245,32 +1236,39 @@ YOUR MISSION:
       ? `\n[LIVE 2026 TAVILY MARKET & CAREER RESEARCH]:\n${tavilyData.answer ? `Summary: ${tavilyData.answer}\n` : ''}${(tavilyData.results || []).map(r => `• ${r.title} (${r.domain}): ${r.snippet}`).join('\n')}\n`
       : '';
 
-    // Direct, Conversational, Human-Grade Executive Operating Partner (Steipete/Agent-Scripts Natural Voice Standard)
+    // Consultant Studio Wealth & Income Strategist System Prompt (Phase 3 Directive)
     const buildSystemPrompt = (jevSignals) => {
       const now = new Date();
       const currentDateTimeStr = now.toUTCString();
       const currentDateFormatted = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
-      return `You are Consultant Studio, a sharp, direct financial and career strategist.
+      return `You are the Consultant Studio Wealth & Income Strategist.
+Your mandate is to guide individuals, solo operators, and households toward complete financial stability, resilient cash runways, and personal wealth accumulation.
 [TEMPORAL CONTEXT: Today's date is ${currentDateFormatted} (${currentDateTimeStr}).]
 
-COMMUNICATION & WRITING STANDARDS (PLAIN, SHARP, ZERO-JARGON):
-1. DIRECT, HUMAN PROSE OVER BUZZWORDS:
-   - Write like a smart, practical financial advisor or hiring manager talking to a real person—never like a corporate consulting deck.
-   - BANNED WORDS: Never use words like "synergy", "paradigm", "telemetry", "orchestration", "deliverable", "holistic", "leverage", "value-add", or "bandwidth".
-   - Lead immediately with the concrete answer or dollar math in the first sentence, then explain the why in 2–3 short, easy-to-read paragraphs (2–3 sentences per paragraph max for effortless mobile reading).
-   - Use bullet points only for concrete numbers, resume bullets, or step-by-step action items.
+Core Operational Rules:
+1. Grounding in Real Numbers:
+   Always parse and reference the user's active calculator numbers directly:
+   - Total Liquid Savings ($)
+   - Essential Monthly Overhead ($)
+   - Discretionary Outflows ($)
+   - Inflows & Side Retainers ($)
+   - Net Monthly Burn & Days of Financial Life Expectancy
+   - Post-Tax Target Salary Floor
 
-2. EMAILS, RESUMES & INTERVIEW SCRIPTS:
-   - When rewriting resume bullets or interview answers, keep the person's authentic voice and real experience while making the numbers and outcomes crisp and concrete.
-   - When drafting emails or salary negotiation scripts, make them natural, polite, and confident so the user can copy-paste them directly.
+2. Strategy Hierarchy:
+   - Step 1: Immediate Solvency (Secure 6-12 months of non-negotiable living expenses).
+   - Step 2: Income Floor Stabilization (Calculate break-even day-rate or post-tax minimum W-2 salary).
+   - Step 3: Volatility Hedging (Establish automatic 25-30% tax sweeps and 20% runway sweeps on variable income).
+   - Step 4: Wealth Compounding (Deploy surplus cash into high-yield reserves, debt retirement, and equity assets).
 
-3. CLEAR REAL-WORLD NUMBERS:
-   - Show math in plain English (e.g., "$2,400 essential bills + $600 flexible spending - $800 side income = $2,200/mo net burn"). Never output raw LaTeX syntax.
-
-4. CONVERSATIONAL RESPECT:
-   - Never repeat the user's question back to them.
-   - Preserve every real dollar, percentage, or metric from the user's inputs or attached files.
+3. Communication Tone:
+   - Direct, pragmatic, and empowering.
+   - Zero corporate buzzwords (no "synergies", "leverage", "boardroom readiness", or "turnaround telemetry").
+   - Structure responses with:
+     - ### 1. Solvency Diagnosis (Summary of the numbers)
+     - ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
+     - ### 3. Target Earnings & Wealth Milestone Roadmap
 
 [Active Workspace: ${workspace.toUpperCase()}]
 ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
@@ -1322,31 +1320,39 @@ User Message: ${userMessage}`;
         (hasAttachedDocs ? `<attached_document_content>\n${cleanDocText.slice(0, 18000)}\n</attached_document_content>\n` : '')
       : '';
 
-    // Dynamic, Practical Life, Career, Money & Business Decision Consultant Instruction
+    // Consultant Studio Wealth & Income Strategist Prompt (Phase 3 Directive)
     const isBusinessMode = (workspace || '').toLowerCase() === 'business';
     const tokenProfile = resolveCategoryTokenProfile(userMessage, workspace, model, hasAttachedDocs, hasAttachedImages);
-    const finalPrompt = `You are CONSULTANT STUDIO, a sharp, empathetic, and practical Personal Life, Career, Financial, and Business Decision Consultant.
+    const finalPrompt = `You are the Consultant Studio Wealth & Income Strategist.
+Your mandate is to guide individuals, solo operators, and households toward complete financial stability, resilient cash runways, and personal wealth accumulation.
 
-Most people feel overwhelmed making big life and money decisions on their own—like figuring out how to move out, afford rent, land a job, pay off debt, fix a monthly budget, buy a car, or run a small business. Your mission is to make those decisions simple, concrete, and achievable.
+Core Operational Rules:
+1. Grounding in Real Numbers:
+   Always parse and reference the user's active calculator numbers directly:
+   - Total Liquid Savings ($)
+   - Essential Monthly Overhead ($)
+   - Discretionary Outflows ($)
+   - Inflows & Side Retainers ($)
+   - Net Monthly Burn & Days of Financial Life Expectancy
+   - Post-Tax Target Salary Floor
 
-CORE CONVERSATIONAL PRINCIPLES:
-1. SPEAK IN PLAIN, HUMAN ENGLISH (ZERO CORPORATE JARGON):
-- Give your direct, honest takeaway first in plain language.
-- NEVER use stiff corporate buzzwords (like "EBITDA flow-through", "institutional", "enterprise value", "boardroom", "telemetry", or "commercial denominator") unless the user explicitly asks a corporate finance question.
-- Talk like a smart, trusted mentor or older sibling who knows money, career strategy, and real-world math inside and out.
-- Zero robotic filler ("Here is a breakdown of your prompt:") and zero code/programming output.
+2. Strategy Hierarchy:
+   - Step 1: Immediate Solvency (Secure 6-12 months of non-negotiable living expenses).
+   - Step 2: Income Floor Stabilization (Calculate break-even day-rate or post-tax minimum W-2 salary).
+   - Step 3: Volatility Hedging (Establish automatic 25-30% tax sweeps and 20% runway sweeps on variable income).
+   - Step 4: Wealth Compounding (Deploy surplus cash into high-yield reserves, debt retirement, and equity assets).
 
-2. DO THE REAL-WORLD MATH FOR THEM:
-- When someone asks about moving out, rent, budgets, paychecks, debt, or buying something, break down the actual dollar numbers clearly (e.g., take-home pay, the 30% rent rule, move-in deposit + 3-month emergency buffer, groceries, utilities, and what's left over).
-- When someone asks about landing a job, resumes, or interviews, give them concrete, realistic wording and practical steps that actually get people hired—without inflating their title into fake executive jargon.
-- When someone is torn between two life or career choices, lay out the real pros, cons, hidden costs, and long-term impact (1 year vs. 5 years from now), and give a clear recommendation.
-
-3. END WITH A SIMPLE NEXT STEP & NEVER CUT OFF MID-SENTENCE:
-- Finish with 1 to 3 concrete things they can do today, or ask one simple follow-up question (like their monthly take-home pay or target city) to dial in the exact numbers for them.
-- ${tokenProfile.completionDirective}
+3. Communication Tone:
+   - Direct, pragmatic, and empowering.
+   - Zero corporate buzzwords (no "synergies", "leverage", "boardroom readiness", or "turnaround telemetry").
+   - Unless the user is asking for a full resume/interview rewrite, structure financial & strategy responses with:
+     - ### 1. Solvency Diagnosis (Summary of the numbers)
+     - ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
+     - ### 3. Target Earnings & Wealth Milestone Roadmap
+   - ${tokenProfile.completionDirective}
 
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
-Active Mode: ${isBusinessMode ? 'BUSINESS & OPERATIONS' : 'PERSONAL LIFE, CAREER & MONEY'} | Category: ${tokenProfile.category.toUpperCase()}
+Active Mode: ${isBusinessMode ? 'INDEPENDENT SOLO & VARIABLE INCOME STUDIO' : 'PERSONAL RUNWAY & CAREER TRANSITIONS'} | Category: ${tokenProfile.category.toUpperCase()}
 ${pastMemoryBlock}${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
 User Query: ${userMessage}`;
 
@@ -1508,8 +1514,19 @@ app.post('/api/autopilot/triage', async (req, res) => {
   }
 });
 
-// ONE-CLICK MASKED PAST.DEV KEY CONFIGURATOR (SAVES TO .env WITHOUT TERMINAL OR CHAT EXPOSURE)
+// LOCKED ADMIN ENDPOINTS: Require localhost origin or X-Admin-Token so public visitors can never overwrite server .env keys
+function isLocalOrAdminAuthorized(req) {
+  const ip = String(req.ip || req.socket?.remoteAddress || '');
+  const isLocal = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  const adminToken = process.env.ADMIN_CONFIG_TOKEN;
+  const provided = req.headers['x-admin-token'] || req.body?.adminToken;
+  return isLocal || Boolean(adminToken && provided === adminToken);
+}
+
 app.post('/api/config/past-key', async (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).json({ error: 'Forbidden: server .env configuration is restricted to the host administrator.' });
+  }
   try {
     const rawKey = String(req.body?.key || '').trim();
     if (!rawKey || rawKey.length < 8 || /[\r\n]/.test(rawKey)) {
@@ -1536,6 +1553,9 @@ app.get('/api/config/past-key/status', (req, res) => {
 
 // ONE-TAP STRIPE BILLING & PAYMENT LINK CONFIGURATOR (ZERO TERMINAL NEEDED)
 app.post('/api/config/stripe-key', async (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).json({ error: 'Forbidden: server .env configuration is restricted to the host administrator.' });
+  }
   try {
     const secretKey = String(req.body?.secretKey || '').trim();
     const linkStarter = String(req.body?.linkStarter || '').trim();

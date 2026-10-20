@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-stripe-billing-v42';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-launch-directive-v43';
 const ASSETS = [
   '/',
   '/index.html',
