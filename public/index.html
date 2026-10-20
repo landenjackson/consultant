@@ -41,17 +41,18 @@
     }
     </script>
     <!-- Progressive Web App (PWA) Manifest & Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json?v=37">
     <meta name="theme-color" content="#07090D">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Consultant">
-    <link rel="icon" type="image/png" sizes="32x32" href="/brand/consultant_studio_official_icon.png?v=30">
-    <link rel="icon" type="image/png" sizes="192x192" href="/brand/icon-192.png?v=30">
-    <link rel="icon" type="image/png" sizes="512x512" href="/brand/icon-512.png?v=30">
-    <link rel="shortcut icon" href="/favicon.ico?v=30">
-    <link rel="apple-touch-icon" href="/brand/consultant_studio_official_icon.png?v=30">
-    <link rel="apple-touch-icon" sizes="180x180" href="/brand/icon-192.png?v=30">
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-192.png?v=37">
+    <link rel="icon" type="image/png" sizes="192x192" href="/brand/icon-192.png?v=37">
+    <link rel="icon" type="image/png" sizes="512x512" href="/brand/icon-512.png?v=37">
+    <link rel="shortcut icon" href="/favicon.ico?v=37">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=37">
+    <link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png?v=37">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1848,41 +1849,36 @@
             }
 
             header {
-                padding: 0 8px !important;
-                height: 50px !important;
-            }
-
-            .header-title-text {
-                display: none !important;
-            }
-
-            #globalTelemetryRibbon {
-                padding: 2px 6px !important;
-                gap: 3px !important;
-                max-width: 160px !important;
-            }
-
-            #activeClientSelector {
-                max-width: 95px !important;
-                font-size: 10.5px !important;
-            }
-
-            .header-gate-text {
-                display: none !important;
+                padding: 0 12px !important;
+                height: 52px !important;
             }
 
             .workspace-stage {
-                height: calc(100vh - 50px) !important;
+                height: auto !important;
+                min-height: calc(100dvh - 52px) !important;
                 max-width: 100vw !important;
                 overflow-x: hidden !important;
+                overflow-y: visible !important;
             }
 
             #chatFeed {
-                padding: 10px 10px 95px !important;
-                gap: 10px !important;
+                padding: 12px 12px 115px !important;
+                gap: 12px !important;
                 max-width: 100vw !important;
                 overflow-x: hidden !important;
+                overflow-y: visible !important;
                 box-sizing: border-box !important;
+            }
+
+            #prInputsGrid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
+                padding: 12px !important;
+            }
+
+            #prKpiGrid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
             }
 
             .hero-banner-card {
@@ -2192,13 +2188,14 @@
 
             .bubble-user {
                 max-width: 92%;
-                font-size: 13px;
+                font-size: 14px;
                 padding: 10px 14px;
             }
 
             .bubble-assistant {
-                padding: 14px 14px;
-                font-size: 13px;
+                padding: 16px 14px;
+                font-size: 14.5px;
+                line-height: 1.7;
                 border-radius: 12px;
             }
 
@@ -2213,51 +2210,21 @@
 
             .exec-table {
                 width: 100% !important;
-                min-width: 780px !important;
+                min-width: 480px !important;
                 table-layout: auto !important;
-                font-size: 11.5px;
-                line-height: 1.4;
+                font-size: 12.5px;
+                line-height: 1.45;
             }
 
             .exec-table th {
-                font-size: 10.5px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 7px 10px;
                 white-space: nowrap !important;
             }
 
             .exec-table td {
-                padding: 6px 10px;
+                padding: 7px 10px;
                 white-space: nowrap !important;
-            }
-
-            .exec-table td.metric-name {
-                font-size: 10.5px;
-                width: 32%;
-            }
-
-            .exec-table td.metric-target {
-                font-size: 10.5px;
-                width: 25%;
-                white-space: normal;
-            }
-
-            .exec-table td.metric-desc {
-                font-size: 10px;
-                width: 43%;
-            }
-
-            .dock-container {
-                padding: 8px 10px;
-            }
-
-            .dock-box {
-                border-radius: 10px;
-                padding: 2px 8px;
-            }
-
-            .btn-send {
-                padding: 6px 12px;
-                font-size: 12px;
             }
 
             .deliverables-bar {
@@ -2267,8 +2234,8 @@
             }
 
             .btn-export {
-                padding: 5px 9px;
-                font-size: 11px;
+                padding: 6px 10px;
+                font-size: 11.5px;
             }
 
             /* Responsive Full-Screen Canvas Overlay on Mobile */
@@ -2360,8 +2327,8 @@
             </div>
 
             <!-- SECONDARY SIGN-IN & TRIAL ACTIONS -->
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:36px; width:100%; max-width:520px;">
-                <button class="btn-export" onclick="handleGoogleSecuritySignIn()" style="flex:1; min-width:210px; justify-content:center; gap:10px; font-size:13.5px; font-weight:700; padding:11px 20px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border-color:rgba(255,255,255,0.2); color:#FFF; border-radius:10px; cursor:pointer;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom:36px; width:100%; max-width:680px;">
+                <button class="btn-export" onclick="handleGoogleSecuritySignIn()" style="flex:1; min-width:190px; justify-content:center; gap:10px; font-size:13.5px; font-weight:700; padding:11px 18px; background:linear-gradient(180deg, #161D2B 0%, #0F141E 100%); border-color:rgba(255,255,255,0.2); color:#FFF; border-radius:10px; cursor:pointer;">
                     <svg width="16" height="16" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
                         <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
@@ -2370,7 +2337,10 @@
                     </svg>
                     <span>Continue with Google</span>
                 </button>
-                <button class="btn-export" onclick="openPricing()" style="flex:1; min-width:210px; justify-content:center; font-size:13.5px; font-weight:700; padding:11px 20px; background:transparent; border-color:rgba(255,255,255,0.16); color:#F8FAFC; border-radius:10px; cursor:pointer;">
+                <button class="btn-export" onclick="openPwaInstallGuide()" style="flex:1; min-width:190px; justify-content:center; font-size:13.5px; font-weight:700; padding:11px 18px; background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.4); color:#FDE68A; border-radius:10px; cursor:pointer;">
+                    <span>📲 Add App to Phone Home Screen</span>
+                </button>
+                <button class="btn-export" onclick="openPricing()" style="flex:1; min-width:190px; justify-content:center; font-size:13.5px; font-weight:700; padding:11px 18px; background:transparent; border-color:rgba(255,255,255,0.16); color:#F8FAFC; border-radius:10px; cursor:pointer;">
                     <span>View Plans &amp; 30-Day Free Trial</span>
                 </button>
             </div>
@@ -2420,6 +2390,12 @@
             </button>
             <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
                 <span>👤</span> <span>Account Profile</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px; border-color:rgba(245,158,11,0.35); color:#FDE68A;" onclick="openPwaInstallGuide(); toggleSidebar(false);">
+                <span>📲</span> <span>Install on Phone Home Screen</span>
+            </button>
+            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="showLandingPortalAgain(); toggleSidebar(false);">
+                <span>🏠</span> <span>Switch Track / Main Portal</span>
             </button>
         </div>
 
@@ -2520,7 +2496,7 @@
                     </div>
 
                     <!-- INPUTS GRID -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(195px, 1fr)); gap:12px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.07); margin-bottom:14px;">
+                    <div id="prInputsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.07); margin-bottom:14px;">
                         <div>
                             <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Liquid Savings ($)</label>
                             <input type="number" id="prLiquidSavings" value="18000" min="0" step="500" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
@@ -2548,7 +2524,7 @@
                     </div>
 
                     <!-- EMERALD & GOLD WEALTH KPI CARDS -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:14px;">
+                    <div id="prKpiGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:14px;">
                         <div style="background:linear-gradient(145deg, #0D1714 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(245,158,11,0.32); border-radius:12px; padding:15px 16px;">
                             <div style="font-size:11px; font-weight:700; color:#FBBF24; text-transform:uppercase; letter-spacing:0.05em;">Net Monthly Burn</div>
                             <div id="prNetBurnOut" style="font-size:23px; font-weight:800; color:#FFFFFF; font-family:monospace; margin:4px 0;">$2,200/mo</div>
@@ -2907,17 +2883,9 @@
 
         <div class="dock-box">
             <input type="file" id="fileInput" accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.json,.png,.jpg,.jpeg,.webp,.heic" multiple style="display:none" onchange="handleFileUpload(event)">
-            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach up to 10 Files, CSVs, P&Ls, Screenshots, or Photos">
+            <button class="btn-icon" onclick="document.getElementById('fileInput').click()" title="Attach Resume, Lease, Spreadsheet, or Screenshot">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                </svg>
-            </button>
-            <button class="btn-icon" onclick="resetChatSession()" title="Start New Chat / Reset Session" style="color:var(--text-muted);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                    <path d="M21 3v5h-5"></path>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                    <path d="M3 21v-5h5"></path>
                 </svg>
             </button>
 
@@ -4306,8 +4274,10 @@
             const isAuthenticated = localStorage.getItem('consultant_user_authenticated') === 'true';
             const portal = document.getElementById('landingPortal');
 
-            // Show introductory landing page for unauthenticated new visitors
-            if (!isAuthenticated && !isCreator && !location.search.includes('pwa=true')) {
+            const isStandalonePwa = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true || location.search.includes('pwa=true');
+
+            // Show introductory landing page only for unauthenticated browser visitors (never trap Home Screen PWA users!)
+            if (!isAuthenticated && !isCreator && !isStandalonePwa) {
                 if (portal) portal.style.display = 'flex';
             } else {
                 if (portal) portal.style.display = 'none';
@@ -4320,15 +4290,65 @@
 
             if (profile.name) {
                 if (welcomeH1) welcomeH1.innerText = `Welcome back, ${profile.name.split(' ')[0]}.`;
-                if (welcomeSub) welcomeSub.innerText = `Your personal consultant for life, career, money, and business decisions${profile.company ? ` (${profile.company})` : ''}. Ask anything in plain English or attach a file to get a clear, honest breakdown.`;
+                if (welcomeSub) welcomeSub.innerText = `Calculate your exact months of runway, post-tax minimum salary, and offer surplus.`;
                 if (sidebarName) sidebarName.innerText = profile.name + (isCreator ? ' (Creator)' : ' (Active Trial)');
                 if (authBtnText) authBtnText.innerText = 'Account & Plan';
             } else {
-                if (welcomeH1) welcomeH1.innerText = 'Track Personal Cash Runway & Career Transition Math';
-                if (welcomeSub) welcomeSub.innerText = "Model your exact months and days of financial solvency, calculate your minimum target salary after taxes, benchmark job offers or consulting day-rates, and polish your resume or STAR interview answers.";
-                if (sidebarName) sidebarName.innerText = 'Guest Preview (3 Free Queries)';
+                if (welcomeH1) welcomeH1.innerText = 'Personal Cash Runway & Salary Engine';
+                if (welcomeSub) welcomeSub.innerText = 'Calculate your exact months of runway, post-tax minimum salary, and offer surplus.';
+                if (sidebarName) sidebarName.innerText = 'Guest Preview (Free Trial)';
                 if (authBtnText) authBtnText.innerText = 'Sign In / Start 30-Day Trial';
             }
+        }
+
+        function showLandingPortalAgain() {
+            const portal = document.getElementById('landingPortal');
+            if (portal) portal.style.display = 'flex';
+        }
+
+        window._deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window._deferredPwaPrompt = e;
+        });
+
+        async function openPwaInstallGuide() {
+            if (window._deferredPwaPrompt) {
+                try {
+                    window._deferredPwaPrompt.prompt();
+                    await window._deferredPwaPrompt.userChoice;
+                    window._deferredPwaPrompt = null;
+                    return;
+                } catch (e) {}
+            }
+            const modal = document.getElementById('legalTrustModal');
+            const title = document.getElementById('legalModalTitle');
+            const sub = document.getElementById('legalModalSub');
+            const body = document.getElementById('legalModalBody');
+            if (!modal || !body) return;
+            if (title) title.innerText = '📲 Add Consultant Studio to Your Phone Home Screen';
+            if (sub) sub.innerText = 'Launch in 1 tap with the 24K Gold Coin app icon and full-screen mobile view';
+            body.innerHTML = `
+                <div style="display:flex; align-items:center; gap:14px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.35); border-radius:12px; padding:14px;">
+                    <div class="gold-sovereign-coin" style="width:52px; height:52px; flex-shrink:0;">
+                        <img src="/brand/gold_coin_emblem.webp?v=37" alt="Gold Coin">
+                    </div>
+                    <div style="font-size:13px; color:#F8FAFC; line-height:1.5;">
+                        <strong>Important for Telegram Users:</strong> If you opened this link inside Telegram's built-in browser, tap the <strong>•••</strong> or <strong>Safari / Compass icon</strong> in the bottom-right corner first so it opens in <strong>Safari</strong> (iPhone) or <strong>Chrome</strong> (Android).
+                    </div>
+                </div>
+                <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                    <strong style="color:#4ADE80; display:block; margin-bottom:6px;">🍏 On iPhone (Safari) — 2 Taps:</strong>
+                    1. Tap the <strong>Share</strong> button at the bottom of Safari (the square with an upward arrow <code>↑</code>).<br>
+                    2. Scroll down and tap <strong>"Add to Home Screen"</strong>, then tap <strong>Add</strong> in the top-right corner.
+                </div>
+                <div style="background:#090D14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px;">
+                    <strong style="color:#FBBF24; display:block; margin-bottom:6px;">🤖 On Android (Chrome) — 2 Taps:</strong>
+                    1. Tap the <strong>⋮</strong> menu in the top-right corner of Chrome.<br>
+                    2. Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.
+                </div>
+            `;
+            modal.style.display = 'flex';
         }
 
         function enterDedicatedTrack(trackMode) {

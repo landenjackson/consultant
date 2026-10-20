@@ -1,9 +1,11 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-gold-coin-v36';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-pwa-homescreen-v37';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/brand/apple-touch-icon.png',
   '/brand/gold_coin_emblem.webp',
   '/brand/icon-192.png',
   '/brand/icon-512.png',
