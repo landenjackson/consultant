@@ -345,16 +345,16 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       const isDeepSeek = lowerPin.includes('deepseek');
       const isLowLatency = Boolean(lowerPin.includes('latency') || lowerPin.includes('flash'));
       // Route MiniMax M3.1 Flash ("Space Bunny") to minimax/minimax-m3.1-flash:free (with fallback to minimax/minimax-m3),
-      // DeepSeek requests to deepseek/deepseek-chat-v3-0324, low-latency to google/gemini-3.1-flash-lite-preview, and standard/deep to google/gemini-3-flash-preview
+      // DeepSeek requests to deepseek/deepseek-v4.1-flash-1017 (DeepInfer engine), low-latency to google/gemini-3.1-flash-lite-preview, and standard/deep to google/gemini-3-flash-preview
       const orModel = isMiniMax
         ? 'minimax/minimax-m3.1-flash:free'
         : ((isDeepSeek && !hasImages)
-            ? 'deepseek/deepseek-chat-v3-0324'
+            ? 'deepseek/deepseek-v4.1-flash-1017'
             : (isLowLatency ? 'google/gemini-3.1-flash-lite-preview' : 'google/gemini-3-flash-preview'));
       const displayLabel = isMiniMax
         ? 'MiniMax M3.1 Flash (Space Bunny)'
         : (isDeepSeek
-            ? 'DeepSeek Quantitative Math'
+            ? 'DeepSeek V4.1 Flash (DeepInfer)'
             : (isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning'));
       const maxOutTokens = categoryTokenCap || (isLowLatency ? 4096 : 6000);
       console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
@@ -1106,8 +1106,8 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
     const probeAPromise = hasImgs
       ? callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2)
       : Promise.any([
-          callOpenRouter('minimax/minimax-m3.1-flash:free', buildPayload(invDirective), 1800, 0.2),
-          callOpenRouter('deepseek/deepseek-chat-v3-0324', buildPayload(invDirective), 1800, 0.2)
+          callOpenRouter('deepseek/deepseek-v4.1-flash-1017', buildPayload(invDirective), 1800, 0.2),
+          callOpenRouter('minimax/minimax-m3.1-flash:free', buildPayload(invDirective), 1800, 0.2)
         ]).catch(() => callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2));
 
     const [probeA, probeB] = await Promise.all([
