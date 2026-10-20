@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-pwa-homescreen-v38';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-zero-horiz-scroll-v39';
 const ASSETS = [
   '/',
   '/index.html',
