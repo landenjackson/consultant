@@ -2496,29 +2496,40 @@
                     </div>
 
                     <!-- INPUTS GRID -->
+                    <style>
+                        #prInputsGrid > div {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: flex-end;
+                        }
+                        #prInputsGrid input[type="number"] {
+                            box-sizing: border-box !important;
+                            width: 100% !important;
+                        }
+                    </style>
                     <div id="prInputsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; background:#07090D; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.07); margin-bottom:14px;">
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Liquid Savings ($)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Liquid Savings ($)</label>
                             <input type="number" id="prLiquidSavings" value="18000" min="0" step="500" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
                         </div>
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Essential Monthly Bills ($)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Essential Bills ($/mo)</label>
                             <input type="number" id="prEssentialCosts" value="2400" min="0" step="100" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;" title="Rent, debt, groceries, baseline utilities">
                         </div>
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Flexible Spending ($/mo)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Flexible Spend ($/mo)</label>
                             <input type="number" id="prDiscretionary" value="600" min="0" step="50" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
                         </div>
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Side / Bridge Income ($/mo)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Side Income ($/mo)</label>
                             <input type="number" id="prSideIncome" value="800" min="0" step="100" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
                         </div>
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Annual Savings Goal ($/yr)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Savings Goal ($/yr)</label>
                             <input type="number" id="prSavingsTarget" value="6000" min="0" step="500" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
                         </div>
                         <div>
-                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;">Estimated Tax Rate (%)</label>
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Est. Tax Rate (%)</label>
                             <input type="number" id="prTaxRate" value="22" min="0" max="55" step="1" oninput="recalcPersonalRunway()" style="width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.14); color:#F8FAFC; padding:9px 11px; border-radius:8px; font-family:monospace; font-size:13.5px; font-weight:700;">
                         </div>
                     </div>
