@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-light-mode-clarity-v44';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-light-mode-clarity-v45';
 const ASSETS = [
   '/',
   '/index.html',

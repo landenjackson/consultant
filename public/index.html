@@ -325,6 +325,12 @@
         }
         [data-theme="light"] .dock-input {
             color: var(--text-primary) !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        [data-theme="light"] #prTimelineTrackBar {
+            background: #E2E8F0 !important;
         }
         /* COMPREHENSIVE LIGHT THEME READABILITY OVERRIDES FOR ALL INNER CONTAINERS & TEXT */
         [data-theme="light"] .btn-icon-drawer,
@@ -2863,10 +2869,10 @@
                     <!-- SOLVENCY TIMELINE BAR & OFFER BENCHMARKING -->
                     <div style="background:#07090D; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:15px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-                            <span style="font-size:12px; font-weight:700; color:#F8FAFC;">12-Month Cash Solvency Projection</span>
+                            <span style="font-size:12px; font-weight:700; color:var(--text-primary);">12-Month Cash Solvency Projection</span>
                             <span id="prTimelineStatusBadge" style="font-size:11px; font-weight:800; color:#4ADE80; font-family:monospace; background:rgba(34,197,94,0.12); padding:2px 8px; border-radius:6px; border:1px solid rgba(34,197,94,0.3);">Healthy Buffer (>6 Months)</span>
                         </div>
-                        <div style="width:100%; height:12px; background:#151C28; border-radius:8px; overflow:hidden; margin-bottom:8px;">
+                        <div id="prTimelineTrackBar" style="width:100%; height:12px; background:#151C28; border-radius:8px; overflow:hidden; margin-bottom:8px;">
                             <div id="prTimelineFill" style="height:100%; width:68%; background:linear-gradient(90deg, #22C55E 0%, #10B981 75%, #F59E0B 100%); transition:width 0.25s ease;"></div>
                         </div>
                         <div id="prTimelineMonthStrip" style="display:grid; grid-template-columns:repeat(12, 1fr); gap:4px; margin-bottom:14px;">
