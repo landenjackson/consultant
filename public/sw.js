@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-light-mode-clarity-v45';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-drawer-z950-v46';
 const ASSETS = [
   '/',
   '/index.html',

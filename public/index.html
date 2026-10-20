@@ -403,6 +403,37 @@
             border-color: #CBD5E1 !important;
             color: #475569 !important;
         }
+        [data-theme="light"] .sidebar-brand-title,
+        [data-theme="light"] .plan-name,
+        [data-theme="light"] .plan-price,
+        [data-theme="light"] .modal-header h2,
+        [data-theme="light"] #canvasTitle {
+            color: #0F172A !important;
+        }
+        [data-theme="light"] .plan-box {
+            background: #F8FAFC !important;
+            border-color: #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        [data-theme="light"] .plan-box.featured {
+            background: linear-gradient(180deg, #ECFDF5 0%, #FFFFFF 100%) !important;
+            border-color: #047857 !important;
+        }
+        [data-theme="light"] .btn-modal-close {
+            background: #F1F5F9 !important;
+            border-color: #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        [data-theme="light"] #breakevenStudio > div > div:nth-of-type(3),
+        [data-theme="light"] #breakevenStudio thead tr {
+            background: #F1F5F9 !important;
+            color: #0F172A !important;
+            border-color: #CBD5E1 !important;
+        }
+        [data-theme="light"] #beTableBody td {
+            color: #0F172A !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+        }
 
         @keyframes meshDrift {
             0% { transform: translate(0px, 0px) scale(1); }
@@ -2667,17 +2698,17 @@
         </main>
     </div>
 
-    <!-- SLIDE-OVER EXECUTIVE COMMAND CENTER & MODULE SELECTOR (Z-50 DRAWER + Z-40 BLURRED BACKDROP) -->
-    <div id="sidebarOverlay" onclick="toggleSidebar(false)" style="position:fixed; inset:0; background:rgba(2, 6, 23, 0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:40; opacity:0; pointer-events:none; transition:opacity 0.3s ease-in-out;"></div>
-    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:310px; max-width:88vw; background:#0B0E14; border-right:1px solid rgba(255,255,255,0.08); z-index:50; transform:translateX(-100%); pointer-events:none; transition:transform 0.3s ease-in-out; display:flex; flex-direction:column; padding:20px 16px; box-shadow:20px 0 60px rgba(0,0,0,0.9); overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08);">
+    <!-- SLIDE-OVER EXECUTIVE COMMAND CENTER & MODULE SELECTOR (Z-950 DRAWER ABOVE HEADER + Z-900 BLURRED BACKDROP) -->
+    <div id="sidebarOverlay" onclick="toggleSidebar(false)" style="position:fixed; inset:0; background:rgba(2, 6, 23, 0.65); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:900; opacity:0; pointer-events:none; transition:opacity 0.3s ease-in-out;"></div>
+    <aside id="executiveSidebar" style="position:fixed; top:0; left:0; bottom:0; width:310px; max-width:86vw; background:var(--bg-surface, #0B0E14); border-right:1px solid var(--border-strong, rgba(255,255,255,0.12)); z-index:950; transform:translateX(-100%); pointer-events:none; transition:transform 0.3s ease-in-out; display:flex; flex-direction:column; padding:calc(16px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)) 16px; box-shadow:20px 0 60px rgba(0,0,0,0.85); overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border, rgba(255,255,255,0.08));">
             <div style="display:flex; align-items:center; gap:10px;">
-                <div class="gold-sovereign-coin" style="width:32px; height:32px;">
-                    <img src="/brand/gold_coin_emblem.webp?v=36" alt="Gold Coin Logo">
+                <div class="gold-sovereign-coin" style="width:34px; height:34px;">
+                    <img src="/brand/gold_coin_emblem.webp?v=46" alt="Gold Coin Logo">
                 </div>
                 <div>
-                    <div style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14.5px; color:#FFF;">Consultant Studio</div>
-                    <div style="font-size:10px; font-weight:700; color:#FBBF24; text-transform:uppercase; letter-spacing:0.04em;">Wealth &amp; Career Hub</div>
+                    <div class="sidebar-brand-title" style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; color:var(--text-primary, #FFF);">Consultant Studio</div>
+                    <div style="font-size:10px; font-weight:700; color:#F59E0B; text-transform:uppercase; letter-spacing:0.04em;">Wealth &amp; Career Hub</div>
                 </div>
             </div>
             <button class="btn-modal-close" onclick="toggleSidebar(false)" aria-label="Close" title="Close">
@@ -2687,31 +2718,31 @@
 
         <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
             <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin:4px 0 2px 6px;">Workspace</div>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="openVaultModal(); toggleSidebar(false);">
                 <span>🔒</span> <span>Saved Vault</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="openPricing(); toggleSidebar(false);">
                 <span>💳</span> <span>Plans &amp; Free Trial</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openSettingsModal(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="openSettingsModal(); toggleSidebar(false);">
                 <span>⚙️</span> <span>Display &amp; API Settings</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="openAuthModal(); toggleSidebar(false);">
                 <span>👤</span> <span>Account Profile</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px; border-color:rgba(245,158,11,0.35); color:#FDE68A;" onclick="openPwaInstallGuide(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="openPwaInstallGuide(); toggleSidebar(false);">
                 <span>📲</span> <span>Install on Phone Home Screen</span>
             </button>
-            <button class="btn-export" style="justify-content:flex-start; padding:10px 14px; border-radius:10px; font-size:13px;" onclick="showLandingPortalAgain(); toggleSidebar(false);">
+            <button class="btn-export" style="justify-content:flex-start; padding:11px 14px; border-radius:10px; font-size:13px;" onclick="showLandingPortalAgain(); toggleSidebar(false);">
                 <span>🏠</span> <span>Switch Track / Main Portal</span>
             </button>
         </div>
 
-        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+        <div style="border-top:1px solid var(--border, rgba(255,255,255,0.08)); padding-top:12px; margin-top:12px; display:flex; flex-direction:column; gap:6px;">
             <div style="font-size:11px; color:var(--text-muted);">Active Profile:</div>
-            <div id="sidebarUserName" style="font-size:12.5px; font-weight:700; color:var(--accent-glow);">Guest Operator</div>
-            <button id="authTriggerBtn" class="btn-export" style="padding:6px 10px; font-size:11.5px; justify-content:center;" onclick="openAuthModal(); toggleSidebar(false);">
-                <span>🔑</span> <span id="authBtnText">Manage Account / Sign In</span>
+            <div id="sidebarUserName" style="font-size:12.5px; font-weight:700; color:var(--accent-glow);">Guest Preview (Free Trial)</div>
+            <button id="authTriggerBtn" class="btn-export" style="padding:8px 10px; font-size:12px; justify-content:center;" onclick="openAuthModal(); toggleSidebar(false);">
+                <span>🔑</span> <span id="authBtnText">Sign In / Start 30-Day Trial</span>
             </button>
         </div>
     </aside>
