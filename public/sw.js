@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-editorial-luxury-v34';
+const CACHE_NAME = 'consultant-studio-v2026-10-20-mobile-chat-polish-v35';
 const ASSETS = [
   '/',
   '/index.html',
