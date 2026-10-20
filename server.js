@@ -84,7 +84,12 @@ app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0
 }));
 
-// Stripe Instance
+// Dynamic Stripe Instance Helper (reloads cleanly whenever STRIPE_SECRET_KEY is updated via /stripe-setup)
+function getStripeClient() {
+  const key = (process.env.STRIPE_SECRET_KEY || '').trim();
+  if (!key || key.includes('placeholder') || key.length < 16) return null;
+  return new Stripe(key, { apiVersion: '2023-10-16' });
+}
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2023-10-16'
 });
@@ -634,40 +639,64 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 // IN-MEMORY EXECUTION RESUMPTION STORE (GOOGLE AX RESILIENT RUNTIME)
 const axExecutionLog = new Map();
 
-// 1. DYNAMIC STRIPE CHECKOUT SESSIONS
+// 1. DYNAMIC STRIPE CHECKOUT SESSIONS (WITH PAYMENT LINK & INSTANT TRIAL FALLBACK)
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { planId = 'pro', tier = 'Pro Operator', amount = 3999, customerEmail = null } = req.body;
+    const { planId = 'pro', tier = 'Partners', amount = 3999, customerEmail = null } = req.body;
     const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://www.consultant-studio.app');
 
-    const sessionPayload = {
-      payment_method_types: ['card'],
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Consultant Studio — ${tier}`,
-            description: 'Executive Operations & Strategic Intelligence Suite (30-Day Free Trial)'
-          },
-          unit_amount: amount,
-          recurring: { interval: 'month' }
-        },
-        quantity: 1
-      }],
-      mode: 'subscription',
-      subscription_data: {
-        trial_period_days: 30
-      },
-      success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
-      cancel_url: `${origin}/?canceled=true`
+    // Option A: Direct Stripe Payment Links if configured in .env
+    const paymentLinkMap = {
+      starter: process.env.STRIPE_LINK_STARTER,
+      pro: process.env.STRIPE_LINK_PRO,
+      exec: process.env.STRIPE_LINK_EXEC
     };
-
-    if (customerEmail) {
-      sessionPayload.customer_email = customerEmail;
+    if (paymentLinkMap[planId] && paymentLinkMap[planId].startsWith('https://')) {
+      const linkUrl = customerEmail
+        ? `${paymentLinkMap[planId]}${paymentLinkMap[planId].includes('?') ? '&' : '?'}prefilled_email=${encodeURIComponent(customerEmail)}`
+        : paymentLinkMap[planId];
+      return res.json({ id: `link_${planId}`, url: linkUrl, mode: 'payment_link' });
     }
 
-    const session = await stripe.checkout.sessions.create(sessionPayload);
-    res.json({ id: session.id, url: session.url });
+    // Option B: Dynamic Stripe Checkout Session (Apple Pay, Google Pay, Link, Card) if STRIPE_SECRET_KEY is active
+    const activeStripe = getStripeClient();
+    if (activeStripe) {
+      const sessionPayload = {
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Consultant Studio — ${tier}`,
+              description: 'Personal Cash Runway, Career & Business Financial Modeling (Includes 30-Day Free Trial)'
+            },
+            unit_amount: amount,
+            recurring: { interval: 'month' }
+          },
+          quantity: 1
+        }],
+        mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 30
+        },
+        allow_promotion_codes: true,
+        success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
+        cancel_url: `${origin}/?canceled=true`
+      };
+
+      if (customerEmail && customerEmail.includes('@')) {
+        sessionPayload.customer_email = customerEmail;
+      }
+
+      const session = await activeStripe.checkout.sessions.create(sessionPayload);
+      return res.json({ id: session.id, url: session.url, mode: 'stripe_checkout' });
+    }
+
+    // Option C: Instant 30-Day Free Trial Activation ($0 Today) while Stripe live payouts are pending setup
+    return res.json({
+      id: `trial_${Date.now()}`,
+      url: `${origin}/?plan=${encodeURIComponent(planId)}&tier=${encodeURIComponent(tier)}&subscribed=true&trial=active`,
+      mode: 'instant_trial'
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1503,6 +1532,116 @@ app.post('/api/config/past-key', async (req, res) => {
 
 app.get('/api/config/past-key/status', (req, res) => {
   return res.json({ configured: Boolean(process.env.PAST_API_KEY && process.env.PAST_API_KEY.length > 8) });
+});
+
+// ONE-TAP STRIPE BILLING & PAYMENT LINK CONFIGURATOR (ZERO TERMINAL NEEDED)
+app.post('/api/config/stripe-key', async (req, res) => {
+  try {
+    const secretKey = String(req.body?.secretKey || '').trim();
+    const linkStarter = String(req.body?.linkStarter || '').trim();
+    const linkPro = String(req.body?.linkPro || '').trim();
+    const linkExec = String(req.body?.linkExec || '').trim();
+
+    const envPath = path.join(__dirname, '.env');
+    let envContent = '';
+    try {
+      envContent = await fs.readFile(envPath, 'utf-8');
+    } catch (e) {}
+
+    let lines = envContent.split('\n').filter(l =>
+      !l.startsWith('STRIPE_SECRET_KEY=') &&
+      !l.startsWith('STRIPE_LINK_STARTER=') &&
+      !l.startsWith('STRIPE_LINK_PRO=') &&
+      !l.startsWith('STRIPE_LINK_EXEC=')
+    );
+
+    if (secretKey && (secretKey.startsWith('sk_live_') || secretKey.startsWith('sk_test_') || secretKey.startsWith('rk_'))) {
+      process.env.STRIPE_SECRET_KEY = secretKey;
+      lines.push(`STRIPE_SECRET_KEY=${secretKey}`);
+    }
+    if (linkStarter.startsWith('https://')) {
+      process.env.STRIPE_LINK_STARTER = linkStarter;
+      lines.push(`STRIPE_LINK_STARTER=${linkStarter}`);
+    }
+    if (linkPro.startsWith('https://')) {
+      process.env.STRIPE_LINK_PRO = linkPro;
+      lines.push(`STRIPE_LINK_PRO=${linkPro}`);
+    }
+    if (linkExec.startsWith('https://')) {
+      process.env.STRIPE_LINK_EXEC = linkExec;
+      lines.push(`STRIPE_LINK_EXEC=${linkExec}`);
+    }
+
+    await fs.writeFile(envPath, lines.filter((l, i, arr) => l !== '' || i < arr.length - 1).join('\n') + '\n', { mode: 0o600 });
+    return res.json({
+      ok: true,
+      stripeActive: Boolean(getStripeClient() || process.env.STRIPE_LINK_STARTER || process.env.STRIPE_LINK_PRO)
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/stripe-status', (req, res) => {
+  const hasSecret = Boolean(getStripeClient());
+  const hasLinks = Boolean(process.env.STRIPE_LINK_STARTER || process.env.STRIPE_LINK_PRO || process.env.STRIPE_LINK_EXEC);
+  return res.json({
+    configured: hasSecret || hasLinks,
+    mode: hasSecret ? 'stripe_checkout' : (hasLinks ? 'payment_links' : 'instant_trial')
+  });
+});
+
+app.get('/stripe-setup', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect Stripe Payments — Consultant Studio</title>
+  <style>
+    body { background:#070A09; color:#F8FAFC; font-family:-apple-system,BlinkMacSystemFont,'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:16px; box-sizing:border-box; }
+    .card { max-width:460px; width:100%; background:#0C1311; border:1px solid rgba(245,158,11,0.35); border-radius:18px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,0.85); }
+    h2 { margin:0 0 6px 0; font-size:20px; color:#FFF; }
+    p { margin:0 0 16px 0; font-size:13px; color:#94A3B8; line-height:1.5; }
+    label { display:block; font-size:11.5px; font-weight:700; color:#FDE68A; margin-bottom:5px; }
+    input { width:100%; box-sizing:border-box; background:#07090D; border:1px solid rgba(255,255,255,0.16); color:#FFF; border-radius:10px; padding:11px 12px; font-size:13.5px; margin-bottom:12px; outline:none; }
+    button { width:100%; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:800; cursor:pointer; }
+    .status { margin-top:12px; font-size:13px; color:#4ADE80; display:none; text-align:center; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>💳 Connect Live Stripe Subscriptions</h2>
+    <p>Paste either your <strong>Stripe Secret Key</strong> (<code>sk_live_...</code> from <a href="https://dashboard.stripe.com/apikeys" target="_blank" style="color:#FBBF24;">dashboard.stripe.com/apikeys</a>) OR your 3 Stripe Payment Links below. Zero terminal needed.</p>
+    <label>Option 1: Stripe Secret Key (Automatically creates $15.99, $39.99 & $79.99 checkouts)</label>
+    <input type="password" id="sk" placeholder="sk_live_... or sk_test_..." autocomplete="off">
+    <label>Option 2 (Optional): Direct Stripe Payment Links</label>
+    <input type="url" id="l1" placeholder="Solo ($15.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <input type="url" id="l2" placeholder="Partners ($39.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <input type="url" id="l3" placeholder="Business ($79.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <button onclick="saveStripe()">Save & Activate Live Billing</button>
+    <div id="st" class="status">✓ Stripe Billing Saved & Active!</div>
+  </div>
+  <script>
+    async function saveStripe() {
+      const payload = {
+        secretKey: document.getElementById('sk').value.trim(),
+        linkStarter: document.getElementById('l1').value.trim(),
+        linkPro: document.getElementById('l2').value.trim(),
+        linkExec: document.getElementById('l3').value.trim()
+      };
+      const r = await fetch('/api/config/stripe-key', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      if (r.ok) {
+        document.getElementById('sk').value = '';
+        document.getElementById('st').style.display = 'block';
+      } else {
+        alert('Could not save Stripe settings.');
+      }
+    }
+  </script>
+</body>
+</html>`);
 });
 
 app.get('/past-key', (req, res) => {
