@@ -2882,6 +2882,7 @@
                         </div>
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                             <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px;" onclick="resetPersonalRunway()">Reset</button>
+                            <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px; border-color:rgba(245,158,11,0.4); color:var(--text-primary); font-weight:700;" onclick="shareRunwayScorecard()">📤 Share Scorecard</button>
                             <button type="button" class="btn-export" style="padding:4px 10px; font-size:11px; background:rgba(34,197,94,0.12); color:var(--accent-glow); border-color:var(--border-glow); font-weight:700;" onclick="exportPersonalRunwayXLSX()">📥 Export (.xlsx)</button>
                         </div>
                     </div>
@@ -6168,6 +6169,30 @@
             const d = window._lastPersonalRunway || {};
             const offerVal = parseFloat(document.getElementById('prOfferCompareInput')?.value) || 58000;
             sendQuick(`Personal Runway & Salary Benchmark: I have $${(d.liquid || 18000).toLocaleString()} in liquid savings, $${(d.essential || 2400).toLocaleString()}/mo in essential fixed costs, $${(d.discretionary || 600).toLocaleString()}/mo in discretionary spending, and $${(d.inflow || 800).toLocaleString()}/mo in side income. My net monthly burn is $${Math.round(d.netBurn || 2200).toLocaleString()}/mo (${(d.runwayMonths || 8.2).toFixed(1)} months / ${d.runwayDays || 249} days of runway), and my minimum target salary is $${Math.round(d.minTargetSalary || 44615).toLocaleString()}/yr ($${Math.round(d.consultingDayRate || 186)}/day consulting floor). Benchmark this against an offer of $${offerVal.toLocaleString()} and give me an action plan.`);
+        }
+
+        async function shareRunwayScorecard() {
+            recalcPersonalRunway();
+            const d = window._lastPersonalRunway || {};
+            const runwayLabel = Number.isFinite(d.runwayMonths) ? `${d.runwayMonths.toFixed(1)} months (${d.runwayDays} days)` : 'Cash-Flow Positive (Infinite)';
+            const shareText = `🪙 My Cash Runway & Target Salary Scorecard (via Consultant Studio)\n• Cash Runway: ${runwayLabel}\n• Net Monthly Burn: $${Math.round(d.netBurn || 0).toLocaleString()}/mo\n• Post-Tax Minimum Salary Floor: $${Math.round(d.minTargetSalary || 0).toLocaleString()}/yr ($${Math.round(d.consultingDayRate || 0)}/day)\n\nCalculate yours 100% client-side (zero cloud retention): https://www.consultant-studio.app`;
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'My Cash Runway & Target Salary Scorecard | Consultant Studio',
+                        text: shareText,
+                        url: 'https://www.consultant-studio.app'
+                    });
+                    showToast('📤 Shared Runway Scorecard!');
+                    return;
+                }
+            } catch (e) {}
+            try {
+                await navigator.clipboard.writeText(shareText);
+                showToast('📋 Copied Runway Scorecard to Clipboard! Ready to paste on X, Reddit, or LinkedIn.');
+            } catch (e) {
+                showToast('📤 Share URL: https://www.consultant-studio.app');
+            }
         }
 
         // LIVE TAVILY JOB & RESUME OPTION PICKER (1-CLICK SELECTION WITHOUT HARD SCROLLING)

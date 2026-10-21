@@ -1897,6 +1897,45 @@ Monthly Breakeven Revenue = Fixed Monthly Overhead (Rent + Insurance + Base OpEx
       </ol>
       <p>In Consultant Studio, you can upload both offer letters (or job descriptions) + your resume and run <strong>🔬 Harness² (MiniMax/DeepSeek + Gemini Compose)</strong> to get a side-by-side mathematical P&L audit and career positioning verdict in 10 seconds.</p>
     `
+  },
+  '1099-tax-sweep-and-variable-income-buffer': {
+    slug: '1099-tax-sweep-and-variable-income-buffer',
+    tag: 'Solo & 1099 Income',
+    title: 'Variable & 1099 Income Buffer Calculator: The 30% Tax & 20% Runway Sweep',
+    metaDesc: 'How freelancers, independent contractors, and route operators smooth irregular 1099 income using an automated 25-30% quarterly tax sweep and 20% personal wealth runway buffer.',
+    summary: 'Stop living feast-to-famine on irregular 1099 payouts. Calculate your exact weekly tax sweep, 20% cash runway reserve, and net hourly realization after fuel and overhead.',
+    ctaLabel: 'Open 1099 Income Buffer Studio →',
+    ctaUrl: '/?track=personal',
+    bodyHtml: `
+      <h2>Why Irregular 1099 &amp; Route Income Creates Cash Flow Traps</h2>
+      <p>When you earn variable income—whether from independent consulting retainers, commission sales, or last-mile delivery blocks (Amazon Flex, DoorDash, Uber)—treating your gross payout as spendable take-home pay leads to two predictable emergencies: quarterly IRS tax shocks and vehicle/overhead cash crunches during slow weeks.</p>
+      <h2>The 3-Bucket Monday Sweep Formula</h2>
+      <ul>
+        <li><strong>1. Operating &amp; Mileage Reserve (First Deduction):</strong> Deduct direct fuel, maintenance reserves, and software overhead from gross weekly payouts to isolate your <strong>Net Operating Profit</strong>.</li>
+        <li><strong>2. Quarterly Tax Sweep (25%–30% of Net Profit):</strong> Route 25%–30% of net weekly profit into a dedicated high-yield tax vault before touching personal checking.</li>
+        <li><strong>3. Personal Wealth Runway Sweep (20% of Net Profit):</strong> Route 20% into your 6–12 month liquid cash runway so slow weeks never touch your rent or grocery budget.</li>
+      </ul>
+      <p>Use Consultant Studio's built-in <strong>Variable &amp; 1099 Income Buffer Studio</strong> to calculate your weekly sweeps in 0ms and export a clean <code>.xlsx</code> ledger.</p>
+    `
+  },
+  'safe-rent-ceiling-and-move-out-calculator': {
+    slug: 'safe-rent-ceiling-and-move-out-calculator',
+    tag: 'Personal Finance & Housing',
+    title: 'Safe Rent Ceiling & Move-Out Cash Buffer Calculator (Post-Tax Rule)',
+    metaDesc: 'Calculate your maximum safe monthly rent, total move-in cash required, and post-rent emergency runway based on your true post-tax take-home pay.',
+    summary: 'Landlords use gross income (3x rent), which ignores taxes and savings goals. Calculate your true post-tax safe rent ceiling and move-out cash buffer in seconds.',
+    ctaLabel: 'Calculate Safe Rent & Runway →',
+    ctaUrl: '/?track=personal',
+    bodyHtml: `
+      <h2>Why the Traditional "3x Gross Income" Rent Rule Fails</h2>
+      <p>Qualifying for an apartment at 33% of your <strong>gross</strong> income often consumes 45%–50% of your actual <strong>post-tax take-home pay</strong>—wiping out your ability to save or survive a career transition.</p>
+      <h2>The Solvency-First Housing Formula</h2>
+      <ol>
+        <li><strong>28%–30% of Net Take-Home Pay:</strong> Your base rent + essential utilities should stay at or below 30% of your post-tax monthly inflow.</li>
+        <li><strong>Move-In Cash + 6-Month Fortress Buffer:</strong> Before signing a lease, verify that after paying first month, security deposit, and moving costs, your remaining liquid savings still cover at least <strong>6 months (180 days)</strong> of essential living expenses.</li>
+      </ol>
+      <p>Launch the free on-device calculator below to stress-test your exact rent, essential bills, and liquid savings in real time.</p>
+    `
   }
 };
 
