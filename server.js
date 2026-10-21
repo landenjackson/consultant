@@ -264,18 +264,26 @@ function resolveCategoryTokenProfile(userText = '', workspace = 'personal', pinn
   let maxTokens = 4096;
   let completionDirective = '';
 
-  if (lower.includes('resume') || lower.includes('cv') || lower.includes('bullet') || lower.includes('cover letter') || lower.includes('ats') || lower.includes('rewrite')) {
+  if (lower.includes('resume') || lower.includes('cv') || lower.includes('bullet') || lower.includes('cover letter') || lower.includes('ats') || lower.includes('rewrite') || lower.includes('job description') || lower.includes('tailor')) {
     category = 'resume_audit';
     maxTokens = 6500;
-    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (RESUME & FILE POLISH — ${maxTokens} TOKEN BUDGET):
-- You MUST output the COMPLETE, end-to-end 1-page resume or full set of rewritten bullet points without ever cutting off mid-section.
-- Keep your intro takeaway to 2–3 sentences so 85%+ of your token budget goes directly into the concrete, copy-ready resume sections (Header, Summary, Experience Bullets, Education, and Skills) plus 2–3 immediate next steps.`;
-  } else if (lower.includes('interview') || lower.includes('star') || lower.includes('question') || lower.includes('negotiate') || lower.includes('talking point')) {
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (JOB-DESCRIPTION-MATCHED RESUME & ATS AUDIT — ${maxTokens} TOKEN BUDGET):
+- GOLDEN RULE: Every resume MUST be tailored to a specific Job Description (JD) or target role—never output a generic, one-size-fits-all resume!
+- Start with a compact **🎯 Job Description Match & ATS Gap Scorecard**:
+  1. **ATS Keyword Match Score (%)** & the top 6–8 exact keywords/skills from the target Job Description.
+  2. **Matched Keywords vs. Missing/Weak Keywords** (and how we bridged them using the candidate's real experience without inventing fake jobs).
+- Next, output the **COMPLETE, end-to-end 1-page Job-Matched Resume** (Header aligned to the target role title, Tailored Executive Summary mirroring the JD's top 3 priorities, Re-ordered & Keyword-Matched Experience Bullets with quantified impact, Education, and JD-Aligned Core Competencies) without ever cutting off mid-section.
+- If the user has NOT pasted a specific Job Description yet, tailor the resume to their stated target role AND explicitly remind them at the end: "💡 Paste the exact Job Description (or upload the posting) so I can mirror its exact ATS keywords line-by-line."`;
+  } else if (lower.includes('interview') || lower.includes('star') || lower.includes('question') || lower.includes('negotiate') || lower.includes('talking point') || lower.includes('hiring manager') || lower.includes('mock')) {
     category = 'interview_prep';
-    maxTokens = 5500;
-    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (INTERVIEW & STAR PREP — ${maxTokens} TOKEN BUDGET):
-- Deliver complete, word-for-word STAR stories (Situation, Task, Action, Result) and salary negotiation scripts from start to finish.
-- Avoid long introductory preambles; give 3–4 full, ready-to-speak answers and end with a complete closing summary.`;
+    maxTokens = 6000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (RIGOROUS EXECUTIVE INTERVIEW & STAR SIMULATION — ${maxTokens} TOKEN BUDGET):
+- Treat interview preparation with high-stakes seriousness—this determines the user's future career and income trajectory. Never give vague, generic "be confident" advice!
+- Structure your response into 4 rigorous, ready-to-speak sections:
+  1. **🎯 The "First 60 Seconds" Pitch ("Tell Me About Yourself" / Why This Role)**: A word-for-word opening script connecting the user's exact metrics directly to the employer's pain points.
+  2. **⚡ 4 High-Stakes Hiring Manager Questions + Word-for-Word STAR Answers**: Include tough behavioral, analytical, and pressure-test questions for this exact role, with complete **Situation • Task • Action • Quantified Result (STAR)** scripts using the candidate's real numbers.
+  3. **🛡️ Tough Curveball & "Red Flag / Gap" Defense**: How to handle the hardest skeptical question the interviewer will ask (e.g., transitioning industries, entry-level experience vs. stretch requirements) and turn it into an operational strength.
+  4. **💼 3 High-Impact Reverse Questions + Salary Floor Anchor Script**: Smart operator-level questions to ask the hiring manager at the end, plus a word-for-word script to defend their post-tax target salary floor.`;
   } else if (lower.includes('runway') || lower.includes('salary') || lower.includes('offer') || lower.includes('day-rate') || lower.includes('move') || lower.includes('rent') || lower.includes('budget') || lower.includes('paycheck') || lower.includes('debt')) {
     category = 'personal_runway_finance';
     maxTokens = 5000;
@@ -1329,15 +1337,15 @@ User Message: ${userMessage}`;
     const creatorBaselineBlock = (!userIdentity || String(userIdentity).toLowerCase().includes('landen') || String(userIdentity).toLowerCase().includes('creator'))
       ? `\n[VERIFIED OPERATOR RESUME & BACKGROUND BASELINE (Landen Jackson — Tallahassee, FL)]:
 - Headline: Operations & Commercial Strategy Analyst | Unit-Economic Turnarounds & Workflow Automation ( NEVER call him a "Marketing Manager" and DO NOT include Consultant Studio on his resume).
+- Independent Logistics (Amazon Flex, DoorDash & Uber) — Operations & Dispatch Lead (May 2025 – Present, Tallahassee, FL):
+  • Executed 800+ time-sensitive last-mile package blocks and on-demand deliveries with a 99% on-time completion rate and 90%+ customer satisfaction.
+  • Streamlined station load-out sorting, zone organization, and multi-stop dispatch sequencing ahead of target SLA windows.
+  • Tracked per-mile operating costs, order density by zone, and peak-hour payout spreads in Excel to maximize net route profitability.
 - Ma's Diner — Operations & Commercial Strategy Lead (Apr 2025 – Present, Tallahassee, FL):
   • Lifted weekday lunch foot traffic by 25% over 8 weeks while maintaining 100% full-price menu margins.
   • Built automated Excel food-waste and daily prep-par tracking models, cutting perishable COGS by 4.8% (~$35,000/yr annualized savings) with <2% weekly variance.
   • Reorganized prep line staging & order handoff, reducing average ticket times from 8 to 5 minutes (+3 tables/hr peak capacity).
   • Built a 5% repeat local customer baseline via competitor pricing and foot-traffic audits.
-- Independent Logistics (Amazon Flex, DoorDash & Uber) — Operations & Dispatch Lead (May 2025 – Present, Tallahassee, FL):
-  • Executed 800+ time-sensitive last-mile package blocks and on-demand deliveries with a 99% on-time completion rate and 90%+ customer satisfaction.
-  • Streamlined station load-out sorting, zone organization, and multi-stop dispatch sequencing ahead of target SLA windows.
-  • Tracked per-mile operating costs, order density by zone, and peak-hour payout spreads in Excel to maximize net route profitability.
 - Walk-On's Sports Bistreaux — Shift Lead & Operations Coordinator (Jun 2021 – Feb 2025, Tallahassee, FL):
   • Directed 10–60 concurrent to-go/delivery orders on high-volume game days with zero order-accuracy defects.
   • Standardized station setup checklists, cutting new-hire onboarding time by 20%.
@@ -1349,8 +1357,10 @@ User Message: ${userMessage}`;
       : '';
 
     const structureInstruction = isResumeOrCareerQuery
-      ? `- CRITICAL ROUTING RULE FOR RESUME, INTERVIEW & CAREER QUESTIONS:
-  • Answer the user's exact question about their resume, bullet points, interview stories, or career positioning DIRECTLY and IMMEDIATELY.
+      ? `- CRITICAL ROUTING RULE FOR JOB-MATCHED RESUME, INTERVIEW & CAREER QUESTIONS:
+  • Answer the user's exact question about their resume, job description alignment, bullet points, or interview stories DIRECTLY and IMMEDIATELY.
+  • NEVER produce a generic, one-size-fits-all resume: always mirror the exact verbs, KPIs, and ATS keywords of the target Job Description (JD) while keeping 100% of the candidate's real employers, dates, and quantified metrics truthful.
+  • For interview prep, treat every mock question and STAR answer as a serious, career-defining rehearsal—give word-for-word scripts, tough hiring-manager follow-up drills, and salary defense language.
   • Do NOT force "### 1. Solvency Diagnosis / ### 2. 90-Day Tactical Cash Plan" headers onto a resume or interview answer unless the user specifically asked about their cash runway or budget!
   • Preserve the user's exact verified metrics, company names, dates, education, and contact details verbatim—NEVER replace real facts with "[City, State]", "[Dates]", or "[Degree]" placeholders, and NEVER invent unverified numbers.`
       : `- When the user asks about cash runway, budgeting, salary floors, or financial planning, structure your response with:

@@ -2864,8 +2864,8 @@
 
                     <!-- COMPACT QUICK-ACTION PILLS (REPLACES 4 GIANT BOXES) -->
                     <div id="starterChipsWrap" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
-                        <button type="button" class="btn-export" onclick="sendQuick('Resume & File Polish: Audit my attached resume or background. Rewrite my bullet points into clear, quantified results and format a clean 1-page resume.')" style="font-size:12px; padding:6px 12px; border-color:rgba(245,158,11,0.28); color:#F8FAFC;">📄 Polish Resume</button>
-                        <button type="button" class="btn-export" onclick="sendQuick('Job Interview & Case Prep (STAR Method): Help me prepare structured Situation-Task-Action-Result (STAR) interview stories, salary negotiation talking points, and smart questions for the hiring manager.')" style="font-size:12px; padding:6px 12px; border-color:rgba(16,185,129,0.3); color:#F8FAFC;">🎙️ STAR Interview Prep</button>
+                        <button type="button" class="btn-export" onclick="runJobDescriptionMatch('resume')" style="font-size:12px; padding:6px 12px; border-color:rgba(245,158,11,0.35); color:#F8FAFC;">🎯 Match Resume to Job Description</button>
+                        <button type="button" class="btn-export" onclick="runJobDescriptionMatch('interview')" style="font-size:12px; padding:6px 12px; border-color:rgba(16,185,129,0.35); color:#F8FAFC;">🎙️ Serious STAR Interview Drill</button>
                         <button type="button" class="btn-export" onclick="benchmarkTargetSalary()" style="font-size:12px; padding:6px 12px; border-color:rgba(245,158,11,0.28); color:#F8FAFC;">💵 Benchmark Job Offer</button>
                         <button type="button" class="btn-export" onclick="sendQuick('Moving Out & Rent Affordability Check: Based on my monthly take-home pay and savings, calculate the safe rent ceiling, move-in cash required, and post-rent monthly cash buffer.')" style="font-size:12px; padding:6px 12px; border-color:rgba(16,185,129,0.3); color:#F8FAFC;">🏠 Rent &amp; Move-Out Math</button>
                     </div>
@@ -3081,6 +3081,25 @@
                             <button type="button" id="tavilyCareerSearchBtn" onclick="runTavilyCareerLookup()" style="background:#38BDF8; color:#000; font-weight:800; border:none; padding:9px 16px; border-radius:8px; font-size:12.5px; cursor:pointer; white-space:nowrap;">
                                 🔎 Find Best Options
                             </button>
+                        </div>
+
+                        <!-- PASTE JOB DESCRIPTION (JD) -> TAILOR RESUME & MOCK INTERVIEW STUDIO -->
+                        <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
+                                <label for="jdMatchInput" style="font-size:11.5px; font-weight:800; color:#FBBF24; text-transform:uppercase; letter-spacing:0.04em;">
+                                    🎯 Match Resume &amp; Interview Prep to Exact Job Description (No Generic Resumes)
+                                </label>
+                                <span style="font-size:11px; color:#94A3B8;">Paste any job posting below to align your ATS keywords &amp; STAR stories 1-to-1</span>
+                            </div>
+                            <textarea id="jdMatchInput" rows="2" placeholder="Paste the target Job Description (or responsibilities/qualifications) here so your resume and interview prep match the exact role..." style="width:100%; background:#0E131C; border:1px solid rgba(245,158,11,0.3); color:#F8FAFC; padding:8px 11px; border-radius:8px; font-size:12px; line-height:1.45; resize:vertical; margin-bottom:8px;"></textarea>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button type="button" class="btn-export" onclick="runJobDescriptionMatch('resume')" style="background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.45); color:#FBBF24; font-weight:800; font-size:11.5px; padding:7px 12px;">
+                                    🎯 Match My Resume to This Job Description
+                                </button>
+                                <button type="button" class="btn-export" onclick="runJobDescriptionMatch('interview')" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.45); color:#4ADE80; font-weight:800; font-size:11.5px; padding:7px 12px;">
+                                    🎙️ Run Serious Hiring-Manager Interview Simulation
+                                </button>
+                            </div>
                         </div>
 
                         <!-- PICKABLE RESULTS CONTAINER -->
@@ -6378,12 +6397,43 @@
             }
 
             if (actionType === 'prep_interview') {
-                sendQuick(`STAR Interview Prep forChosen Role ("${card.title}"): Based on live market research (${card.summary.slice(0, 200)}), give me the top 3 interview questions hiring managers ask for this exact role, concrete STAR method answer templates I can use in plain English, and smart negotiation talking points for a ~$${sal.toLocaleString()}/yr target.`);
+                sendQuick(`Serious Hiring-Manager Interview Simulation for Chosen Role ("${card.title}"): Based on live market requirements (${card.summary.slice(0, 220)}), run a rigorous interview prep session: (1) My 60-second opening pitch tailored to this exact role, (2) The 4 toughest behavioral & operational questions the hiring manager will ask with word-for-word STAR answers using my real quantified metrics, (3) How to defend against the hardest skeptical curveball question, and (4) 3 high-impact reverse questions + a salary anchor script for ~$${sal.toLocaleString()}/yr.`);
                 return;
             }
 
             // Default: tailor_resume
-            sendQuick(`Tailor My Resume for Chosen Option ("${card.title}"): Based on live 2026 market research from ${card.source} ("${card.summary.slice(0, 220)}"), give me 4 ready-to-copy, quantified resume bullet points and the top ATS keywords I can drop straight into my 1-page resume—using grounded, realistic entry/junior-level operator & analyst wording with zero fake executive jargon.`);
+            sendQuick(`Job-Description-Matched Resume Audit for Chosen Role ("${card.title}"): Never output a generic resume. Using the live requirements from ${card.source} ("${card.summary.slice(0, 240)}"), first give me an ATS Keyword Match Scorecard (top keywords & how my real experience maps to them), and then output a COMPLETE, 1-page Job-Matched Resume where my summary, skills, and quantified bullet points directly mirror this exact job description without inventing fake roles.`);
+        }
+
+        function runJobDescriptionMatch(mode) {
+            const jdEl = document.getElementById('jdMatchInput');
+            const searchEl = document.getElementById('tavilyCareerSearchInput');
+            const jdText = (jdEl?.value || '').trim();
+            const roleFallback = (searchEl?.value || '').trim() || 'Operations, Logistics & Commercial Strategy Analyst';
+
+            if (mode === 'interview') {
+                if (jdText) {
+                    sendQuick(`Serious Hiring-Manager Interview Simulation (Matched to Job Description): Here is the exact target Job Description:\n"""\n${jdText.slice(0, 3500)}\n"""\nPrepare me seriously for my future in this interview: (1) Word-for-word 60-second opening pitch ("Tell me about yourself") mapped to this JD's top pain points, (2) The 4 toughest hiring-manager questions for this posting with complete word-for-word STAR answers using my verified metrics, (3) Tough curveball / gap defense script, and (4) 3 operator-level questions to ask the interviewer + salary floor anchor.`);
+                } else {
+                    sendQuick(`Serious Hiring-Manager Interview Simulation (Target Role: ${roleFallback}): Prepare me seriously for this interview with zero generic fluff: (1) Word-for-word 60-second opening pitch ("Tell me about yourself"), (2) The 4 toughest hiring-manager questions for this role with complete word-for-word STAR answers using my real quantified metrics, (3) How to answer the toughest skeptical curveball question, and (4) 3 high-impact questions to ask the interviewer + salary negotiation script.`);
+                }
+                return;
+            }
+
+            // mode === 'resume'
+            if (jdText) {
+                sendQuick(`Job-Description-Matched Resume & ATS Alignment: Never make a generic resume—every resume must match the job description! Here is the target Job Description:\n"""\n${jdText.slice(0, 3500)}\n"""\n1. Give me a compact ATS Keyword Match Scorecard (top 6–8 required keywords/skills from this JD and how my real experience maps to each one).\n2. Output my COMPLETE, copy-ready 1-page resume tailored specifically to this Job Description—mirroring its exact terminology while keeping 100% of my real employers, dates, and quantified metrics truthful.`);
+            } else {
+                const detailsEl = document.getElementById('prAdvancedDetails');
+                if (detailsEl && !detailsEl.open) detailsEl.open = true;
+                if (jdEl) {
+                    jdEl.focus();
+                    if (typeof showToast === 'function') {
+                        showToast('🎯 Paste the Job Description into the yellow box (or I will tailor to your target role now)!', '📄');
+                    }
+                }
+                sendQuick(`Job-Description-Matched Resume & ATS Alignment (Target Role: ${roleFallback}): Every resume must match the target job description instead of being generic. First show me the top ATS keywords hiring managers screen for in "${roleFallback}" and how my real experience maps to them, then output a complete, 1-page Job-Matched Resume tailored to "${roleFallback}" (and remind me which 2–3 bullets to customize once I paste the exact job posting).`);
+            }
         }
 
         function exportPersonalRunwayXLSX() {
