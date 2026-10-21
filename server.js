@@ -1208,15 +1208,15 @@ YOUR MISSION:
 
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
 
-    // Limit history to the last 2 turns (trimmed to 150 chars) to strictly protect token budget and prevent context bloat
-    const recentMessages = messages.slice(-2);
-    const conversationHistory = recentMessages.length > 1
-      ? recentMessages.slice(0, -1).map(m => {
-          const role = m.role === 'assistant' ? 'Consultant' : 'User';
-          const text = m.content ? m.content.slice(0, 150) : '';
-          return `${role}: ${text}`;
-        }).join('\n\n')
-      : '';
+        // Limit history to the last 6 turns (up to 1,200 chars per turn) so multi-turn resume/interview follow-ups keep full context!
+        const recentMessages = messages.slice(-6);
+        const conversationHistory = recentMessages.length > 1
+          ? recentMessages.slice(0, -1).map(m => {
+              const role = m.role === 'assistant' ? 'Consultant' : 'User';
+              const text = m.content ? m.content.slice(0, 1200) : '';
+              return `${role}: ${text}`;
+            }).join('\n\n')
+          : '';
 
     // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + past.dev Memory Recall + Live Tavily Market Research IN PARALLEL
     // Skip blocking Tavily web search when the user attached a file/image so file/vision analysis starts at 0ms!
@@ -1320,40 +1320,64 @@ User Message: ${userMessage}`;
         (hasAttachedDocs ? `<attached_document_content>\n${cleanDocText.slice(0, 18000)}\n</attached_document_content>\n` : '')
       : '';
 
-    // Consultant Studio Wealth & Income Strategist Prompt (Phase 3 Directive)
+    // Consultant Studio Adaptive Wealth, Career & Resume Strategist Prompt
     const isBusinessMode = (workspace || '').toLowerCase() === 'business';
     const tokenProfile = resolveCategoryTokenProfile(userMessage, workspace, model, hasAttachedDocs, hasAttachedImages);
-    const finalPrompt = `You are the Consultant Studio Wealth & Income Strategist.
-Your mandate is to guide individuals, solo operators, and households toward complete financial stability, resilient cash runways, and personal wealth accumulation.
+    const isResumeOrCareerQuery = tokenProfile.category === 'resume_audit' || tokenProfile.category === 'interview_prep' || /\b(resume|cv|bullet|linkedin|interview|star|ma's diner|walk-on|amazon flex|doordash|fsu|experience|background|job|hire)\b/i.test(userMessage);
+
+    // Verified Creator Baseline Context so questions about Landen's resume/background are ALWAYS 100% accurate even when no file is freshly attached
+    const creatorBaselineBlock = (!userIdentity || String(userIdentity).toLowerCase().includes('landen') || String(userIdentity).toLowerCase().includes('creator'))
+      ? `\n[VERIFIED OPERATOR RESUME & BACKGROUND BASELINE (Landen Jackson — Tallahassee, FL)]:
+- Headline: Operations & Commercial Strategy Analyst | Unit-Economic Turnarounds & Workflow Automation ( NEVER call him a "Marketing Manager" and DO NOT include Consultant Studio on his resume).
+- Ma's Diner — Operations & Commercial Strategy Lead (Apr 2025 – Present, Tallahassee, FL):
+  • Lifted weekday lunch foot traffic by 25% over 8 weeks while maintaining 100% full-price menu margins.
+  • Built automated Excel food-waste and daily prep-par tracking models, cutting perishable COGS by 4.8% (~$35,000/yr annualized savings) with <2% weekly variance.
+  • Reorganized prep line staging & order handoff, reducing average ticket times from 8 to 5 minutes (+3 tables/hr peak capacity).
+  • Built a 5% repeat local customer baseline via competitor pricing and foot-traffic audits.
+- Independent Logistics (Amazon Flex, DoorDash & Uber) — Operations & Dispatch Lead (May 2025 – Present, Tallahassee, FL):
+  • Executed 800+ time-sensitive last-mile package blocks and on-demand deliveries with a 99% on-time completion rate and 90%+ customer satisfaction.
+  • Streamlined station load-out sorting, zone organization, and multi-stop dispatch sequencing ahead of target SLA windows.
+  • Tracked per-mile operating costs, order density by zone, and peak-hour payout spreads in Excel to maximize net route profitability.
+- Walk-On's Sports Bistreaux — Shift Lead & Operations Coordinator (Jun 2021 – Feb 2025, Tallahassee, FL):
+  • Directed 10–60 concurrent to-go/delivery orders on high-volume game days with zero order-accuracy defects.
+  • Standardized station setup checklists, cutting new-hire onboarding time by 20%.
+  • Rewrote closing breakdown checklists and introduced a 10-minute shift handover walkthrough across a 15+ person team, cutting shift-change delays by 50% and saving ~$18,000/yr in overtime labor across 8,000+ monthly guest covers.
+- Education & Credentials:
+  • B.S. in Marketing — Florida State University (Alumni, Graduated Jul 2026); co-authored empirical consumer trust study on institutional decision-making frameworks (p < .001).
+  • A.A. — Tallahassee State College (3x Dean's List).
+  • Eagle Scout (BSA) • Google AI Professional Certificate • Advanced Microsoft Excel Certified.\n`
+      : '';
+
+    const structureInstruction = isResumeOrCareerQuery
+      ? `- CRITICAL ROUTING RULE FOR RESUME, INTERVIEW & CAREER QUESTIONS:
+  • Answer the user's exact question about their resume, bullet points, interview stories, or career positioning DIRECTLY and IMMEDIATELY.
+  • Do NOT force "### 1. Solvency Diagnosis / ### 2. 90-Day Tactical Cash Plan" headers onto a resume or interview answer unless the user specifically asked about their cash runway or budget!
+  • Preserve the user's exact verified metrics, company names, dates, education, and contact details verbatim—NEVER replace real facts with "[City, State]", "[Dates]", or "[Degree]" placeholders, and NEVER invent unverified numbers.`
+      : `- When the user asks about cash runway, budgeting, salary floors, or financial planning, structure your response with:
+  • ### 1. Solvency Diagnosis (Summary of the numbers)
+  • ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
+  • ### 3. Target Earnings & Wealth Milestone Roadmap
+- For any other direct question, answer the user's exact question directly first, then connect it to their numbers if relevant.`;
+
+    const finalPrompt = `You are the Consultant Studio Wealth, Career & Income Strategist.
+Your mandate is to give direct, accurate, and high-signal answers tailored to the user's exact question—whether they are polishing their resume, preparing STAR interview stories, auditing their cash runway, or modeling business breakeven.
 
 Core Operational Rules:
-1. Grounding in Real Numbers:
-   Always parse and reference the user's active calculator numbers directly:
-   - Total Liquid Savings ($)
-   - Essential Monthly Overhead ($)
-   - Discretionary Outflows ($)
-   - Inflows & Side Retainers ($)
-   - Net Monthly Burn & Days of Financial Life Expectancy
-   - Post-Tax Target Salary Floor
+1. Direct Question-First Accuracy:
+   - Always answer the user's specific question first using their exact attached document, resume baseline, and active calculator numbers.
+   - Never hallucinate placeholder brackets (like "[City, State]" or "[Degree]") when the real facts are present in context.
 
-2. Strategy Hierarchy:
-   - Step 1: Immediate Solvency (Secure 6-12 months of non-negotiable living expenses).
-   - Step 2: Income Floor Stabilization (Calculate break-even day-rate or post-tax minimum W-2 salary).
-   - Step 3: Volatility Hedging (Establish automatic 25-30% tax sweeps and 20% runway sweeps on variable income).
-   - Step 4: Wealth Compounding (Deploy surplus cash into high-yield reserves, debt retirement, and equity assets).
+2. Financial & Calculator Grounding (When Relevant):
+   - Reference the user's active calculator numbers (Liquid Savings, Essential Overhead, Discretionary Outflows, Side Inflows, Net Monthly Burn, Days of Runway, and Post-Tax Target Salary Floor) when discussing pay targets, job offers, or cash planning.
 
-3. Communication Tone:
-   - Direct, pragmatic, and empowering.
-   - Zero corporate buzzwords (no "synergies", "leverage", "boardroom readiness", or "turnaround telemetry").
-   - Unless the user is asking for a full resume/interview rewrite, structure financial & strategy responses with:
-     - ### 1. Solvency Diagnosis (Summary of the numbers)
-     - ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
-     - ### 3. Target Earnings & Wealth Milestone Roadmap
+3. Communication Tone & Structure:
+   - Direct, pragmatic, and empowering. Zero corporate buzzwords.
+${structureInstruction}
    - ${tokenProfile.completionDirective}
 
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
 Active Mode: ${isBusinessMode ? 'INDEPENDENT SOLO & VARIABLE INCOME STUDIO' : 'PERSONAL RUNWAY & CAREER TRANSITIONS'} | Category: ${tokenProfile.category.toUpperCase()}
-${pastMemoryBlock}${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
+${creatorBaselineBlock}${pastMemoryBlock}${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
 User Query: ${userMessage}`;
 
     // Capture optional client BYOK key from request headers
