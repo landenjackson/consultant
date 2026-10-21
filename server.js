@@ -1514,13 +1514,14 @@ app.post('/api/autopilot/triage', async (req, res) => {
   }
 });
 
-// LOCKED ADMIN ENDPOINTS: Require localhost origin or X-Admin-Token so public visitors can never overwrite server .env keys
+// LOCKED ADMIN ENDPOINTS: Require true localhost origin (NOT via Cloudflare Tunnel) or X-Admin-Token so public visitors can never overwrite server .env keys
 function isLocalOrAdminAuthorized(req) {
+  const cfIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.headers['cf-ray'];
   const ip = String(req.ip || req.socket?.remoteAddress || '');
-  const isLocal = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  const isDirectLocal = !cfIp && (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1');
   const adminToken = process.env.ADMIN_CONFIG_TOKEN;
-  const provided = req.headers['x-admin-token'] || req.body?.adminToken;
-  return isLocal || Boolean(adminToken && provided === adminToken);
+  const provided = req.headers['x-admin-token'] || req.body?.adminToken || req.query?.token;
+  return isDirectLocal || Boolean(adminToken && provided === adminToken);
 }
 
 app.post('/api/config/past-key', async (req, res) => {
@@ -1612,6 +1613,10 @@ app.get('/api/config/stripe-status', (req, res) => {
 });
 
 app.get('/stripe-setup', (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).send('Forbidden: Administrator token required.');
+  }
+  const tokenParam = String(req.query?.token || '').replace(/[^a-zA-Z0-9_-]/g, '');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(`<!DOCTYPE html>
 <html>
@@ -1646,6 +1651,7 @@ app.get('/stripe-setup', (req, res) => {
   <script>
     async function saveStripe() {
       const payload = {
+        adminToken: '${tokenParam}',
         secretKey: document.getElementById('sk').value.trim(),
         linkStarter: document.getElementById('l1').value.trim(),
         linkPro: document.getElementById('l2').value.trim(),
