@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-20-growth-marketing-v49';
+const CACHE_NAME = 'consultant-studio-v2026-10-21-omh-award-lifecycle-v50';
 const ASSETS = [
   '/',
   '/index.html',

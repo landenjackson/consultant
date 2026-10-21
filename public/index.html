@@ -55,7 +55,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png?v=37">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
     <!-- Robust Document Ingestion & Chart Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -2926,21 +2926,21 @@
                         </div>
                     </div>
 
-                    <!-- EMERALD & GOLD WEALTH KPI CARDS -->
+                    <!-- EMERALD & GOLD WEALTH KPI CARDS (FLUID CLAMP TYPOGRAPHY + JETBRAINS MONO) -->
                     <div id="prKpiGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; margin-bottom:14px;">
                         <div style="background:linear-gradient(145deg, #0D1714 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(245,158,11,0.32); border-radius:12px; padding:15px 16px;">
                             <div style="font-size:11px; font-weight:700; color:#FBBF24; text-transform:uppercase; letter-spacing:0.05em;">Net Monthly Burn</div>
-                            <div id="prNetBurnOut" style="font-size:23px; font-weight:800; color:#FFFFFF; font-family:monospace; margin:4px 0;">$2,200/mo</div>
+                            <div id="prNetBurnOut" style="font-size:clamp(20px, 2.4vw, 26px); font-weight:800; color:#FFFFFF; font-family:'JetBrains Mono', monospace; margin:4px 0; font-variant-numeric:tabular-nums;">$2,200/mo</div>
                             <div style="font-size:11.5px; color:#94A3B8;">Monthly Bills Minus Side Income</div>
                         </div>
                         <div style="background:linear-gradient(145deg, rgba(16,185,129,0.16) 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(16,185,129,0.45); border-radius:12px; padding:15px 16px;">
                             <div style="font-size:11px; font-weight:700; color:#34D399; text-transform:uppercase; letter-spacing:0.05em;">Cash Runway</div>
-                            <div id="prRunwayOut" style="font-size:23px; font-weight:800; color:#4ADE80; font-family:monospace; margin:4px 0;">8.2 mos (249 days)</div>
+                            <div id="prRunwayOut" style="font-size:clamp(20px, 2.4vw, 26px); font-weight:800; color:#4ADE80; font-family:'JetBrains Mono', monospace; margin:4px 0; font-variant-numeric:tabular-nums;">8.2 mos (249 days)</div>
                             <div id="prDepletionDateOut" style="font-size:11.5px; color:#A7F3D0;">How long your savings last</div>
                         </div>
                         <div style="background:linear-gradient(145deg, rgba(245,158,11,0.16) 0%, #080E0C 100%); color:#F8FAFC; border:1px solid rgba(245,158,11,0.45); border-radius:12px; padding:15px 16px;">
                             <div style="font-size:11px; font-weight:700; color:#FBBF24; text-transform:uppercase; letter-spacing:0.05em;">Minimum Target Salary</div>
-                            <div id="prTargetSalaryOut" style="font-size:23px; font-weight:800; color:#FDE68A; font-family:monospace; margin:4px 0;">$44,615/yr</div>
+                            <div id="prTargetSalaryOut" style="font-size:clamp(20px, 2.4vw, 26px); font-weight:800; color:#FDE68A; font-family:'JetBrains Mono', monospace; margin:4px 0; font-variant-numeric:tabular-nums;">$44,615/yr</div>
                             <div id="prDayRateOut" style="font-size:11.5px; color:#4ADE80; font-weight:600;">~$21.45/hr • $186/day floor</div>
                         </div>
                     </div>
@@ -4821,8 +4821,10 @@
 
             const isStandalonePwa = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true || location.search.includes('pwa=true');
 
-            // Show introductory landing page only for unauthenticated browser visitors (never trap Home Screen PWA users!)
-            if (!isAuthenticated && !isCreator && !isStandalonePwa) {
+            // LIFECYCLE GROWTH EXPERIMENT ("Calculator-First Instant Activation"):
+            // Open directly into the interactive calculator so first-time visitors experience 0ms math in 0 clicks (eliminating the 88.5% landing portal bounce wall).
+            // Users can still open the full portal anytime via the menu ("Switch Track / Main Portal") or ?portal=true.
+            if (location.search.includes('portal=true')) {
                 if (portal) portal.style.display = 'flex';
             } else {
                 if (portal) portal.style.display = 'none';
@@ -6077,10 +6079,10 @@
 
             if (burnEl) {
                 if (netBurn > 0) {
-                    burnEl.innerText = `$${Math.round(netBurn).toLocaleString()}/mo`;
+                    animateKpiNumber(burnEl, Math.round(netBurn), v => `$${v.toLocaleString()}/mo`);
                     burnEl.style.color = '#FFFFFF';
                 } else {
-                    burnEl.innerText = `+$${Math.round(Math.abs(netBurn)).toLocaleString()}/mo Surplus`;
+                    animateKpiNumber(burnEl, Math.round(Math.abs(netBurn)), v => `+$${v.toLocaleString()}/mo Surplus`);
                     burnEl.style.color = '#4ADE80';
                 }
             }
@@ -6093,13 +6095,13 @@
                 } else {
                     const depDate = new Date(Date.now() + runwayDays * 86400000);
                     const depStr = depDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    runwayEl.innerText = `${runwayMonths.toFixed(1)} mos (${runwayDays} days)`;
+                    animateKpiNumber(runwayEl, runwayDays, dVal => `${(dVal / 30.4375).toFixed(1)} mos (${dVal} days)`);
                     runwayEl.style.color = runwayMonths >= 6 ? '#4ADE80' : (runwayMonths >= 3 ? '#FBBF24' : '#F87171');
                     depEl.innerText = `Est. depletion date: ${depStr}`;
                 }
             }
 
-            if (salEl) salEl.innerText = `$${Math.round(minTargetSalary).toLocaleString()}/yr`;
+            if (salEl) animateKpiNumber(salEl, Math.round(minTargetSalary), v => `$${v.toLocaleString()}/yr`);
             if (dayEl) dayEl.innerText = `~$${hourlyFloor.toFixed(2)}/hr W-2 • $${Math.round(consultingDayRate)}/day consulting floor`;
 
             if (badgeEl && fillEl) {
@@ -6126,7 +6128,7 @@
                     const rem = netBurn <= 0 ? liquid + (Math.abs(netBurn) * m) : Math.max(0, liquid - (netBurn * m));
                     const isSolvent = rem > 0;
                     cells += `
-                        <div style="background:${isSolvent ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'}; border:1px solid ${isSolvent ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.28)'}; border-radius:6px; padding:4px 2px; text-align:center; font-family:monospace;">
+                        <div onclick="inspectRunwayMonth(${m}, ${Math.round(rem)}, ${Math.round(netBurn)})" title="Tap to inspect Month ${m} projected cash balance" style="cursor:pointer; background:${isSolvent ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'}; border:1px solid ${isSolvent ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.28)'}; border-radius:6px; padding:4px 2px; text-align:center; font-family:'JetBrains Mono', monospace; transition:transform 0.15s ease;">
                             <div style="font-size:9.5px; color:var(--text-muted);">M${m}</div>
                             <div style="font-size:10px; font-weight:700; color:${isSolvent ? '#4ADE80' : '#F87171'};">$${(rem / 1000).toFixed(1)}k</div>
                         </div>
@@ -6162,6 +6164,35 @@
                 if (el) el.value = val;
             });
             recalcPersonalRunway();
+        }
+
+        // Smooth 220ms rAF Number Odometer (respects prefers-reduced-motion for WCAG + CSSDA Innovation Axis)
+        function animateKpiNumber(el, targetVal, formatter) {
+            if (!el) return;
+            const prevVal = Number(el.dataset.numVal ?? targetVal);
+            el.dataset.numVal = String(targetVal);
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduceMotion || prevVal === targetVal || !Number.isFinite(prevVal)) {
+                el.innerText = formatter(targetVal);
+                return;
+            }
+            const start = performance.now();
+            const duration = 220;
+            function step(now) {
+                const t = Math.min(1, (now - start) / duration);
+                const eased = 1 - Math.pow(1 - t, 3);
+                const cur = Math.round(prevVal + (targetVal - prevVal) * eased);
+                el.innerText = formatter(cur);
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function inspectRunwayMonth(monthIdx, remCash, netBurn) {
+            const status = remCash > 0
+                ? `Month ${monthIdx} Projected Reserve: $${remCash.toLocaleString()} remaining (after $${Math.abs(netBurn).toLocaleString()}/mo net ${netBurn > 0 ? 'burn' : 'surplus'})`
+                : `Month ${monthIdx}: Cash reserve depleted ($0 remaining).`;
+            if (typeof showToast === 'function') showToast(status, '📅');
         }
 
         function benchmarkTargetSalary() {
