@@ -84,6 +84,12 @@ app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0
 }));
 
+// JOB HUNT OS — clean dedicated page (served before the SPA fallback)
+app.get('/job-hunt', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.sendFile(path.join(__dirname, 'public', 'job-hunt.html'));
+});
+
 // Dynamic Stripe Instance Helper (reloads cleanly whenever STRIPE_SECRET_KEY is updated via /stripe-setup)
 function getStripeClient() {
   const key = (process.env.STRIPE_SECRET_KEY || '').trim();
@@ -2187,6 +2193,7 @@ app.get('/guides/:slug', (req, res) => {
 app.get('/sitemap.xml', (req, res) => {
   const urls = [
     'https://www.consultant-studio.app/',
+    'https://www.consultant-studio.app/job-hunt',
     'https://www.consultant-studio.app/guides',
     ...Object.keys(SEO_GUIDES).map(s => `https://www.consultant-studio.app/guides/${s}`)
   ];
