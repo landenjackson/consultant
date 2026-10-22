@@ -1792,6 +1792,96 @@ app.post('/api/contact', async (req, res) => {
 // ============================================================================
 const TELEMETRY_LOG_FILE = path.join(__dirname, 'telemetry_events.jsonl');
 
+// ============================================================================
+// JOB HUNT OS: 1-TAP JOB-DESCRIPTION -> TAILORED RESUME + INTERVIEW BATTLE CARD
+// ============================================================================
+const JOB_HUNT_DIR = '/home/jacks/job_hunt_os';
+const JOB_HUNT_PY = path.join(JOB_HUNT_DIR, '.venv/bin/python');
+const JOB_HUNT_SCRIPT = path.join(JOB_HUNT_DIR, 'job_hunt_os.py');
+const JOB_HUNT_OUT = path.join(JOB_HUNT_DIR, 'out');
+const JOB_HUNT_DOWNLOADS = '/mnt/c/Users/jacks/Downloads';
+
+app.post('/api/job-hunt', async (req, res) => {
+  try {
+    const jd = String(req.body?.jd || '').trim();
+    const company = String(req.body?.company || 'Target Company').trim().slice(0, 80);
+    const role = String(req.body?.role || 'Target Role').trim().slice(0, 80);
+    if (jd.length < 40) {
+      return res.status(400).json({ error: 'Paste the full Job Description (at least a few lines).' });
+    }
+    let jobHuntReady = true;
+    try {
+      await fs.access(JOB_HUNT_PY);
+      await fs.access(JOB_HUNT_SCRIPT);
+    } catch {
+      jobHuntReady = false;
+    }
+    if (!jobHuntReady) {
+      return res.status(503).json({ error: 'Job Hunt OS is not installed on this host yet.' });
+    }
+
+    const stamp = Date.now();
+    const tmpJd = path.join(JOB_HUNT_DIR, `.jd_${stamp}.txt`);
+    await fs.writeFile(tmpJd, jd, 'utf-8');
+
+    const { stdout } = await execFileAsync(JOB_HUNT_PY, [
+      JOB_HUNT_SCRIPT, '--jd-file', tmpJd, '--company', company, '--role', role
+    ], { timeout: 300000, maxBuffer: 8 * 1024 * 1024, cwd: JOB_HUNT_DIR });
+
+    await fs.unlink(tmpJd).catch(() => {});
+    let payload = {};
+    try { payload = JSON.parse(stdout); } catch { /* keep the empty object */ }
+
+    // Build direct download links for each artifact in Windows Downloads.
+    const files = await fs.readdir(JOB_HUNT_DOWNLOADS).catch(() => []);
+    const slug = `${company}_${role}`.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60);
+    const download = (name) => `/api/job-hunt/download/${encodeURIComponent(name)}`;
+    const find = (prefix, ext) => files.find((f) => f.startsWith(prefix) && f.endsWith(ext) && f.includes(slug));
+
+    const resumePdf = find('Landen_Jackson_Resume_', '.pdf');
+    const resumeDocx = find('Landen_Jackson_Resume_', '.docx');
+    const cardPdf = find('Landen_Jackson_Interview_Sheet_', '.pdf');
+    const scoreMd = find('ATS_Scorecard_', '.md');
+
+    return res.json({
+      ok: true,
+      atsScore: payload.ats_score ?? null,
+      artifacts: {
+        resumePdf: resumePdf ? download(resumePdf) : null,
+        resumeDocx: resumeDocx ? download(resumeDocx) : null,
+        interviewCard: cardPdf ? download(cardPdf) : null,
+        scorecard: scoreMd ? download(scoreMd) : null
+      },
+      names: { resumePdf, resumeDocx, cardPdf, scoreMd }
+    });
+  } catch (e) {
+    const msg = e?.stderr ? String(e.stderr).slice(-400) : (e?.message || 'Job Hunt OS failed');
+    return res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/api/job-hunt/download/:name', async (req, res) => {
+  try {
+    const name = path.basename(String(req.params.name || ''));
+    const file = path.join(JOB_HUNT_DOWNLOADS, name);
+    if (!file.startsWith(JOB_HUNT_DOWNLOADS)) {
+      return res.status(404).json({ error: 'File not found.' });
+    }
+    let exists = true;
+    try { await fs.access(file); } catch { exists = false; }
+    if (!exists) {
+      return res.status(404).json({ error: 'File not found.' });
+    }
+    res.setHeader('Content-Type', name.endsWith('.pdf') ? 'application/pdf'
+      : name.endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      : 'text/markdown');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    return res.sendFile(file);
+  } catch (e) {
+    return res.status(500).json({ error: 'Download failed.' });
+  }
+});
+
 app.post('/api/telemetry/event', async (req, res) => {
   try {
     const evt = {

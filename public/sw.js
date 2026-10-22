@@ -1,4 +1,4 @@
-const CACHE_NAME = 'consultant-studio-v2026-10-21-jd-match-interview-drill-v52';
+const CACHE_NAME = 'consultant-studio-v2026-10-21-job-hunt-os-v53';
 const ASSETS = [
   '/',
   '/index.html',
