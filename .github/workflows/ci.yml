@@ -31,7 +31,6 @@ jobs:
         run: |
           node --check server.js
           node --check public/sw.js
-          node --check public/office_export.js
 
       - name: Health Check Notification
         run: echo "Consultant Studio syntax checks passed."

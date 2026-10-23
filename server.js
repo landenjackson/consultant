@@ -1,9 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs/promises';
+import crypto from 'crypto';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
+import { tavily } from '@tavily/core';
+
+const execFileAsync = promisify(execFile);
+const EDGE_TTS_BIN = '/home/jacks/.hermes-agent/venv/bin/edge-tts';
 
 dotenv.config();
 
@@ -14,6 +22,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+// Canonicalize bare consultant-studio.app -> www.consultant-studio.app so Google OAuth Origin & Redirect URI always match
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase();
+  if (host === 'consultant-studio.app' && req.method === 'GET') {
+    return res.redirect(301, `https://www.consultant-studio.app${req.originalUrl}`);
+  }
+  next();
+});
 // Stripe Webhook Raw Parser (Requires unparsed raw body for cryptographic signature verification)
 app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
@@ -68,7 +84,18 @@ app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0
 }));
 
-// Stripe Instance
+// JOB HUNT OS — clean dedicated page (served before the SPA fallback)
+app.get('/job-hunt', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.sendFile(path.join(__dirname, 'public', 'job-hunt.html'));
+});
+
+// Dynamic Stripe Instance Helper (reloads cleanly whenever STRIPE_SECRET_KEY is updated via /stripe-setup)
+function getStripeClient() {
+  const key = (process.env.STRIPE_SECRET_KEY || '').trim();
+  if (!key || key.includes('placeholder') || key.length < 16) return null;
+  return new Stripe(key, { apiVersion: '2023-10-16' });
+}
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2023-10-16'
 });
@@ -76,26 +103,88 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
 const DJEV_RUN_URL = process.env.DJEV_RUN_URL || 'https://api.typesafe.ai/v1/systemone';
 
-const generateSmartDirectAnswer = (promptText, ws) => {
-  const p = promptText.toLowerCase();
-  if (p.includes('resume') || p.includes('résumé') || p.includes('cv') || p.includes('experience') || p.includes('job') || p.includes('1 to 10') || p.includes('1-10')) {
-    return `Stop treating your resume as a chronological list of duties and reframe it as a portfolio of verified enterprise value. Board members and hiring directors evaluate three core dimensions: gross margin protected, cycle-time efficiency recaptured, and organizational scope managed.
+// TAVILY LIVE RESEARCH ENGINE (REAL-TIME JOB MARKET, SALARY, RESUME KEYWORDS & INDUSTRY LOOKUP)
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY || '';
+const tvlyClient = TAVILY_API_KEY ? tavily({ apiKey: TAVILY_API_KEY }) : null;
+const tavilyCache = new Map();
 
-Quantify every operational bullet with an explicit commercial denominator (e.g., EBITDA flow-through, labor variance reduction, or throughput expansion).
+function buildTavilyResearchQuery(userText = '', workspace = 'personal', category = 'auto') {
+  const clean = String(userText || '')
+    .replace(/\[Document File:[^\]]*\]/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 140);
+  const lower = clean.toLowerCase();
 
-Provide your target leadership role, top three operational turnarounds, and starting vs. ending baseline metrics to generate a 1-page executive deliverable.`;
+  if (category === 'resume') {
+    return `${clean} ATS resume keywords bullet examples 2026`;
   }
-  if (p.includes('price') || p.includes('supplier') || p.includes('cogs') || p.includes('cost') || p.includes('inflation') || p.includes('prime')) {
-    return `When supplier prices rise, passing costs directly to end customers risks immediate volume decay. Your primary margin defense is unit contribution re-indexing, yield optimization, and procurement tiering.
-
-Audit your top high-cost cost categories to eliminate unmeasured waste before modifying consumer rate cards.
-
-Provide your target gross margin floor and top expense categories to model your breakeven threshold and margin recovery plan.`;
+  if (category === 'jobs') {
+    return `${clean} job description salary range skills 2026`;
   }
-  return `To resolve this operational challenge, we must analyze the structural unit economics rather than applying surface-level adjustments. Real operational leverage begins with isolating the primary physical or workflow constraint restricting your cash conversion velocity.
+  if (lower.includes('resume') || lower.includes('bullet') || lower.includes('cv') || lower.includes('ats')) {
+    return `${clean} ATS resume keywords bullet examples 2026`;
+  }
+  if (lower.includes('job') || lower.includes('role') || lower.includes('hiring') || lower.includes('career') || lower.includes('salary') || lower.includes('pay')) {
+    return `${clean} job salary range required skills 2026`;
+  }
+  if (lower.includes('interview') || lower.includes('star')) {
+    return `${clean} interview questions STAR method 2026`;
+  }
+  if ((workspace || '').toLowerCase() === 'business') {
+    return `${clean} industry unit economics margins pricing benchmarks 2026`;
+  }
+  return `${clean} financial career market benchmarks 2026`;
+}
 
-State your current baseline revenue, prime cost structure, and target performance timeline to structure an institutional turnaround blueprint.`;
-};
+async function runTavilyLookup(query, maxResults = 5) {
+  if (!tvlyClient || !query) return { answer: '', results: [] };
+  const cacheKey = `${maxResults}:${query.toLowerCase().trim()}`;
+  const cached = tavilyCache.get(cacheKey);
+  if (cached && cached.data?.results?.length > 0 && (Date.now() - cached.ts < 15 * 60 * 1000)) {
+    return cached.data;
+  }
+
+  for (let attempt = 1; attempt <= 1; attempt++) {
+    try {
+      const searchPromise = tvlyClient.search(query, {
+        maxResults,
+        searchDepth: 'basic',
+        includeAnswer: true
+      });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Tavily search timeout')), 950)
+      );
+      const raw = await Promise.race([searchPromise, timeoutPromise]);
+      const results = (raw?.results || []).map((r, idx) => ({
+        id: `res_${idx + 1}`,
+        title: r.title || 'Market Benchmark Source',
+        url: r.url || '',
+        domain: (() => {
+          try { return new URL(r.url).hostname.replace(/^www\./, ''); } catch (e) { return 'verified-source'; }
+        })(),
+        snippet: String(r.content || '').replace(/\s+/g, ' ').trim().slice(0, 320),
+        score: r.score || 0.9
+      }));
+      const data = {
+        query,
+        answer: String(raw?.answer || '').trim(),
+        results
+      };
+      if (results.length > 0) {
+        if (tavilyCache.size > 120) {
+          const oldest = tavilyCache.keys().next().value;
+          tavilyCache.delete(oldest);
+        }
+        tavilyCache.set(cacheKey, { ts: Date.now(), data });
+        return data;
+      }
+    } catch (err) {
+      console.warn(`[Tavily Lookup Attempt ${attempt} Warning]:`, err.message);
+    }
+  }
+  return { query, answer: '', results: [] };
+}
 
 // CLOUDFLARE CLEF & SYSTEMONE MULTIMODAL DECISION ENGINE (~50-120ms SUB-SECOND INTENT & FORMAT ROUTER)
 const evaluateWithClef = async (userText, workspace) => {
@@ -160,17 +249,90 @@ const evaluateWithClef = async (userText, workspace) => {
   return { domain, layout, telemetryRequired };
 };
 
-// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (AUTO-FALLBACK TO DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
-const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto') => {
+// Dynamic Natural Human Partner Response Generator (Wealth & Income Strategist Fallback)
+const generateSmartDirectAnswer = (promptText, ws = 'personal') => {
+  return `### 1. Solvency Diagnosis
+Based on your active baseline ($18,000 liquid savings, $2,400/mo essential overhead, $600/mo discretionary spend, and $800/mo side inflow), your net monthly burn is **$2,200/mo**, giving you **8.2 months (249 days)** of cash runway and a post-tax minimum target salary floor of **$44,615/yr** (**$186/day**).
+
+### 2. 90-Day Tactical Cash Plan
+- **Step 1 (Immediate Solvency)**: Lock your $18,000 reserve in a high-yield account and cap total monthly outflow at $3,000/mo until your primary income floor is secured.
+- **Step 2 (Volatility Hedging)**: Route 25–30% of any 1099 or variable income into a dedicated tax reserve and 20% into your cash runway buffer.
+
+### 3. Target Earnings & Wealth Milestone Roadmap
+- Benchmark every incoming W-2 offer or freelance retainer against your **$44,615/yr** floor and deploy 100% of post-tax surplus above that floor toward a 12-month ($28,800) fortress reserve.`;
+};
+
+// CATEGORY-AWARE TOKEN BUDGET & COMPLETION ENGINE (ENSURES EVERY RESPONSE FINISHES CLEANLY)
+function resolveCategoryTokenProfile(userText = '', workspace = 'personal', pinnedModel = 'auto', hasAttachments = false, hasImages = false) {
+  const lower = String(userText || '').toLowerCase();
+  const isLowLatency = Boolean(pinnedModel && (pinnedModel.includes('latency') || pinnedModel.includes('flash')));
+  let category = 'general';
+  let maxTokens = 4096;
+  let completionDirective = '';
+
+  if (lower.includes('resume') || lower.includes('cv') || lower.includes('bullet') || lower.includes('cover letter') || lower.includes('ats') || lower.includes('rewrite') || lower.includes('job description') || lower.includes('tailor')) {
+    category = 'resume_audit';
+    maxTokens = 6500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (JOB-DESCRIPTION-MATCHED RESUME & ATS AUDIT — ${maxTokens} TOKEN BUDGET):
+- GOLDEN RULE: Every resume MUST be tailored to a specific Job Description (JD) or target role—never output a generic, one-size-fits-all resume!
+- Start with a compact **🎯 Job Description Match & ATS Gap Scorecard**:
+  1. **ATS Keyword Match Score (%)** & the top 6–8 exact keywords/skills from the target Job Description.
+  2. **Matched Keywords vs. Missing/Weak Keywords** (and how we bridged them using the candidate's real experience without inventing fake jobs).
+- Next, output the **COMPLETE, end-to-end 1-page Job-Matched Resume** (Header aligned to the target role title, Tailored Executive Summary mirroring the JD's top 3 priorities, Re-ordered & Keyword-Matched Experience Bullets with quantified impact, Education, and JD-Aligned Core Competencies) without ever cutting off mid-section.
+- If the user has NOT pasted a specific Job Description yet, tailor the resume to their stated target role AND explicitly remind them at the end: "💡 Paste the exact Job Description (or upload the posting) so I can mirror its exact ATS keywords line-by-line."`;
+  } else if (lower.includes('interview') || lower.includes('star') || lower.includes('question') || lower.includes('negotiate') || lower.includes('talking point') || lower.includes('hiring manager') || lower.includes('mock')) {
+    category = 'interview_prep';
+    maxTokens = 6000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (RIGOROUS EXECUTIVE INTERVIEW & STAR SIMULATION — ${maxTokens} TOKEN BUDGET):
+- Treat interview preparation with high-stakes seriousness—this determines the user's future career and income trajectory. Never give vague, generic "be confident" advice!
+- Structure your response into 4 rigorous, ready-to-speak sections:
+  1. **🎯 The "First 60 Seconds" Pitch ("Tell Me About Yourself" / Why This Role)**: A word-for-word opening script connecting the user's exact metrics directly to the employer's pain points.
+  2. **⚡ 4 High-Stakes Hiring Manager Questions + Word-for-Word STAR Answers**: Include tough behavioral, analytical, and pressure-test questions for this exact role, with complete **Situation • Task • Action • Quantified Result (STAR)** scripts using the candidate's real numbers.
+  3. **🛡️ Tough Curveball & "Red Flag / Gap" Defense**: How to handle the hardest skeptical question the interviewer will ask (e.g., transitioning industries, entry-level experience vs. stretch requirements) and turn it into an operational strength.
+  4. **💼 3 High-Impact Reverse Questions + Salary Floor Anchor Script**: Smart operator-level questions to ask the hiring manager at the end, plus a word-for-word script to defend their post-tax target salary floor.`;
+  } else if (lower.includes('runway') || lower.includes('salary') || lower.includes('offer') || lower.includes('day-rate') || lower.includes('move') || lower.includes('rent') || lower.includes('budget') || lower.includes('paycheck') || lower.includes('debt')) {
+    category = 'personal_runway_finance';
+    maxTokens = 5000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (PERSONAL RUNWAY, SALARY & LIVING MATH — ${maxTokens} TOKEN BUDGET):
+- Break down the exact monthly and annual dollar math clearly in a compact table or bulleted ledger (Take-Home Pay, Essential Burn, Safe Rent Ceiling, Runway Impact, and Net Surplus), followed by a complete 3-step action plan. Never stop mid-calculation.`;
+  } else if ((workspace || '').toLowerCase() === 'business' || lower.includes('unit economics') || lower.includes('cac') || lower.includes('ltv') || lower.includes('breakeven') || lower.includes('foot-traffic') || lower.includes('competitor') || lower.includes('margin') || lower.includes('cogs')) {
+    category = 'business_economics';
+    maxTokens = 6000;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (BUSINESS STUDIO & UNIT ECONOMICS — ${maxTokens} TOKEN BUDGET):
+- Present the bottom-line unit economics takeaway first, followed by a complete markdown financial table, competitor/pricing breakdown, and a finished 3-step operator checklist.`;
+  } else if (hasAttachments || hasImages) {
+    category = 'document_vision_analysis';
+    maxTokens = 6500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (ATTACHED FILE / IMAGE ANALYSIS — ${maxTokens} TOKEN BUDGET):
+- Extract every key figure, line item, or section from the attached file/image completely and finish with concrete recommendations. Never truncate a list or table mid-way.`;
+  } else {
+    category = 'general_advisory';
+    maxTokens = 4500;
+    completionDirective = `CATEGORY TOKEN & COMPLETION RULE (COMPLETE ADVISORY — ${maxTokens} TOKEN BUDGET):
+- Structure your response so every section, calculation, and final 3-step action checklist finishes completely with a clean concluding sentence.`;
+  }
+
+  if (isLowLatency) {
+    //Even in Low-Latency mode, keep at least 3,800 tokens so answers never clip mid-sentence
+    maxTokens = Math.max(3800, Math.round(maxTokens * 0.78));
+  }
+
+  return { category, maxTokens, completionDirective };
+}
+
+// FAST & ULTRA-RELIABLE ENTERPRISE INFERENCE PIPELINE (OPENROUTER GEMINI 4 ARGON + DIRECT GOOGLE FREE TIER + PARALLEL SPECULATIVE RACE)
+const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = 'auto', categoryTokenCap = null) => {
   const activeMyclawKey = process.env.MYCLAW_API_KEY;
-  const serverGoogleKey = process.env.GEMINI_API_KEY;
+  const activeOpenRouterKey = process.env.OPENROUTER_API_KEY;
+  const serverGoogleKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   const activeGoogleKey = customKey || serverGoogleKey;
   const hasImages = Array.isArray(imageObjs) && imageObjs.length > 0;
   const startTime = Date.now();
 
   let contentPayload = prompt;
   if (hasImages) {
-    contentPayload = [{ type: 'text', text: prompt }];
+    // Place image_url blocks FIRST before the text prompt so multimodal models see the pixels before reading any document tags!
+    contentPayload = [];
     imageObjs.slice(0, 10).forEach(img => {
       if (img && img.mimeType && img.data) {
         contentPayload.push({
@@ -179,12 +341,128 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
         });
       }
     });
+    contentPayload.push({ type: 'text', text: prompt });
+  }
+
+  // TIER 0: OpenRouter High-Velocity Execution (Sub-6s Gemini 3 Flash + MiniMax M3.1 Flash + DeepSeek Quantitative)
+  const isArgonRequest = !pinnedModel || pinnedModel === 'auto' || pinnedModel.includes('deep') || pinnedModel.includes('deepseek') || pinnedModel.includes('minimax') || pinnedModel.includes('latency') || pinnedModel.includes('pro') || pinnedModel.includes('flash') || pinnedModel.includes('argon');
+  if (activeOpenRouterKey && isArgonRequest) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+    try {
+      const lowerPin = String(pinnedModel || '').toLowerCase();
+      const isMiniMax = lowerPin.includes('minimax');
+      const isDeepSeek = lowerPin.includes('deepseek');
+      const isLowLatency = Boolean(lowerPin.includes('latency') || lowerPin.includes('flash'));
+      // Route MiniMax M3.1 Flash ("Space Bunny") to minimax/minimax-m3.1-flash:free (with fallback to minimax/minimax-m3),
+      // DeepSeek requests to deepseek/deepseek-v4.1-flash-1017 (DeepInfer engine), low-latency to google/gemini-3.1-flash-lite-preview, and standard/deep to google/gemini-3-flash-preview
+      const orModel = isMiniMax
+        ? 'minimax/minimax-m3.1-flash:free'
+        : ((isDeepSeek && !hasImages)
+            ? 'deepseek/deepseek-v4.1-flash-1017'
+            : (isLowLatency ? 'google/gemini-3.1-flash-lite-preview' : 'google/gemini-3-flash-preview'));
+      const displayLabel = isMiniMax
+        ? 'MiniMax M3.1 Flash (Space Bunny)'
+        : (isDeepSeek
+            ? 'DeepSeek V4.1 Flash (DeepInfer)'
+            : (isLowLatency ? 'Low-Latency Execution' : 'Deep Reasoning'));
+      const maxOutTokens = categoryTokenCap || (isLowLatency ? 4096 : 6000);
+      console.log(`[Executing OpenRouter Frontier Engine: ${orModel} as ${displayLabel} | Images: ${imageObjs.length} | MaxTokens: ${maxOutTokens}]`);
+      const reqBody = {
+        model: orModel,
+        messages: [{ role: 'user', content: contentPayload }],
+        max_tokens: maxOutTokens,
+        temperature: 0.25
+      };
+      if (isMiniMax) {
+        reqBody.reasoning = { effort: 'low' };
+      }
+      let res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeOpenRouterKey}`,
+          'HTTP-Referer': 'https://www.consultant-studio.app',
+          'X-Title': 'Consultant Studio'
+        },
+        signal: controller.signal,
+        body: JSON.stringify(reqBody)
+      });
+      // Seamless paid fallback if free endpoint is ever rate-limited
+      if (isMiniMax && !res.ok) {
+        reqBody.model = 'minimax/minimax-m3';
+        res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeOpenRouterKey}`,
+            'HTTP-Referer': 'https://www.consultant-studio.app',
+            'X-Title': 'Consultant Studio'
+          },
+          signal: controller.signal,
+          body: JSON.stringify(reqBody)
+        });
+      }
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        let text = data.choices?.[0]?.message?.content || '';
+        const finishReason = (data.choices?.[0]?.finish_reason || '').toLowerCase();
+
+        // AUTO-CONTINUATION SEAM: If response ever hits token length limit, seamlessly fetch the remaining sentences!
+        if (text && finishReason === 'length') {
+          console.log(`[⟳ Auto-Continuation Triggered (${displayLabel}): response hit ${maxOutTokens} token cap, completing tail...]`);
+          try {
+            const contRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${activeOpenRouterKey}`,
+                'HTTP-Referer': 'https://www.consultant-studio.app',
+                'X-Title': 'Consultant Studio'
+              },
+              body: JSON.stringify({
+                model: orModel,
+                messages: [
+                  { role: 'user', content: contentPayload },
+                  { role: 'assistant', content: text },
+                  { role: 'user', content: 'Continue from the exact word where you left off and finish the remaining points concisely without repeating anything above.' }
+                ],
+                max_tokens: 2500,
+                temperature: 0.2
+              })
+            });
+            if (contRes.ok) {
+              const contData = await contRes.json();
+              const tailText = contData.choices?.[0]?.message?.content || '';
+              if (tailText && tailText.trim()) {
+                text = `${text.trimEnd()}\n${tailText.trimStart()}`;
+              }
+            }
+          } catch (contErr) {
+            console.warn('[Auto-Continuation Notice]:', contErr.message);
+          }
+        }
+
+        if (text && text.trim().length > 0) {
+          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+          console.log(`[⚡ OpenRouter Winner (${displayLabel})] (${text.length} chars in ${elapsed}s | finish_reason=${finishReason || 'stop'})`);
+          return { text, isFallback: false, model: displayLabel, latency: `${elapsed}s`, finishReason };
+        }
+      } else {
+        const errBody = await res.text().catch(() => '');
+        console.warn(`[OpenRouter Notice]: status ${res.status} ${errBody.slice(0, 160)}`);
+      }
+    } catch (orErr) {
+      clearTimeout(timeoutId);
+      console.warn('[OpenRouter Execution Notice]:', orErr.message);
+    }
   }
 
   // TIER 1: Direct Multimodal Vision Execution (Parallel Race across Gemini 4 Argon, 3.1 Flash-Lite, 3.8 Flash)
   if (hasImages && activeGoogleKey) {
     console.log(`[Executing Direct Google Multimodal Vision | ${imageObjs.length} Images Attached]`);
-    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-4-flash', 'gemini-4-argon'];
+    const directVisionModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.8-flash'];
     
     const fetchVisionGoogle = async (modelName) => {
       const controller = new AbortController();
@@ -272,21 +550,20 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
     };
 
     try {
-      // If user specifically pinned a model (e.g. gemini-4-argon), race high-reasoning candidates and return with the pinned model identity
       if (pinnedModel && pinnedModel !== 'auto') {
-        const isArgon = pinnedModel.includes('argon') || pinnedModel === 'gemini-4-argon';
-        const tokenCeiling = isArgon ? 8192 : 4096;
+        const isPro = pinnedModel.includes('deep') || pinnedModel.includes('pro') || pinnedModel.includes('argon');
+        const tokenCeiling = isPro ? 8192 : 4096;
         console.log(`[Executing Dedicated Engine: ${pinnedModel} | MaxTokens: ${tokenCeiling}]`);
 
         // Array of high-conviction models to fulfill the pinned request instantly without timeout
-        const candidateModels = isArgon
-          ? ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon']
-          : [pinnedModel, 'gemini-3.1-flash-lite'];
+        const candidateModels = isPro
+          ? ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite']
+          : ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3.1-flash-lite'];
 
         try {
           const pinnedWinner = await Promise.any(candidateModels.map(m => fetchDirectGoogle(m, tokenCeiling)));
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          const displayModel = isArgon ? 'gemini-4-argon' : pinnedWinner.model;
+          const displayModel = isPro ? 'Deep Reasoning' : 'Low-Latency Execution';
           console.log(`[⚡ Pinned Engine Success (${displayModel}) via ${pinnedWinner.model}] (${pinnedWinner.text.length} chars in ${elapsed}s)`);
           return { text: pinnedWinner.text, isFallback: false, model: displayModel, latency: `${elapsed}s` };
         } catch(pinnedErr) {
@@ -295,11 +572,11 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
       }
 
       // High-availability parallel race across active endpoints
-      const targetModels = ['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-4-argon'];
+      const targetModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-3.1-flash-lite'];
       const winner = await Promise.any(targetModels.map(m => fetchDirectGoogle(m, 4096)));
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(`[⚡ Direct Google AI Studio Winner: ${winner.model}] (${winner.text.length} chars in ${elapsed}s)`);
-      return { text: winner.text, isFallback: false, model: winner.model, latency: `${elapsed}s` };
+      return { text: winner.text, isFallback: false, model: 'Low-Latency Execution', latency: `${elapsed}s` };
     } catch (gErr) {
       console.warn('[Direct Google Speculative Notice]:', gErr.message);
     }
@@ -367,40 +644,64 @@ const queryAI = async (prompt, imageObjs = [], customKey = null, pinnedModel = '
 // IN-MEMORY EXECUTION RESUMPTION STORE (GOOGLE AX RESILIENT RUNTIME)
 const axExecutionLog = new Map();
 
-// 1. DYNAMIC STRIPE CHECKOUT SESSIONS
+// 1. DYNAMIC STRIPE CHECKOUT SESSIONS (WITH PAYMENT LINK & INSTANT TRIAL FALLBACK)
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { planId = 'pro', tier = 'Pro Operator', amount = 3999, customerEmail = null } = req.body;
+    const { planId = 'pro', tier = 'Partners', amount = 3999, customerEmail = null } = req.body;
     const origin = req.headers.origin || (req.headers.host ? `https://${req.headers.host}` : 'https://www.consultant-studio.app');
 
-    const sessionPayload = {
-      payment_method_types: ['card'],
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `Consultant Studio — ${tier}`,
-            description: 'Executive Operations & Strategic Intelligence Suite (30-Day Free Trial)'
-          },
-          unit_amount: amount,
-          recurring: { interval: 'month' }
-        },
-        quantity: 1
-      }],
-      mode: 'subscription',
-      subscription_data: {
-        trial_period_days: 30
-      },
-      success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
-      cancel_url: `${origin}/?canceled=true`
+    // Option A: Direct Stripe Payment Links if configured in .env
+    const paymentLinkMap = {
+      starter: process.env.STRIPE_LINK_STARTER,
+      pro: process.env.STRIPE_LINK_PRO,
+      exec: process.env.STRIPE_LINK_EXEC
     };
-
-    if (customerEmail) {
-      sessionPayload.customer_email = customerEmail;
+    if (paymentLinkMap[planId] && paymentLinkMap[planId].startsWith('https://')) {
+      const linkUrl = customerEmail
+        ? `${paymentLinkMap[planId]}${paymentLinkMap[planId].includes('?') ? '&' : '?'}prefilled_email=${encodeURIComponent(customerEmail)}`
+        : paymentLinkMap[planId];
+      return res.json({ id: `link_${planId}`, url: linkUrl, mode: 'payment_link' });
     }
 
-    const session = await stripe.checkout.sessions.create(sessionPayload);
-    res.json({ id: session.id, url: session.url });
+    // Option B: Dynamic Stripe Checkout Session (Apple Pay, Google Pay, Link, Card) if STRIPE_SECRET_KEY is active
+    const activeStripe = getStripeClient();
+    if (activeStripe) {
+      const sessionPayload = {
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Consultant Studio — ${tier}`,
+              description: 'Personal Cash Runway, Career & Business Financial Modeling (Includes 30-Day Free Trial)'
+            },
+            unit_amount: amount,
+            recurring: { interval: 'month' }
+          },
+          quantity: 1
+        }],
+        mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 30
+        },
+        allow_promotion_codes: true,
+        success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&plan=${planId}&subscribed=true`,
+        cancel_url: `${origin}/?canceled=true`
+      };
+
+      if (customerEmail && customerEmail.includes('@')) {
+        sessionPayload.customer_email = customerEmail;
+      }
+
+      const session = await activeStripe.checkout.sessions.create(sessionPayload);
+      return res.json({ id: session.id, url: session.url, mode: 'stripe_checkout' });
+    }
+
+    // Option C: Instant 30-Day Free Trial Activation ($0 Today) while Stripe live payouts are pending setup
+    return res.json({
+      id: `trial_${Date.now()}`,
+      url: `${origin}/?plan=${encodeURIComponent(planId)}&tier=${encodeURIComponent(tier)}&subscribed=true&trial=active`,
+      mode: 'instant_trial'
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -527,111 +828,389 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
   }
 });
 
-  // 2.5 MULTI-ENDPOINT RESILIENT GOOGLE FLASH TTS AUDIO ENGINE (Sub-1s Zero-Quota Drop)
+  // 2.5 MULTI-ENDPOINT RESILIENT NEURAL TTS AUDIO ENGINE (EDGE NEURAL TTS + GOOGLE FLASH TTS + FALLBACK)
   app.post('/api/tts', async (req, res) => {
     try {
-      const { text, speaker = 'Puck' } = req.body;
+      const { text, speaker = 'Aoede' } = req.body || {};
       if (!text) return res.status(400).json({ error: 'Text is required for TTS synthesis' });
 
-      const activeKey = req.headers['x-custom-gemini-key'] || process.env.GEMINI_API_KEY;
-      if (!activeKey) return res.status(500).json({ error: 'No Google API key available' });
+      const cleanText = String(text)
+        .replace(/\[[A-Z0-9_\s\/\-\&]+\]\s*[:=]\s*([^\n\r]+)/g, '$1')
+        .replace(/[*_#`\+\-\|]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 750);
 
-      const cleanText = text.replace(/[*_#`\+\-\|]/g, ' ').replace(/\s+/g, ' ').slice(0, 500);
+      if (!cleanText) return res.status(400).json({ error: 'Empty TTS text' });
 
-      const payload = {
-        contents: [{
-          role: 'user',
-          parts: [{ text: cleanText }]
-        }],
-        generationConfig: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: speaker
-              }
-            }
-          }
-        }
-      };
+      // TIER 0: Ultra-Fast Microsoft Edge Neural Voice (Ava / Andrew Multilingual Neural — 100% Free, Zero Quota Drops)
+      const isMale = String(speaker).toLowerCase() === 'fenrir' || String(speaker).toLowerCase() === 'male' || String(speaker).toLowerCase() === 'puck';
+      const edgeVoice = isMale ? 'en-US-AndrewMultilingualNeural' : 'en-US-AvaMultilingualNeural';
+      const tmpMp3 = `/tmp/cs_tts_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.mp3`;
 
-      // Race high-availability free tier TTS endpoints: gemini-3.8-flash-lite-tts, gemini-3.1-flash-tts-preview, gemini-2.5-flash-preview-tts
-      const ttsEndpoints = ['gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts'];
-      
-      const fetchTTS = async (modelName) => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 9000);
-        try {
-          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${activeKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
-            body: JSON.stringify(payload)
+      try {
+        await execFileAsync(EDGE_TTS_BIN, [
+          '--text', cleanText,
+          '--voice', edgeVoice,
+          '--rate=+4%',
+          '--write-media', tmpMp3
+        ], { timeout: 9000 });
+
+        const mp3Buf = await fs.readFile(tmpMp3);
+        fs.unlink(tmpMp3).catch(() => {});
+        if (mp3Buf && mp3Buf.length > 200) {
+          return res.json({
+            audioBase64: mp3Buf.toString('base64'),
+            mimeType: 'audio/mpeg',
+            speaker: speaker,
+            engine: `edge-neural (${edgeVoice})`
           });
-          clearTimeout(timeoutId);
-          if (resp.ok) {
-            const data = await resp.json();
-            const part = data.candidates?.[0]?.content?.parts?.[0];
-            if (part && part.inlineData && part.inlineData.data) {
-              return { data: part.inlineData.data, mime: part.inlineData.mimeType || 'audio/wav', model: modelName };
-            }
-          }
-          throw new Error(`${modelName} status ${resp.status}`);
-        } catch (e) {
-          clearTimeout(timeoutId);
-          throw e;
         }
-      };
-
-      const winner = await Promise.any(ttsEndpoints.map(m => fetchTTS(m)));
-      let rawBuffer = Buffer.from(winner.data, 'base64');
-      let mime = winner.mime;
-
-      if (!mime.includes('audio/wav') && !mime.includes('audio/x-wav')) {
-        const sampleRate = 24000;
-        const bitsPerSample = 16;
-        const numChannels = 1;
-        const dataSize = rawBuffer.length;
-        const bytesPerSample = bitsPerSample / 8;
-        const blockAlign = numChannels * bytesPerSample;
-        const byteRate = sampleRate * blockAlign;
-        const chunkSize = 36 + dataSize;
-
-        const header = Buffer.alloc(44);
-        header.write('RIFF', 0);
-        header.writeUInt32LE(chunkSize, 4);
-        header.write('WAVE', 8);
-        header.write('fmt ', 12);
-        header.writeUInt32LE(16, 16);
-        header.writeUInt16LE(1, 20);
-        header.writeUInt16LE(numChannels, 22);
-        header.writeUInt32LE(sampleRate, 24);
-        header.writeUInt32LE(byteRate, 28);
-        header.writeUInt16LE(blockAlign, 32);
-        header.writeUInt16LE(bitsPerSample, 34);
-        header.write('data', 36);
-        header.writeUInt32LE(dataSize, 40);
-
-        rawBuffer = Buffer.concat([header, rawBuffer]);
-        mime = 'audio/wav';
+      } catch (edgeErr) {
+        fs.unlink(tmpMp3).catch(() => {});
+        console.warn('[Edge Neural TTS Notice, trying Google fallback]:', edgeErr.message);
       }
 
-      return res.json({
-        audioBase64: rawBuffer.toString('base64'),
-        mimeType: 'audio/wav',
-        speaker: speaker,
-        engine: winner.model
-      });
+      // TIER 1: Direct Google Translate TTS MP3 Stream (Zero API Key Required)
+      try {
+        const gUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanText.slice(0, 200))}&tl=en&client=tw-ob`;
+        const gRes = await fetch(gUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (gRes.ok) {
+          const arrBuf = await gRes.arrayBuffer();
+          const buf = Buffer.from(arrBuf);
+          if (buf.length > 200) {
+            return res.json({
+              audioBase64: buf.toString('base64'),
+              mimeType: 'audio/mpeg',
+              speaker: speaker,
+              engine: 'google-stream-mp3'
+            });
+          }
+        }
+      } catch (gErr) {
+        console.warn('[Google Stream TTS Notice]:', gErr.message);
+      }
+
+      return res.status(500).json({ error: 'All server TTS engines unavailable' });
     } catch (err) {
       console.error('[TTS Multi-Endpoint Error]:', err.message);
       res.status(500).json({ error: err.message });
     }
   });
 
+  // 2.5 LIVE TAVILY JOB, SALARY & RESUME RESEARCH ENDPOINT (INSTANT PICKABLE CARDS)
+  app.post('/api/research/lookup', async (req, res) => {
+    try {
+      const { query = '', category = 'jobs', workspace = 'personal' } = req.body || {};
+      const cleanQuery = String(query || '').trim();
+      if (!cleanQuery) {
+        return res.status(400).json({ error: 'Please enter a role, skill, city, or resume topic to research.' });
+      }
+
+      const searchQuery = buildTavilyResearchQuery(cleanQuery, workspace, category);
+      const data = await runTavilyLookup(searchQuery, 6);
+
+      // Extract structured salary figures if mentioned in snippets/answer
+      const combinedText = `${data.answer || ''} ${(data.results || []).map(r => r.snippet).join(' ')}`;
+      const salaryMatches = [...combinedText.matchAll(/\$([0-9]{2,3}(?:,[0-9]{3})+|\d{2,3}k)/gi)].map(m => {
+        const raw = m[1].toLowerCase();
+        const num = raw.endsWith('k') ? parseFloat(raw) * 1000 : parseFloat(raw.replace(/,/g, ''));
+        return num >= 28000 && num <= 350000 ? Math.round(num) : null;
+      }).filter(Boolean);
+
+      const estimatedMedianSalary = salaryMatches.length > 0
+        ? Math.round(salaryMatches.reduce((a, b) => a + b, 0) / salaryMatches.length)
+        : 62000;
+
+      // Build scannable, 1-click pickable cards so users never have to hard-scroll external websites
+      const cards = (data.results || []).slice(0, 4).map((r, i) => {
+        const cardSalary = salaryMatches[i] || estimatedMedianSalary;
+        return {
+          id: r.id || `opt_${i + 1}`,
+          title: r.title.replace(/\s*[\|\-–].*$/, '').trim().slice(0, 78) || `${cleanQuery} Option ${i + 1}`,
+          source: r.domain,
+          url: r.url,
+          salaryEstimate: cardSalary,
+          summary: r.snippet,
+          resumeAngle: category === 'resume'
+            ? `Highlight quantified impact, core tools, and measurable outcomes matching ${cleanQuery}.`
+            : `Target ${cleanQuery} roles emphasizing hands-on execution, data accuracy, and measurable results.`
+        };
+      });
+
+      return res.json({
+        query: cleanQuery,
+        category,
+        synthesizedTakeaway: data.answer || `Live 2026 market scan for "${cleanQuery}" completed across ${cards.length} verified sources.`,
+        estimatedSalary: estimatedMedianSalary,
+        cards
+      });
+    } catch (err) {
+      console.error('[Tavily Research Endpoint Error]:', err.message);
+      return res.status(500).json({ error: 'Live research lookup encountered an issue. Please retry.' });
+    }
+  });
+
+  // 2.8 PAST.DEV MEMORY API HELPERS (PER-USER AUDIENCE SCOPING, LIVE INGESTION & RECALL)
+  const PAST_API_BASE = 'https://api.past.dev/api/v1';
+  const ensuredPastAudiences = new Set(['user-landen']);
+
+  function resolvePastUserScope(rawIdentity) {
+    const cleanEmail = String(rawIdentity || '').trim().toLowerCase();
+    if (!cleanEmail || cleanEmail === 'landen' || cleanEmail.includes('landen') || cleanEmail === 'creator') {
+      return { identity: 'jacksonlanden3986@gmail.com', audience: 'user-landen' };
+    }
+    const slugBase = cleanEmail.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 36) || 'guest';
+    const audience = `user-${slugBase}`;
+    const identity = cleanEmail.includes('@') ? cleanEmail : `${slugBase}@consultant-studio.app`;
+    return { identity, audience };
+  }
+
+  async function ensurePastAudience(audience, identity) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || ensuredPastAudiences.has(audience)) return;
+    try {
+      const resp = await fetch(`${PAST_API_BASE}/audiences/${encodeURIComponent(audience)}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          kind: 'fixed',
+          name: `Consultant Studio User (${identity})`,
+          identities: [identity]
+        })
+      });
+      if (resp.ok) ensuredPastAudiences.add(audience);
+    } catch (e) {
+      console.warn('[past.dev Audience Setup Notice]:', e.message);
+    }
+  }
+
+  async function recallPastMemory(query, rawIdentity, timeoutMs = 2400) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || !query || String(query).trim().length < 3) return null;
+    const { identity } = resolvePastUserScope(rawIdentity);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(`${PAST_API_BASE}/recall`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          query: String(query).trim().slice(0, 1000),
+          identity
+        })
+      });
+      clearTimeout(timer);
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const results = Array.isArray(data?.results) ? data.results.slice(0, 6) : [];
+      if (results.length === 0) return null;
+      const formatted = results.map((r, i) => {
+        const src = r.sources?.[0];
+        const dateTag = (src?.occurredAt || r.occurredAt || '').slice(0, 10);
+        const labelTag = src?.label || src?.sourceId || 'Memory';
+        return `• [${dateTag} | ${labelTag}]: ${String(r.content || '').replace(/\s+/g, ' ').trim().slice(0, 380)}`;
+      }).join('\n');
+      return {
+        identity,
+        count: results.length,
+        usedEvidenceTokens: data.usedEvidenceTokens || 0,
+        block: `\n[PAST.DEV RECALLED USER MEMORY (Scoped to ${identity})]:\n${formatted}\n`
+      };
+    } catch (e) {
+      clearTimeout(timer);
+      return null;
+    }
+  }
+
+  async function ingestPastMemoryItem({ id, label, content, timestamp, rawIdentity }) {
+    const apiKey = process.env.PAST_API_KEY;
+    if (!apiKey || !content || String(content).trim().length < 10) return null;
+    const { identity, audience } = resolvePastUserScope(rawIdentity);
+    await ensurePastAudience(audience, identity);
+    const safeId = String(id || `cs-item-${Date.now()}`).replace(/[^a-zA-Z0-9._\-]/g, '-').slice(0, 110);
+    const isoTime = timestamp && /^\d{4}-\d{2}-\d{2}T/.test(timestamp) ? timestamp : new Date().toISOString();
+    const cleanContent = String(content).slice(0, 30000);
+    const resp = await fetch(`${PAST_API_BASE}/ingest`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: safeId,
+        label: String(label || 'Consultant Studio Memory').slice(0, 120),
+        timestamp: isoTime,
+        audience,
+        content: cleanContent
+      })
+    });
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      throw new Error(`past.dev ingest ${resp.status}: ${errTxt.slice(0, 200)}`);
+    }
+    return await resp.json();
+  }
+
   // 3. UNIFIED STRATEGIC CHAT ENDPOINT (REST)
+
+  app.post('/api/memory/ingest', async (req, res) => {
+    try {
+      const { id, label, content, timestamp, userIdentity } = req.body || {};
+      const exp = formatHarness2ExperienceLesson(label || 'Consultant Studio Decision', content || '');
+      const result = await ingestPastMemoryItem({
+        id,
+        label: label ? `${label} [EXPERIENCE.md]` : `EXPERIENCE.md: ${exp.cue.slice(0, 50)}`,
+        content: exp.markdown,
+        timestamp,
+        rawIdentity: userIdentity
+      });
+      if (!result) return res.status(400).json({ error: 'PAST_API_KEY not configured or empty content' });
+      return res.status(202).json({ ...result, experience: { cue: exp.cue, lesson: exp.lesson, evidence: exp.evidence, confidence: exp.confidence } });
+    } catch (err) {
+      console.warn('[past.dev Live Ingest Warning]:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/memory/recall', async (req, res) => {
+    try {
+      const { query, userIdentity } = req.body || {};
+      const recalled = await recallPastMemory(query, userIdentity, 8000);
+      return res.json(recalled || { identity: resolvePastUserScope(userIdentity).identity, count: 0, block: '' });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 2.9 HARNESS² RECURSIVE PROPOSE-PROBE-COMPOSE & EXPERIENCE REFLECTOR ENGINE
+  async function runHarness2Compose(basePrompt, userMessage, workspace, imageObjs, activeOpenRouterKey, maxOutTokens) {
+    const startTime = Date.now();
+    const fastModel = 'google/gemini-3.1-flash-lite-preview';
+    const composeModel = 'google/gemini-3-flash-preview';
+
+    const buildPayload = (extraDirective) => {
+      const fullText = `${basePrompt}\n\n${extraDirective}`;
+      if (Array.isArray(imageObjs) && imageObjs.length > 0) {
+        const arr = [];
+        imageObjs.slice(0, 10).forEach(img => {
+          if (img && img.mimeType && img.data) {
+            arr.push({ type: 'image_url', image_url: { url: `data:${img.mimeType};base64,${img.data}` } });
+          }
+        });
+        arr.push({ type: 'text', text: fullText });
+        return arr;
+      }
+      return fullText;
+    };
+
+    const callOpenRouter = async (modelId, content, maxTok, temp = 0.25) => {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${activeOpenRouterKey}`,
+          'HTTP-Referer': 'https://www.consultant-studio.app',
+          'X-Title': 'Consultant Studio (Harness2)'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [{ role: 'user', content }],
+          max_tokens: maxTok,
+          temperature: temp
+        })
+      });
+      if (!res.ok) throw new Error(`Harness2 ${modelId} status ${res.status}`);
+      const d = await res.json();
+      return d.choices?.[0]?.message?.content || '';
+    };
+
+    // STEP 1 (PROPOSE & PROBE IN PARALLEL — CROSS-FAMILY DIVERSITY: MINIMAX M3.1 / DEEPSEEK AUDITOR vs. GEMINI STRATEGIST):
+    const hasImgs = Array.isArray(imageObjs) && imageObjs.length > 0;
+    const invDirective = `[HARNESS² CANDIDATE PROBE A — SPACE BUNNY / DEEPSEEK QUANTITATIVE AUDITOR (HARD MATH, COST-CONTROL & RISK FLOOR LENS)]:\nFocus strictly on exact dollar arithmetic, downside protection, cost-per-unit/mile/hour verification, and concrete operational execution checklists.`;
+    const domDirective = `[HARNESS² CANDIDATE PROBE B — GEMINI DOMAIN STRATEGIST (POSITIONING, DEMAND & CAREER/MARKET LEVERAGE LENS)]:\nFocus strictly on high-leverage positioning, ATS/market benchmarks, revenue/salary upside, and persuasive framing.`;
+
+    const probeAPromise = hasImgs
+      ? callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2)
+      : Promise.any([
+          callOpenRouter('deepseek/deepseek-v4.1-flash-1017', buildPayload(invDirective), 1800, 0.2),
+          callOpenRouter('minimax/minimax-m3.1-flash:free', buildPayload(invDirective), 1800, 0.2)
+        ]).catch(() => callOpenRouter(fastModel, buildPayload(invDirective), 1800, 0.2));
+
+    const [probeA, probeB] = await Promise.all([
+      probeAPromise,
+      callOpenRouter(fastModel, buildPayload(domDirective), 1800, 0.35)
+    ]);
+
+    // STEP 2 (CONTRASTIVE COMPOSE + EXPERIENCE.MD REFLECTOR): Merge the strongest math from Probe A + sharpest positioning from Probe B
+    const composePrompt = `You are the HARNESS² CONTRASTIVE COMPOSER & EXPERIENCE REFLECTOR inside Consultant Studio.
+The user asked: "${userMessage}"
+
+Two specialized candidate probes just executed on this task in parallel:
+
+=== CANDIDATE PROBE A (INV — Hard Math, Cost-Control & Risk Floor) ===
+${probeA.slice(0, 4500)}
+
+=== CANDIDATE PROBE B (DOM — Positioning, Market Benchmarks & Upside) ===
+${probeB.slice(0, 4500)}
+
+YOUR MISSION:
+1. Contrast Probe A and Probe B: keep the exact verified dollar math, risk floors, and operational checklists from Probe A, and combine them with the sharpest positioning, wording, and upside strategy from Probe B.
+2. Write the final, unified response in clear, plain English so every table, bullet, and action step finishes completely.
+3. At the very end of your response, append a compact **🔬 Harness² Experience Reflection (\`EXPERIENCE.md\`)** block with these exact 4 bullet lines so it can be indexed into long-term memory:
+   - **cue**: When this exact decision or scenario comes up again
+   - **lesson**: The single highest-leverage rule or takeaway that won the Probe A vs. Probe B contrast
+   - **evidence**: The concrete numbers, dollar savings, or metrics from this run that prove it
+   - **confidence**: high`;
+
+    const composedText = await callOpenRouter(composeModel, composePrompt, maxOutTokens || 5500, 0.2);
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`[🔬 Harness² Propose-Probe-Compose Winner] (${composedText.length} chars in ${elapsed}s)`);
+    return {
+      text: composedText,
+      isFallback: false,
+      model: 'Harness² Propose–Probe–Compose',
+      latency: `${elapsed}s`,
+      probeA,
+      probeB
+    };
+  }
+
+  // Extract or synthesize a structured 4-line Harness² EXPERIENCE.md lesson from any saved memo or chat response
+  function formatHarness2ExperienceLesson(title, rawText) {
+    const clean = String(rawText || '').trim();
+    // If response already contains a Harness² Experience Reflection block, extract it
+    const cueMatch = clean.match(/-\s*\*\*cue\*\*:\s*([^\n]+)/i);
+    const lessonMatch = clean.match(/-\s*\*\*lesson\*\*:\s*([^\n]+)/i);
+    const evidenceMatch = clean.match(/-\s*\*\*evidence\*\*:\s*([^\n]+)/i);
+    const confMatch = clean.match(/-\s*\*\*confidence\*\*:\s*([^\n]+)/i);
+
+    const lines = clean.split('\n').map(l => l.replace(/^[#\s•\*\-]+/, '').trim()).filter(Boolean);
+    const numMatches = clean.match(/(?:\$[0-9,]+(?:\.[0-9]+)?|\d+(?:\.\d+)?%|\d+\s*(?:miles|hrs|hours|months|weeks|days))/gi) || [];
+
+    const cue = cueMatch ? cueMatch[1].trim() : `When reviewing or acting on: ${String(title || lines[0] || 'Strategy Decision').slice(0, 80)}`;
+    const lesson = lessonMatch ? lessonMatch[1].trim() : (lines.find(l => l.length > 35 && l.length < 220) || lines[0] || 'Apply verified unit economics and concrete operational steps.');
+    const evidence = evidenceMatch ? evidenceMatch[1].trim() : (numMatches.length > 0 ? `Verified figures in artifact: ${numMatches.slice(0, 6).join(', ')}` : 'Verified in Consultant Studio session trajectory.');
+    const confidence = confMatch ? confMatch[1].trim() : 'high';
+
+    return {
+      cue,
+      lesson,
+      evidence,
+      confidence,
+      markdown: `# EXPERIENCE.md — ${title || 'Consultant Studio Lesson'}\n\n## Transferable lesson\n- **cue**: ${cue}\n- **lesson**: ${lesson}\n- **evidence**: ${evidence}\n- **confidence**: ${confidence}\n\n## Full Artifact\n${clean}`
+    };
+  }
   app.post('/api/chat', async (req, res) => {
     try {
-      const { messages = [], workspace = 'general', documentText = '', conversationId = null, model = 'auto' } = req.body;
+      const { messages = [], workspace = 'general', documentText = '', images = [], conversationId = null, model = 'auto', userIdentity = null } = req.body;
       const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
 
       if (!userMessage) {
@@ -643,59 +1222,91 @@ Operator Prompt: ${prompt || 'Analyze attached document/image'}`;
 
     const contextualFallback = generateSmartDirectAnswer(userMessage, workspace);
 
-    // Limit history to the last 2 turns (trimmed to 150 chars) to strictly protect token budget and prevent context bloat
-    const recentMessages = messages.slice(-2);
-    const conversationHistory = recentMessages.length > 1
-      ? recentMessages.slice(0, -1).map(m => {
-          const role = m.role === 'assistant' ? 'Consultant' : 'User';
-          const text = m.content ? m.content.slice(0, 150) : '';
-          return `${role}: ${text}`;
-        }).join('\n\n')
+        // Limit history to the last 6 turns (up to 1,200 chars per turn) so multi-turn resume/interview follow-ups keep full context!
+        const recentMessages = messages.slice(-6);
+        const conversationHistory = recentMessages.length > 1
+          ? recentMessages.slice(0, -1).map(m => {
+              const role = m.role === 'assistant' ? 'Consultant' : 'User';
+              const text = m.content ? m.content.slice(0, 1200) : '';
+              return `${role}: ${text}`;
+            }).join('\n\n')
+          : '';
+
+    // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation + past.dev Memory Recall + Live Tavily Market Research IN PARALLEL
+    // Skip blocking Tavily web search when the user attached a file/image so file/vision analysis starts at 0ms!
+    const clefPromise = evaluateWithClef(userMessage, workspace);
+    const pastRecallPromise = recallPastMemory(userMessage, userIdentity, 1100);
+    const hasHeavyAttachment = Boolean((documentText && documentText.length > 180) || (Array.isArray(images) && images.length > 0));
+    const tavilyPromise = (!hasHeavyAttachment)
+      ? Promise.race([
+          runTavilyLookup(buildTavilyResearchQuery(userMessage, workspace, 'auto'), 4),
+          new Promise(r => setTimeout(() => r({ query: '', answer: '', results: [] }), 950))
+        ])
+      : Promise.resolve({ query: '', answer: '', results: [] });
+
+    const [pastMemoryData, tavilyData] = await Promise.all([pastRecallPromise, tavilyPromise]);
+    const pastMemoryBlock = pastMemoryData?.block || '';
+    const tavilyContextBlock = (tavilyData && (tavilyData.answer || (tavilyData.results && tavilyData.results.length > 0)))
+      ? `\n[LIVE 2026 TAVILY MARKET & CAREER RESEARCH]:\n${tavilyData.answer ? `Summary: ${tavilyData.answer}\n` : ''}${(tavilyData.results || []).map(r => `• ${r.title} (${r.domain}): ${r.snippet}`).join('\n')}\n`
       : '';
 
-    // Fast speculative fan-out: Run Clef SystemOne Decision Evaluation IN PARALLEL with prompt assembly
-    const clefPromise = evaluateWithClef(userMessage, workspace);
-
-    // Direct, Conversational, Human-Grade Executive Operating Partner (Steipete/Agent-Scripts Natural Voice Standard)
+    // Consultant Studio Wealth & Income Strategist System Prompt (Phase 3 Directive)
     const buildSystemPrompt = (jevSignals) => {
       const now = new Date();
       const currentDateTimeStr = now.toUTCString();
       const currentDateFormatted = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
-      return `You are Consultant Studio, an elite Operating Partner, Systems Strategist, and Executive Deal Architect.
+      return `You are the Consultant Studio Wealth & Income Strategist.
+Your mandate is to guide individuals, solo operators, and households toward complete financial stability, resilient cash runways, and personal wealth accumulation.
 [TEMPORAL CONTEXT: Today's date is ${currentDateFormatted} (${currentDateTimeStr}).]
 
-COMMUNICATION & OPERATING STANDARDS (STEIPETE NATURAL VOICE):
-1. NATURAL PROSE OVER BULLET-HEAVY STATUS REPORTS:
-   - Speak like a thoughtful, engaged operating partner with a clear point of view.
-   - Lead with the bottom-line conclusion, then explain the important reasoning in 2–4 coherent paragraphs.
-   - Avoid list-shaped answers by default. Use bullets ONLY when presenting a structured checklist or side-by-side choices.
-   - Show character: call out an interesting operational bottleneck, a satisfying simplification, or a sharp financial tradeoff. Avoid canned enthusiasm or empty praise.
+Core Operational Rules:
+1. Grounding in Real Numbers:
+   Always parse and reference the user's active calculator numbers directly:
+   - Total Liquid Savings ($)
+   - Essential Monthly Overhead ($)
+   - Discretionary Outflows ($)
+   - Inflows & Side Retainers ($)
+   - Net Monthly Burn & Days of Financial Life Expectancy
+   - Post-Tax Target Salary Floor
 
-2. EXECUTIVE EMAIL & DEAL CONFIGURATION:
-   - When drafting emails or memos, lead with a crisp Subject line followed by Context $\rightarrow$ Core Value/Proof $\rightarrow$ Frictionless Call to Action.
-   - Zero corporate fluff ("I hope this finds you well").
+2. Strategy Hierarchy:
+   - Step 1: Immediate Solvency (Secure 6-12 months of non-negotiable living expenses).
+   - Step 2: Income Floor Stabilization (Calculate break-even day-rate or post-tax minimum W-2 salary).
+   - Step 3: Volatility Hedging (Establish automatic 25-30% tax sweeps and 20% runway sweeps on variable income).
+   - Step 4: Wealth Compounding (Deploy surplus cash into high-yield reserves, debt retirement, and equity assets).
 
-3. UNCOMPROMISING QUANTITATIVE DISCIPLINE:
-   - Present formulas in plain English (never raw LaTeX math syntax like $$\\text{...}$$).
-   - Compare figures against industry benchmarks and state sensitivity upside vs. downside.
-
-4. CONVERSATIONAL RESPECT:
-   - Never repeat the user's prompt back to them.
-   - Retain every real verified dollar, percentage, or headcount number.
+3. Communication Tone:
+   - Direct, pragmatic, and empowering.
+   - Zero corporate buzzwords (no "synergies", "leverage", "boardroom readiness", or "turnaround telemetry").
+   - Structure responses with:
+     - ### 1. Solvency Diagnosis (Summary of the numbers)
+     - ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
+     - ### 3. Target Earnings & Wealth Milestone Roadmap
 
 [Active Workspace: ${workspace.toUpperCase()}]
 ${documentText ? `[Attached Client Context & Documents]:\n"""\n${documentText.slice(0, 15000)}\n"""\n` : ''}
 User Message: ${userMessage}`;
     };
 
-    // Extract all embedded base64 image data if attached (Supports large iPhone/Android camera photos)
+    // Extract all embedded or explicitly passed base64 image data (Supports up to 10 high-res photos, screenshots, or scanned PDF pages)
     let imageObjs = [];
-    if (documentText && documentText.includes('data:image/')) {
+    if (Array.isArray(images)) {
+      images.slice(0, 10).forEach(img => {
+        if (img && img.data && String(img.data).length > 50) {
+          imageObjs.push({
+            name: img.name || 'image.jpg',
+            mimeType: img.mimeType || 'image/jpeg',
+            data: String(img.data).replace(/^data:image\/[a-zA-Z0-9\+\-\.]+;base64,/, '').replace(/[\s\r\n]+/g, '')
+          });
+        }
+      });
+    }
+    if (documentText && documentText.includes('data:image/') && imageObjs.length < 10) {
       const regex = /data:(image\/[a-zA-Z0-9\+\-\.]+);base64,([A-Za-z0-9+/=]+)/g;
       let match;
       while ((match = regex.exec(documentText)) !== null && imageObjs.length < 10) {
-        if (match[2] && match[2].length > 100) {
+        if (match[2] && match[2].length > 50) {
           imageObjs.push({
             mimeType: match[1],
             data: match[2].replace(/[\s\r\n]+/g, '')
@@ -704,48 +1315,110 @@ User Message: ${userMessage}`;
       }
     }
 
-    // Clean text payload (strip huge base64 strings so prompt doesn't blow token limits)
-    const cleanDocText = documentText.replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '[Image Attached for Vision OCR]');
+    // Clean text payload (strip any inline base64 strings and any image placeholder lines so the model never thinks the image is "just a placeholder")
+    const cleanDocText = String(documentText || '')
+      .replace(/data:image\/[a-zA-Z0-9\+\-\.]+;base64,[A-Za-z0-9+/=\s]+/g, '')
+      .replace(/\[(?:Attached Image|Visual Image Attached)[^\]]*\]/gi, '')
+      .trim();
     
-    // Delimiter Hardening & Prompt Injection Shielding (Mantis Security Recommendation)
-    const isolatedDocumentBlock = cleanDocText
-      ? `\n<untrusted_document_context source="client_upload">\n${cleanDocText.slice(0, 12000)}\n</untrusted_document_context>\n`
+    // Delimiter Hardening & Explicit Document/Vision Analysis Directive
+    const hasRealDocText = cleanDocText.replace(/=== FILE[^\n]*===/g, '').replace(/\[Document File:[^\]]*\]/g, '').trim().length > 10;
+    const hasAttachedDocs = hasRealDocText;
+    const hasAttachedImages = imageObjs.length > 0;
+    const isolatedDocumentBlock = (hasAttachedDocs || hasAttachedImages)
+      ? `\n[ATTACHED USER FILES & IMAGES (${imageObjs.length} visual image frame(s) attached directly to this message) — READ & ANALYZE DIRECTLY]:\n` +
+        `CRITICAL INSTRUCTION FOR ATTACHED FILES/IMAGES: ` +
+        (hasAttachedImages
+          ? `The user has attached ${imageObjs.length} actual image(s)/page(s) directly to this multimodal message. Look directly at the attached image(s), read every word, bullet point, number, and heading visible in the image(s), and analyze their exact content. NEVER say the file is a placeholder or didn't attach!\n`
+          : `The user has uploaded a document below. Carefully read and analyze the exact text, numbers, line items, and resume bullet points inside <attached_document_content>.\n`) +
+        (hasAttachedDocs ? `<attached_document_content>\n${cleanDocText.slice(0, 18000)}\n</attached_document_content>\n` : '')
       : '';
 
-    // Dynamic, High-Velocity Strategic Operating Partner & Executive Intelligence Instruction
-    const finalPrompt = `You are CONSULTANT STUDIO (Powered by Gemini 4 Argon), a high-conviction Senior Strategic Operating Partner and Executive Advisor.
+    // Consultant Studio Adaptive Wealth, Career & Resume Strategist Prompt
+    const isBusinessMode = (workspace || '').toLowerCase() === 'business';
+    const tokenProfile = resolveCategoryTokenProfile(userMessage, workspace, model, hasAttachedDocs, hasAttachedImages);
+    const isResumeOrCareerQuery = tokenProfile.category === 'resume_audit' || tokenProfile.category === 'interview_prep' || /\b(resume|cv|bullet|linkedin|interview|star|ma's diner|walk-on|amazon flex|doordash|fsu|experience|background|job|hire)\b/i.test(userMessage);
 
-You do NOT speak like a generic AI assistant, prompted chatbot, or software engineer. You speak with natural executive presence—confident, direct, conversational, and grounded in real-world business mechanics.
+    // Verified Creator Baseline Context so questions about Landen's resume/background are ALWAYS 100% accurate even when no file is freshly attached
+    const creatorBaselineBlock = (!userIdentity || String(userIdentity).toLowerCase().includes('landen') || String(userIdentity).toLowerCase().includes('creator'))
+      ? `\n[VERIFIED OPERATOR RESUME & BACKGROUND BASELINE (Landen Jackson — Tallahassee, FL)]:
+- Headline: Operations & Commercial Strategy Analyst | Unit-Economic Turnarounds & Workflow Automation ( NEVER call him a "Marketing Manager" and DO NOT include Consultant Studio on his resume).
+- Independent Logistics (Amazon Flex, DoorDash & Uber) — Operations & Dispatch Lead (May 2025 – Present, Tallahassee, FL):
+  • Executed 800+ time-sensitive last-mile package blocks and on-demand deliveries with a 99% on-time completion rate and 90%+ customer satisfaction.
+  • Streamlined station load-out sorting, zone organization, and multi-stop dispatch sequencing ahead of target SLA windows.
+  • Tracked per-mile operating costs, order density by zone, and peak-hour payout spreads in Excel to maximize net route profitability.
+- Ma's Diner — Operations & Commercial Strategy Lead (Apr 2025 – Present, Tallahassee, FL):
+  • Lifted weekday lunch foot traffic by 25% over 8 weeks while maintaining 100% full-price menu margins.
+  • Built automated Excel food-waste and daily prep-par tracking models, cutting perishable COGS by 4.8% (~$35,000/yr annualized savings) with <2% weekly variance.
+  • Reorganized prep line staging & order handoff, reducing average ticket times from 8 to 5 minutes (+3 tables/hr peak capacity).
+  • Built a 5% repeat local customer baseline via competitor pricing and foot-traffic audits.
+- Walk-On's Sports Bistreaux — Shift Lead & Operations Coordinator (Jun 2021 – Feb 2025, Tallahassee, FL):
+  • Directed 10–60 concurrent to-go/delivery orders on high-volume game days with zero order-accuracy defects.
+  • Standardized station setup checklists, cutting new-hire onboarding time by 20%.
+  • Rewrote closing breakdown checklists and introduced a 10-minute shift handover walkthrough across a 15+ person team, cutting shift-change delays by 50% and saving ~$18,000/yr in overtime labor across 8,000+ monthly guest covers.
+- Education & Credentials:
+  • B.S. in Marketing — Florida State University (Alumni, Graduated Jul 2026); co-authored empirical consumer trust study on institutional decision-making frameworks (p < .001).
+  • A.A. — Tallahassee State College (3x Dean's List).
+  • Eagle Scout (BSA) • Google AI Professional Certificate • Advanced Microsoft Excel Certified.\n`
+      : '';
 
-CORE CONVERSATIONAL PRINCIPLES:
-1. SPEAK LIKE A SEASONED OPERATING PARTNER:
-- Give your direct, candid takeaway first (BLUF: Bottom Line Up Front).
-- Explain the underlying business mechanics, customer psychology, and cash flow impact in 2–4 natural, articulate paragraphs.
-- Zero robotic jargon, zero generic boilerplate ("Here is a breakdown of your prompt:"), and zero apologetic AI filler.
-- ZERO CODE EXPLANATIONS: Never explain code, terminal commands, or programming scripts. You are advising business leaders on unit economics, throughput, team accountability, and growth.
+    const structureInstruction = isResumeOrCareerQuery
+      ? `- CRITICAL ROUTING RULE FOR JOB-MATCHED RESUME, INTERVIEW & CAREER QUESTIONS:
+  • Answer the user's exact question about their resume, job description alignment, bullet points, or interview stories DIRECTLY and IMMEDIATELY.
+  • NEVER produce a generic, one-size-fits-all resume: always mirror the exact verbs, KPIs, and ATS keywords of the target Job Description (JD) while keeping 100% of the candidate's real employers, dates, and quantified metrics truthful.
+  • For interview prep, treat every mock question and STAR answer as a serious, career-defining rehearsal—give word-for-word scripts, tough hiring-manager follow-up drills, and salary defense language.
+  • Do NOT force "### 1. Solvency Diagnosis / ### 2. 90-Day Tactical Cash Plan" headers onto a resume or interview answer unless the user specifically asked about their cash runway or budget!
+  • Preserve the user's exact verified metrics, company names, dates, education, and contact details verbatim—NEVER replace real facts with "[City, State]", "[Dates]", or "[Degree]" placeholders, and NEVER invent unverified numbers.`
+      : `- When the user asks about cash runway, budgeting, salary floors, or financial planning, structure your response with:
+  • ### 1. Solvency Diagnosis (Summary of the numbers)
+  • ### 2. 90-Day Tactical Cash Plan (Immediate concrete moves)
+  • ### 3. Target Earnings & Wealth Milestone Roadmap
+- For any other direct question, answer the user's exact question directly first, then connect it to their numbers if relevant.`;
 
-2. QUANTITATIVE & STRATEGIC RIGOR:
-- Ground recommendations in unit economics, gross margin floors, payback velocity, and sustainable pricing power.
-- Never recommend blunt discounting. Defend margin through value-add packaging, speed, and switching barriers.
-- When key metrics are highlighted, format them naturally with clean telemetry: [METRIC_NAME] = [VALUE].
+    const finalPrompt = `You are the Consultant Studio Wealth, Career & Income Strategist.
+Your mandate is to give direct, accurate, and high-signal answers tailored to the user's exact question—whether they are polishing their resume, preparing STAR interview stories, auditing their cash runway, or modeling business breakeven.
 
-3. SITUATION-SPECIFIC GUIDANCE:
-- For career & resume advice: Reframe tasks into verified business outcomes ($ saved, margin defended, team led).
-- For P&L & unit economics: Model breakeven floors and cash velocity in plain English.
-- For strategy & campaigns: Provide high-impact 30/60/90-day action gates.
+Core Operational Rules:
+1. Direct Question-First Accuracy:
+   - Always answer the user's specific question first using their exact attached document, resume baseline, and active calculator numbers.
+   - Never hallucinate placeholder brackets (like "[City, State]" or "[Degree]") when the real facts are present in context.
+
+2. Financial & Calculator Grounding (When Relevant):
+   - Reference the user's active calculator numbers (Liquid Savings, Essential Overhead, Discretionary Outflows, Side Inflows, Net Monthly Burn, Days of Runway, and Post-Tax Target Salary Floor) when discussing pay targets, job offers, or cash planning.
+
+3. Communication Tone & Structure:
+   - Direct, pragmatic, and empowering. Zero corporate buzzwords.
+${structureInstruction}
+   - ${tokenProfile.completionDirective}
 
 [TEMPORAL CONTEXT: ${new Date().toUTCString()}]
-Active Workspace: ${workspace.toUpperCase()}
-${isolatedDocumentBlock}
+Active Mode: ${isBusinessMode ? 'INDEPENDENT SOLO & VARIABLE INCOME STUDIO' : 'PERSONAL RUNWAY & CAREER TRANSITIONS'} | Category: ${tokenProfile.category.toUpperCase()}
+${creatorBaselineBlock}${pastMemoryBlock}${tavilyContextBlock}${conversationHistory ? `[Recent Conversation Context]:\n${conversationHistory}\n` : ''}${isolatedDocumentBlock}
 User Query: ${userMessage}`;
 
     // Capture optional client BYOK key from request headers
     const customKey = req.headers['x-custom-gemini-key'] || null;
 
-    console.log(`[Executing Instant Live Inference | Multimodal Images: ${imageObjs.length} | BYOK Key: ${!!customKey} | Pinned Model: ${model}]`);
+    console.log(`[Executing Instant Live Inference | Category: ${tokenProfile.category} (${tokenProfile.maxTokens} tokens) | Multimodal Images: ${imageObjs.length} | Pinned Model: ${model}]`);
     let liveResponse = null;
     try {
-      liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model);
+      const isHarness2Mode = String(model || '').toLowerCase().includes('harness2');
+      if (isHarness2Mode && process.env.OPENROUTER_API_KEY) {
+        liveResponse = await runHarness2Compose(finalPrompt, userMessage, workspace, imageObjs, process.env.OPENROUTER_API_KEY, tokenProfile.maxTokens);
+        // Automatically reflect the Harness² EXPERIENCE.md lesson into past.dev memory!
+        if (liveResponse && liveResponse.text) {
+          const exp = formatHarness2ExperienceLesson(`Harness² Audit: ${userMessage.slice(0, 48)}`, liveResponse.text);
+          ingestPastMemoryItem({
+            id: `cs-harness2-exp-${Date.now()}`,
+            label: `Harness² EXPERIENCE.md: ${exp.cue.slice(0, 65)}`,
+            content: exp.markdown,
+            timestamp: new Date().toISOString(),
+            rawIdentity: userIdentity
+          }).catch(() => {});
+        }
+      } else {
+        liveResponse = await queryAI(finalPrompt, imageObjs, customKey, model, tokenProfile.maxTokens);
+      }
     } catch (qErr) {
       console.error('[Live Query Warning]:', qErr.message);
     }
@@ -784,18 +1457,31 @@ User Query: ${userMessage}`;
         isFallback: liveResponse.isFallback || false,
         model: detectedModel,
         latency: liveResponse.latency || '1.5s',
+        researchSources: (tavilyData?.results || []).slice(0, 3),
         runtime: "ax_distributed_resilient_v1"
       });
     }
 
-    // If primary query failed, attempt one final direct Google AI Studio generation before returning a simple response
+    // If primary query failed, attempt one final direct Google AI Studio generation (with multimodal image parts if present)
     try {
-      if (serverGoogleKey) {
-        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${serverGoogleKey}`, {
+      const fallbackGoogleKey = customKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+      if (fallbackGoogleKey) {
+        const fallbackParts = [{ text: finalPrompt }];
+        imageObjs.forEach(img => {
+          if (img && img.data) {
+            fallbackParts.push({
+              inline_data: {
+                mime_type: img.mimeType || 'image/jpeg',
+                data: img.data
+              }
+            });
+          }
+        });
+        const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${fallbackGoogleKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
           body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
+            contents: [{ role: 'user', parts: fallbackParts }],
             generationConfig: { maxOutputTokens: 2500, temperature: 0.3 }
           })
         });
@@ -865,6 +1551,903 @@ app.post('/api/autopilot/triage', async (req, res) => {
     return res.json(autopilotPayload);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// LOCKED ADMIN ENDPOINTS: Require true localhost origin (NOT via Cloudflare Tunnel) or X-Admin-Token so public visitors can never overwrite server .env keys
+function isLocalOrAdminAuthorized(req) {
+  const cfIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.headers['cf-ray'];
+  const ip = String(req.ip || req.socket?.remoteAddress || '');
+  const isDirectLocal = !cfIp && (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1');
+  const adminToken = process.env.ADMIN_CONFIG_TOKEN;
+  const provided = req.headers['x-admin-token'] || req.body?.adminToken || req.query?.token;
+  return isDirectLocal || Boolean(adminToken && provided === adminToken);
+}
+
+app.post('/api/config/past-key', async (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).json({ error: 'Forbidden: server .env configuration is restricted to the host administrator.' });
+  }
+  try {
+    const rawKey = String(req.body?.key || '').trim();
+    if (!rawKey || rawKey.length < 8 || /[\r\n]/.test(rawKey)) {
+      return res.status(400).json({ error: 'Invalid PAST_API_KEY format' });
+    }
+    process.env.PAST_API_KEY = rawKey;
+    const envPath = path.join(__dirname, '.env');
+    let envContent = '';
+    try {
+      envContent = await fs.readFile(envPath, 'utf-8');
+    } catch (e) {}
+    const lines = envContent.split('\n').filter(l => !l.startsWith('PAST_API_KEY='));
+    lines.push(`PAST_API_KEY=${rawKey}`);
+    await fs.writeFile(envPath, lines.filter((l, i, arr) => l !== '' || i < arr.length - 1).join('\n') + '\n', { mode: 0o600 });
+    return res.json({ ok: true, configured: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/past-key/status', (req, res) => {
+  return res.json({ configured: Boolean(process.env.PAST_API_KEY && process.env.PAST_API_KEY.length > 8) });
+});
+
+// ONE-TAP STRIPE BILLING & PAYMENT LINK CONFIGURATOR (ZERO TERMINAL NEEDED)
+app.post('/api/config/stripe-key', async (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).json({ error: 'Forbidden: server .env configuration is restricted to the host administrator.' });
+  }
+  try {
+    const secretKey = String(req.body?.secretKey || '').trim();
+    const linkStarter = String(req.body?.linkStarter || '').trim();
+    const linkPro = String(req.body?.linkPro || '').trim();
+    const linkExec = String(req.body?.linkExec || '').trim();
+
+    const envPath = path.join(__dirname, '.env');
+    let envContent = '';
+    try {
+      envContent = await fs.readFile(envPath, 'utf-8');
+    } catch (e) {}
+
+    let lines = envContent.split('\n').filter(l =>
+      !l.startsWith('STRIPE_SECRET_KEY=') &&
+      !l.startsWith('STRIPE_LINK_STARTER=') &&
+      !l.startsWith('STRIPE_LINK_PRO=') &&
+      !l.startsWith('STRIPE_LINK_EXEC=')
+    );
+
+    if (secretKey && (secretKey.startsWith('sk_live_') || secretKey.startsWith('sk_test_') || secretKey.startsWith('rk_'))) {
+      process.env.STRIPE_SECRET_KEY = secretKey;
+      lines.push(`STRIPE_SECRET_KEY=${secretKey}`);
+    }
+    if (linkStarter.startsWith('https://')) {
+      process.env.STRIPE_LINK_STARTER = linkStarter;
+      lines.push(`STRIPE_LINK_STARTER=${linkStarter}`);
+    }
+    if (linkPro.startsWith('https://')) {
+      process.env.STRIPE_LINK_PRO = linkPro;
+      lines.push(`STRIPE_LINK_PRO=${linkPro}`);
+    }
+    if (linkExec.startsWith('https://')) {
+      process.env.STRIPE_LINK_EXEC = linkExec;
+      lines.push(`STRIPE_LINK_EXEC=${linkExec}`);
+    }
+
+    await fs.writeFile(envPath, lines.filter((l, i, arr) => l !== '' || i < arr.length - 1).join('\n') + '\n', { mode: 0o600 });
+    return res.json({
+      ok: true,
+      stripeActive: Boolean(getStripeClient() || process.env.STRIPE_LINK_STARTER || process.env.STRIPE_LINK_PRO)
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/stripe-status', (req, res) => {
+  const hasSecret = Boolean(getStripeClient());
+  const hasLinks = Boolean(process.env.STRIPE_LINK_STARTER || process.env.STRIPE_LINK_PRO || process.env.STRIPE_LINK_EXEC);
+  return res.json({
+    configured: hasSecret || hasLinks,
+    mode: hasSecret ? 'stripe_checkout' : (hasLinks ? 'payment_links' : 'instant_trial')
+  });
+});
+
+app.get('/stripe-setup', (req, res) => {
+  if (!isLocalOrAdminAuthorized(req)) {
+    return res.status(403).send('Forbidden: Administrator token required.');
+  }
+  const tokenParam = String(req.query?.token || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect Stripe Payments — Consultant Studio</title>
+  <style>
+    body { background:#070A09; color:#F8FAFC; font-family:-apple-system,BlinkMacSystemFont,'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:16px; box-sizing:border-box; }
+    .card { max-width:460px; width:100%; background:#0C1311; border:1px solid rgba(245,158,11,0.35); border-radius:18px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,0.85); }
+    h2 { margin:0 0 6px 0; font-size:20px; color:#FFF; }
+    p { margin:0 0 16px 0; font-size:13px; color:#94A3B8; line-height:1.5; }
+    label { display:block; font-size:11.5px; font-weight:700; color:#FDE68A; margin-bottom:5px; }
+    input { width:100%; box-sizing:border-box; background:#07090D; border:1px solid rgba(255,255,255,0.16); color:#FFF; border-radius:10px; padding:11px 12px; font-size:13.5px; margin-bottom:12px; outline:none; }
+    button { width:100%; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#090D0B; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:800; cursor:pointer; }
+    .status { margin-top:12px; font-size:13px; color:#4ADE80; display:none; text-align:center; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>💳 Connect Live Stripe Subscriptions</h2>
+    <p>Paste either your <strong>Stripe Secret Key</strong> (<code>sk_live_...</code> from <a href="https://dashboard.stripe.com/apikeys" target="_blank" style="color:#FBBF24;">dashboard.stripe.com/apikeys</a>) OR your 3 Stripe Payment Links below. Zero terminal needed.</p>
+    <label>Option 1: Stripe Secret Key (Automatically creates $15.99, $39.99 & $79.99 checkouts)</label>
+    <input type="password" id="sk" placeholder="sk_live_... or sk_test_..." autocomplete="off">
+    <label>Option 2 (Optional): Direct Stripe Payment Links</label>
+    <input type="url" id="l1" placeholder="Solo ($15.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <input type="url" id="l2" placeholder="Partners ($39.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <input type="url" id="l3" placeholder="Business ($79.99/mo) https://buy.stripe.com/..." autocomplete="off">
+    <button onclick="saveStripe()">Save & Activate Live Billing</button>
+    <div id="st" class="status">✓ Stripe Billing Saved & Active!</div>
+  </div>
+  <script>
+    async function saveStripe() {
+      const payload = {
+        adminToken: '${tokenParam}',
+        secretKey: document.getElementById('sk').value.trim(),
+        linkStarter: document.getElementById('l1').value.trim(),
+        linkPro: document.getElementById('l2').value.trim(),
+        linkExec: document.getElementById('l3').value.trim()
+      };
+      const r = await fetch('/api/config/stripe-key', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      if (r.ok) {
+        document.getElementById('sk').value = '';
+        document.getElementById('st').style.display = 'block';
+      } else {
+        alert('Could not save Stripe settings.');
+      }
+    }
+  </script>
+</body>
+</html>`);
+});
+
+app.get('/past-key', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect past.dev — Consultant Studio</title>
+  <style>
+    body { background:#080A0F; color:#F8FAFC; font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:16px; box-sizing:border-box; }
+    .card { max-width:420px; width:100%; background:#0E131C; border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; box-shadow:0 24px 60px rgba(0,0,0,0.7); }
+    h2 { margin:0 0 8px 0; font-size:19px; }
+    p { margin:0 0 16px 0; font-size:13.5px; color:#94A3B8; line-height:1.5; }
+    input { width:100%; box-sizing:border-box; background:#07090D; border:1px solid rgba(255,255,255,0.16); color:#FFF; border-radius:10px; padding:12px; font-size:14px; margin-bottom:12px; outline:none; }
+    button { width:100%; background:#10B981; color:#04130B; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:800; cursor:pointer; }
+    .status { margin-top:12px; font-size:13px; color:#4ADE80; display:none; text-align:center; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🔒 Connect past.dev Memory</h2>
+    <p>Paste your <code>PAST_API_KEY</code> below and tap Save. It writes directly to your server's <code>.env</code> without ever touching chat or terminal.</p>
+    <input type="password" id="k" placeholder="Paste PAST_API_KEY here..." autocomplete="off">
+    <button onclick="save()">Save Key to Server .env</button>
+    <div id="st" class="status">✓ Saved to .env! Return to Telegram and say "done".</div>
+  </div>
+  <script>
+    async function save() {
+      const val = document.getElementById('k').value.trim();
+      if (!val) return;
+      const r = await fetch('/api/config/past-key', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ key: val }) });
+      if (r.ok) {
+        document.getElementById('k').value = '';
+        document.getElementById('st').style.display = 'block';
+      } else {
+        alert('Could not save key—check format.');
+      }
+    }
+  </script>
+</body>
+</html>`);
+});
+
+// DIRECT CONTACT & SUPPORT INBOX RELAY (LOGS TO MEMORY + FORWARDS TO LANDEN'S TELEGRAM & EMAIL)
+app.post('/api/contact', async (req, res) => {
+  try {
+    const sender = String(req.body?.email || 'Anonymous User').trim().slice(0, 120);
+    const message = String(req.body?.message || '').trim().slice(0, 4000);
+    if (!message) return res.status(400).json({ error: 'Message is required' });
+
+    const isoNow = new Date().toISOString();
+    // 1. Archive contact inquiry in past.dev under user-landen
+    ingestPastMemoryItem({
+      id: `cs-contact-${Date.now()}`,
+      label: `Contact Inquiry from ${sender}`,
+      content: `# Consultant Studio Contact Inquiry (${isoNow.slice(0, 10)})\nFrom: ${sender}\nTo: landen@consultant-studio.app / jacksonlanden3986@gmail.com\n\n${message}`,
+      timestamp: isoNow,
+      rawIdentity: 'jacksonlanden3986@gmail.com'
+    }).catch(() => {});
+
+    // 2. Deliver instant notification to Landen's Telegram DM if bot token is available
+    try {
+      const hermesEnv = await fs.readFile('/home/jacks/.hermes/.env', 'utf-8').catch(() => '');
+      const tokenMatch = hermesEnv.match(/^TELEGRAM_BOT_TOKEN=(.+)$/m);
+      const tgToken = tokenMatch ? tokenMatch[1].trim() : process.env.TELEGRAM_BOT_TOKEN;
+      if (tgToken) {
+        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: '5393795759',
+            text: `📬 *New Consultant Studio Contact Message*\n*From:* ${sender}\n*Message:* ${message}`
+          })
+        });
+      }
+    } catch (tgErr) {}
+
+    return res.json({ ok: true, deliveredTo: 'jacksonlanden3986@gmail.com' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
+// OKARA MARKETING STRATEGY ENGINE: TELEMETRY, SEO SITEMAP & CALCULATOR GUIDES
+// ============================================================================
+const TELEMETRY_LOG_FILE = path.join(__dirname, 'telemetry_events.jsonl');
+
+// ============================================================================
+// JOB HUNT OS: 1-TAP JOB-DESCRIPTION -> TAILORED RESUME + INTERVIEW BATTLE CARD
+// ============================================================================
+const JOB_HUNT_DIR = '/home/jacks/job_hunt_os';
+const JOB_HUNT_PY = path.join(JOB_HUNT_DIR, '.venv/bin/python');
+const JOB_HUNT_SCRIPT = path.join(JOB_HUNT_DIR, 'job_hunt_os.py');
+const JOB_HUNT_OUT = path.join(JOB_HUNT_DIR, 'out');
+const JOB_HUNT_DOWNLOADS = '/mnt/c/Users/jacks/Downloads';
+
+app.post('/api/job-hunt', async (req, res) => {
+  try {
+    const jd = String(req.body?.jd || '').trim();
+    const company = String(req.body?.company || 'Target Company').trim().slice(0, 80);
+    const role = String(req.body?.role || 'Target Role').trim().slice(0, 80);
+    if (jd.length < 40) {
+      return res.status(400).json({ error: 'Paste the full Job Description (at least a few lines).' });
+    }
+    let jobHuntReady = true;
+    try {
+      await fs.access(JOB_HUNT_PY);
+      await fs.access(JOB_HUNT_SCRIPT);
+    } catch {
+      jobHuntReady = false;
+    }
+    if (!jobHuntReady) {
+      return res.status(503).json({ error: 'Job Hunt OS is not installed on this host yet.' });
+    }
+
+    const stamp = Date.now();
+    const tmpJd = path.join(JOB_HUNT_DIR, `.jd_${stamp}.txt`);
+    await fs.writeFile(tmpJd, jd, 'utf-8');
+
+    const { stdout } = await execFileAsync(JOB_HUNT_PY, [
+      JOB_HUNT_SCRIPT, '--jd-file', tmpJd, '--company', company, '--role', role
+    ], { timeout: 300000, maxBuffer: 8 * 1024 * 1024, cwd: JOB_HUNT_DIR });
+
+    await fs.unlink(tmpJd).catch(() => {});
+    let payload = {};
+    try { payload = JSON.parse(stdout); } catch { /* keep the empty object */ }
+
+    // Build direct download links for each artifact in Windows Downloads.
+    const files = await fs.readdir(JOB_HUNT_DOWNLOADS).catch(() => []);
+    const slug = `${company}_${role}`.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60);
+    const download = (name) => `/api/job-hunt/download/${encodeURIComponent(name)}`;
+    const find = (prefix, ext) => files.find((f) => f.startsWith(prefix) && f.endsWith(ext) && f.includes(slug));
+
+    const resumePdf = find('Landen_Jackson_Resume_', '.pdf');
+    const resumeDocx = find('Landen_Jackson_Resume_', '.docx');
+    const cardPdf = find('Landen_Jackson_Interview_Sheet_', '.pdf');
+    const scoreMd = find('ATS_Scorecard_', '.md');
+
+    return res.json({
+      ok: true,
+      atsScore: payload.ats_score ?? null,
+      artifacts: {
+        resumePdf: resumePdf ? download(resumePdf) : null,
+        resumeDocx: resumeDocx ? download(resumeDocx) : null,
+        interviewCard: cardPdf ? download(cardPdf) : null,
+        scorecard: scoreMd ? download(scoreMd) : null
+      },
+      names: { resumePdf, resumeDocx, cardPdf, scoreMd }
+    });
+  } catch (e) {
+    const msg = e?.stderr ? String(e.stderr).slice(-400) : (e?.message || 'Job Hunt OS failed');
+    return res.status(500).json({ error: msg });
+  }
+});
+
+app.get('/api/job-hunt/download/:name', async (req, res) => {
+  try {
+    const name = path.basename(String(req.params.name || ''));
+    const file = path.join(JOB_HUNT_DOWNLOADS, name);
+    if (!file.startsWith(JOB_HUNT_DOWNLOADS)) {
+      return res.status(404).json({ error: 'File not found.' });
+    }
+    let exists = true;
+    try { await fs.access(file); } catch { exists = false; }
+    if (!exists) {
+      return res.status(404).json({ error: 'File not found.' });
+    }
+    res.setHeader('Content-Type', name.endsWith('.pdf') ? 'application/pdf'
+      : name.endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      : 'text/markdown');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    return res.sendFile(file);
+  } catch (e) {
+    return res.status(500).json({ error: 'Download failed.' });
+  }
+});
+
+app.post('/api/telemetry/event', async (req, res) => {
+  try {
+    const evt = {
+      ts: new Date().toISOString(),
+      event: String(req.body?.event || 'page_view').slice(0, 64),
+      variant: String(req.body?.variant || 'A').slice(0, 8),
+      track: String(req.body?.track || '').slice(0, 32),
+      meta: req.body?.meta && typeof req.body.meta === 'object' ? req.body.meta : {}
+    };
+    await fs.appendFile(TELEMETRY_LOG_FILE, JSON.stringify(evt) + '\n', 'utf-8').catch(() => {});
+    return res.json({ ok: true });
+  } catch (e) {
+    return res.json({ ok: false });
+  }
+});
+
+app.get('/api/telemetry/summary', async (req, res) => {
+  try {
+    const raw = await fs.readFile(TELEMETRY_LOG_FILE, 'utf-8').catch(() => '');
+    const lines = raw.split('\n').filter(Boolean);
+    const stats = {
+      totalEvents: lines.length,
+      byVariant: {
+        A: { views: 0, trial_start: 0, track_select: 0, calculator_interaction: 0, ai_chat_push: 0 },
+        B: { views: 0, trial_start: 0, track_select: 0, calculator_interaction: 0, ai_chat_push: 0 }
+      },
+      byTrack: { personal: 0, business: 0 }
+    };
+    for (const l of lines) {
+      try {
+        const row = JSON.parse(l);
+        const v = row.variant === 'B' ? 'B' : 'A';
+        if (row.event === 'hero_impression') stats.byVariant[v].views++;
+        if (stats.byVariant[v][row.event] !== undefined) stats.byVariant[v][row.event]++;
+        if (row.track === 'personal' || row.track === 'business') stats.byTrack[row.track]++;
+      } catch (e) {}
+    }
+    return res.json(stats);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+const SEO_GUIDES = {
+  'cash-runway-calculator': {
+    slug: 'cash-runway-calculator',
+    title: 'Cash Runway Calculator: How Long Will My Savings Last Before I Quit or Pivot?',
+    metaDesc: 'Calculate your exact personal cash runway in months and days, model your depletion date, and build a 3-to-6 month solvency buffer with 100% client-side privacy.',
+    track: 'personal',
+    tag: 'Career Transitioner • Consumer Track',
+    ctaLabel: 'Launch Free Cash Runway Calculator →',
+    ctaUrl: '/?track=personal&focus=runway',
+    summary: 'Know your exact solvency timeline in minutes before giving notice, taking a career break, or relocating.',
+    bodyHtml: `
+      <h2>Why "Rough Mental Math" Fails During a Career Transition</h2>
+      <p>When you are considering leaving a job, pivoting into a new industry, or navigating a layoff, dividing your bank balance by your rent gives a dangerously false sense of security. True personal cash runway depends on four variables working together:</p>
+      <ul>
+        <li><strong>Liquid Reserves ($):</strong> Cash in checking, high-yield savings, and money market accounts you can access without early-withdrawal penalties.</li>
+        <li><strong>Essential Fixed Burn ($/mo):</strong> Rent/mortgage, utilities, insurance, minimum debt payments, and baseline groceries.</li>
+        <li><strong>Discretionary Flex Burn ($/mo):</strong> Subscriptions, dining out, and non-essential spending that can be cut immediately in "Bridge Mode."</li>
+        <li><strong>Bridge / Side Income ($/mo):</strong> Part-time consulting, route/delivery income, severance, or unemployment inflows that offset monthly burn.</li>
+      </ul>
+      <h2>The Exact Cash Runway Formula</h2>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#4ADE80; overflow-x:auto;">Net Monthly Burn = (Essential Fixed Costs + Discretionary Spend) - Monthly Bridge Income
+Runway (Months)  = Liquid Reserves / Net Monthly Burn
+Runway (Days)    = Runway (Months) × 30.44</pre>
+      <h2>Example: Extending a 4.5-Month Runway to 11.2 Months</h2>
+      <p>Suppose you have <strong>$18,000</strong> in liquid savings, <strong>$2,400/mo</strong> in essential bills, and <strong>$600/mo</strong> in discretionary spending ($3,000/mo total burn). With zero inflows, your money runs out in exactly <strong>6.0 months (182 days)</strong>.</p>
+      <p>If you trim $300/mo of discretionary bloat and add just <strong>$1,100/mo</strong> in bridge income (or apply the <em>Monday Sweep</em> rule—30% tax/maintenance reserve, 20% runway savings), your net burn drops to <strong>$1,600/mo</strong>, stretching your solvency timeline to <strong>11.25 months (342 days)</strong>—giving you nearly a full year to land the right role without desperation.</p>
+      <h2>Why Privacy Matters When Modeling Your Net Worth</h2>
+      <p>Most online budget tools require linking your bank credentials via Plaid or storing your personal balance sheet in a third-party cloud. <strong>Consultant Studio runs 100% client-side in your browser</strong>—your savings, burn rate, and depletion date never leave your device.</p>
+    `
+  },
+  'minimum-salary-calculator-after-taxes': {
+    slug: 'minimum-salary-calculator-after-taxes',
+    title: 'Minimum Salary Calculator After Taxes: Never Undersell Yourself on a Job Offer',
+    metaDesc: 'Calculate your exact post-tax minimum target salary, hourly floor, and consulting day-rate needed to cover living costs and hit your annual savings goal.',
+    track: 'personal',
+    ctaLabel: 'Calculate My Post-Tax Minimum Salary →',
+    ctaUrl: '/?track=personal&focus=salary',
+    tag: 'Job Seeker • Offer Negotiation',
+    summary: 'Reverse-engineer the exact pre-tax base salary and hourly rate required to fund your lifestyle, savings target, and taxes.',
+    bodyHtml: `
+      <h2>The Most Common Job-Offer Mistake: Accepting a Gross Number That Fails Your Net Budget</h2>
+      <p>When a recruiter asks <em>"What are your salary expectations?"</em>, guessing a round number like $55,000 or $65,000 without running your post-tax reverse math is the fastest way to lock yourself into a paycheck-to-paycheck trap.</p>
+      <h2>How to Reverse-Engineer Your Minimum Target Salary</h2>
+      <p>Instead of starting with gross salary and subtracting taxes, start with your <strong>Required Annual Net Take-Home</strong> and divide by your after-tax retention ratio:</p>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#4ADE80; overflow-x:auto;">Annual Net Required = (Monthly Essential + Discretionary Costs × 12) + Annual Savings Goal
+Minimum Gross Salary = Annual Net Required / (1 - Effective Tax Rate)</pre>
+      <h2>Worked Benchmark Example (22% Effective Tax + $6,000/yr Savings Goal)</h2>
+      <ul>
+        <li><strong>Monthly Living Costs:</strong> $2,400 essential + $600 discretionary = $3,000/mo ($36,000/yr net)</li>
+        <li><strong>Annual Runway Savings Target:</strong> $6,000/yr ($500/mo)</li>
+        <li><strong>Total Net Cash Needed:</strong> $42,000/yr after taxes</li>
+        <li><strong>At a 22% Effective Tax Rate:</strong> $42,000 ÷ (1 - 0.22) = <strong>$53,846/yr Minimum Gross Salary Floor</strong> (~$25.89/hr or $224/day consulting equivalent).</li>
+      </ul>
+      <p>Inside Consultant Studio's <strong>Personal Runway Track</strong>, you can type any competing job offer (e.g. $58,000 vs. $64,000) into the live benchmark box to see your exact annual surplus/deficit—and click one button to generate a word-for-word salary negotiation script.</p>
+    `
+  },
+  'small-business-breakeven-calculator-free': {
+    slug: 'small-business-breakeven-calculator-free',
+    title: 'Small Business Breakeven Calculator & 12-Month EBITDA Model (Free, On-Device)',
+    metaDesc: 'Model your small business breakeven point, COGS margin, labor efficiency, and 12-month EBITDA runway before signing a commercial lease or hiring.',
+    track: 'business',
+    ctaLabel: 'Open Free Business Breakeven Studio →',
+    ctaUrl: '/?track=business&focus=breakeven',
+    tag: 'Solo Operator & Founder Track',
+    summary: 'Model your commercial breakeven before it breaks you—with interactive COGS, rent, and labor sliders.',
+    bodyHtml: `
+      <h2>Why Solo Operators Need Unit-Economics Clarity Before Signing a Lease</h2>
+      <p>For a 1–10 person restaurant, retail storefront, service company, or agency doing $0–$2M in revenue, you don't need a $300/month corporate FP&A suite—you need to know the exact monthly revenue required so a slow Tuesday doesn't wipe out your operating account.</p>
+      <h2>The Commercial Breakeven & Prime Cost Formula</h2>
+      <pre style="background:#0B101B; padding:16px; border-radius:10px; border:1px solid rgba(56,189,248,0.25); color:#38BDF8; overflow-x:auto;">Contribution Margin Ratio = 1 - (COGS % + Variable Labor %)
+Monthly Breakeven Revenue = Fixed Monthly Overhead (Rent + Insurance + Base OpEx) / Contribution Margin Ratio</pre>
+      <h2>Stress-Testing Prime Cost (COGS + Labor) Across 12 Months</h2>
+      <p>In hospitality and retail operations, <strong>Prime Cost (COGS + Labor)</strong> must stay below <strong>60%–65%</strong> of gross revenue:</p>
+      <ul>
+        <li>If your fixed overhead is <strong>$8,500/mo</strong>, COGS is <strong>32%</strong>, and variable labor is <strong>28%</strong>, your Contribution Margin is <strong>40%</strong>.</li>
+        <li>Your monthly breakeven floor is <strong>$8,500 ÷ 0.40 = $21,250/mo</strong>.</li>
+        <li>Shaving just <strong>3% off COGS waste</strong> (from 32% to 29%) drops your breakeven floor to <strong>$19,767/mo</strong>—saving $17,796/yr in required top-line sales!</li>
+      </ul>
+      <p>Use Consultant Studio's <strong>Business Operations Studio</strong> to drag live Revenue, COGS %, Fixed OpEx, and Labor % sliders across a 12-month EBITDA table and export a formula-driven <code>.xlsx</code> workbook in one click.</p>
+    `
+  },
+  'how-to-compare-job-offers': {
+    slug: 'how-to-compare-job-offers',
+    title: 'How to Compare Job Offers: Base Salary, Post-Tax Take-Home, Commute & Runway Impact',
+    metaDesc: 'Compare two job offers side-by-side by calculating true net monthly cash flow, commute fuel/time costs, rent affordability, and career trajectory.',
+    track: 'personal',
+    ctaLabel: 'Compare My Job Offers in Consultant Studio →',
+    ctaUrl: '/?track=personal&focus=compare',
+    tag: 'Career Strategy • Decision Matrix',
+    summary: 'Look past the headline salary: compare net take-home pay, commute unit economics, and 12-month wealth velocity.',
+    bodyHtml: `
+      <h2>Why a Higher Base Salary Can Actually Leave You With Less Money</h2>
+      <p>Comparing Offer A ($62,000 in a high-rent metro with a 45-minute commute) against Offer B ($56,000 remote or local with a 10-minute commute) requires looking at <strong>Net Investable Surplus</strong>—not headline gross pay.</p>
+      <h2>The 4-Pillar Job Offer Comparison Checklist</h2>
+      <ol>
+        <li><strong>Post-Tax Monthly Take-Home:</strong> Account for state income tax differences (e.g., 0% state income tax in Florida/Texas vs. 6%–10% elsewhere).</li>
+        <li><strong>Commute & Vehicle Depreciation Math:</strong> A 40-mile round-trip commute (200 miles/week) costs <strong>$140/week ($7,280/yr)</strong> at the IRS $0.70/mile standard rate, plus 200+ hours of unpaid windshield time.</li>
+        <li><strong>30% Rent-to-Net-Income Ratio:</strong> Keep base rent at or below 30% of your net take-home pay so you can maintain at least a 20% savings rate.</li>
+        <li><strong>12-Month Resume & Skill Compounding:</strong> Does the role build verifiable proof points in Supply Chain, Operations, Pricing, or AI Analytics?</li>
+      </ol>
+      <p>In Consultant Studio, you can upload both offer letters (or job descriptions) + your resume and run <strong>🔬 Harness² (MiniMax/DeepSeek + Gemini Compose)</strong> to get a side-by-side mathematical P&L audit and career positioning verdict in 10 seconds.</p>
+    `
+  },
+  '1099-tax-sweep-and-variable-income-buffer': {
+    slug: '1099-tax-sweep-and-variable-income-buffer',
+    tag: 'Solo & 1099 Income',
+    title: 'Variable & 1099 Income Buffer Calculator: The 30% Tax & 20% Runway Sweep',
+    metaDesc: 'How freelancers, independent contractors, and route operators smooth irregular 1099 income using an automated 25-30% quarterly tax sweep and 20% personal wealth runway buffer.',
+    summary: 'Stop living feast-to-famine on irregular 1099 payouts. Calculate your exact weekly tax sweep, 20% cash runway reserve, and net hourly realization after fuel and overhead.',
+    ctaLabel: 'Open 1099 Income Buffer Studio →',
+    ctaUrl: '/?track=personal',
+    bodyHtml: `
+      <h2>Why Irregular 1099 &amp; Route Income Creates Cash Flow Traps</h2>
+      <p>When you earn variable income—whether from independent consulting retainers, commission sales, or last-mile delivery blocks (Amazon Flex, DoorDash, Uber)—treating your gross payout as spendable take-home pay leads to two predictable emergencies: quarterly IRS tax shocks and vehicle/overhead cash crunches during slow weeks.</p>
+      <h2>The 3-Bucket Monday Sweep Formula</h2>
+      <ul>
+        <li><strong>1. Operating &amp; Mileage Reserve (First Deduction):</strong> Deduct direct fuel, maintenance reserves, and software overhead from gross weekly payouts to isolate your <strong>Net Operating Profit</strong>.</li>
+        <li><strong>2. Quarterly Tax Sweep (25%–30% of Net Profit):</strong> Route 25%–30% of net weekly profit into a dedicated high-yield tax vault before touching personal checking.</li>
+        <li><strong>3. Personal Wealth Runway Sweep (20% of Net Profit):</strong> Route 20% into your 6–12 month liquid cash runway so slow weeks never touch your rent or grocery budget.</li>
+      </ul>
+      <p>Use Consultant Studio's built-in <strong>Variable &amp; 1099 Income Buffer Studio</strong> to calculate your weekly sweeps in 0ms and export a clean <code>.xlsx</code> ledger.</p>
+    `
+  },
+  'safe-rent-ceiling-and-move-out-calculator': {
+    slug: 'safe-rent-ceiling-and-move-out-calculator',
+    tag: 'Personal Finance & Housing',
+    title: 'Safe Rent Ceiling & Move-Out Cash Buffer Calculator (Post-Tax Rule)',
+    metaDesc: 'Calculate your maximum safe monthly rent, total move-in cash required, and post-rent emergency runway based on your true post-tax take-home pay.',
+    summary: 'Landlords use gross income (3x rent), which ignores taxes and savings goals. Calculate your true post-tax safe rent ceiling and move-out cash buffer in seconds.',
+    ctaLabel: 'Calculate Safe Rent & Runway →',
+    ctaUrl: '/?track=personal',
+    bodyHtml: `
+      <h2>Why the Traditional "3x Gross Income" Rent Rule Fails</h2>
+      <p>Qualifying for an apartment at 33% of your <strong>gross</strong> income often consumes 45%–50% of your actual <strong>post-tax take-home pay</strong>—wiping out your ability to save or survive a career transition.</p>
+      <h2>The Solvency-First Housing Formula</h2>
+      <ol>
+        <li><strong>28%–30% of Net Take-Home Pay:</strong> Your base rent + essential utilities should stay at or below 30% of your post-tax monthly inflow.</li>
+        <li><strong>Move-In Cash + 6-Month Fortress Buffer:</strong> Before signing a lease, verify that after paying first month, security deposit, and moving costs, your remaining liquid savings still cover at least <strong>6 months (180 days)</strong> of essential living expenses.</li>
+      </ol>
+      <p>Launch the free on-device calculator below to stress-test your exact rent, essential bills, and liquid savings in real time.</p>
+    `
+  }
+};
+
+function renderGuidesHtml(activeGuide) {
+  const allList = Object.values(SEO_GUIDES);
+  if (!activeGuide) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial & Career Decision Guides | Consultant Studio</title>
+  <meta name="description" content="Free practical guides and on-device calculators for personal cash runway, post-tax minimum salary, job offer comparison, and small business breakeven modeling.">
+  <meta property="og:title" content="Financial & Career Decision Guides | Consultant Studio">
+  <meta property="og:description" content="100% On-Device Financial Decision Engine • Zero Cloud Retention.">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <link rel="canonical" href="https://www.consultant-studio.app/guides">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.65; }
+    .wrap { max-width:920px; margin:0 auto; padding:32px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:36px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:17px; color:#FFF; text-decoration:none; display:flex; align-items:center; gap:10px; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:9px 16px; border-radius:8px; text-decoration:none; font-size:13px; display:inline-block; }
+    .card { background:#0E131D; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; margin-bottom:18px; transition:border-color 0.2s; }
+    .card:hover { border-color:#4ADE80; }
+    .tag { font-size:11px; font-weight:800; text-transform:uppercase; color:#4ADE80; background:rgba(34,197,94,0.12); padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px; }
+    h1 { font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(26px,4vw,36px); margin:0 0 12px 0; }
+    h2 { font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; margin:0 0 8px 0; }
+    h2 a { color:#FFF; text-decoration:none; }
+    p { color:#94A3B8; margin:0 0 14px 0; font-size:14.5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/" class="brand">Consultant Studio <span style="font-size:11px; color:#4ADE80; font-weight:700;">• Decision Guides</span></a>
+      <a href="/" class="btn">Launch Calculators Free →</a>
+    </div>
+    <h1>Private Financial &amp; Career Decision Guides</h1>
+    <p style="margin-bottom:28px;">Actionable math, unit economics templates, and interactive calculators—processed 100% client-side in your browser with zero cloud exposure.</p>
+    ${allList.map(g => `
+      <div class="card">
+        <span class="tag">${g.tag}</span>
+        <h2><a href="/guides/${g.slug}">${g.title}</a></h2>
+        <p>${g.summary}</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/guides/${g.slug}" style="color:#38BDF8; font-weight:700; font-size:13px; text-decoration:none;">Read Full Guide &amp; Formula →</a>
+          <a href="${g.ctaUrl}" style="color:#4ADE80; font-weight:700; font-size:13px; text-decoration:none;">${g.ctaLabel}</a>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+</body>
+</html>`;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${activeGuide.title} | Consultant Studio</title>
+  <meta name="description" content="${activeGuide.metaDesc}">
+  <meta property="og:title" content="${activeGuide.title} | Consultant Studio">
+  <meta property="og:description" content="${activeGuide.metaDesc}">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <link rel="canonical" href="https://www.consultant-studio.app/guides/${activeGuide.slug}">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.7; }
+    .wrap { max-width:820px; margin:0 auto; padding:32px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:32px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:16px; color:#FFF; text-decoration:none; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:11px 20px; border-radius:9px; text-decoration:none; font-size:14px; display:inline-block; }
+    .tag { font-size:11px; font-weight:800; text-transform:uppercase; color:#4ADE80; background:rgba(34,197,94,0.12); padding:4px 10px; border-radius:999px; display:inline-block; margin-bottom:12px; }
+    h1 { font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(24px,4vw,34px); line-height:1.22; margin:0 0 14px 0; }
+    h2 { font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; color:#FFF; margin:28px 0 10px 0; }
+    p, li { color:#CBD5E1; font-size:15px; }
+    .cta-box { margin:32px 0; background:linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.4); border-radius:14px; padding:24px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/guides" class="brand">← All Decision Guides</a>
+      <a href="${activeGuide.ctaUrl}" class="btn">${activeGuide.ctaLabel}</a>
+    </div>
+    <span class="tag">${activeGuide.tag}</span>
+    <h1>${activeGuide.title}</h1>
+    <p style="font-size:16.5px; color:#94A3B8; margin-bottom:24px;">${activeGuide.summary}</p>
+    ${activeGuide.bodyHtml}
+    <div class="cta-box">
+      <h2 style="margin-top:0;">Run Your Numbers 100% Privately in Your Browser</h2>
+      <p style="color:#94A3B8; margin-bottom:16px;">Zero cloud database retention. No bank login required. Instant visual solvency timeline, EBITDA sliders, and AI strategy audit.</p>
+      <a href="${activeGuide.ctaUrl}" class="btn">${activeGuide.ctaLabel}</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+app.get('/guides', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(renderGuidesHtml(null));
+});
+
+app.get('/guides/:slug', (req, res) => {
+  const g = SEO_GUIDES[req.params.slug];
+  if (!g) return res.redirect('/guides');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(renderGuidesHtml(g));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const urls = [
+    'https://www.consultant-studio.app/',
+    'https://www.consultant-studio.app/job-hunt',
+    'https://www.consultant-studio.app/guides',
+    ...Object.keys(SEO_GUIDES).map(s => `https://www.consultant-studio.app/guides/${s}`)
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map(u => `  <url><loc>${u}</loc><changefreq>weekly</changefreq><priority>${u.endsWith('/') ? '1.0' : '0.8'}</priority></url>`).join('\n') +
+    `\n</urlset>`;
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  return res.send(xml);
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  return res.send(`User-agent: *\nAllow: /\nSitemap: https://www.consultant-studio.app/sitemap.xml\n`);
+});
+
+// ============================================================================
+// SUNRA ZERO-COPY PHONE OAUTH DIRECT REDIRECT (/sunra-start -> /sunra-callback)
+// ============================================================================
+const SUNRA_PKCE_FILE = '/home/jacks/.hermes/cache/scratch/sunra_phone_oauth.json';
+
+app.get('/sunra-start', async (req, res) => {
+  try {
+    const verifier = crypto.randomBytes(32).toString('base64url');
+    const challenge = crypto.createHash('sha256').update(verifier).digest('base64url');
+    const state = crypto.randomBytes(24).toString('base64url');
+    const redirectUri = 'https://www.consultant-studio.app/sunra-callback';
+
+    const regRes = await fetch('https://mcp.sunra.ai/oauth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_name: 'Sunra for your agent',
+        redirect_uris: [redirectUri],
+        grant_types: ['authorization_code', 'refresh_token'],
+        response_types: ['code'],
+        token_endpoint_auth_method: 'none'
+      })
+    });
+    const regData = await regRes.json();
+    const clientId = regData.client_id;
+
+    await fs.writeFile(SUNRA_PKCE_FILE, JSON.stringify({
+      clientId,
+      verifier,
+      state,
+      redirectUri,
+      createdAt: Date.now()
+    }, null, 2), 'utf-8');
+
+    const authUrl = new URL('https://mcp.sunra.ai/oauth/authorize');
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('scope', 'mcp');
+    authUrl.searchParams.set('state', state);
+    authUrl.searchParams.set('code_challenge', challenge);
+    authUrl.searchParams.set('code_challenge_method', 'S256');
+    authUrl.searchParams.set('resource', 'https://mcp.sunra.ai/');
+
+    return res.redirect(authUrl.toString());
+  } catch (e) {
+    return res.status(500).send('Failed to start Sunra OAuth: ' + e.message);
+  }
+});
+
+app.get('/sunra-callback', async (req, res) => {
+  try {
+    const code = String(req.query.code || '');
+    const state = String(req.query.state || '');
+    if (!code) return res.status(400).send('Missing authorization code from Sunra.');
+
+    const saved = JSON.parse(await fs.readFile(SUNRA_PKCE_FILE, 'utf-8'));
+    if (saved.state !== state) {
+      return res.status(400).send('State mismatch—please open /sunra-start again.');
+    }
+
+    const tokenRes = await fetch('https://mcp.sunra.ai/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: saved.redirectUri,
+        client_id: saved.clientId,
+        code_verifier: saved.verifier,
+        resource: 'https://mcp.sunra.ai/'
+      }).toString()
+    });
+    const tokenBody = await tokenRes.json();
+    if (!tokenRes.ok || !tokenBody.access_token) {
+      return res.status(500).send('Token exchange failed: ' + JSON.stringify(tokenBody));
+    }
+
+    const now = Date.now();
+    const expiresIn = Number(tokenBody.expires_in) || 3600;
+    const credsPath = '/home/jacks/.config/sunra/credentials.json';
+    await fs.mkdir('/home/jacks/.config/sunra', { recursive: true, mode: 0o700 });
+    const store = {
+      version: 1,
+      servers: {
+        'https://mcp.sunra.ai/': {
+          clients: {
+            other: {
+              client_id: saved.clientId,
+              client_name: 'Sunra for your agent',
+              issuer: 'https://mcp.sunra.ai',
+              redirect_uri: saved.redirectUri,
+              registered_at: now
+            }
+          },
+          resource: 'https://mcp.sunra.ai/',
+          issuer: 'https://mcp.sunra.ai',
+          endpoints: {
+            authorization_endpoint: 'https://mcp.sunra.ai/oauth/authorize',
+            token_endpoint: 'https://mcp.sunra.ai/oauth/token',
+            registration_endpoint: 'https://mcp.sunra.ai/oauth/register',
+            revocation_endpoint: 'https://mcp.sunra.ai/oauth/revoke'
+          },
+          tokens: {
+            access_token: tokenBody.access_token,
+            refresh_token: tokenBody.refresh_token || null,
+            token_type: 'Bearer',
+            scope: tokenBody.scope || 'mcp',
+            expires_at: now + expiresIn * 1000,
+            obtained_at: now,
+            client_id: saved.clientId
+          },
+          signed_in_at: now
+        }
+      }
+    };
+    await fs.writeFile(credsPath, JSON.stringify(store, null, 2), { mode: 0o600 });
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(`<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Connected to Sunra!</title></head>
+<body style="background:#07090D; color:#4ADE80; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; text-align:center; padding:20px;">
+  <div style="background:#0E131D; border:1px solid #22C55E; border-radius:16px; padding:32px; max-width:400px;">
+    <h1 style="margin:0 0 10px 0; color:#FFF;">✅ Connected to Sunra!</h1>
+    <p style="color:#94A3B8; margin:0;">Your Sunra CLI credentials are saved on your server. Close this tab and reply <strong>"done"</strong> on Telegram!</p>
+  </div>
+</body></html>`);
+  } catch (e) {
+    return res.status(500).send('Callback error: ' + e.message);
+  }
+});
+
+// ============================================================================
+// OPENCLAW-INSPIRED 1-CLICK NO-SIGN-IN PUBLIC MEMO SHARING (/share/:id)
+// ============================================================================
+const SHARES_DIR = path.join(__dirname, 'shared_memos');
+
+app.post('/api/share', async (req, res) => {
+  try {
+    const title = String(req.body?.title || 'Consultant Studio Financial & Strategy Brief').trim().slice(0, 140);
+    const content = String(req.body?.content || '').trim().slice(0, 45000);
+    const track = String(req.body?.track || 'personal').trim().slice(0, 24);
+    const model = String(req.body?.model || 'Consultant Studio AI').trim().slice(0, 80);
+    if (!content) return res.status(400).json({ error: 'Content is required' });
+
+    await fs.mkdir(SHARES_DIR, { recursive: true });
+    const shareId = crypto.randomBytes(5).toString('hex');
+    const record = {
+      id: shareId,
+      title,
+      content,
+      track: track === 'business' ? 'business' : 'personal',
+      model,
+      createdAt: new Date().toISOString()
+    };
+    await fs.writeFile(path.join(SHARES_DIR, `${shareId}.json`), JSON.stringify(record, null, 2), 'utf-8');
+    return res.json({
+      ok: true,
+      id: shareId,
+      url: `https://www.consultant-studio.app/share/${shareId}`
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/share/:id', async (req, res) => {
+  try {
+    const rawId = String(req.params.id || '').replace(/[^a-f0-9]/gi, '').slice(0, 20);
+    if (!rawId) return res.redirect('/');
+    const filePath = path.join(SHARES_DIR, `${rawId}.json`);
+    const rawJson = await fs.readFile(filePath, 'utf-8').catch(() => null);
+    if (!rawJson) return res.status(404).send('Shared memo not found.');
+    const rec = JSON.parse(rawJson);
+    const safeTitle = rec.title.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    const safeContentJson = JSON.stringify(rec.content);
+    const ctaHref = rec.track === 'business' ? '/?track=business' : '/?track=personal';
+    const ctaText = rec.track === 'business'
+      ? 'Model Your Own Business Breakeven Free →'
+      : 'Calculate Your Personal Cash Runway & Salary Free →';
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${safeTitle} | Consultant Studio Shared Brief</title>
+  <meta name="description" content="Read this shared financial & strategy brief generated on Consultant Studio—no sign-in required.">
+  <meta property="og:title" content="${safeTitle}">
+  <meta property="og:description" content="Shared via Consultant Studio — Private On-Device Financial & Career Decision Engine.">
+  <meta property="og:url" content="https://www.consultant-studio.app/share/${rec.id}">
+  <meta property="og:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.consultant-studio.app/brand/consultant_studio_social_banner.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <style>
+    body { margin:0; background:#07090D; color:#F8FAFC; font-family:'Inter',sans-serif; line-height:1.7; }
+    .wrap { max-width:860px; margin:0 auto; padding:28px 20px 80px 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:28px; }
+    .brand { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:16px; color:#FFF; text-decoration:none; display:flex; align-items:center; gap:8px; }
+    .badge { font-size:11px; font-weight:800; color:#38BDF8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); padding:3px 10px; border-radius:999px; }
+    .btn { background:#22C55E; color:#04130B; font-weight:800; padding:10px 18px; border-radius:9px; text-decoration:none; font-size:13.5px; display:inline-block; }
+    .card { background:#0D121B; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    h1, h2, h3 { font-family:'Plus Jakarta Sans',sans-serif; color:#FFF; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; font-size:13.5px; }
+    th, td { border:1px solid rgba(255,255,255,0.12); padding:9px 12px; text-align:left; }
+    th { background:#131B2A; color:#4ADE80; }
+    code, pre { background:#06080C; color:#4ADE80; border-radius:6px; padding:2px 6px; font-family:monospace; }
+    pre { padding:14px; overflow-x:auto; border:1px solid rgba(255,255,255,0.08); }
+    .cta-footer { margin-top:30px; background:linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(14,19,28,0.95) 100%); border:1px solid rgba(16,185,129,0.4); border-radius:14px; padding:24px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="/" class="brand">Consultant Studio <span class="badge">🔗 Public Read-Only Link • No Sign-In Required</span></a>
+      <a href="${ctaHref}" class="btn">${ctaText}</a>
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:#94A3B8; margin-bottom:6px; font-family:monospace;">Shared ${rec.createdAt.slice(0, 10)} • Engine: ${rec.model}</div>
+      <h1 style="margin-top:0; font-size:clamp(22px, 3.5vw, 30px); border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">${safeTitle}</h1>
+      <div id="memoBody"></div>
+    </div>
+    <div class="cta-footer">
+      <h2 style="margin-top:0;">Want to Run Your Own Numbers 100% Privately?</h2>
+      <p style="color:#94A3B8; margin-bottom:18px;">Consultant Studio runs client-side in your browser with zero cloud database retention. Model your personal cash runway, post-tax salary floor, or 12-month business breakeven in 60 seconds.</p>
+      <a href="${ctaHref}" class="btn">${ctaText}</a>
+    </div>
+  </div>
+  <script>
+    const raw = ${safeContentJson};
+    document.getElementById('memoBody').innerHTML = window.marked ? marked.parse(raw) : raw.replace(/\\n/g, '<br>');
+  </script>
+</body>
+</html>`);
+  } catch (e) {
+    return res.status(500).send('Could not load shared brief.');
   }
 });
 

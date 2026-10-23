@@ -12,14 +12,14 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "@tavily/core": "^0.7.8",
+    "@tavily/core": "^0.7.14",
     "apify-client": "^2.25.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "node-fetch": "^3.3.2",
     "nodemailer": "^9.1.1",
-    "resend": "^6.25.0",
-    "stripe": "^22.6.1"
+    "resend": "^6.32.1",
+    "stripe": "^23.0.0"
   }
 }

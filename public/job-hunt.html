@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Hunt OS — Tailored Resume & Interview Kit | Consultant Studio</title>
+<meta name="description" content="Paste any job description. Get a 1-page ATS-matched resume and a printable interview battle card in under 2 minutes.">
+<link rel="icon" href="/brand/gold_coin_emblem.webp">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050807;
+    --surface: #0B1210;
+    --surface-2: #0E131C;
+    --border: rgba(255,255,255,0.12);
+    --text: #F8FAFC;
+    --text-2: #CBD5E1;
+    --text-3: #94A3B8;
+    --gold: #F59E0B;
+    --gold-lt: #FBBF24;
+    --emerald: #10B981;
+    --emerald-lt: #4ADE80;
+    --violet: #A855F7;
+    --violet-lt: #C084FC;
+    --sky: #38BDF8;
+  }
+  [data-theme="light"] {
+    --bg: #F6F8FA; --surface: #FFFFFF; --surface-2: #F1F5F9;
+    --border: rgba(15,23,42,0.14); --text: #0F172A; --text-2: #334155; --text-3: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1100px 520px at 78% -12%, rgba(16,185,129,0.13), transparent 62%),
+                radial-gradient(900px 460px at 12% -8%, rgba(245,158,11,0.11), transparent 60%),
+                var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh; padding: 28px 18px 64px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
+  .brand img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--gold-lt); }
+  .brand-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 10.5px; font-weight: 700; color: var(--emerald-lt); text-transform: uppercase; letter-spacing: 0.07em; }
+  .back { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--text-3); text-decoration: none;
+          border: 1px solid var(--border); padding: 7px 13px; border-radius: 9px; }
+  .back:hover { color: var(--text); border-color: var(--gold); }
+  h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(26px, 4.6vw, 40px); font-weight: 800;
+       letter-spacing: -0.03em; line-height: 1.12; margin-bottom: 8px; }
+  h1 .g { background: linear-gradient(135deg, #FDE68A, #F59E0B); -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent; }
+  .lede { color: var(--text-2); font-size: 14.5px; line-height: 1.5; max-width: 660px; margin-bottom: 22px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+  .card.gold { border-color: rgba(245,158,11,0.35); }
+  .card.violet { border-color: rgba(168,85,247,0.35); }
+  label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+          color: var(--gold-lt); margin-bottom: 6px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .row > div { flex: 1; min-width: 190px; }
+  input, textarea {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 10px; font-family: inherit; font-size: 13.5px; outline: none;
+  }
+  input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 190px; line-height: 1.5; }
+  .go {
+    width: 100%; background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; border: none;
+    padding: 15px 20px; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+    font-size: 15px; cursor: pointer; box-shadow: 0 10px 28px rgba(168,85,247,0.3);
+  }
+  .go:disabled { opacity: 0.6; cursor: progress; }
+  .status { display: none; margin-top: 14px; padding: 14px; border-radius: 11px; font-size: 13px; line-height: 1.55; }
+  .status.show { display: block; }
+  .status.busy { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.4); color: var(--violet-lt); }
+  .status.done { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.4); color: var(--text-2); }
+  .status.err { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.45); color: #FCA5A5; }
+  .status b { color: var(--text); }
+  .score { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--emerald-lt); font-size: 17px; }
+  .dl { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .dl a { display: inline-flex; align-items: center; gap: 7px; padding: 10px 15px; border-radius: 10px;
+          font-size: 13px; font-weight: 800; text-decoration: none; border: 1px solid; transition: transform .15s ease; }
+  .dl a:hover { transform: translateY(-1px); }
+  .dl .pdf { background: rgba(245,158,11,0.13); border-color: rgba(245,158,11,0.5); color: var(--gold-lt); }
+  .dl .doc { background: rgba(245,158,11,0.13); border-color: rgba(245,158,11,0.5); color: var(--gold-lt); }
+  .dl .card-dl { background: rgba(16,185,129,0.13); border-color: rgba(16,185,129,0.5); color: var(--emerald-lt); }
+  .dl .sc { background: rgba(56,189,248,0.13); border-color: rgba(56,189,248,0.5); color: var(--sky); }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 6px; }
+  .step { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 13px; }
+  .step .n { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; color: var(--gold-lt); }
+  .step .t { font-size: 13px; font-weight: 800; margin: 4px 0 3px; }
+  .step .d { font-size: 11.5px; color: var(--text-3); line-height: 1.45; }
+  .note { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin-top: 10px; }
+  .kpis { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .kpi { flex: 1; min-width: 130px; background: var(--surface-2); border: 1px solid var(--border);
+         border-radius: 11px; padding: 11px 13px; }
+  .kpi .v { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 800; color: var(--emerald-lt); }
+  .kpi .l { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img src="/brand/gold_coin_emblem.webp" alt="Consultant Studio">
+    <div>
+      <div class="brand-name">Consultant Studio</div>
+      <div class="brand-sub">Job Hunt OS</div>
+    </div>
+    <a class="back" href="/">← Back to Studio</a>
+  </div>
+
+  <h1>Where’s Your Money Going To?<br><span class="g">Get the job that answers it.</span></h1>
+  <p class="lede">
+    Paste any job posting. In under 2 minutes you get a <b>1-page ATS-matched resume</b>,
+    a <b>printable interview battle card</b> written for that exact role, and a
+    <b>keyword gap scorecard</b>. Every employer, date, and number stays 100% truthful.
+  </p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">1 page</div><div class="l">ATS Resume</div></div>
+    <div class="kpi"><div class="v">4 STAR</div><div class="l">Interview Stories</div></div>
+    <div class="kpi"><div class="v">~2 min</div><div class="l">Turnaround</div></div>
+    <div class="kpi"><div class="v">0 fake</div><div class="l">Metrics</div></div>
+  </div>
+
+  <div class="card gold">
+    <label for="jd">1 · Paste the Job Description</label>
+    <textarea id="jd" placeholder="Paste the full job posting here — title, responsibilities, qualifications, and salary band. The more complete the posting, the tighter the ATS keyword match."></textarea>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="company">2 · Company</label>
+        <input type="text" id="company" placeholder="e.g. Tallahassee Logistics Hub">
+      </div>
+      <div>
+        <label for="role">3 · Target Role Title</label>
+        <input type="text" id="role" placeholder="e.g. Operations & Supply Chain Analyst">
+      </div>
+    </div>
+    <button class="go" id="goBtn" onclick="run()">⚡ Build My Application Kit</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card violet">
+    <label>What You Get</label>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div class="t">ATS Match Scorecard</div>
+        <div class="d">Your match %, the exact keywords this employer screens for, and how your real experience covers each one.</div></div>
+      <div class="step"><div class="n">02</div><div class="t">Tailored 1-Page Resume</div>
+        <div class="d">Headline, summary, competencies, and bullets rewritten in the employer’s own language. Auto-fits to one page.</div></div>
+      <div class="step"><div class="n">03</div><div class="t">Interview Battle Card</div>
+        <div class="d">Opening pitch, 4 targeted STAR stories, curveball defense, salary anchor, and 3 reverse questions.</div></div>
+      <div class="step"><div class="n">04</div><div class="t">Saved &amp; Backed Up</div>
+        <div class="d">Every file lands in your Windows Downloads, your Resumes folder, and your private Cua Volume backup.</div></div>
+    </div>
+    <p class="note">🔒 Your job description is processed in memory and never stored or trained on. Only your own verified resume facts are ever written to disk.</p>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function setStatus(cls, html) {
+    const el = $('status');
+    el.className = 'status show ' + cls;
+    el.innerHTML = html;
+  }
+
+  async function run() {
+    const jd = $('jd').value.trim();
+    const company = $('company').value.trim() || 'Target Company';
+    const role = $('role').value.trim() || 'Target Role';
+    if (jd.length < 40) {
+      setStatus('err', '⚠️ Paste the full Job Description first (at least a few lines).');
+      $('jd').focus();
+      return;
+    }
+    const btn = $('goBtn');
+    btn.disabled = true;
+    btn.textContent = '⚡ Building your kit… (~2 min)';
+    setStatus('busy', '<b>⚡ Building your Application Kit…</b><br>Matching ATS keywords, tailoring your 1-page resume, and scripting your interview answers. This takes about 2 minutes — stay on this page.');
+
+    try {
+      const res = await fetch('/api/job-hunt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jd, company, role })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Build failed');
+      const a = data.artifacts || {};
+      const link = (href, label, cls) => href
+        ? `<a class="${cls}" href="${href}" download>${label}</a>` : '';
+      setStatus('done', `
+        <b>✅ Application Kit ready${data.atsScore ? ` — ATS Match <span class="score">${data.atsScore}%</span>` : ''}</b><br>
+        <span style="color:var(--text-3)">Tailored to <b style="color:var(--text)">${escapeHtml(role)}</b> at <b style="color:var(--text)">${escapeHtml(company)}</b>. Also saved to your Windows Downloads folder.</span>
+        <div class="dl">
+          ${link(a.resumePdf, '📄 Tailored Resume (.pdf)', 'pdf')}
+          ${link(a.resumeDocx, '📝 Editable Resume (.docx)', 'doc')}
+          ${link(a.interviewCard, '🎙️ Interview Battle Card (.pdf)', 'card-dl')}
+          ${link(a.scorecard, '📊 ATS Scorecard (.md)', 'sc')}
+        </div>`);
+    } catch (err) {
+      setStatus('err', `⚠️ ${escapeHtml(err.message || 'Build failed')}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '⚡ Build My Application Kit';
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+</script>
+</body>
+</html>
